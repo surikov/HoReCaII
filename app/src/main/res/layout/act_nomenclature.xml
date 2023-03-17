@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#E3E3E3"
+    android:orientation="vertical" >
+
+    <TabHost
+        android:id="@+id/tab_host"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/layout_bottom" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" >
+
+                <include
+                    android:id="@+id/nomenclaturetab"
+                    layout="@layout/tab_nomenclature" />
+
+                <include
+                    android:id="@+id/searchtab"
+                    layout="@layout/tab_search" />
+
+                <include
+                    android:id="@+id/historytab"
+                    layout="@layout/tab_history" />
+ <!--
+                <include
+                    android:id="@+id/maxpricetab"
+                    layout="@layout/tab_extra" />
+
+                <include
+                    android:id="@+id/crtab"
+                    layout="@layout/tab_cr" />
+                -->
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
+    <RelativeLayout
+        android:id="@+id/layout_bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+         >
+
+        <TextView
+            android:id="@+id/text_order_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dip"
+            android:layout_alignParentLeft="true" />
+	    <!--<Button
+            android:id="@+id/btn_requestSklad"
+            android:layout_width="250dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="757dip"
+            android:text="Доступные остатки" />-->
+        <Button
+            android:id="@+id/btn_requestCertifikat"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="607dip"
+            android:text="Сертификат" />
+        <Button
+            android:id="@+id/btn_requestPrice"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="407dip"
+            android:text="Запрос цен" />
+		<Button
+            android:id="@+id/btn_show_photo"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="207dip"
+            android:text="Фото" />
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="200dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="7dip"
+            android:text="@string/add" />
+        
+    </RelativeLayout>
+
+</RelativeLayout>

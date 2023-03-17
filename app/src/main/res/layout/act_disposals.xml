@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#E3E3E3" >
+
+    <include
+        android:id="@+id/bar_period"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="20dip"
+        android:layout_marginTop="10dip"
+        layout="@layout/bar_period" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/bar_period"
+        android:layout_above="@+id/btn_add_disposal" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent" >
+
+            <include
+                android:id="@+id/list_header"
+                layout="@layout/header_disposals" />
+
+            <ListView
+                android:id="@+id/list_disposals"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/list_header"
+                android:cacheColorHint="#00000000"
+                android:dividerHeight="0dip" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+        <Button
+        android:id="@+id/btn_add_disposal"
+        android:layout_width="250dip"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="@string/add" />
+    
+</RelativeLayout>

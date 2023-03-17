@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dip" >
+
+    <LinearLayout
+        android:id="@+id/layout_period"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" >
+
+        <TextView
+            android:id="@+id/text_from_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dip"
+            android:text="@string/period_since" />
+
+        <EditText
+            android:id="@+id/edit_from_date"
+            android:layout_width="match_parent"
+            android:layout_height="48dip"
+            android:editable="false"
+            android:focusable="false"
+            android:layout_weight="1"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btn_from_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/point_point_point" />
+
+        <TextView
+            android:id="@+id/text_to_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:text="@string/period_till" />
+
+        <EditText
+            android:id="@+id/edit_to_date"
+            android:layout_width="match_parent"
+            android:layout_height="48dip"
+            android:editable="false"
+            android:layout_weight="1"
+            android:focusable="false"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btn_to_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/point_point_point" />
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/check_only_not_completed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/layout_period"
+        android:text="@string/only_not_completed"
+        android:layout_marginTop="10dip" />
+
+    <Button
+        android:id="@+id/btn_generate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/check_only_not_completed"
+        android:layout_marginTop="10dip"
+        android:text="@string/generate_report" />
+
+</RelativeLayout>

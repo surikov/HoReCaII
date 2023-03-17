@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1" >
+
+    <TextView
+        android:id="@+id/row_date"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_marginLeft="7dip"
+        android:layout_weight=".1" />
+
+    <TextView
+        android:id="@+id/row_time"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight=".4" />
+
+    <TextView
+        android:id="@+id/row_shirota"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight=".25" />
+
+    <TextView
+        android:id="@+id/row_dolgota"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight=".25" />
+
+</LinearLayout>

@@ -1,0 +1,399 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="sweetlife.android10">
+<!--
+	<application
+		android:allowBackup="true"
+		android:icon="@mipmap/ic_launcher"
+		android:label="@string/app_name"
+		android:roundIcon="@mipmap/ic_launcher_round"
+		android:supportsRtl="true"
+		android:theme="@style/AppTheme" />
+-->
+	<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+	<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+	<application
+		android:name="sweetlife.android10.ApplicationHoreca"
+		android:allowBackup="true"
+		android:icon="@drawable/svlogoshadow"
+		android:label="@string/app_name"
+		android:networkSecurityConfig="@xml/network_security_config"
+		android:requestLegacyExternalStorage="true"
+		android:roundIcon="@drawable/svlogoshadow"
+		android:supportsRtl="true"
+		android:extractNativeLibs="true"
+		android:theme="@style/AppTheme"
+		android:usesCleartextTraffic="true"
+		>
+		<service
+			android:name="sweetlife.android10.UpdateApk"
+			android:exported="false"></service>
+		<receiver
+			android:name="sweetlife.android10.SweetStart"
+			android:enabled="true">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+			</intent-filter>
+		</receiver>
+		<!--
+		<activity
+			android:name=".supervisor.ActivityYandexMapKontragent"
+			android:label="ActivityYandexMapKontragent"
+			android:theme="@style/ThemeLight.NoActionBar"></activity>
+
+		<activity
+			android:name=".supervisor.ActivityCarDelivery"
+			android:label="@string/title_activity_car_delivery"
+			android:theme="@style/ThemeLight.NoActionBar"></activity>
+		-->
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityYandexMapKontragent"
+			android:label="ActivityYandexMapKontragent"></activity>
+
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityCarDelivery"
+			android:label="@string/title_activity_car_delivery"></activity>
+		<!-- android:theme="@style/AppTheme" -->
+
+		<service
+			android:name="sweetlife.android10.HRCFirebaseMessagingService"
+			android:exported="false">
+			<intent-filter>
+				<action android:name="com.google.firebase.MESSAGING_EVENT" />
+			</intent-filter>
+		</service>
+
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Login"
+			android:label="@string/app_name"
+
+			android:exported="false"
+
+			android:screenOrientation="userLandscape">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<!--
+		<activity
+			android:name=".ui.Activity_Route"
+			android:screenOrientation="userLandscape" />
+			-->
+		<!--
+		<activity
+			android:name=".ui.Activity_Base"
+			android:screenOrientation="userLandscape"
+			 />
+		-->
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Update"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Bid"
+			android:screenOrientation="userLandscape"
+			android:windowSoftInputMode="stateHidden" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_BidsContractsEtc"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_BidsContractsEtc_2"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_NomenclatureSimple"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Trafiks"
+			android:screenOrientation="userLandscape"
+			android:windowSoftInputMode="stateHidden" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Services"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Nomenclature"
+			android:screenOrientation="userLandscape"
+			android:windowSoftInputMode="stateHidden" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_NomenclatureNew"
+			android:screenOrientation="userLandscape"
+			android:windowSoftInputMode="stateHidden" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Returns"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Disposals"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_FixedPrices"
+			android:screenOrientation="userLandscape"
+			android:windowSoftInputMode="stateHidden" />
+		<activity
+			android:name="sweetlife.android10.ui.Dialog_EditDisposal"
+			android:screenOrientation="userLandscape"
+			android:windowSoftInputMode="stateHidden" />
+		<activity
+			android:name="sweetlife.android10.ui.Dialog_Upload"
+			android:screenOrientation="userLandscape" />
+		<!--
+		<activity
+			android:name=".ui.Dialog_Update"
+			android:screenOrientation="userLandscape"
+			 />
+		-->
+		<activity
+			android:name="sweetlife.android10.ui.Dialog_Documents"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_UploadFixedPrices"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_UploadReturns"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_GpsInfo"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Doc_GPS_Points"
+			android:screenOrientation="userLandscape" />
+		<!--
+		<activity
+			android:name=".ui.Activity_Doc_GPS_Points_2"
+			android:screenOrientation="userLandscape"
+			 />
+		-->
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Doc_Visits"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Doc_Orders"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Doc_Bids"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_UploadBids"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportDialog"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportBalance"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportShowReport"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportStatistics"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportDate"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportOrderState"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportTrafiks"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportKPI"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReportPredzakazTrafik"
+			android:screenOrientation="userLandscape" />
+		<!--
+		<activity
+			android:name=".reports.ActivityReports"
+			android:screenOrientation="userLandscape"
+			 />
+		-->
+		<activity
+			android:name="sweetlife.android10.reports.ActivityPhoto"
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityWebServicesReports"
+			android:screenOrientation="userLandscape" />
+
+		<service
+			android:name="sweetlife.android10.gps.SWLifeGpsService"
+			android:enabled="true"
+			android:exported="false"
+			android:screenOrientation="userLandscape" />
+
+		<activity
+			android:name="sweetlife.android10.ui.Activity_BidSpecificaciya"
+			android:label="@string/title_activity_activity__bid_specificaciya"
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.ui.Activity_BidDegustacia"
+			android:label="Activity_BidDegustacia"
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Route_2"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Pechati"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityMatricaList"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityMatricaEdit"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityMatricaKontragent"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityMatricaDay"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityGPSMap"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityLimitList"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityLimitEdit"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityLimitDogovor"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityVseAnketi"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityOdnaAnketa"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityOdnaAnketaContact"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityZapiski"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityZapiska"
+			android:label="..."
+			android:screenOrientation="userLandscape"></activity>
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityPoKassamDlyaTPAll"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityPoKassamDlyaTPOne"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityPlanObucheniaAll"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityPlanObucheniaOne"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityCheckList"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityCheckDayPodr"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityCheckList2"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityCheckDocs"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityZayavkaVozmehenie"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityKartaKlienta"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityKartaKlientaEdit"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_DannieMercuryAll"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_DannieMercuryOne"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.Activity_IzmenitMarshrutList"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.Activity_IzmenitMarshrutOne"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityKartochkaKlienta"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityZayavkaIzmenenieNakladnoy"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_ReceptChooser"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_FlagmanChooser"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityZayavkaNaPostavku"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.Activity_Listovka"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityKlientPeople"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.Activity_YandexMap"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.Activity_FireBaseMessages"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityWebView"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.ActivityMenuKlienta"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
+	</application>
+</manifest>

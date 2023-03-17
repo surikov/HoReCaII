@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <Button
+        android:id="@+id/head_btn_number"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.05"
+        android:text="№" />
+
+    <Button
+        android:id="@+id/head_btn_article"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.1"
+        android:text="@string/article" />
+
+    <Button
+        android:id="@+id/head_btn_nomenclature"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.3"
+        android:text="@string/nomenclature" />
+
+    <Button
+        android:id="@+id/head_btn_date"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.15"
+        android:text="@string/date" />
+
+    <Button
+        android:id="@+id/head_btn_count"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.1"
+        android:text="@string/count" />
+
+    <Button
+        android:id="@+id/head_btn_unit"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.1"
+        android:text="@string/ed" />
+
+    <Button
+        android:id="@+id/head_btn_min_count"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.1"
+        android:text="@string/min_count" />
+
+    <Button
+        android:id="@+id/head_btn_place_count"
+        android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.1"
+        android:text="@string/k_mest" />
+
+</LinearLayout>

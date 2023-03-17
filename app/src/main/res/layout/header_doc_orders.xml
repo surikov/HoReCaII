@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <Button
+        android:id="@+id/head_order_btn_date"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight=".1"
+        android:text="@string/head_order_btn_date" />
+
+    <Button
+        android:id="@+id/head_order_btn_number"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight=".1"
+        android:text="@string/head_order_btn_number" />
+
+    <Button
+        android:id="@+id/head_order_btn_kontragent"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight=".25"
+        android:text="@string/head_order_btn_kontragent" />
+
+    <Button
+        android:id="@+id/head_order_btn_type_payment"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight=".12"
+        android:text="@string/head_order_btn_type_payment" />
+
+    <Button
+        android:id="@+id/head_order_btn_document_summ"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight=".08"
+        android:text="@string/head_order_btn_document_summ" />
+
+    <Button
+        android:id="@+id/head_order_btn_date_shipment"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight=".1"
+        android:text="@string/head_order_btn_date_shipment"
+        android:textSize="7pt" />
+
+    <Button
+        android:id="@+id/head_order_btn_comments"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight=".25"
+        android:text="@string/head_order_btn_comments" />
+
+</LinearLayout>

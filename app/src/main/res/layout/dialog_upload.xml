@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dip" 
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/btn_gps_data"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/gps_data" />
+
+    <Button
+        android:id="@+id/btn_bids"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:text="@string/bids" />
+
+    <Button
+        android:id="@+id/btn_fixed_prices"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:text="@string/fixed_prices" />
+ 
+    <Button
+        android:id="@+id/btn_returns"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:text="@string/returns_for_clients" />
+
+</LinearLayout>

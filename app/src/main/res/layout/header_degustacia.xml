@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1" >
+
+    <Button
+        android:id="@+id/head_btn_uploaded"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.09"
+        android:text="@string/uploaded" />
+
+    <Button
+        android:id="@+id/head_btn_number"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.1"
+        android:text="@string/number" />
+
+    <Button
+        android:id="@+id/head_btn_date"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.12"
+        android:text="Дата отгр." />
+
+    <Button
+        android:id="@+id/head_btn_kontragent"
+		android:layout_height="40dip" android:layout_width="0dip"
+        android:layout_weight="0.57"
+        android:text="Комментарий" />
+
+   
+    
+</LinearLayout>

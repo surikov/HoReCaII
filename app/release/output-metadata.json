@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "sweetlife.android10",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "properties": [],
+      "versionCode": 1021,
+      "versionName": "3.10.21",
+      "enabled": true,
+      "outputFile": "app-armeabi-v7a-release.apk"
+    }
+  ]
+}

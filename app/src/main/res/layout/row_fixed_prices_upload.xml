@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/row"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1" >
+
+    <TextView
+        android:id="@+id/text_number"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_marginLeft="7dip"
+        android:layout_weight="0.1" />
+
+    <TextView
+        android:id="@+id/text_date"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight="0.12" />
+
+    <TextView
+        android:id="@+id/text_kontragent"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight="0.3" />
+
+    <TextView
+        android:id="@+id/text_date_since"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight="0.12" />
+
+    <TextView
+        android:id="@+id/text_date_till"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight="0.12" />
+
+    <TextView
+        android:id="@+id/text_comment"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight="0.16" />
+
+    <ImageView
+        android:id="@+id/image_upload"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="0.09"
+        android:contentDescription="@string/upload" />
+
+</LinearLayout>

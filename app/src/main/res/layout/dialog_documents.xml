@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dip" >
+
+    <Button
+        android:id="@+id/btn_visits"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/visits_tp" />
+<!-- 
+    <Button
+        android:id="@+id/btn_orders"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_visits"
+        android:layout_centerHorizontal="true"
+        android:text="@string/doc_orders" />
+-->
+    <Button
+        android:id="@+id/btn_bids"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_visits"
+        android:layout_centerHorizontal="true"
+        android:text="@string/doc_bids" />
+ 
+    <Button
+        android:id="@+id/btn_gps_points"
+        android:layout_width="500dip"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_bids"
+        android:layout_centerHorizontal="true"
+        android:text="@string/doc_gps_points" />
+
+</RelativeLayout>

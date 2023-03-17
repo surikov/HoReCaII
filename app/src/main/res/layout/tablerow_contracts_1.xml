@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contracts_tablerow_1"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="1" >
+
+    <TextView
+        android:id="@+id/text_date"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_marginLeft="7dip"
+        android:layout_weight="0.25" />
+
+    <TextView
+        android:id="@+id/text_document"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight="0.5" />
+
+    <TextView
+        android:id="@+id/text_amount"
+        android:layout_width="0px" android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_weight="0.25" />
+
+</TableRow>

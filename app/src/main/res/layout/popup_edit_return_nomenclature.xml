@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroller"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:drawable/alert_light_frame"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/text_nomenclature"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dip"
+        android:layout_marginRight="7dip"
+        android:layout_marginTop="10dip"
+        android:ellipsize="end"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/text_count"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dip"
+        android:layout_marginRight="7dip"
+        android:layout_marginTop="7dip"
+        android:text="@string/count" />
+
+    <EditText
+        android:id="@+id/edit_count"
+        android:layout_width="600dp"
+        android:layout_height="match_parent"
+        android:layout_margin="9dip"
+        android:editable="false"
+        android:focusable="false"
+        android:inputType="none" />
+
+    <TextView
+        android:id="@+id/text_bill_number"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dip"
+        android:layout_marginRight="7dip"
+        android:text="@string/bill_number" />
+
+    <EditText
+        android:id="@+id/edit_bill_number"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="9dip"
+        android:editable="false"
+        android:focusable="false"
+        android:inputType="none" />
+
+    <TextView
+        android:id="@+id/text_bill_date"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dip"
+        android:layout_marginRight="7dip"
+        android:text="@string/bill_date" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="9dip"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/edit_returns_date"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:editable="false"
+            android:focusable="false"
+            android:inputType="text" 
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/btn_returns_date"/>
+
+        <Button
+            android:id="@+id/btn_returns_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/point_point_point"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dip"
+        android:layout_marginLeft="8dip"
+        android:layout_marginRight="8dip"
+        layout="@layout/popup_buttons" />
+
+</LinearLayout>
