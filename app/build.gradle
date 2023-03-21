@@ -8,8 +8,8 @@ android {
 		applicationId "sweetlife.android10"
 		minSdkVersion 29
 		targetSdkVersion 29
-		versionCode 1021
-		versionName "3.10.21"
+		versionCode 1023
+		versionName "3.10.23"
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 	}

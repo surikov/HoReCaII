@@ -28,6 +28,7 @@
 		android:theme="@style/AppTheme"
 		android:usesCleartextTraffic="true"
 		>
+
 		<service
 			android:name="sweetlife.android10.UpdateApk"
 			android:exported="false"></service>
@@ -70,7 +71,7 @@
 			android:name="sweetlife.android10.ui.Activity_Login"
 			android:label="@string/app_name"
 
-			android:exported="false"
+			android:exported="true"
 
 			android:screenOrientation="userLandscape">
 			<intent-filter>
