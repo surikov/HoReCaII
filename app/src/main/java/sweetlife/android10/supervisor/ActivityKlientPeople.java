@@ -649,7 +649,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 								}).labelText.is("...").top().is(Auxiliary.tapSize * 6.75).left().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 1).height().is(Auxiliary.tapSize * 1)
 						)
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 9)//
+						.height().is(Auxiliary.tapSize * 11)//
 
 
 				, "Отправить", new Task() {

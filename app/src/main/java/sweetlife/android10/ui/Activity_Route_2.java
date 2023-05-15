@@ -44,6 +44,7 @@ public class Activity_Route_2 extends Activity {
 	ColumnText columnCh;
 	ColumnText columnPt;
 	ColumnText columnSb;
+	ColumnText columnMenu;
 	//public static int lastGridY=0;
 	//public static int lastGridOffset=0;
 	//ColumnText columnToDen;
@@ -248,13 +249,14 @@ public class Activity_Route_2 extends Activity {
 		columnCh = new ColumnText();
 		columnPt = new ColumnText();
 		columnSb = new ColumnText();
+		columnMenu= new ColumnText();
 		//System.out.println("columnClient "+columnClient);
 		layoutless.child(dataGrid//
 				.headerHeight.is(0.5 * Auxiliary.tapSize)//
 				.columns(new Column[]{//
 						columnKod.title.is("Код").width.is(1.5 * Auxiliary.tapSize)
 						//
-						, columnClient.title.is("Контрагент").width.is(Auxiliary.screenWidth(this) - 4.5 * Auxiliary.tapSize)
+						, columnClient.title.is("Контрагент").width.is(Auxiliary.screenWidth(this) - 5.5 * Auxiliary.tapSize)
 						//
 						,
 						//columnToDen.title.is("план/факт").width.is(1.5 * Auxiliary.tapSize),
@@ -274,6 +276,7 @@ public class Activity_Route_2 extends Activity {
 						//
 						, columnSb.title.is("Сб").width.is(0.5 * Auxiliary.tapSize)
 						//
+						,columnMenu.title.is(" ").width.is(1 * Auxiliary.tapSize)
 				})//
 				.left().is(0)//
 				.top().is(1 * Auxiliary.tapSize)//
@@ -1305,7 +1308,7 @@ I/System.out: </>
 								.width().is(Auxiliary.tapSize * 2.0).height().is(Auxiliary.tapSize * 0.7))//
 						.child(new Decor(this).labelText.is(result.child("result").child("Mail").value.property).labelAlignLeftBottom()
 								.left().is(Auxiliary.tapSize * 2.5).top().is(Auxiliary.tapSize * 0.5)
-								.width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.7))//
+								.width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.7))//
 
 
 						.child(new Decor(this).labelText.is("ФИО").labelAlignRightBottom()
@@ -1314,7 +1317,7 @@ I/System.out: </>
 						.child(new RedactText(this)
 								.text.is(result.child("result").child("FIO").value.property)
 								.left().is(Auxiliary.tapSize * 2.5).top().is(Auxiliary.tapSize * 1.5)
-								.width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.7))//
+								.width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.7))//
 
 
 						.child(new Decor(this).labelText.is("тел.").labelAlignRightBottom()
@@ -1323,10 +1326,10 @@ I/System.out: </>
 						.child(new RedactText(this)
 								.text.is(result.child("result").child("Phone").value.property)
 								.left().is(Auxiliary.tapSize * 2.5).top().is(Auxiliary.tapSize * 2.5)
-								.width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.7))//
+								.width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.7))//
 
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 5)//
+						.height().is(Auxiliary.tapSize *6)//
 				, "Обновить", new Task() {
 					@Override
 					public void doTask() {
@@ -1355,7 +1358,7 @@ I/System.out: </>
 						.child(new RedactDate(this).date.is(dataNakladnoy).format.is("dd.MM.yyyy")
 								.left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 1.5).width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 3)//
+						.height().is(Auxiliary.tapSize * 6)//
 				, "Отправить", new Task() {
 					@Override
 					public void doTask() {
@@ -1508,7 +1511,7 @@ I/System.out: </>
 		//System.out.println("requeryGridData start");
 		gridData.children.removeAllElements();
 		String sql = gridSQL();
-		System.out.println("sql " + sql);
+		//System.out.println("sql " + sql);
 		gridData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		//System.out.println(gridData.dumpXML());
 		//System.out.println("columnClient "+columnClient);
@@ -1533,12 +1536,12 @@ I/System.out: </>
 
 		for (int i = 0; i < gridData.children.size(); i++) {
 			Bough row = gridData.children.get(i);
-			final String k = row.child("Kontragent").value.property.value();
+			final String kk = row.child("Kontragent").value.property.value();
 			Task tapTask = new Task() {
 				public void doTask() {
 					Intent intent = new Intent();
 					intent.setClass(Activity_Route_2.this, Activity_BidsContractsEtc_2.class);
-					intent.putExtra(sweetlife.android10.consts.IExtras.CLIENT_ID, "x'" + k + "'");
+					intent.putExtra(sweetlife.android10.consts.IExtras.CLIENT_ID, "x'" + kk + "'");
 					intent.putExtra(sweetlife.android10.consts.IExtras.CHOOSED_DAY, new java.util.Date().getTime());
 					startActivityForResult(intent, 0);
 				}
@@ -1673,8 +1676,24 @@ I/System.out: </>
 			columnCh.cell(formatDayToggle(row.child("Den4").value.property.value()), bg4, tapTask);
 			columnPt.cell(formatDayToggle(row.child("Den5").value.property.value()), bg5, tapTask);
 			columnSb.cell(formatDayToggle(row.child("Den6").value.property.value()), bg6, tapTask);
+			columnMenu.cell("...",new Task(){
+				public void doTask() {
+
+					Auxiliary.pickConfirm(Activity_Route_2.this,"Распоряжение на отгрузку","Создать",new Task(){
+						public void doTask() {
+							pickRaspOt("x'" + kk + "'");
+						}
+					});
+				}
+			});
 		}
 		//System.out.println("after flipGrid gridOffset "+this.gridOffset.value());
+	}
+	void pickRaspOt(String hexKlient){
+		Intent intent = new Intent();
+		intent.setClass(Activity_Route_2.this, Dialog_EditDisposal.class);
+		intent.putExtra("hexKlient", hexKlient);
+		startActivity(intent);
 	}
 
 	public String gridSQL() {

@@ -84,6 +84,7 @@ public class FixedPricesNomenclatureListAdapter extends ZoomListArrayAdapter {
 			mTextNumber.setText( String.valueOf(tovar.getNomerStroki()) );
 			mTextNumber.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
+
 			mTextArticle.setText( tovar.getArtikul() );
 			mTextArticle.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
@@ -109,6 +110,12 @@ public class FixedPricesNomenclatureListAdapter extends ZoomListArrayAdapter {
 				mTextTovarooborot.setText( DecimalFormatHelper.format(tovar.getObyazatelstva()) );
 			}
 			mTextTovarooborot.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
+
+			mTextNumber.setTextColor(0xff000000);
+			mTextArticle.setTextColor(0xff000000);
+			mTextNomenclature.setTextColor(0xff000000);
+			mTextCena.setTextColor(0xff000000);
+			mTextTovarooborot.setTextColor(0xff000000);
 		}
 	}
 }

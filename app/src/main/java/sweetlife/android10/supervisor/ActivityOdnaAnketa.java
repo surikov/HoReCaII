@@ -330,16 +330,18 @@ public class ActivityOdnaAnketa extends Activity {
 			Auxiliary.warn("Заполните время приёма товара", this);
 			return false;
 		}*/
-		if (PotencialniyKlient.value() != 0) {
-			if (UrFizLico.value() > 4) {//== 5) {
-				if ((INN.value().length() != 12) && (PotencialniyKlient.value() > 0)) {//ne pk
-					Auxiliary.warn("ИНН для физ. лица должен быть из 12 цифр", this);
-					return false;
-				}
-			} else {
-				if ((INN.value().length() != 10) && (PotencialniyKlient.value() > 0)) {//ne pk
-					Auxiliary.warn("ИНН для юр. лица должен быть из 10 цифр", this);
-					return false;
+		if(PKorNew.value()!=0) {
+			if (PotencialniyKlient.value() != 0) {
+				if (UrFizLico.value() > 4) {//== 5) {
+					if ((INN.value().length() != 12) && (PotencialniyKlient.value() > 0)) {//ne pk
+						Auxiliary.warn("ИНН для физ. лица должен быть из 12 цифр", this);
+						return false;
+					}
+				} else {
+					if ((INN.value().length() != 10) && (PotencialniyKlient.value() > 0)) {//ne pk
+						Auxiliary.warn("ИНН для юр. лица должен быть из 10 цифр", this);
+						return false;
+					}
 				}
 			}
 		}
@@ -1037,8 +1039,8 @@ public class ActivityOdnaAnketa extends Activity {
 			final Note msg = new Note();
 			final Note status = new Note();
 			final Note ok = new Note();
-			/*System.out.println(json);
-			System.out.println(url);
+			System.out.println(json);
+			/*System.out.println(url);
 			System.out.println(Cfg.whoCheckListOwner());
 			System.out.println(Cfg.hrcPersonalPassword());*/
 			Expect expect = new Expect().status.is("Отправка").task.is(new Task() {

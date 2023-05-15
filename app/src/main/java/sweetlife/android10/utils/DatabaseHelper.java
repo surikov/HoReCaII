@@ -163,6 +163,14 @@ public class DatabaseHelper {
 		mDB.execSQL("create index if not exists IX_ReceptiiIngridienty_ingridient on ReceptiiIngridienty(ingridient);");
 		mDB.execSQL("create index if not exists IX_ReceptiiIngridienty_IDRRef on ReceptiiIngridienty(_IDRRef);");
 
+		mDB.execSQL("create table if not exists Zametki ("//
+				+ "_id integer primary key asc"//
+				+ ",kontragentKod numeric null"//
+				+ ",dateCreate date null"//
+				+ ",zametka text null"//
+				+ ");"//
+		);
+
 		//
 		try {
 			mDB.execSQL("alter table Nomenklatura add column Mark blob;");
@@ -183,11 +191,11 @@ public class DatabaseHelper {
 			System.out.println(t.getMessage());
 		}*/
 
-		/*try {
+		try {
 			mDB.execSQL("alter table AnketaKlienta add column osobennostiRejimaRaboty text;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
-		}*/
+		}
 
 		try {
 			mDB.execSQL("alter table nomenklatura add column Tegi text;");

@@ -175,8 +175,8 @@ void doRefreshMap(){
 									.width().is(Auxiliary.tapSize * 10)
 									.height().is(Auxiliary.tapSize * 6)
 							)//
-							.width().is(Auxiliary.tapSize * 10)//
-							.height().is(Auxiliary.tapSize * 6)//
+							.width().is(Auxiliary.tapSize * 8)//
+							.height().is(Auxiliary.tapSize * 9)//
 					, "Отправить новые координаты", new Task() {
 						@Override
 						public void doTask() {

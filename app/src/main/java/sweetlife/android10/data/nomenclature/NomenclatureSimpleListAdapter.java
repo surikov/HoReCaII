@@ -37,7 +37,7 @@ public class NomenclatureSimpleListAdapter extends ZoomListCursorAdapter impleme
 
 		if( getSelectedPosition() == cursor.getPosition() ) {
 
-			list_row.setBackgroundColor(Color.rgb(16, 109, 206));
+			list_row.setBackgroundColor(0xffffffff);//Color.rgb(16, 109, 206));
 		}
 		else {
 
@@ -74,12 +74,15 @@ public class NomenclatureSimpleListAdapter extends ZoomListCursorAdapter impleme
 
 			mArticul.setText( Request_NomenclatureBase.getArtikul(cursor) );
 			mArticul.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
+			mArticul.setTextColor(0xff000000);
 
 			mNaimenovanie.setText( Request_NomenclatureBase.getNaimenovanie(cursor) );
 			mNaimenovanie.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
+			mNaimenovanie.setTextColor(0xff000000);
 
 			mVendor.setText( Request_NomenclatureBase.getProizvoditelNaimenovanie(cursor) );
 			mVendor.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
+			mVendor.setTextColor(0xff000000);
 		}
 	}
 }

@@ -8,8 +8,8 @@ public abstract class ZoomListArrayAdapter extends BaseAdapter implements IZoomL
 	protected float   mRowTextFontSize=16;
 	
 	public float getRowTextFontSize() {
-		
-		return mRowTextFontSize;
+		return 29;
+		//return mRowTextFontSize;
 	}
 
 	public void setRowTextFontSize(float rowTextFontSize) {

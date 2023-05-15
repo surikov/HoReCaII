@@ -96,7 +96,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 		menuClearFixPrice = menu.add("Удалить заявки на фикс.цены");
 		menuKlientPeople = menu.add("Контактные лица клиента");
 		menuVislatNakladnieNaPochtu = menu.add("Выслать накладные на почту");
-		menuKlienta = menu.add("Меню клиента");
+		menuKlienta = menu.add("Заметки");
 		menuAktSverki = menu.add("Акты сверки клиента");
 		menuRassylkaSchetovNaOplatu = menu.add("Рассылка счетов на оплату");
 
@@ -204,41 +204,42 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 
 		return false;
 	}
-/*
-	void promptZayavkaNaPerevodVdosudebnye(){
-		Auxiliary.pickConfirm(this,"Заявка на перевод в досудебные","Отправить",new Task(){
-			@Override
-			public void doTask() {
-				sendZayavkaNaPerevodVdosudebnye();
-			}
-		});
-	}
-	void sendZayavkaNaPerevodVdosudebnye(){
 
-		final Note result = new Note();
-		new Expect().task.is(new Task() {
-			@Override
-			public void doTask() {
-				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/CreateClientTransferRequest/"
-						+ ApplicationHoreca.getInstance().getClientInfo().getKod() ;
-				//url="https://testservice.swlife.ru/okunev_hrc/hs/Planshet/CreateClientTransferRequest/277793";
-				try {
-					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					Bough rr=Bough.parseJSON(new String(b, "UTF-8"));
-					//result.value(new String(b, "UTF-8"));
-					result.value(rr.child("Message").value.property.value());
-				} catch (Throwable t) {
-					t.printStackTrace();
-					result.value(t.getMessage());
+	/*
+		void promptZayavkaNaPerevodVdosudebnye(){
+			Auxiliary.pickConfirm(this,"Заявка на перевод в досудебные","Отправить",new Task(){
+				@Override
+				public void doTask() {
+					sendZayavkaNaPerevodVdosudebnye();
 				}
-			}
-		}).afterDone.is(new Task() {
-			@Override
-			public void doTask() {
-				Auxiliary.warn(result.value(), Activity_BidsContractsEtc_2.this);
-			}
-		}).status.is("Подождите...").start(this);
-	}*/
+			});
+		}
+		void sendZayavkaNaPerevodVdosudebnye(){
+
+			final Note result = new Note();
+			new Expect().task.is(new Task() {
+				@Override
+				public void doTask() {
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/CreateClientTransferRequest/"
+							+ ApplicationHoreca.getInstance().getClientInfo().getKod() ;
+					//url="https://testservice.swlife.ru/okunev_hrc/hs/Planshet/CreateClientTransferRequest/277793";
+					try {
+						byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+						Bough rr=Bough.parseJSON(new String(b, "UTF-8"));
+						//result.value(new String(b, "UTF-8"));
+						result.value(rr.child("Message").value.property.value());
+					} catch (Throwable t) {
+						t.printStackTrace();
+						result.value(t.getMessage());
+					}
+				}
+			}).afterDone.is(new Task() {
+				@Override
+				public void doTask() {
+					Auxiliary.warn(result.value(), Activity_BidsContractsEtc_2.this);
+				}
+			}).status.is("Подождите...").start(this);
+		}*/
 	void sendRassylkaSchetovNaOplatu(final String email) {
 		final Note result = new Note();
 		new Expect().task.is(new Task() {
@@ -246,8 +247,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 			public void doTask() {
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/CreateClientMailScore/"
 						+ ApplicationHoreca.getInstance().getClientInfo().getKod()
-						+"/"+email
-						;
+						+ "/" + email;
 				try {
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					result.value(new String(b, "UTF-8"));
@@ -290,8 +290,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 									+ "/hs/Planshet/DeleteClientMailScore/"
 									+ ApplicationHoreca.getInstance().getClientInfo().getKod()
-									+ "/" + email.trim()
-									;
+									+ "/" + email.trim();
 
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							result.value(new String(bytes, "UTF-8"));
@@ -622,7 +621,7 @@ I/System.out: </>
 								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize)//
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 4.5)//
+						.height().is(Auxiliary.tapSize * 8)//
 				, "Отправить", new Task() {
 					@Override
 					public void doTask() {
@@ -808,31 +807,31 @@ I/System.out: </>
 				, new SubLayoutless(a)//
 						.child(new RedactToggle(a).labelText.is("По спецификации").yes.is(Settings.emailPoSpecificacii)//
 								.left().is(Auxiliary.tapSize * 0.5)//
-								.top().is(Auxiliary.tapSize * 0.0)//
+								.top().is(Auxiliary.tapSize * 0.5)//
 								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize)//
 								.height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactToggle(a).labelText.is("По ИНН").yes.is(Settings.emailPoINNToSend)//
 								.left().is(Auxiliary.tapSize * 0.5)//
-								.top().is(Auxiliary.tapSize * 1.0)//
+								.top().is(Auxiliary.tapSize * 1.5)//
 								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize)//
 								.height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactToggle(a).labelText.is("Номенклатура по группам").yes.is(Settings.emailGroupingToSend)//
 								.left().is(Auxiliary.tapSize * 0.5)//
-								.top().is(Auxiliary.tapSize * 2.0)//
+								.top().is(Auxiliary.tapSize * 2.5)//
 								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize)//
 								.height().is(Auxiliary.tapSize * 1))//
 						.child(new Decor(a).labelText.is("e-mail")//
 								.left().is(Auxiliary.tapSize * 0.5)//
-								.top().is(Auxiliary.tapSize * 3.0)//
+								.top().is(Auxiliary.tapSize * 3.5)//
 								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize)//
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(new RedactText(a).text.is(Settings.emailToSend)//
 								.left().is(Auxiliary.tapSize * 0.5)//
-								.top().is(Auxiliary.tapSize * 3.5)//
+								.top().is(Auxiliary.tapSize * 4)//
 								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize)//
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 4.5)//
+						.height().is(Auxiliary.tapSize * 7)//
 				, "Отправить", new Task() {
 					@Override
 					public void doTask() {
@@ -870,7 +869,7 @@ I/System.out: </>
 		//"да"
 		//: "%D0%BD%D0%B5%D1%82"//"нет""http://89.109.7.162/shatov"
 		String rawlist = Settings.emailGroupingToSend.value() ? net : da;
-//curl -X POST -d '103576,102050,91602' http://89.109.7.162/shatov/hs/ZakazNaShablon/135847/20100101/20200813/surikov@swlife.nnov.ru/нет/да
+		//curl -X POST -d '103576,102050,91602' http://89.109.7.162/shatov/hs/ZakazNaShablon/135847/20100101/20200813/surikov@swlife.nnov.ru/нет/да
 		final String url =
 				Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 						//"http://89.109.7.162/shatov"
@@ -1160,6 +1159,29 @@ I/System.out: </>
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
 		);
+		layoutless.child(new Knob(this).afterTap.is(new Task() {
+					@Override
+					public void doTask() {
+						promptKlientPeople();
+					}
+				})//
+						.labelText.is("Конт.инф.")
+				.left().is(layoutless.width().property.minus(9 * Auxiliary.tapSize))//
+						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
+						.width().is(3 * Auxiliary.tapSize)//
+						.height().is(1 * Auxiliary.tapSize)//
+		);
+		layoutless.child(new Knob(this).afterTap.is(new Task() {
+					@Override
+					public void doTask() {
+						zametkiClick();
+					}
+				})//
+						.labelText.is("Заметки").left().is(layoutless.width().property.minus(6 * Auxiliary.tapSize))//
+						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
+						.width().is(3 * Auxiliary.tapSize)//
+						.height().is(1 * Auxiliary.tapSize)//
+		);
 		newZakaz = new Knob(this);
 		layoutless.child(newZakaz.afterTap.is(new Task() {
 					@Override
@@ -1231,6 +1253,29 @@ I/System.out: </>
 	void requeryGridData() {
 	}
 
+	void zametkiClick() {
+		final Note note = new Note();
+		Auxiliary.pickString(this, "Новая заметка", note
+				, "Добавить", new Task() {
+					public void doTask() {
+						Activity_Zametki.addNew(note.value());
+					}
+				}, "Все заметки", new Task() {
+					public void doTask() {
+						zametkiOpen();
+					}
+				},null,null
+				);
+
+	}
+
+	void zametkiOpen() {
+		Intent intent = new Intent();
+		intent.setClass(this, sweetlife.android10.ui.Activity_Zametki.class);
+		this.startActivity(intent);
+
+	}
+
 	void addButtonClick() {
 		int ORDER_UPDATE = 5;
 		StartBidsActivity(ORDER_UPDATE, null);
@@ -1239,6 +1284,7 @@ I/System.out: </>
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Activity_Bid.unLockCreateNewOrder();
 		refreshGrid();
 	}
 
@@ -1569,10 +1615,10 @@ I/System.out: </>
 			public void doTask() {
 				String idrrf = ApplicationHoreca.getInstance().getClientInfo().getID();
 				String sql = "delete from ZayavkaNaSkidki_TovaryPhiksCen where _ZayavkaNaSkidki_IDRRef in (select _idrref from ZayavkaNaSkidki where kontragent=" + idrrf + ");";
-				System.out.println(sql);
+				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 				sql = "delete from ZayavkaNaSkidki where kontragent=" + idrrf + ";";
-				System.out.println(sql);
+				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 				//Activity_BidsContractsEtc_2.this.finish();
 				refreshGrid();
@@ -1580,16 +1626,26 @@ I/System.out: </>
 		});
 	}
 
+
+
 	void StartBidsActivity(int requestCode, ZayavkaPokupatelya bid) {
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		Intent intent = new Intent();
 		intent.setClass(Activity_BidsContractsEtc_2.this, Activity_Bid.class);
 		intent.putExtra("client_id", mAppInstance.getClientInfo().getID());
 		if (bid != null) {
+			//intent.putExtra("newDoc", false);
 			intent.putExtra("ZayavkaPokupatelya", bid);
+			//ApplicationHoreca.lastZayavkaPokupatelya=bid;
+
 			if (!mIsEditable || bid.isProveden()) {
 				intent.putExtra("is_editable", false);
 			}
+			//intent.putExtra("doc", "exists");
+		}else{
+			Activity_Bid.unLockCreateNewOrder();
+			//intent.putExtra("doc", "new");
+			//ApplicationHoreca.lastZayavkaPokupatelya=null;
 		}
 		startActivityForResult(intent, requestCode);
 	}

@@ -127,7 +127,7 @@ public class NomenclaturaAdapter extends ZoomListCursorAdapter implements ITable
 			mUnit.setText(Request_NomenclatureBase.getEdinicyIzmereniyaNaimenovanie(cursor));
 			mUnit.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
 			//mPrice.setText("?"+Request_NomenclatureBase.getCena(cursor));
-			if(sweetlife.android10.ui.Activity_Bid.hideStatus) {
+			if(sweetlife.android10.ui.Activity_Bid.hideNacenkaStatus) {
 				mPrice.setText(Request_NomenclatureBase.getCena(cursor));
 			}
 			else {

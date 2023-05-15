@@ -373,9 +373,9 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportProcentZapolneniyaChekListov.folderKey())) {
 			report = new ReportProcentZapolneniyaChekListov(this);
 		}
-		if (key.equals(ReportStatusyRasporjazheniy.folderKey())) {
-			report = new ReportStatusyRasporjazheniy(this);
-		}
+		//if (key.equals(ReportStatusyRasporjazheniy.folderKey())) {
+		//	report = new ReportStatusyRasporjazheniy(this);
+		//}
 		if (key.equals(ReportStatusyRasporjazheniySKD.folderKey())) {
 			report = new ReportStatusyRasporjazheniySKD(this);
 		}
@@ -415,6 +415,10 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportResultatyUtverjdenihSpecifikaciy.folderKey())) {
 			report = new ReportResultatyUtverjdenihSpecifikaciy(this);
 		}
+		if (key.equals(ReportProdazhiSTM.folderKey())) {
+			report = new ReportProdazhiSTM(this);
+		}
+
 		return report;
 	}
 
@@ -629,6 +633,7 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportVozmeschenie.folderKey(), ReportVozmeschenie.menuLabel());
 		addReportMenu2(ReportVipolnenieDopMotivaciy.folderKey(), ReportVipolnenieDopMotivaciy.menuLabel());
 		addReportMenu2(ReportVipolneniePlanovPoPrilojeniu.folderKey(), ReportVipolneniePlanovPoPrilojeniu.menuLabel());
+		//addReportMenu2(ReportVipolneniePlanov.folderKey(), ReportVipolneniePlanov.menuLabel());
 		addReportMenu2(ReportDegustaciaDlyaTP.folderKey(), ReportDegustaciaDlyaTP.menuLabel());
 		addReportMenu2(ReportDZDlyaTP.folderKey(), ReportDZDlyaTP.menuLabel());
 		addReportMenu2(ReportDistribucia.folderKey(), ReportDistribucia.menuLabel());
@@ -663,6 +668,8 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportProdajiFlagmanov.folderKey(), ReportProdajiFlagmanov.menuLabel());
 		addReportMenu2(ReportProdajiFlagmanovPoKontragentam.folderKey(), ReportProdajiFlagmanovPoKontragentam.menuLabel());
 		addReportMenu2(ReportResultatyUtverjdenihSpecifikaciy.folderKey(), ReportResultatyUtverjdenihSpecifikaciy.menuLabel());
+		addReportMenu2(ReportProdazhiSTM.folderKey(), ReportProdazhiSTM.menuLabel());
+
 		addReportMenu2(ReportRekomendaciiKlientam.folderKey(), ReportRekomendaciiKlientam.menuLabel());
 		addReportMenu2(ReportSvodDlyaTP.folderKey(), ReportSvodDlyaTP.menuLabel());
 		addReportMenu2(ReportSkidkiDlyaKlientov.folderKey(), ReportSkidkiDlyaKlientov.menuLabel());
@@ -677,7 +684,7 @@ public class ActivityWebServicesReports extends Activity {
 
 		addReportMenu2(ReportStatusyVozvratov.folderKey(), ReportStatusyVozvratov.menuLabel());
 		addReportMenu2(ReportStatusyZakazov.folderKey(), ReportStatusyZakazov.menuLabel());
-		addReportMenu2(ReportStatusyRasporjazheniy.folderKey(), ReportStatusyRasporjazheniy.menuLabel());
+		//addReportMenu2(ReportStatusyRasporjazheniy.folderKey(), ReportStatusyRasporjazheniy.menuLabel());
 		addReportMenu2(ReportStatusyRasporjazheniySKD.folderKey(), ReportStatusyRasporjazheniySKD.menuLabel());
 
 		addReportMenu2(ReportBonusyDlyaTP.folderKey(), ReportBonusyDlyaTP.menuLabel());
@@ -1192,7 +1199,9 @@ public class ActivityWebServicesReports extends Activity {
 	void sendAllFixDocsApprove() {
 		System.out.println("sendAllFixDocsApprove");
 		String page = Cfg.pathToHTML(ActivityWebServicesReports.this.preReport.getFolderKey(), ActivityWebServicesReports.this.preKey);
+
 		final Vector<String> strings = Auxiliary.readTextFromFile(new File(page));
+		System.out.println(strings.size()+": "+page);
 		final Bough b = new Bough();
 		final Note statustext = new Note().value("Подождите");
 		Expect expect = new Expect().status.is(statustext)//
@@ -1200,15 +1209,16 @@ public class ActivityWebServicesReports extends Activity {
 					@Override
 					public void doTask() {
 						try {
+							System.out.println("sendAllFixDocsApprove start");
 							String result = "";
 							//String regexp = "(№(\\S+)\\s*,\\s*+Арт(\\S+\\d+))";
-							String regexp = "(>(\\S+)\\s*,\\s*+Арт\\s+(\\d+)\\s+)";
+							String regexp = "(>(\\S+)\\s*,\\s*+Арт\\s+(\\d+))";
 							Pattern pattern = Pattern.compile(regexp);
 							for (int i = 0; i < strings.size(); i++) {
-								//System.out.println(strings.get(i));
+								//System.out.println(""+i+": "+strings.get(i));
 								Matcher matcher = pattern.matcher(strings.get(i));
 								if (matcher.find()) {
-									System.out.println(strings.get(i));
+									System.out.println("sendAllFixDocsApprove found "+strings.get(i));
 									String fixDocNum = matcher.group(2);
 									String fixArtikul = matcher.group(3);
 									String msg = "№" + fixDocNum + ", артикул " + fixArtikul;
@@ -1225,7 +1235,7 @@ public class ActivityWebServicesReports extends Activity {
 								}
 							}
 							b.child("result").value.is(result);
-							System.out.println("result: " + result);
+							System.out.println("sendAllFixDocsApprove result"+result);
 							preReport.writeCurrentPage();
 						} catch (Throwable t) {
 							t.printStackTrace();
@@ -1235,7 +1245,7 @@ public class ActivityWebServicesReports extends Activity {
 				}).afterDone.is(new Task() {
 					@Override
 					public void doTask() {
-						Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
+						Auxiliary.warn("Результат: "+b.child("result").value.property.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
 				});
@@ -2113,7 +2123,12 @@ class OrderItemInfo {
 	public String artikul = "";
 	public String naimenovanie = "";
 	public double cena = 0;
-	public String poslednyaa = "";
+	public String poslednyaya = "";
+	public String edizm = "";
+
+	public String minNorma = "";
+	public String koephphicient = "";
+
 	public double min = 0;
 	public double max = 0;
 	public double kolichestvo = 0;

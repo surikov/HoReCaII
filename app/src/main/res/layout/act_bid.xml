@@ -199,7 +199,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/btn_gazeta"
             android:focusable="false"
-            android:text="@string/save" />
+            android:text="Сохранить" />
 
         <LinearLayout
             android:layout_width="match_parent"

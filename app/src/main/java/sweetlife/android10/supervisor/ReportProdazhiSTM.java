@@ -15,29 +15,29 @@ import tee.binding.*;
 
 import java.io.*;
 
-public class ReportSvodDlyaTP extends Report_Base {
-	Numeric dateMonth = new Numeric();
-	//Numeric dateCreateTo = new Numeric();
+public class ReportProdazhiSTM extends Report_Base {
+	Numeric docFrom = new Numeric();
+	Numeric docTo = new Numeric();
 	Numeric territory = new Numeric();
-	Numeric modeNew = new Numeric();
+
 
 	public static String menuLabel() {
-		return "СводДляТП";
+		return "Продажи СТМ";
 	}
 
 	public static String folderKey() {
-		return "svodDlyaTP";
+		return "prodazhistm";
 	}
 
 	public String getMenuLabel() {
-		return "СводДляТП";
+		return "Продажи СТМ";
 	}
 
 	public String getFolderKey() {
-		return "svodDlyaTP";
+		return "prodazhistm";
 	}
 
-	public ReportSvodDlyaTP(ActivityWebServicesReports p) {
+	public ReportProdazhiSTM(ActivityWebServicesReports p) {
 		super(p);
 	}
 
@@ -49,11 +49,6 @@ public class ReportSvodDlyaTP extends Report_Base {
 			b = Bough.parseXML(xml);
 			int i = (int) Numeric.string2double(b.child("territory").value.property.value());
 			String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
-			if (modeNew.value() > 0) {
-				s = s + ", Свод по СТМ";
-			} else {
-				s = s + ", Свод ТП";
-			}
 			return s;
 		} catch (Throwable t) {
 			//
@@ -68,8 +63,8 @@ public class ReportSvodDlyaTP extends Report_Base {
 		try {
 			b = Bough.parseXML(xml);
 			String dfrom = Cfg.formatMills(Numeric.string2double(b.child("docFrom").value.property.value()), "dd.MM.yyyy");
-			//String dto = Cfg.formatMills(Numeric.string2double(b.child("docTo").value.property.value()), "dd.MM.yyyy");
-			return dfrom;//+ " - " + dto;
+			String dto = Cfg.formatMills(Numeric.string2double(b.child("docTo").value.property.value()), "dd.MM.yyyy");
+			return dfrom + " - " + dto;
 		} catch (Throwable t) {
 			//
 		}
@@ -81,6 +76,7 @@ public class ReportSvodDlyaTP extends Report_Base {
 		Bough b = null;
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey))));
 		//System.out.println("readForm " + xml);
+		System.out.println("readForm: "+instanceKey+": "+xml);
 		try {
 			b = Bough.parseXML(xml);
 		} catch (Throwable t) {
@@ -89,33 +85,38 @@ public class ReportSvodDlyaTP extends Report_Base {
 		if (b == null) {
 			b = new Bough();
 		}
-		dateMonth.value(Numeric.string2double(b.child("dateMonth").value.property.value()));
-		//dateCreateTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
+		docFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
+		docTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
 		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
-		modeNew.value(Numeric.string2double(b.child("modeNew").value.property.value()));
 	}
 
 	@Override
 	public void writeForm(String instanceKey) {
 		Bough b = new Bough().name.is(getFolderKey());
-		b.child("dateMonth").value.is("" + dateMonth.value());
+		b.child("docFrom").value.is("" + docFrom.value());
+		b.child("docTo").value.is("" + docTo.value());
 		b.child("territory").value.is("" + territory.value());
-		b.child("modeNew").value.is("" + modeNew.value());
+		//b.child("modeNew").value.is("" + modeNew.value());
 		//b.child("docTo").value.is("" + dateCreateTo.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		//System.out.println("writeForm " + xml);
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
+		System.out.println("writeForm: "+instanceKey+": "+xml);
 	}
 
 	@Override
 	public void writeDefaultForm(String instanceKey) {
 		Bough b = new Bough().name.is(getFolderKey());
 		long d = new Date().getTime();
-		b.child("dateMonth").value.is("" + (d - 0 * 24 * 60 * 60 * 1000.0));
-		//b.child("docTo").value.is("" + (d + 0 * 24 * 60 * 60 * 1000.0));
+		Calendar from = Calendar.getInstance();
+		//from.setTimeInMillis(docFrom.value().longValue());
+		from.set(Calendar.DAY_OF_MONTH, 1);
+		b.child("docFrom").value.is("" + from.getTimeInMillis());
+		b.child("docTo").value.is("" + (d + 0 * 24 * 60 * 60 * 1000.0));
 		//b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
+		System.out.println("writeDefaultForm: "+instanceKey+": "+xml);
 	}
 
 	/*@Override
@@ -133,7 +134,7 @@ public class ReportSvodDlyaTP extends Report_Base {
 				+ "</m:Имя>"//
 				+ "\n					<m:НачалоПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(dateMonth.value(), "yyyy-MM-dd") + "T00:00:00</m:НачалоПериода>"//
 				+ "\n					<m:КонецПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(dateMonth.value(), "yyyy-MM-dd") + "T23:59:59</m:КонецПериода>"//
-				+ "\n					<m:КодПользователя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + hrc//Cfg.currentHRC() 
+				+ "\n					<m:КодПользователя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + hrc//Cfg.currentHRC()
 				+ "</m:КодПользователя>"//
 				+ "\n					<m:Параметры xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"//
 				+ "\n					</m:Параметры>"//
@@ -149,25 +150,27 @@ public class ReportSvodDlyaTP extends Report_Base {
 		int i = territory.value().intValue();
 		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
 		//http://89.109.7.162/hrc120107/hs/Report/ВыполнениеПлановПродаж/zentr?param={"ВариантОтчета":"Свод","ДатаНачала":"20190501","ДатаОкончания":"20190531"}
-		Calendar from = Calendar.getInstance();
+		/*Calendar from = Calendar.getInstance();
 		from.setTimeInMillis(dateMonth.value().longValue());
 		from.set(Calendar.DAY_OF_MONTH, 1);
-
+*/
+		Calendar from = Calendar.getInstance();
+		from.setTimeInMillis(docFrom.value().longValue());
 		Calendar to = Calendar.getInstance();
-		to.setTimeInMillis(dateMonth.value().longValue());
-		to.set(Calendar.DAY_OF_MONTH, 1);
-		to.add(Calendar.MONTH, 1);
-		to.add(Calendar.DAY_OF_MONTH, -1);
+		to.setTimeInMillis(docTo.value().longValue());
+		//to.set(Calendar.DAY_OF_MONTH, 1);
+		//to.add(Calendar.MONTH, 1);
+		//to.add(Calendar.DAY_OF_MONTH, -1);
 
 
 		String p = "{\"";
-				//+ "ВариантОтчета\":\"Свод\""
-		if (modeNew.value() > 0) {
-			p =p+"ВариантОтчета\":\"СводСТМ\"";
+		p = p + "ВариантОтчета\":\"ВаловаяПрибыльСТМ\"";
+		/*if (modeNew.value() > 0) {
+			p = p + "ВариантОтчета\":\"СводСТМ\"";
 		} else {
 			p = p + "ВариантОтчета\":\"Свод\"";
-		}
-				p=p+ ",\"ДатаНачала\":\""
+		}*/
+		p = p + ",\"ДатаНачала\":\""
 				+ Cfg.formatMills(from.getTimeInMillis(), "yyyyMMdd")
 				+ "\",\"ДатаОкончания\":\""
 				+ Cfg.formatMills(to.getTimeInMillis(), "yyyyMMdd")
@@ -183,7 +186,7 @@ public class ReportSvodDlyaTP extends Report_Base {
 			t.printStackTrace();
 			e = t.getMessage();
 		}
-		String serviceName = "ВыполнениеПлановПродаж";
+		String serviceName = "ВаловаяПрибыль";
 		try {
 			serviceName = URLEncoder.encode(serviceName, "UTF-8");
 		} catch (Throwable t) {
@@ -214,9 +217,10 @@ public class ReportSvodDlyaTP extends Report_Base {
 			}
 			propertiesForm//
 					.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
-					.input(context, 1, Auxiliary.tapSize * 0.3, "Месяц", new RedactDate(context).date.is(dateMonth).format.is("dd.MM.yyyy"))//
-					.input(context, 2, Auxiliary.tapSize * 0.3, "Территория", terr)//
-					.input(context, 3, Auxiliary.tapSize * 0.3, "Вариант", new RedactSingleChoice(context).selection.is(modeNew).item("Свод ТП").item("Свод по СТМ"))//
+					.input(context, 1, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(docFrom).format.is("dd.MM.yyyy"))//
+					.input(context, 2, Auxiliary.tapSize * 0.3, "до", new RedactDate(context).date.is(docTo).format.is("dd.MM.yyyy"))//
+					.input(context, 3, Auxiliary.tapSize * 0.3, "Территория", terr)//
+					//.input(context, 3, Auxiliary.tapSize * 0.3, "Вариант", new RedactSingleChoice(context).selection.is(modeNew).item("Свод ТП").item("Свод по СТМ"))//
 			//.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
 			/*.input(context, 3, Auxiliary.tapSize * 0.3, "", new Knob(context).labelText.is("Обновить").afterTap.is(new Task() {
 				@Override
@@ -230,11 +234,12 @@ public class ReportSvodDlyaTP extends Report_Base {
 					.afterTap.is(new Task() {
 						@Override
 						public void doTask() {
-							//Date mb = new Date();
-							//mb.setDate(1);
+							Date mb = new Date();
+							mb.setDate(1);
+							docFrom.value(mb.getTime() - 0 * 24 * 60 * 60 * 1000.0);
 							long d = new Date().getTime();
 							//dateFrom.value((double) d);
-							dateMonth.value(d - 0 * 24 * 60 * 60 * 1000.0);
+							docTo.value(d - 0 * 24 * 60 * 60 * 1000.0);
 							//dateCreateTo.value((double) d);
 							//checkHolding();
 							expectRequery.start(activityReports);
@@ -265,7 +270,7 @@ public class ReportSvodDlyaTP extends Report_Base {
 						@Override
 						public void doTask() {
 							//expectRequery.start(activityReports);
-							activityReports.promptDeleteRepoort(ReportSvodDlyaTP.this, currentKey);
+							activityReports.promptDeleteRepoort(ReportProdazhiSTM.this, currentKey);
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//

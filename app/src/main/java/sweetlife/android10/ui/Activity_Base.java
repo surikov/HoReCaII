@@ -181,6 +181,7 @@ public abstract class Activity_Base extends Activity implements OnTouchListener,
 			//System.out.println("button.getTextSize() "+button.getTextSize());
 			
 			((IZoomList) list.getAdapter()).setRowTextFontSize(button.getTextSize() + ZOOM_DIFFENT_BETWEEN_ROW_AND_HEADER);
+
 			list.invalidate();
 		}
 	}

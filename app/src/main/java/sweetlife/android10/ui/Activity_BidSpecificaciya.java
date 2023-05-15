@@ -597,7 +597,7 @@ void sortModeMenuTitle(){
 					+ ", hrc='" + ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim() + "'"//
 					+ ", kod='" + ApplicationHoreca.getInstance().getClientInfo().getKod().trim() + "'"//
 					+ " where _id=" + id.value();
-			System.out.println(sql);
+			//System.out.println(sql);
 			//SQLiteStatement statement = ApplicationHoreca.getInstance().getDataBase().compileStatement(sql);
 			//statement.executeInsert();
 			//statement.close();
@@ -895,7 +895,7 @@ void sortModeMenuTitle(){
 						.child(new Decor(this).labelText.is("Обяз-во по товарообороту").labelAlignRightCenter().top().is(Auxiliary.tapSize * 1).width().is(Auxiliary.tapSize * 4.5).height().is(Auxiliary.tapSize))//
 						.child(new RedactNumber(this).number.is(whatOborot).left().is(Auxiliary.tapSize * 5).top().is(Auxiliary.tapSize * 1).width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize))//
 						.width().is(Auxiliary.tapSize * 10)//
-						.height().is(Auxiliary.tapSize * 3)//
+						.height().is(Auxiliary.tapSize * 6)//
 				, "Изменить", new Task() {
 					@Override
 					public void doTask() {

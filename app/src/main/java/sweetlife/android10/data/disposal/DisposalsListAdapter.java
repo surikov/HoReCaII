@@ -25,8 +25,8 @@ public class DisposalsListAdapter extends ZoomListCursorAdapter {
 	public void bindView(View row, Context context, Cursor cursor) {
 
 		DisposalsHolder holder = (DisposalsHolder)row.getTag();
-
-		holder.populateFrom( cursor, getRowTextFontSize() );
+		holder.populateFrom( cursor, 24);
+		//holder.populateFrom( cursor, getRowTextFontSize() );
 	}
 
 	@Override

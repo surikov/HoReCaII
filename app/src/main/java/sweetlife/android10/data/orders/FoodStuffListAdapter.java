@@ -1,5 +1,6 @@
 package sweetlife.android10.data.orders;
 
+import sweetlife.android10.data.common.NomenclatureBasedItem;
 import sweetlife.android10.data.common.ZoomListArrayAdapter;
 import sweetlife.android10.ui.Activity_Bid;
 import sweetlife.android10.utils.DecimalFormatHelper;
@@ -13,14 +14,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Comparator;
+
 public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 
 	int screenWidth = 0;
-	private FoodstuffsData mFoodStuffs;
+	public FoodstuffsData mFoodStuffs;
 
 	public FoodStuffListAdapter(FoodstuffsData foodStuffs, int screenWidth) {
 		mFoodStuffs = foodStuffs;
 		this.screenWidth = screenWidth;
+		this.sortListByMode(0);
 	}
 
 	@Override
@@ -41,19 +45,17 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		FoodStuffViewHolder holder = null;
-		if(convertView == null) {
+		if (convertView == null) {
 			convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_foodstuffs, null);
 			holder = new FoodStuffViewHolder(convertView, screenWidth);
 			convertView.setTag(holder);
-		}
-		else {
+		} else {
 			holder = (FoodStuffViewHolder) convertView.getTag();
 		}
 		ZayavkaPokupatelya_Foodstaff foodstuff = mFoodStuffs.getFoodstuff(position);
-		if(foodstuff.isCRAvailable()) {
+		if (foodstuff.isCRAvailable()) {
 			convertView.setBackgroundColor(Color.LTGRAY);
-		}
-		else {
+		} else {
 			convertView.setBackgroundColor(Color.TRANSPARENT);
 		}
 		holder.SetValues(foodstuff);
@@ -110,6 +112,10 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 			mTextAmount.setWidth((int) (Auxiliary.tapSize * 1.4));*/
 		}
 
+		public float getRowTextFontSize() {
+			return 19;
+		}
+
 		void SetValues(ZayavkaPokupatelya_Foodstaff foodstuff) {
 			//System.out.println(this.getClass().getCanonicalName() + ": SetValues");
 			mTextNumber.setText(String.valueOf(foodstuff.getNomerStroki()));
@@ -128,11 +134,10 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 			mTextPrice.setText(DecimalFormatHelper.format(foodstuff.getCena()));
 			mTextPrice.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
 			double lastPrice = foodstuff.getLastPrice();
-			if(lastPrice > 0) {
+			if (lastPrice > 0) {
 				mTextLast.setText(DecimalFormatHelper.format(lastPrice));
 				mTextLast.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
-			}
-			else {
+			} else {
 				mTextLast.setText("");
 			}
 			/*if (foodstuff.hasSale() || foodstuff.isCRAvailable()) {
@@ -158,12 +163,12 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 				mTextSaleType.setText("");
 				mTextPricewithsale.setText("");
 			}*/
-			if(Activity_Bid.hideStatus) {
+			if (Activity_Bid.hideNacenkaStatus) {
 				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy()));
-			}
-			else {
-				int fakt = (int) (100 * (foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice());
-				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy()) + "/" + fakt + "%");
+			} else {
+				//int fakt = (int) (100 * (foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice());
+				double fakt = 100*(foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice();
+				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy()) + "р.\n" + String.format("%.2f", fakt) + "%");
 				mTextPricewithsale.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize() - 5);
 			}
 			//if(cursor.getInt(37)>0){
@@ -175,8 +180,8 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 			mTextMinCount.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
 			mTextSale.setText("" + foodstuff.getSkidka());
 			mTextSaleType.setText(foodstuff.getVidSkidki());
-			System.out.println("row "+foodstuff.getArtikul()+", ["+foodstuff.getSkidka()+"], ["+foodstuff.getVidSkidki()+"]");
-			if(foodstuff.getNomenklaturaNaimenovanie().endsWith("`")) {
+			//System.out.println("row " + foodstuff.getArtikul() + ", [" + foodstuff.getSkidka() + "], [" + foodstuff.getVidSkidki() + "]");
+			if (foodstuff.getNomenklaturaNaimenovanie().endsWith("`")) {
 				mTextNumber.setBackgroundColor(Settings.colorTop20);
 				mTextArticle.setBackgroundColor(Settings.colorTop20);
 				mTextNomenclature.setBackgroundColor(Settings.colorTop20);
@@ -190,8 +195,7 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 				mTextMinCount.setBackgroundColor(Settings.colorTop20);
 				mTextSale.setBackgroundColor(Settings.colorTop20);
 				mTextSaleType.setBackgroundColor(Settings.colorTop20);
-			}
-			else {
+			} else {
 				mTextNumber.setBackgroundColor(0xffe3e3e3);
 				mTextArticle.setBackgroundColor(0xffe3e3e3);
 				mTextNomenclature.setBackgroundColor(0xffe3e3e3);
@@ -204,10 +208,135 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 				mTextAmount.setBackgroundColor(0xffe3e3e3);
 				mTextMinCount.setBackgroundColor(0xffe3e3e3);
 				mTextSale.setBackgroundColor(0xffe3e3e3);
+				//mTextSaleType.setBackgroundColor(0xffe3e3e3);
 				mTextSaleType.setBackgroundColor(0xffe3e3e3);
 			}
+			//mTextSaleType.setTextColor(0xff000000);
+
 			//mTextNomenclature.setBackgroundColor(0xff00ffff);
 			//Auxiliary.screenWidth(this);
+			mTextNumber.setTextColor(0xff000000);
+			mTextArticle.setTextColor(0xff000000);
+			mTextNomenclature.setTextColor(0xff000000);
+			mTextPlaceCount.setTextColor(0xff000000);
+			mTextUnit.setTextColor(0xff000000);
+			mTextCount.setTextColor(0xff000000);
+			mTextPrice.setTextColor(0xff000000);
+			mTextLast.setTextColor(0xff000000);
+			mTextPricewithsale.setTextColor(0xff000000);
+			mTextAmount.setTextColor(0xff000000);
+			mTextMinCount.setTextColor(0xff000000);
+			mTextSale.setTextColor(0xff000000);
+			mTextSaleType.setTextColor(0xff000000);
+		}
+	}
+
+	public final static int sortByName = 0;
+	public final static int sortByCount = 1;
+	public final static int sortByPrice = 2;
+	public final static int sortByLastPrice = 3;
+	public final static int sortByNacenka = 4;
+	public final static int sortByNum = 5;
+	Comparator<NomenclatureBasedItem> comparatorNumOrder = new Comparator<NomenclatureBasedItem>() {
+		public int compare(NomenclatureBasedItem o1, NomenclatureBasedItem o2) {
+			try {
+				ZayavkaPokupatelya_Foodstaff zz1 = (ZayavkaPokupatelya_Foodstaff) o1;
+				ZayavkaPokupatelya_Foodstaff zz2 = (ZayavkaPokupatelya_Foodstaff) o2;
+				return zz1.getNomerStroki() - zz2.getNomerStroki();
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+			return 0;
+		}
+	};
+	Comparator<NomenclatureBasedItem> comparatorNacenka = new Comparator<NomenclatureBasedItem>() {
+		public int compare(NomenclatureBasedItem o1, NomenclatureBasedItem o2) {
+			try {
+				ZayavkaPokupatelya_Foodstaff zz1 = (ZayavkaPokupatelya_Foodstaff) o1;
+				ZayavkaPokupatelya_Foodstaff zz2 = (ZayavkaPokupatelya_Foodstaff) o2;
+
+				double fakt1 =  (zz1.getCenaSoSkidkoy() - zz1.getBasePrice()) / zz1.getBasePrice();
+				double fakt2 =  (zz2.getCenaSoSkidkoy() - zz2.getBasePrice()) / zz2.getBasePrice();
+
+				return (int) (1000 * (fakt1-fakt2));
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+			return 0;
+		}
+	};
+	Comparator<NomenclatureBasedItem> comparatorLastPrice = new Comparator<NomenclatureBasedItem>() {
+		public int compare(NomenclatureBasedItem o1, NomenclatureBasedItem o2) {
+			try {
+				ZayavkaPokupatelya_Foodstaff zz1 = (ZayavkaPokupatelya_Foodstaff) o1;
+				ZayavkaPokupatelya_Foodstaff zz2 = (ZayavkaPokupatelya_Foodstaff) o2;
+				return (int) (1000 * (zz1.getLastPrice() - zz2.getLastPrice()));
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+			return 0;
+		}
+	};
+	Comparator<NomenclatureBasedItem> comparatorPrice = new Comparator<NomenclatureBasedItem>() {
+		public int compare(NomenclatureBasedItem o1, NomenclatureBasedItem o2) {
+			try {
+				ZayavkaPokupatelya_Foodstaff zz1 = (ZayavkaPokupatelya_Foodstaff) o1;
+				ZayavkaPokupatelya_Foodstaff zz2 = (ZayavkaPokupatelya_Foodstaff) o2;
+				return (int) (1000 * (zz1.getBasePrice() - zz2.getBasePrice()));
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+			return 0;
+		}
+	};
+	Comparator<NomenclatureBasedItem> comparatorCount = new Comparator<NomenclatureBasedItem>() {
+		public int compare(NomenclatureBasedItem o1, NomenclatureBasedItem o2) {
+			try {
+				ZayavkaPokupatelya_Foodstaff zz1 = (ZayavkaPokupatelya_Foodstaff) o1;
+				ZayavkaPokupatelya_Foodstaff zz2 = (ZayavkaPokupatelya_Foodstaff) o2;
+				return (int) (1000 * (zz1.getKolichestvo() - zz2.getKolichestvo()));
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+			return 0;
+		}
+	};
+	Comparator<NomenclatureBasedItem> comparatorName = new Comparator<NomenclatureBasedItem>() {
+		public int compare(NomenclatureBasedItem o1, NomenclatureBasedItem o2) {
+			try {
+				ZayavkaPokupatelya_Foodstaff zz1 = (ZayavkaPokupatelya_Foodstaff) o1;
+				ZayavkaPokupatelya_Foodstaff zz2 = (ZayavkaPokupatelya_Foodstaff) o2;
+				return zz1.getNomenklaturaNaimenovanie().compareTo(zz2.getNomenklaturaNaimenovanie());
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+			return 0;
+		}
+	};
+
+	public void sortListByMode(int sortMode) {
+		if (sortMode == FoodStuffListAdapter.sortByName) {
+			mFoodStuffs.mNomenclaureList.sort(comparatorName);
+		} else {
+			if (sortMode == FoodStuffListAdapter.sortByCount) {
+				mFoodStuffs.mNomenclaureList.sort(comparatorCount);
+			} else {
+				if (sortMode == FoodStuffListAdapter.sortByPrice) {
+					mFoodStuffs.mNomenclaureList.sort(comparatorPrice);
+				} else {
+					if (sortMode == FoodStuffListAdapter.sortByLastPrice) {
+						mFoodStuffs.mNomenclaureList.sort(comparatorLastPrice);
+					} else {
+						if (sortMode == FoodStuffListAdapter.sortByNacenka) {
+							mFoodStuffs.mNomenclaureList.sort(comparatorNacenka);
+						} else {
+							if (sortMode == FoodStuffListAdapter.sortByNum) {
+								mFoodStuffs.mNomenclaureList.sort(comparatorNumOrder);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }

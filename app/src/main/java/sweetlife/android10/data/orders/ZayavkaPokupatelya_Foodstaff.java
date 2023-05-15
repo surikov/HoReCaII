@@ -53,7 +53,7 @@ public double ves=0;
 																																											//,skidkaProcent
 																																											//,skidkaNaimenovanie
 		);
-		System.out.println(""+artikul+": lastPrice "+lastPrice+"/"+vidSkidki);
+		//System.out.println(""+artikul+": lastPrice "+lastPrice+"/"+vidSkidki);
 		//CRbyHands=crByHands;
 		//isMustList=isml;
 		mSumma = summa;
@@ -122,14 +122,14 @@ public double ves=0;
 			//Hex.decodeHexWithPrefix("");
 			//values.put("VidSkidki", Hex.decodeHexWithPrefix(mVidSkidki));
 			//if (mVidSkidki.compareTo(Sales.CR_ID) == 0) {
-			System.out.println("mVidSkidki '"+mVidSkidki+"'");
+			//System.out.println("mVidSkidki '"+mVidSkidki+"'");
 			if (mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaIdOldCenovoyeReagirovanie+"'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaIdCenovoyeReagirovanie+"'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaIdAutoReagirovanie+"'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaId_Heroy+"'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaId_TGCR+"'") == 0
 			) {
-				System.out.println("setToDataBase mVidSkidki '"+mVidSkidki+"'");
+				//System.out.println("setToDataBase mVidSkidki '"+mVidSkidki+"'");
 				values.put("VidSkidki", Hex.decodeHexWithPrefix(mVidSkidki));
 			}
 			else {
@@ -221,7 +221,7 @@ public double ves=0;
 	}
 	public String getVidSkidki() {
 		//if (mVidSkidki.compareTo(Sales.CR_ID) == 0) {
-		System.out.println("getVidSkidki "+mVidSkidki);
+		//System.out.println("getVidSkidki "+mVidSkidki);
 		if (mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaIdOldCenovoyeReagirovanie+"'") == 0
 				|| mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaIdCenovoyeReagirovanie+"'") == 0
 				|| mVidSkidki.compareToIgnoreCase("x'"+sweetlife.android10.supervisor.Cfg.skidkaIdAutoReagirovanie+"'") == 0

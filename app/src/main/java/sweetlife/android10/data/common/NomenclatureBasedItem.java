@@ -3,35 +3,33 @@ package sweetlife.android10.data.common;
 import android.database.sqlite.SQLiteDatabase;
 
 public abstract class NomenclatureBasedItem {
-	
-	protected int      m_id;
-	protected int      mNomerStroki;
-	protected String   mNomenklaturaID;
-	protected String   mArtikul;
-	protected String   mNomenklaturaNaimenovanie;
-	protected String   mZayavka_IDRRef;
-	protected boolean  mNew;
-	
-	public Boolean currentPartnerState=null;
-	
+
+	protected int m_id;
+	protected int mNomerStroki;
+	protected String mNomenklaturaID;
+	protected String mArtikul;
+	protected String mNomenklaturaNaimenovanie;
+	protected String mZayavka_IDRRef;
+	protected boolean mNew;
+
+	public Boolean currentPartnerState = null;
+
 	//public String skidkaProcent="";
 	//public String skidkaNaimenovanie="";
-	
-	
-	
-	
-	public NomenclatureBasedItem(int _id, 
-			int        nomerStroki,
-			String     nomenklaturaID,
-			String     artikul,
-			String     nomenklaturaNaimenovanie,
-			String     zayavka,
-			boolean    New	
-			//, String skidkaProcent//
-			//, String skidkaNaimenovanie//
-			) {
 
-		m_id = _id; 
+
+	public NomenclatureBasedItem(int _id,
+								 int nomerStroki,
+								 String nomenklaturaID,
+								 String artikul,
+								 String nomenklaturaNaimenovanie,
+								 String zayavka,
+								 boolean New
+								 //, String skidkaProcent//
+								 //, String skidkaNaimenovanie//
+	) {
+
+		m_id = _id;
 		mNomerStroki = nomerStroki;
 		mNomenklaturaID = nomenklaturaID;
 		mArtikul = artikul;
@@ -39,10 +37,10 @@ public abstract class NomenclatureBasedItem {
 		mZayavka_IDRRef = zayavka;
 		mNew = New;
 		//this.skidkaProcent=skidkaProcent;
-			//	this.skidkaNaimenovanie=skidkaNaimenovanie;
+		//	this.skidkaNaimenovanie=skidkaNaimenovanie;
 	}
-	
-	public abstract void setToDataBase( SQLiteDatabase db );
+
+	public abstract void setToDataBase(SQLiteDatabase db);
 
 	public int getNomerStroki() {
 

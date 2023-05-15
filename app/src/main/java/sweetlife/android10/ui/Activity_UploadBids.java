@@ -299,7 +299,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 							Vector<Bough> forOrders = b.children("ДанныеПоЗаказам");
 							for (int rr = 0; rr < forOrders.size(); rr++) {
 								Bough row = forOrders.get(rr);
-								System.out.println("row " + row.dumpXML());
+								//System.out.println("row " + row.dumpXML());
 								String rowNum = row.child("ВнешнийНомер").value.property.value();
 								double rowStatus = Numeric.string2double(row.child("Статус").value.property.value());
 

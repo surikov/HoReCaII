@@ -844,7 +844,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 	left join Podrazdeleniya p5  on p4.roditel=p5._idrref "//
 					+ "\n 	where Polzovateli._idrref=" + polzovatelID;
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-			System.out.println(sql + ": " + b.dumpXML());
+			//System.out.println(sql + ": " + b.dumpXML());
 			if (
 					b.child("row").child("f1").value.property.value().equals("01")
 							|| b.child("row").child("f2").value.property.value().equals("01")
@@ -1031,8 +1031,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 		then 'ТГ' else ifnull(newSkidki.comment,'') end as VidSkidki "
 			;
 		}
-		sql = sql + "\n 	,n.skladEdIzm || ' по ' || n.skladEdVes || 'кг' as [EdinicyIzmereniyaNaimenovanie] "//
-				+ "\n 	,n.kvant as MinNorma "//
+		//sql = sql + "\n 	,n.skladEdIzm || ' по ' || n.skladEdVes || 'кг' as [EdinicyIzmereniyaNaimenovanie] ";
+		sql = sql + "\n 	,case when n.skladEdIzm='кг' then 'кг' else n.skladEdIzm || ' по ' || n.skladEdVes || 'кг' end as [EdinicyIzmereniyaNaimenovanie] ";
+		sql = sql + "\n 	,n.kvant as MinNorma "//
 				+ "\n 	,n.otchEdKoef as [Koephphicient] "//
 				+ "\n  	,x'00' as [EdinicyIzmereniyaID] "//
 				+ "\n  	,n.Roditel as Roditel "//
@@ -1080,6 +1081,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 				+ "\n 	,TekuschieCenyOstatkovPartiy.cena as BasePrice "//
 				+ "\n 	,round(100*Prodazhi.Stoimost/Prodazhi.kolichestvo)/100.00 as LastPrice "
 		;
+
 		if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
 			sql = sql + "\n 	,0 as Nacenka ";
 		} else {
@@ -1158,6 +1160,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n  	,n4.minCena as n4minCena ";
 		sql = sql + "\n  	,n5.minCena as n5minCena ";
 		sql = sql + "\n  	,atricle_count.artikul as artCount ";
+		sql = sql + "\n 	,'' || Prodazhi.kolichestvo || n.skladEdIzm as lastSellCount ";
 		sql = sql + "\n	from Nomenklatura_sorted n ";
 		sql = sql + "\n 	cross join Consts const ";
 		sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
@@ -1185,12 +1188,13 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
 		} else {
 			if (flagmanTovarSegmentKod != null) {
-				Calendar c = Calendar.getInstance();
-				c.set(Calendar.DAY_OF_MONTH, 1);
-				String thismonth = Auxiliary.sqliteDate.format(c.getTime());
+				//Calendar c = Calendar.getInstance();
+				//c.set(Calendar.DAY_OF_MONTH, 1);
+				//String thismonth = Auxiliary.sqliteDate.format(c.getTime());
 				sql = sql//
 						+ "\n 	left join Prodazhi_last Prodazhi on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
-						+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] and Prodazhi.period>=date('" + thismonth + "') ";
+						//+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] and Prodazhi.period>=date('" + thismonth + "') ";
+						+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
 			} else {
 				sql = sql//
 						+ "\n 	left join Prodazhi_last Prodazhi on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
@@ -1414,14 +1418,14 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		}
 		sql = sql + "\n limit " + limit + " offset " + offset;
 		//System.out.println("poisk "+tipPoiska +"/"+ ISearchBy.SEARCH_HERO+"/"+poisk);
-		//System.out.println(tipPoiska + ": " + sql);
+		//System.out.println( "composeSQLall_Old: " + sql);
 		return sql;
 	}
 
 	static String dataOtgruzkiTovariGeroiDay = "";
 
 	static void refreshTovariGeroiDay(String dataOtgruzki) {
-		System.out.println("refreshTovariGeroiDay "+dataOtgruzki);
+		//System.out.println("refreshTovariGeroiDay "+dataOtgruzki);
 		if (dataOtgruzki.equals(dataOtgruzkiTovariGeroiDay)) {
 			//
 		} else {
@@ -1454,7 +1458,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n				and date(hero2.datanachala)<=date('" + dataOtgruzki + "')"
 					+ "\n				and date(hero2.DataOkonchaniya)>=date('" + dataOtgruzki + "')"
 					+ "\n			);";
-			System.out.println("refreshTovariGeroiDay "+sql);
+			//System.out.println("refreshTovariGeroiDay "+sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 
 			sql = "create index if not exists IX_TovariGeroiDay_Registrator on TovariGeroiDay(Registrator);";

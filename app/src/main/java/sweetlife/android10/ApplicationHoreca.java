@@ -15,6 +15,7 @@ import reactive.ui.Auxiliary;
 import sweetlife.android10.data.common.Agent;
 import sweetlife.android10.data.common.ClientInfo;
 import sweetlife.android10.data.common.NomenclatureBasedDocument;
+import sweetlife.android10.data.orders.ZayavkaPokupatelya;
 import sweetlife.android10.database.DataBaseOpenHelper;
 import sweetlife.android10.database.Requests;
 import sweetlife.android10.log.*;
@@ -57,6 +58,10 @@ public class ApplicationHoreca
 	private Agent mCurrentAgent = null;
 	private Calendar mShippingDate = null;
 	private ClientInfo mClient = null;
+
+	//public static ZayavkaPokupatelya lastZayavkaPokupatelya=null;
+
+
 	//boolean firstPointInsert = false;
 	public static ApplicationHoreca getInstance() {
 		return mInstance;

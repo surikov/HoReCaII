@@ -242,14 +242,15 @@ public class ActivityZayavkaIzmenenieNakladnoy extends Activity {
                         final Numeric newPrice = new Numeric();
                         final Toggle fix = new Toggle();
                         Auxiliary.pick(ActivityZayavkaIzmenenieNakladnoy.this, "Изменить", new SubLayoutless(ActivityZayavkaIzmenenieNakladnoy.this)//
-                                        .child(new Decor(ActivityZayavkaIzmenenieNakladnoy.this).labelText.is("Артикул").labelAlignRightCenter().top().is(Auxiliary.tapSize * 0).width().is(100).height().is(Auxiliary.tapSize))//
-                                        .child(new RedactText(ActivityZayavkaIzmenenieNakladnoy.this).text.is(newArt).left().is(110).top().is(Auxiliary.tapSize * 0).width().is(200).height().is(Auxiliary.tapSize * 0.9))//
-                                        .child(new Decor(ActivityZayavkaIzmenenieNakladnoy.this).labelText.is("Новая цена").labelAlignRightCenter().top().is(Auxiliary.tapSize * 1).width().is(100).height().is(Auxiliary.tapSize))//
-                                        .child(new RedactNumber(ActivityZayavkaIzmenenieNakladnoy.this).number.is(newPrice).left().is(110).top().is(Auxiliary.tapSize * 1).width().is(200).height().is(Auxiliary.tapSize * 0.9))//
+                                        .child(new Decor(ActivityZayavkaIzmenenieNakladnoy.this).labelText.is("Артикул").labelAlignRightCenter().top().is(Auxiliary.tapSize * 0).width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize))//
+                                        .child(new RedactText(ActivityZayavkaIzmenenieNakladnoy.this).text.is(newArt).left().is(Auxiliary.tapSize * 3.5).top().is(Auxiliary.tapSize * 0).width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.9))//
+
+										.child(new Decor(ActivityZayavkaIzmenenieNakladnoy.this).labelText.is("Новая цена").labelAlignRightCenter().top().is(Auxiliary.tapSize * 1).width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize))//
+                                        .child(new RedactNumber(ActivityZayavkaIzmenenieNakladnoy.this).number.is(newPrice).left().is(Auxiliary.tapSize * 3.5).top().is(Auxiliary.tapSize * 1).width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.9))//
                                         //.child(new Decor(this).labelText.is("Через фикс.цену").labelAlignRightCenter().top().is(Auxiliary.tapSize * 2).width().is(100).height().is(Auxiliary.tapSize))//
-                                        .child(new RedactToggle(ActivityZayavkaIzmenenieNakladnoy.this).yes.is(fix).labelText.is("Через фикс.цену").left().is(110).top().is(Auxiliary.tapSize * 2).width().is(400).height().is(Auxiliary.tapSize * 0.9))//
-                                        .width().is(Auxiliary.tapSize * 30)//
-                                        .height().is(Auxiliary.tapSize * 4)//
+                                        .child(new RedactToggle(ActivityZayavkaIzmenenieNakladnoy.this).yes.is(fix).labelText.is("Через фикс.цену").left().is(Auxiliary.tapSize * 3.5).top().is(Auxiliary.tapSize * 2).width().is(400).height().is(Auxiliary.tapSize * 0.9))//
+                                        .width().is(Auxiliary.tapSize * 10)//
+                                        .height().is(Auxiliary.tapSize * 6)//
                                 , "Добавить", new Task() {
                                     @Override
                                     public void doTask() {

@@ -327,7 +327,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				, false
 				, null, null, this.selectedSegmentKod
 		);
-		//System.out.println(sql);
+		System.out.println("nextProductData "+sql);
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		//System.out.println(data.dumpXML());
 		Date lostedLimit = new Date();

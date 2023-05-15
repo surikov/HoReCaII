@@ -360,7 +360,7 @@ public class ActivityCheckList2 extends Activity {
 				+ "\n     left join kontragenty k on d.odr=k.kod"//
 				+ "\n where d._id=" + doc_id + ";";
 		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		System.out.println(sql);
+		//System.out.println(sql);
 		//Date wh = new Date((long) Numeric.string2double(b.child("row").child("data").value.property.value()));
 		//podr = items.child("row").child("podr").value.property.value();
 		kontragent = b.child("row").child("kontragent").value.property.value();
@@ -624,7 +624,7 @@ public class ActivityCheckList2 extends Activity {
 						.child(new RedactToggle(this).labelText.is(description).yes.is(checkBoxValue).left().is(Auxiliary.tapSize * 0.5).top().is(0).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactText(this).text.is(note).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 1.0).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 2)//
+						.height().is(Auxiliary.tapSize * 5)//
 				, "Сохранить", new Task() {
 					@Override
 					public void doTask() {

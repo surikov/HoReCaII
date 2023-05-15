@@ -568,7 +568,7 @@ public class ActivityCheckList extends Activity {
 				                         .child(new RedactToggle(this).labelText.is(description).yes.is(t).left().is(Auxiliary.tapSize * 0.5).top().is(0).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
 				                         .child(new RedactText(this).text.is(note).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 1.0).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
 				                         .width().is(Auxiliary.tapSize * 9)//
-				                         .height().is(Auxiliary.tapSize * 2)//
+				                         .height().is(Auxiliary.tapSize * 6)//
 				, "Сохранить", new Task() {
 					@Override
 					public void doTask() {

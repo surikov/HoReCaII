@@ -93,7 +93,7 @@ public class NomenclatureByGroupListAdapter extends ZoomListCursorAdapter implem
 			mPlaceCount.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
 			mUnit.setText(Request_NomenclatureBase.getEdinicyIzmereniyaNaimenovanie(cursor));
 			mUnit.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
-			if(sweetlife.android10.ui.Activity_Bid.hideStatus) {
+			if(sweetlife.android10.ui.Activity_Bid.hideNacenkaStatus) {
 				mPrice.setText(Request_NomenclatureBase.getCena(cursor));
 				mPrice.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
 			}else{

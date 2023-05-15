@@ -490,12 +490,12 @@ public class Cfg {
 					+ "\n			select CenyNomenklaturySklada_last._id from CenyNomenklaturySklada_last"//
 					+ "\n				join nomenklatura on nomenklatura._idrref=CenyNomenklaturySklada_last.nomenklatura and nomenklatura.artikul='" + Artikul + "')"//
 					+ "\n	;";
-			System.out.println(sql);
+			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			if (Cfg.lastSQLiteChanesCount() < 1) {
 				sql = "insert into CenyNomenklaturySklada_last (period,nomenklatura,cena)"
 						+ " select date('now') as period, nn._idrref as nomenklatura," + Prais + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
-				System.out.println(sql);
+				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 			sql = "update CenyNomenklaturySklada"//
@@ -505,12 +505,12 @@ public class Cfg {
 					+ "\n				join CenyNomenklaturySklada on CenyNomenklaturySklada.period=CenyNomenklaturySklada_last.period and CenyNomenklaturySklada.nomenklatura=CenyNomenklaturySklada_last.nomenklatura"//
 					+ "\n				join nomenklatura on nomenklatura._idrref=CenyNomenklaturySklada_last.nomenklatura and nomenklatura.artikul='" + Artikul + "')"//
 					+ "\n	;";
-			System.out.println(sql);
+			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			if (Cfg.lastSQLiteChanesCount() < 1) {
 				sql = "insert into CenyNomenklaturySklada (period,nomenklatura,cena)"
 						+ " select date('now') as period, nn._idrref as nomenklatura," + Prais + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
-				System.out.println(sql);
+				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 		}
@@ -522,12 +522,12 @@ public class Cfg {
 					+ "\n			select TekuschieCenyOstatkovPartiy_strip._id from TekuschieCenyOstatkovPartiy_strip"//
 					+ "\n				join nomenklatura on nomenklatura._idrref=TekuschieCenyOstatkovPartiy_strip.nomenklatura and nomenklatura.artikul='" + Artikul + "')"//
 					+ "\n	;";
-			System.out.println(sql);
+			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			if (Cfg.lastSQLiteChanesCount() < 1) {
 				sql = "insert into TekuschieCenyOstatkovPartiy_strip (nomenklatura,cena)"
 						+ " select nn._idrref as nomenklatura," + TekuhayaCena + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
-				System.out.println(sql);
+				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 			sql = "update TekuschieCenyOstatkovPartiy"//
@@ -536,13 +536,13 @@ public class Cfg {
 					+ "\n			select TekuschieCenyOstatkovPartiy._id from TekuschieCenyOstatkovPartiy"//
 					+ "\n				join nomenklatura on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura and nomenklatura.artikul='" + Artikul + "')"//
 					+ "\n	;";
-			System.out.println(sql);
+			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			if (Cfg.lastSQLiteChanesCount() < 1) {
 				r=1;
 				sql = "insert into TekuschieCenyOstatkovPartiy (nomenklatura,cena)"
 						+ " select nn._idrref as nomenklatura," + TekuhayaCena + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
-				System.out.println(sql);
+				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 		}
@@ -553,7 +553,7 @@ public class Cfg {
 					+ "\n			select MinimalnyeNacenki._id from MinimalnyeNacenki"//
 					+ "\n				join nomenklatura on nomenklatura._idrref=MinimalnyeNacenki.nomenklatura and nomenklatura.artikul='" + Artikul + "')"//
 					+ "\n	;";
-			System.out.println(sql);
+			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		}
 		return r;

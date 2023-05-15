@@ -84,15 +84,23 @@ public class EditOrderViaWeb {
 					orderItems.add(info);
 
 					String sql = "select pp.Stoimost/pp.kolichestvo as poslednyaa"
+							//+"\n		,nn.skladEdIzm || ' по ' || nn.skladEdVes || 'кг' as [EdinicyIzmereniyaNaimenovanie] "
 							+ "\n	from Prodazhi_last pp"
 							+ "\n		join Nomenklatura_sorted nn on nn._IDRRef=pp.nomenklatura and nn.artikul='" + info.artikul + "'"
 							+ "\n		join DogovoryKontragentov_strip dog on pp.DogovorKontragenta=dog._IDRRef"
 							+ "\n		join Kontragenty kk on kk._idrref=dog.vladelec and kk.kod='" + currentKlientKod + "'"
 							+ "\n	limit 1;";
 					Bough bough = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-					info.poslednyaa = bough.child("row").child("poslednyaa").value.property.value();
-
-					System.out.println(currentKlientKod + ": " + info.artikul + "/" + info.poslednyaa);
+					info.poslednyaya = bough.child("row").child("poslednyaa").value.property.value();
+					String sql2 = "select nn.skladEdIzm || ' по ' || nn.skladEdVes || 'кг' as [EdinicyIzmereniyaNaimenovanie], nn.kvant as MinNorma, nn.otchEdKoef as [Koephphicient]"
+							+ "\n	from Nomenklatura_sorted nn"
+							+ "\n	where nn.artikul='" + info.artikul + "'"
+							+ "\n	limit 1;";
+					Bough bough2 = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql2, null));
+					//System.out.println(sql2);
+					info.edizm = bough2.child("row").child("EdinicyIzmereniyaNaimenovanie").value.property.value();
+					info.minNorma = bough2.child("row").child("MinNorma").value.property.value();
+					info.koephphicient = bough2.child("row").child("Koephphicient").value.property.value();
 
 
 				}
@@ -155,6 +163,7 @@ public class EditOrderViaWeb {
 
 	void promptActionReportStatusyZakazov() {
 		final Numeric nn = new Numeric();
+		//currentKlientKod="0";
 		Auxiliary.pickSingleChoice(context, new String[]{//
 						"Провести"//
 						, "Пометить заказ на удаление"//
@@ -334,13 +343,13 @@ public class EditOrderViaWeb {
 				+ "	,ifnull(dgvr.ProcentPredoplaty,0) as procent"
 				+ "	,kod as kod"
 				+ "	,dgvr.naimenovanie as name"
-				+ "	from DogovoryKontragentov_strip dgvr "
+				+ "	from DogovoryKontragentov dgvr "
 				+ "	where dgvr.PometkaUdaleniya=x'00' "
 				+ "	and dgvr.vladelec=" + clientID
 				+ "	limit 100;";
-		//System.out.println(sql);
+		System.out.println("promptDogovorTipOplaty "+sql);
 		bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-		//System.out.println(bb.dumpXML());
+		System.out.println(bb.dumpXML());
 		Vector<String> labels = new Vector<String>();
 		final Vector<String> kods = new Vector<String>();
 		final Vector<String> tips = new Vector<String>();
@@ -381,21 +390,26 @@ public class EditOrderViaWeb {
 				}
 			}
 		}
-		final String[] list = new String[labels.size()];
-		labels.copyInto(list);
-		final Numeric idx = new Numeric().value(-1);
-		Auxiliary.pickSingleChoice(context, list, idx);
-		idx.afterChange(new Task() {
-			public void doTask() {
-				System.out.println(list[idx.value().intValue()]);
-				sendDogovorTipOplaty(documentNumber
-						, Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyyMMdd")
+		if(labels.size()>0) {
+			final String[] list = new String[labels.size()];
+			labels.copyInto(list);
+			final Numeric idx = new Numeric().value(-1);
+			Auxiliary.pickSingleChoice(context, list, idx);
+			idx.afterChange(new Task() {
+				public void doTask() {
+					System.out.println(list[idx.value().intValue()]);
+					sendDogovorTipOplaty(documentNumber
+							, Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyyMMdd")
 
-						, tips.get(idx.value().intValue())
-						, kods.get(idx.value().intValue())
-				);
-			}
-		}, true);
+							, tips.get(idx.value().intValue())
+							, kods.get(idx.value().intValue())
+					);
+				}
+			}, true);
+		}else{
+			Auxiliary.warn("Нет доступных договоров.",context);
+		}
+
 	}
 
 	void sendDogovorTipOplaty(final String nomerZakaza, final String dataZakaza, final String nomerFormiOplaty, final String kodDogovora) {
@@ -593,6 +607,7 @@ public class EditOrderViaWeb {
 		today.setTime(NomenclatureBasedDocument.nextWorkingDate(today));
 		final Numeric dateShip = new Numeric().value((double) today.getTime().getTime());
 		System.out.println("today " + today);
+		System.out.println("data " + data.dumpXML());
 		SubLayoutless subLayoutless = new SubLayoutless(context);
 		subLayoutless.child(new Decor(context).labelText.is("Доставка").labelAlignRightCenter().labelStyleMediumNormal()//
 				.left().is(margin).top().is(margin)//
@@ -618,7 +633,7 @@ public class EditOrderViaWeb {
 				.left().is(Auxiliary.tapSize * 3.5 + margin).top().is(margin + Auxiliary.tapSize * 1)//
 				.width().is(Auxiliary.tapSize * 5).height().is(Auxiliary.tapSize * 0.8)//
 		);
-		subLayoutless.width().is(Auxiliary.tapSize * 8 + margin * 2).height().is(Auxiliary.tapSize * 4);
+		subLayoutless.width().is(Auxiliary.tapSize * 8 + margin * 2).height().is(Auxiliary.tapSize * 6);
 		Auxiliary.pick(context, "", subLayoutless, "Скопировать", new Task() {
 			@Override
 			public void doTask() {
@@ -630,6 +645,8 @@ public class EditOrderViaWeb {
 				intent.putExtra("dateShip", "" + dateShip.value());
 				String raw = data.child("raw").dumpXML();
 				intent.putExtra("raw_data", "" + raw);
+
+				Activity_Bid.unLockCreateNewOrder();
 				context.startActivity(intent);
 			}
 		}, null, null, null, null);
@@ -670,8 +687,8 @@ public class EditOrderViaWeb {
 			if (orderItems.get(i).min > 0 && orderItems.get(i).max > 0) {
 				labels[i] = labels[i] + ", от " + orderItems.get(i).min + " до " + orderItems.get(i).max + "р.";
 			}
-			if (orderItems.get(i).poslednyaa.trim().length() > 0 && (!orderItems.get(i).poslednyaa.trim().equals("0"))) {
-				labels[i] = labels[i] + ", история " + orderItems.get(i).poslednyaa + "р.";
+			if (orderItems.get(i).poslednyaya.trim().length() > 0 && (!orderItems.get(i).poslednyaya.trim().equals("0"))) {
+				labels[i] = labels[i] + ", история " + orderItems.get(i).poslednyaya + "р.";
 			}
 		}
 		String c = comment.value();
@@ -711,14 +728,25 @@ public class EditOrderViaWeb {
 		}
 		RedactNumber cena = new RedactNumber(context);
 		cena.setEnabled(inf.min > 0 && inf.max > 0);
+		String kolichestvoLabel="Количество ("+inf.edizm+", мин. "+inf.minNorma+", в упаковке "+inf.koephphicient+")";
 		Auxiliary.pick(context, "", new SubLayoutless(context)//
-						.child(new Decor(context).labelText.is(description).labelStyleMediumNormal().left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 0.0).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
-						.child(new Decor(context).labelText.is("Цена" + minMax).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 1.0).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
-						.child(cena.number.is(itemCena).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 1.5).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
-						.child(new Decor(context).labelText.is("Количество").left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 2.5).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
-						.child(new RedactNumber(context).number.is(itemKolvo).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 3.0).width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
+						.child(new Decor(context).labelText.is(description).labelStyleMediumNormal().left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 0.5)
+								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
+						.child(new Decor(context).labelText.is("Цена" + minMax).left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 1.5)
+								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
+						.child(cena.number.is(itemCena).left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 2.0)
+								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
+						.child(new Decor(context).labelText.is(kolichestvoLabel).left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 3.0)
+								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactNumber(context).number.is(itemKolvo).left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 3.5)
+								.width().is(Auxiliary.tapSize * 9 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 4.5)//
+						.height().is(Auxiliary.tapSize * 6)//
 				, "Сохранить", new Task() {
 					@Override
 					public void doTask() {

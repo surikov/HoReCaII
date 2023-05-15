@@ -252,7 +252,7 @@ public class Activity_ReceptChooser extends Activity_Base implements ITableColum
                 + "\n        group by reingred.kluch"
                 + "\n        order by receptii.naimenovanie,receptii._id,reingred.ingridient,reingred._id"
                 + ";";
-        System.out.println(sql);
+        //System.out.println(sql);
         Bough receptData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
         //System.out.println(selectedRecId+"/"+selectedIngredientId);
         String _id = "";
@@ -308,7 +308,7 @@ public class Activity_ReceptChooser extends Activity_Base implements ITableColum
                 , false
                 , selectedIngredientIdrref, selectedIngredientKluch
         );
-        System.out.println(sql);
+        //System.out.println(sql);
         Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
         //System.out.println(data.children.size());
         for (int i = 0; i < data.children.size(); i++) {

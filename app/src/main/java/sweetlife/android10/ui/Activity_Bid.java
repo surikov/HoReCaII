@@ -88,7 +88,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	private static final int IDD_IS_EMPTY = 103;
 	private static final int IDD_PAYMENT_NOT_SELECT = 104;
 	private static final int IDD_ALREADY_IN_LIST = 106;
-	public static boolean hideStatus = true;
+	public static boolean hideNacenkaStatus = true;
+
+	int sortMode = FoodStuffListAdapter.sortByName;
 	MenuItem menuExport;
 	MenuItem menuImport;
 	MenuItem menuFromSpecificacia;
@@ -142,7 +144,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	ColumnText historyCena = new ColumnText().headerBackground.is(0xffe3e3e3);
 	ColumnText historyRazmSkidki = new ColumnText().headerBackground.is(0xffe3e3e3);
 	ColumnText historyVidSkidki = new ColumnText().headerBackground.is(0xffe3e3e3);
-	ColumnText historyPoslCena = new ColumnText().headerBackground.is(0xffe3e3e3);
+	ColumnDescription historyPoslCena = new ColumnDescription().headerBackground.is(0xffe3e3e3);
 	ColumnText historyMinCena = new ColumnText().headerBackground.is(0xffe3e3e3);
 	ColumnText historyMaxCena = new ColumnText().headerBackground.is(0xffe3e3e3);
 	SplitLeftRight slrHistory;
@@ -186,6 +188,24 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	private TextView mTextOrderAmount;
 	private BidData mBidData;
 	private Calendar mShippingDate;
+
+	public static boolean canCreateNewOrder() {
+		boolean rr = false;
+		Cursor cursor = ApplicationHoreca.getInstance().getDataBase().rawQuery("select TekKatalog from consts where TekKatalog='';", null);
+		if (cursor.moveToNext()) {
+			rr = true;
+		}
+		return rr;
+	}
+
+	public static void unLockCreateNewOrder() {
+		ApplicationHoreca.getInstance().getDataBase().execSQL("update consts set TekKatalog='';");
+	}
+
+	public static void lockCreateNewOrder(String key) {
+		ApplicationHoreca.getInstance().getDataBase().execSQL("update consts set TekKatalog='"+key+"';");
+	}
+
 	CannyTask _updateExtraChargeInfoTask = new CannyTask() {
 		@Override
 		public void doBackground() {
@@ -275,6 +295,38 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			}
 		}
 	};
+
+	void setSort(int mode) {
+		this.sortMode = mode;
+		System.out.println("setSort " + this.sortMode);
+		((Button) findViewById(R.id.head_btn_nomenclature)).setTextColor(0xff000099);
+		((Button) findViewById(R.id.head_btn_count)).setTextColor(0xff000099);
+		((Button) findViewById(R.id.head_btn_price)).setTextColor(0xff000099);
+		((Button) findViewById(R.id.head_btn_last_price)).setTextColor(0xff000099);
+		((Button) findViewById(R.id.head_btn_pricewithsale)).setTextColor(0xff000099);
+		((Button) findViewById(R.id.head_btn_number)).setTextColor(0xff000099);
+		if (this.sortMode == FoodStuffListAdapter.sortByName) {
+			((Button) findViewById(R.id.head_btn_nomenclature)).setTextColor(0xffffffff);
+		}
+		if (this.sortMode == FoodStuffListAdapter.sortByCount) {
+			((Button) findViewById(R.id.head_btn_count)).setTextColor(0xffffffff);
+		}
+		if (this.sortMode == FoodStuffListAdapter.sortByPrice) {
+			((Button) findViewById(R.id.head_btn_price)).setTextColor(0xffffffff);
+		}
+		if (this.sortMode == FoodStuffListAdapter.sortByLastPrice) {
+			((Button) findViewById(R.id.head_btn_last_price)).setTextColor(0xffffffff);
+		}
+		if (this.sortMode == FoodStuffListAdapter.sortByNacenka) {
+			((Button) findViewById(R.id.head_btn_pricewithsale)).setTextColor(0xffffffff);
+		}
+		if (this.sortMode == FoodStuffListAdapter.sortByNum) {
+			((Button) findViewById(R.id.head_btn_number)).setTextColor(0xffffffff);
+		}
+		((FoodStuffListAdapter) mFoodstuffList.getAdapter()).sortListByMode(this.sortMode);
+		((ZoomListArrayAdapter) mFoodstuffList.getAdapter()).notifyDataSetChanged();
+
+	}
 
 	private OnClickListener mGazetaClick = new OnClickListener() {
 		@SuppressWarnings("deprecation")
@@ -525,9 +577,11 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		textClientPlan.setText(status);
 	}
 
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
 
+	@Override
+	public void onCreate(Bundle savedInstanceState2) {
+		super.onCreate(savedInstanceState2);
+		System.out.println("Activity_Bid onCreate " + Auxiliary.bundle2bough(getIntent().getExtras()).dumpXML());
 
 /*
 		System.out.println("android.os.StrictMode.VmPolicy");
@@ -550,6 +604,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		ConstructFoodStuffsList();
 		ConstructServicesList();
 		ConstructTrafiksList();
+
+
 		mTextAvailableAmount = (TextView) findViewById(R.id.text_available_amount);
 		if (!mIsOrderEditable) {
 			mTextAvailableAmount.setVisibility(View.INVISIBLE);
@@ -628,8 +684,44 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		//System.out.println("Activity_Bid onSaveInstanceState "+Auxiliary.bundle2bough(outState.getExtras()).dumpXML());
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		//System.out.println("Activity_Bid onPause");
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		//System.out.println("Activity_Bid onStop");
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		//System.out.println("Activity_Bid onDestroy");
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		//System.out.println("Activity_Bid onStart");
+	}
+
+	@Override
+	public void onRestart() {
+		super.onRestart();
+		//System.out.println("Activity_Bid onRestart");
+	}
+
+	@Override
 	protected void onResume() {
-		//System.out.println("onResume start");
+		//System.out.println("Activity_Bid onResume");
 		try {
 			//UpdateExtraChargeInfo();
 			clearExtraChargeInfo();
@@ -711,46 +803,33 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		mBidData.setChoosedDay(choosedDay);
 		ZayavkaPokupatelya bid = extras.getParcelable(BID);
 		if (bid == null) {
-			System.out.println(Auxiliary.activityExatras(this).dumpXML());
+			if(!canCreateNewOrder()){
+				finish();
+			}
 			double dateShip = Numeric.string2double(Auxiliary.activityExatras(this).child("dateShip").value.property.value());
 			if (dateShip > 0) {
 				Calendar cc = Calendar.getInstance();
 				cc.setTimeInMillis((long) dateShip);
-				//System.out.println(cc);
 				bid = new ZayavkaPokupatelya(mDB, new ClientInfo(mDB, extras.getString(CLIENT_ID)), cc);
-				//ConstructPaymentTypeSpinner(mContractsAdapter.getSelectedItem().getID(), mBidData.getBid().getTipOplaty());
 				bid.setContract(Auxiliary.activityExatras(this).child("dogovor_idrref").value.property.value());
 				bid.setTipOplaty(Auxiliary.activityExatras(this).child("oplatanum").value.property.value());
 				String raw_data = Auxiliary.activityExatras(this).child("raw_data").value.property.value();
-
 				raw_data = raw_data.replace("&", "-");
 				Bough raw = Bough.parseXML(raw_data);
-
-
 				Vector<Bough> tovari = raw.child("Данные").children("Товары");
-				//System.out.println("raw_data: "+Auxiliary.activityExatras(this).child("raw_data").dumpXML());
-				//System.out.println("raw_data/raw: "+Auxiliary.activityExatras(this).child("raw_data").value.property.value());
-				//System.out.println("raw_data children: "+Auxiliary.activityExatras(this).child("raw_data").children.size());
-				//for(int i=0;i<tovari.size();i++){
-				//System.out.println(i+": "+tovari.get(i).dumpXML());
-				//}
 				mBidData.setBid(bid);
 				mBidData.setFoodStuffs(new FoodstuffsData(mDB, mBidData.getBid()));
 				cloneOrder(tovari, mBidData.getFoodStuffs());
 			} else {
-
 				bid = new ZayavkaPokupatelya(mDB, new ClientInfo(mDB, extras.getString(CLIENT_ID)), (Calendar) mBidData.getChoosedDay().clone());
 				mBidData.setBid(bid);
 				mBidData.setFoodStuffs(new FoodstuffsData(mDB, mBidData.getBid()));
 			}
-
 		} else {
 			mIsOrderPropertiesEditable = false;
 			mBidData.setBid(bid);
 			mBidData.setFoodStuffs(new FoodstuffsData(mDB, mBidData.getBid()));
 		}
-
-		//System.out.println("read from db done");
 		mBidData.setServices(new ServicesData(mDB, mBidData.getBid()));
 		mBidData.setTrafiks(new TraficsData(mDB, mBidData.getBid()));
 		mIsOrderEditable = extras.getBoolean(IS_EDITABLE, true);
@@ -786,6 +865,41 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			registerForContextMenu(mFoodstuffList);
 			mFoodstuffList.setOnTouchListener(this);
 		}
+
+		Button bb = (Button) findViewById(R.id.head_btn_article);
+		System.out.println("=====================");
+		System.out.println(bb);
+		((Button) findViewById(R.id.head_btn_nomenclature)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				setSort(FoodStuffListAdapter.sortByName);
+			}
+		});
+		System.out.println(bb);
+		((Button) findViewById(R.id.head_btn_count)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				setSort(FoodStuffListAdapter.sortByCount);
+			}
+		});
+		((Button) findViewById(R.id.head_btn_price)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				setSort(FoodStuffListAdapter.sortByPrice);
+			}
+		});
+		((Button) findViewById(R.id.head_btn_last_price)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				setSort(FoodStuffListAdapter.sortByLastPrice);
+			}
+		});
+		((Button) findViewById(R.id.head_btn_pricewithsale)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				setSort(FoodStuffListAdapter.sortByNacenka);
+			}
+		});
+		((Button) findViewById(R.id.head_btn_number)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				setSort(FoodStuffListAdapter.sortByNum);
+			}
+		});
 	}
 
 	private void ConstructTrafiksList() {
@@ -951,11 +1065,19 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		} else {
 			btnSave.setEnabled(false);
 		}
-
+		/*
+		Button btnKartochka = (Button) findViewById(R.id.btn_add);
+		btnKartochka.setOnClickListener(new View.OnClickListener() {
+			@SuppressWarnings("deprecation")
+			public void onClick(View v) {
+				doKartochkaKlienta();
+			}
+		});
+*/
 	}
 
 	void saveChanges() {
-		//System.out.println("saveChanges");
+		//System.out.println("Activity_Bid saveChanges");
 		if (dogovorEmpty) {
 			return;
 		}
@@ -970,7 +1092,14 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		bid.setSebestoimost(mBidData.getFoodStuffs().getAmount());
 		bid.setShippingDate(mShippingDate.getTimeInMillis());
 		bid.writeToDataBase(mDB);
+		//getIntent().putExtra("client_id", mAppInstance.getClientInfo().getID());
+		//getIntent().putExtra("ZayavkaPokupatelya", bid);
+		//getIntent().putExtra("saved", true);
 		this.resetTitle();
+		//Bundle extras = getIntent().getExtras();
+		//System.out.println("Activity_Bid saveChanges "+Auxiliary.bundle2bough(extras).dumpXML());
+		//ApplicationHoreca.lastZayavkaPokupatelya=bid;
+		lockCreateNewOrder("lock");
 	}
 
 	void changeDateRecalculate(long newMs) {
@@ -981,15 +1110,15 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		FoodstuffsData foodstuffsData = mBidData.getFoodStuffs();
 		mShippingDate.setTimeInMillis(newMs);
 		mEditShippingDate.setText(DateTimeHelper.UIDateString(mShippingDate.getTime()));
-		SimpleDateFormat sdf=new SimpleDateFormat("dd.MM.yyyy");
-		String warnings=("Дата отгрузки: "+sdf.format(calendar.getTime()));
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+		String warnings = ("Дата отгрузки: " + sdf.format(calendar.getTime()));
 		for (int i = 0; i < foodstuffsData.getCount(); i++) {
 			ZayavkaPokupatelya_Foodstaff zf = foodstuffsData.getFoodstuff(i);
-			warnings=warnings+adjustOrderItem(zf);
+			warnings = warnings + adjustOrderItem(zf);
 		}
 		this.saveChanges();
 
-		Auxiliary.warn(warnings,this);
+		Auxiliary.warn(warnings, this);
 		/*if(warnings.length()>0){
 			Auxiliary.warn("Пересчитаны сцены "+warnings,this);
 		}*/
@@ -1030,17 +1159,17 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		double MIN_CENA = Math.ceil(Numeric.string2double(b.children.get(0).child("MinCena").value.property.value()) * 100.0) / 100.0;
 		double MAX_CENA = Numeric.string2double(b.children.get(0).child("MaxCena").value.property.value());
 		double BASE_PRICE = Numeric.string2double(b.children.get(0).child("BasePrice").value.property.value());
-		double CENA_SO_SKIDKOY =  SKIDKA ;
-		if(SKIDKA > 0){
+		double CENA_SO_SKIDKOY = SKIDKA;
+		if (SKIDKA > 0) {
 			//
-		}else{
-			CENA_SO_SKIDKOY =  CENA;
-			if(MIN_CENA>0){
-				if(CENA_SO_SKIDKOY>MAX_CENA){
-					CENA_SO_SKIDKOY=MAX_CENA;
+		} else {
+			CENA_SO_SKIDKOY = CENA;
+			if (MIN_CENA > 0) {
+				if (CENA_SO_SKIDKOY > MAX_CENA) {
+					CENA_SO_SKIDKOY = MAX_CENA;
 				}
-				if(CENA_SO_SKIDKOY<MIN_CENA){
-					CENA_SO_SKIDKOY=MIN_CENA;
+				if (CENA_SO_SKIDKOY < MIN_CENA) {
+					CENA_SO_SKIDKOY = MIN_CENA;
 				}
 			}
 		}
@@ -1052,9 +1181,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		System.out.println("max: " + zf.getMaksimalnayaCena() + " => " + MAX_CENA);
 		System.out.println("vidskidki: " + zf.getVidSkidki() + " => " + VID_SKIDKI);
 */
-		String warning="";
-		if(CENA_SO_SKIDKOY!=zf.getCenaSoSkidkoy()){
-			warning='\n'+"арт. "+artikul+": "+zf.getCenaSoSkidkoy()+" => "+CENA_SO_SKIDKOY;
+		String warning = "";
+		if (CENA_SO_SKIDKOY != zf.getCenaSoSkidkoy()) {
+			warning = '\n' + "арт. " + artikul + ": " + zf.getCenaSoSkidkoy() + " => " + CENA_SO_SKIDKOY;
 		}
 		zf.setMinimalnayaCena(MIN_CENA);
 		zf.setCenaSoSkidkoy(CENA_SO_SKIDKOY);
@@ -1408,9 +1537,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	void refreshAfterPaymentSelect() {
-		System.out.println("refreshAfterPaymentSelect isEmpty " + mPaymentTypeAdapter.GetSelectedItem().isEmpty());
-		System.out.println("mPaymentTypeAdapter count " + mPaymentTypeAdapter.getCount());
-		System.out.println("getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
+		//System.out.println("refreshAfterPaymentSelect isEmpty " + mPaymentTypeAdapter.GetSelectedItem().isEmpty());
+		//System.out.println("mPaymentTypeAdapter count " + mPaymentTypeAdapter.getCount());
+		//System.out.println("getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
 		//boolean removed=mPaymentTypeAdapter.RemoveEmptyItem();
 		//System.out.println("removed empty " + removed);
 		if (!mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
@@ -1421,13 +1550,13 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				System.out.println("removed empty");
 			}
 			//mSpnPaymentType.setSelection(mSpnPaymentType.getSelectedItemPosition()-1);
-			System.out.println("1 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
+			//System.out.println("1 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
 			fillClientHistoryPrompt();
-			System.out.println("2 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
+			//System.out.println("2 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
 			historyFillColumns(true);
-			System.out.println("3 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
+			//System.out.println("3 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
 			gridHistory.refresh();
-			System.out.println("4 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
+			//System.out.println("4 getSelectedItemPosition " + mSpnPaymentType.getSelectedItemPosition());
 			//}
 		}
 		System.out.println("refreshAfterPaymentSelect");
@@ -1489,6 +1618,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	private void UpdateAfterAddingNomenclature() {
+		//sortListByMode(this.sortMode);
 		//System.out.println("UpdateAfterAddingNomenclature start");
 		//System.out.println("1");
 		((ZoomListArrayAdapter) mFoodstuffList.getAdapter()).notifyDataSetChanged();
@@ -1843,6 +1973,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 						mBidData.getBid().dostvkaKoment = komentariy.value();
 						mBidData.getBid().dostvkaVozvrNakl = dostvkaVozvrNakl.value();
 						resetTitle();
+
 					}
 				}, null, null, null, null);
 	}
@@ -1874,14 +2005,14 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 		if (item == menuShowHideStatus) {
 			TextView textClientPlan = (TextView) findViewById(R.id.text_plan_client);
-			if (hideStatus) {
-				hideStatus = false;
+			if (hideNacenkaStatus) {
+				hideNacenkaStatus = false;
 				menuShowHideStatus.setTitle("Спрятать наценку");
 				textClientPlan.setVisibility(textClientPlan.VISIBLE);
 				clearExtraChargeInfo();
 				//updateExtraChargeInfoTask.start();
 			} else {
-				hideStatus = true;
+				hideNacenkaStatus = true;
 				menuShowHideStatus.setTitle("Показать наценку");
 				textClientPlan.setVisibility(textClientPlan.INVISIBLE);
 			}
@@ -1896,34 +2027,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			return true;
 		}
 		if (item == menuKartochkaKlienta) {
-			if (mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
-				showDialog(IDD_PAYMENT_NOT_SELECT);
 
-			} else {
-				Intent intent = new Intent();
-				intent.setClass(this, ActivityKartochkaKlienta.class);
-				//startActivity(intent);
-				String clientID = "0";
-				String polzovatelID = "0";
-				String dataOtgruzki = "0";
-				String sklad = "0";
-				try {
-					clientID = ApplicationHoreca.getInstance().getClientInfo().getID();
-					polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
-					dataOtgruzki = DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime());
-					sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
-				} catch (Throwable ttt) {
-					ttt.printStackTrace();
-				}
-
-				intent.putExtra("clientID", clientID);
-				intent.putExtra("dataOtgruzki", dataOtgruzki);
-				intent.putExtra("polzovatelID", polzovatelID);
-				intent.putExtra("sklad", sklad);
-
-				startActivityForResult(intent, ADD_NOMENCATURE);
-			}
-
+			doKartochkaKlienta();
 			return true;
 		}
 		if (item == menuChangeDateRecalculate) {
@@ -1953,6 +2058,35 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		return true;
 	}
 
+	void doKartochkaKlienta() {
+		if (mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
+			showDialog(IDD_PAYMENT_NOT_SELECT);
+
+		} else {
+			Intent intent = new Intent();
+			intent.setClass(this, ActivityKartochkaKlienta.class);
+			//startActivity(intent);
+			String clientID = "0";
+			String polzovatelID = "0";
+			String dataOtgruzki = "0";
+			String sklad = "0";
+			try {
+				clientID = ApplicationHoreca.getInstance().getClientInfo().getID();
+				polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
+				dataOtgruzki = DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime());
+				sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
+			} catch (Throwable ttt) {
+				ttt.printStackTrace();
+			}
+
+			intent.putExtra("clientID", clientID);
+			intent.putExtra("dataOtgruzki", dataOtgruzki);
+			intent.putExtra("polzovatelID", polzovatelID);
+			intent.putExtra("sklad", sklad);
+
+			startActivityForResult(intent, ADD_NOMENCATURE);
+		}
+	}
 
 	void promptListovkaOtdelaProdazh() {
 		//http://89.109.7.162/GolovaNew/hs/Prilozhenie/ПревьюФотоНоменклатуры?Артикул=2838
@@ -2537,7 +2671,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			Vector<Bough> datarows = curdata.children("row");
 			int n = datarows.size();
 			for (int i = 0; i < n; i++) {
-				System.out.println("row " + i + ": " + datarows.get(i).dumpXML());
+				//System.out.println("row " + i + ": " + datarows.get(i).dumpXML());
 				Vector<String> item = new Vector<String>();
 				String s = datarows.get(i).child("Naimenovanie").value.property.value();//mBidData.getFoodStuffs().getFoodstuff(i).getNomenklaturaNaimenovanie();
 				s = s.replaceAll(" \\(склад 8\\)", "");
@@ -2768,141 +2902,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			workbook.close();
 
 			//Auxiliary.startFile(this, android.content.Intent.ACTION_VIEW, "application/vnd.ms-excel", xfile);
-			Auxiliary.startFile(this,  xfile);
-		} catch (Throwable t) {
-			t.printStackTrace();
-			Auxiliary.warn("Ошибка: " + t.getMessage(), Activity_Bid.this);
-		}
-	}
-
-	void doMenuExport2() {
-		//System.out.println("export");
-		/*
-		mBidData.getFoodStuffs().WriteToDataBase(mDB);
-		mBidData.getServices().WriteToDataBase(mDB);
-		mBidData.getTrafiks().WriteToDataBase(mDB);
-		ZayavkaPokupatelya bid = mBidData.getBid();
-		bid.setSumma(mBidData.getFoodStuffs().getAmount() + mBidData.getServices().getCount());
-		bid.setContract(mContractsAdapter.getSelectedItem().getID());
-		bid.setTipOplaty(mPaymentTypeAdapter.GetSelectedItem().getID());
-		bid.setComment(mEditComment.getText().toString());
-		bid.setSebestoimost(mBidData.getFoodStuffs().getAmount());
-		bid.setShippingDate(mShippingDate.getTimeInMillis());
-		bid.writeToDataBase(mDB);
-		*/
-		/*
-		String txt = "";
-		ZayavkaPokupatelya bid = mBidData.getBid();
-		txt = txt + "Клиент: " + bid.getClientKod() + ": " + bid.getClientName();
-		txt = txt + "\nОплата: " + bid.getTipOplatyName();
-		txt = txt + "\nДата отгрузки: " + DateTimeHelper.UIDateString(bid.getShippingDate());
-		int n = mBidData.getFoodStuffs().getCount();
-		for (int i = 0; i < n; i++) {
-			txt = txt + "\n" + mBidData.getFoodStuffs().getFoodstuff(i).getArtikul()//
-					+ ", " + mBidData.getFoodStuffs().getFoodstuff(i).getNomenklaturaNaimenovanie()//
-					+ ", " + mBidData.getFoodStuffs().getFoodstuff(i).getKolichestvo()//
-					+ ", " + mBidData.getFoodStuffs().getFoodstuff(i).getEdinicaIzmereniyaName()//
-					+ ", " + mBidData.getFoodStuffs().getFoodstuff(i).getCenaSoSkidkoy()//
-					+ ", " + mBidData.getFoodStuffs().getFoodstuff(i).getVidSkidki()//
-			;
-		}
-		txt = txt + "\nИтого: " + mTextOrderAmount.getText();
-		String f = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export.txt";
-		File file = new File(f);
-		Auxiliary.writeTextToFile(file, txt, "windows-1251");
-		Auxiliary.startFile(this, android.content.Intent.ACTION_VIEW, "text/plain", file);
-		*/
-		try {
-			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export.xls";
-			File xfile = new File(xname);
-			jxl.WorkbookSettings wbSettings = new jxl.WorkbookSettings();
-			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
-			ZayavkaPokupatelya bid = mBidData.getBid();
-			jxl.write.WritableWorkbook workbook = jxl.Workbook.createWorkbook(xfile, wbSettings);
-			workbook.createSheet("" + bid.getClientKod(), 0);
-			jxl.write.WritableSheet excelSheet = workbook.getSheet(0);
-			excelSheet.setColumnView(0, 6);
-			excelSheet.setColumnView(1, 44);
-			//excelSheet.setColumnView(2, 4);
-			excelSheet.setColumnView(2, 4);
-			excelSheet.setColumnView(3, 4);
-			excelSheet.setColumnView(4, 8);
-			jxl.write.Label label;
-			//InputStream inStream = this.getResources().openRawResource(R.raw.excellogo);
-			InputStream inStream = this.getResources().openRawResource(R.raw.logo2);
-			byte[] logo = new byte[inStream.available()];
-			int nn = 0;
-			while (inStream.available() > 0) {
-				// dis.read(music[i]); // This assignment does not reverse the order
-				logo[nn] = (byte) inStream.read();
-				nn++;
-			}
-			//ByteArrayInputStream a = new ByteArrayInputStream(str.getBytes());
-			//byte[] bytes=new byte[1];
-			jxl.write.WritableImage img = new jxl.write.WritableImage(0, 0, 2, 3, logo);
-			excelSheet.addImage(img);
-			/*
-			label = new jxl.write.Label(0, 0, "Клиент: ");
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(1, 0, bid.getClientName());
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(0, 1, "Оплата: ");
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(1, 1, bid.getTipOplatyName());
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(0, 2, "На дату отгрузки: ");
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(1, 2, DateTimeHelper.UIDateString(bid.getShippingDate()));
-			excelSheet.addCell(label);
-			*/
-			//label = new jxl.write.Label(0, 3, "Ваш Менеджер: " + Requests.getTPfio(mDB));
-			label = new jxl.write.Label(0, 3, "Ваш Менеджер: " + Cfg.polzovatelFIO(Cfg.selectedOrDbHRC()));
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(0, 4, "Сервисный Центр, тел:  8-800-200-58-58");
-			excelSheet.addCell(label);
-			jxl.write.WritableCellFormat f = new jxl.write.WritableCellFormat();
-			f.setBackground(jxl.format.Colour.ICE_BLUE);
-			label = new jxl.write.Label(0, 5, "Арт", f);
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(1, 5, "Наименование", f);
-			excelSheet.addCell(label);
-			//label = new jxl.write.Label(2, 5, "Место", f);
-			//excelSheet.addCell(label);
-			label = new jxl.write.Label(2, 5, "Мин.заказ", f);
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(3, 5, "Ед.", f);
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(4, 5, "Цена с НДС", f);
-			excelSheet.addCell(label);
-			int n = mBidData.getFoodStuffs().getCount();
-			//n=n/0;
-			for (int i = 0; i < n; i++) {
-				label = new jxl.write.Label(0, 6 + i, mBidData.getFoodStuffs().getFoodstuff(i).getArtikul());
-				excelSheet.addCell(label);
-				String s = mBidData.getFoodStuffs().getFoodstuff(i).getNomenklaturaNaimenovanie();
-				s = s.replaceAll(" \\(склад 8\\)", "");
-				s = s.replaceAll(" \\(склад 10\\)", "");
-				s = s.replaceAll(" \\(склад 12\\)", "");
-				s = s.replaceAll(" \\(склад 14\\)", "");
-				s = s.replaceAll(" \\(склад 17\\)", "");
-				label = new jxl.write.Label(1, 6 + i, s//
-						+ ", по " + mBidData.getFoodStuffs().getFoodstuff(i).getKoefMest()//
-						+ " " + mBidData.getFoodStuffs().getFoodstuff(i).getEdinicaIzmereniyaName()//
-				);
-				excelSheet.addCell(label);
-				//label = new jxl.write.Label(2, 6 + i, "" + mBidData.getFoodStuffs().getFoodstuff(i).getKoefMest());
-				//excelSheet.addCell(label);
-				label = new jxl.write.Label(2, 6 + i, "" + mBidData.getFoodStuffs().getFoodstuff(i).getMinNorma());
-				excelSheet.addCell(label);
-				label = new jxl.write.Label(3, 6 + i, mBidData.getFoodStuffs().getFoodstuff(i).getEdinicaIzmereniyaName());
-				excelSheet.addCell(label);
-				label = new jxl.write.Label(4, 6 + i, "" + mBidData.getFoodStuffs().getFoodstuff(i).getCenaSoSkidkoy());
-				excelSheet.addCell(label);
-			}
-			//label = new jxl.write.Label(0, 0, "123");excelSheet.addCell(label);
-			workbook.write();
-			workbook.close();
-			Auxiliary.startFile(this, android.content.Intent.ACTION_VIEW, "application/vnd.ms-excel", xfile);
+			Auxiliary.startFile(this, xfile);
 		} catch (Throwable t) {
 			t.printStackTrace();
 			Auxiliary.warn("Ошибка: " + t.getMessage(), Activity_Bid.this);
@@ -3422,7 +3422,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				, gridOffsetHistory.value().intValue()//
 				, isMustList//
 				, isTop, null, null, isSkidka, false, null, null, null);
-		//System.out.println("execute");
+		System.out.println("requeryHistoryData " + sql);
 		historyCursor = mDB.rawQuery(sql, null);
 		//System.out.println("fetched");
 		//System.out.println("load history ");
@@ -3586,6 +3586,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			final double BASE_PRICE = Auxiliary.cursorDouble(historyCursor, "BasePrice");
 			//Numeric.string2double(row.child("BasePrice").value.property.value());
 			final double LAST_PRICE = Auxiliary.cursorDouble(historyCursor, "LastPrice");
+			final String lastSellCount = Auxiliary.cursorString(historyCursor, "lastSellCount");
 			//Numeric.string2double(row.child("LastPrice").value.property.value());
 			/*final double CENA_SO_SKIDKOY = getCenaSoSkidkoy(CENA//
 					, Numeric.string2double(row.child("Nacenka").value.property.value())//
@@ -3739,7 +3740,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			historyCena.cell("" + CENA, cenaBackground, click);
 			historyRazmSkidki.cell(DecimalFormatHelper.format(SKIDKA), click);
 			historyVidSkidki.cell(VID_SKIDKI, click);
-			historyPoslCena.cell(DecimalFormatHelper.format(LAST_PRICE), click);
+			historyPoslCena.cell(DecimalFormatHelper.format(LAST_PRICE), click, lastSellCount);
+
 			historyMinCena.cell("" + MIN_CENA, click);
 			historyMaxCena.cell(DecimalFormatHelper.format(MAX_CENA), click);
 			historyPhoto.cell("...", photo);

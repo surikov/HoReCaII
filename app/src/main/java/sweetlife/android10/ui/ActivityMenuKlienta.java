@@ -28,7 +28,7 @@ public class ActivityMenuKlienta extends Activity {
 	void createGUI() {
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
-		this.setTitle("Меню клиента " + ApplicationHoreca.getInstance().getClientInfo().getKod() + ". " + ApplicationHoreca.getInstance().getClientInfo().getName());
+		this.setTitle("Заметки клиента " + ApplicationHoreca.getInstance().getClientInfo().getKod() + ". " + ApplicationHoreca.getInstance().getClientInfo().getName());
 		itemsGrid = new DataGrid(this).center.is(true)//
 				.pageSize.is(999)//itemsGridPageSize)//
 		;
@@ -255,6 +255,7 @@ I/System.out: </>
 	public void flipItemsGrid() {
 		itemsGrid.clearColumns();
 		if (dataItems != null) {
+			System.out.println("dataItems "+dataItems.dumpXML());
 			for (int i = 0; i < dataItems.child("document").children.size(); i++) {
 				final int nn = i;
 				Task tap = new Task() {

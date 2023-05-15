@@ -25,6 +25,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.content.pm.*;
 
+import androidx.core.app.ActivityCompat;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -104,7 +106,7 @@ public static String packageVersion="0";
 	void promptPermissions() {
 		new AlertDialog.Builder(this)
 				.setTitle("Подтверждение доступа")
-				.setMessage("Нажмите ОК и в списке приложений включите перключатель для HorecaX2")
+				.setMessage("Нажмите ОК и в списке приложений включите перключатель для HoReCa v3")
 				//.setIcon(android.R.drawable.ic_dialog_alert)
 				.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 

@@ -251,7 +251,10 @@ public class ActivityGPSMap extends Activity {
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				promptSendPoint(shirota, dolgota, ApplicationHoreca.getInstance().getClientInfo().getName(), ApplicationHoreca.getInstance().getClientInfo().getKod(), beginTime);
+				promptSendPoint(shirota, dolgota
+						, ApplicationHoreca.getInstance().getClientInfo().getName()
+						, ApplicationHoreca.getInstance().getClientInfo().getKod()
+						, beginTime);
 			}
 		}).start(this);
 	}

@@ -80,16 +80,16 @@ public class Activity_NomenclatureNew extends Activity {
 		public void doTask() {
 			System.out.println("set mode");
 
-				//lastMode = mode.value().intValue();
-				if (mode.value() == ShowViewNomenklatura) {
-					refreshCategotyGrid();
-				} else {
-					resetItemsGrid();
-				}
+			//lastMode = mode.value().intValue();
+			if (mode.value() == ShowViewNomenklatura) {
+				refreshCategotyGrid();
+			} else {
+				resetItemsGrid();
+			}
 
 		}
 	};
-	static Activity_NomenclatureNew me=null;
+	static Activity_NomenclatureNew me = null;
 	static Numeric mode = new Numeric().value(ShowViewPoisk).afterChange(new Task() {
 		public void doTask() {
 			if (me == null) {
@@ -283,7 +283,7 @@ public class Activity_NomenclatureNew extends Activity {
 						, columnMinKolichestvo.title.is("Min/Квант").width.is(2 * Auxiliary.tapSize)
 						, columnCena.title.is("Цена").width.is(3.5 * Auxiliary.tapSize)
 						, columnSkidka.title.is("Скидка").width.is(2.5 * Auxiliary.tapSize)
-						, columnPosledniaya.title.is("Последняя цена").width.is(1.5 * Auxiliary.tapSize)
+						, columnPosledniaya.title.is("Последняя цена").width.is(2 * Auxiliary.tapSize)
 				})
 				.left().is(new Numeric().value(5 * Auxiliary.tapSize).when(mode.equals(ShowViewNomenklatura)).otherwise(0))
 				.top().is(new Numeric().value(1 * Auxiliary.tapSize).when(mode.equals(ShowViewNomenklatura)).otherwise(2 * Auxiliary.tapSize))
@@ -318,7 +318,7 @@ public class Activity_NomenclatureNew extends Activity {
 
 
 	void requeryGridData() {
-		System.out.println("requeryGridData " + mode.value());
+		//System.out.println("requeryGridData " + mode.value());
 		if (mode.value() == ShowViewIstoria) {
 			//Date fr = new Date();
 			//fr.setTime(searchFrom.value().longValue());
@@ -345,41 +345,41 @@ public class Activity_NomenclatureNew extends Activity {
 		} else {
 			if (mode.value() == ShowViewPoisk) {
 				//if (searchWord.value().length() > 0) {
-					int searchBy = sweetlife.android10.database.nomenclature.ISearchBy.SEARCH_ARTICLE;
-					if (searchMode.value() == 1) searchBy = ISearchBy.SEARCH_NAME;
-					if (searchMode.value() == 2) searchBy = ISearchBy.SEARCH_VENDOR;
-					//if (searchMode.value() == 3) searchBy = ISearchBy.SEARCH_TAG;
+				int searchBy = sweetlife.android10.database.nomenclature.ISearchBy.SEARCH_ARTICLE;
+				if (searchMode.value() == 1) searchBy = ISearchBy.SEARCH_NAME;
+				if (searchMode.value() == 2) searchBy = ISearchBy.SEARCH_VENDOR;
+				//if (searchMode.value() == 3) searchBy = ISearchBy.SEARCH_TAG;
 
-					String kuhnya = null;
-					if (searchKuhnya.value() > 0) kuhnya = choiceKuhnya.items.get(searchKuhnya.value().intValue());
-					String tochka = null;
-					if (searchTochka.value() > 0) tochka = tipTochkiData.children.get(searchTochka.value().intValue() - 1).child("_idrref").value.property.value();
-					String sql = Request_Search.composeSQLall(//
-							DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
-							, ApplicationHoreca.getInstance().getClientInfo().getID()//
-							, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()//
-							, ""//
-							, ""//
-							, searchWord.value()//
-							, searchBy//
-							, false//
-							, false//
-							, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()
-							, itemsMaxCount//gridPageSize * 3
-							, gridOffset.value().intValue()
-							, false
-							, false
-							, kuhnya
-							, tochka
-							, false
-							, false
-							//, _receptID
-							, null
-							, null
-							, null
-					);
-					System.out.println(sql);
-					itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+				String kuhnya = null;
+				if (searchKuhnya.value() > 0) kuhnya = choiceKuhnya.items.get(searchKuhnya.value().intValue());
+				String tochka = null;
+				if (searchTochka.value() > 0) tochka = tipTochkiData.children.get(searchTochka.value().intValue() - 1).child("_idrref").value.property.value();
+				String sql = Request_Search.composeSQLall(//
+						DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
+						, ApplicationHoreca.getInstance().getClientInfo().getID()//
+						, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()//
+						, ""//
+						, ""//
+						, searchWord.value()//
+						, searchBy//
+						, false//
+						, false//
+						, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()
+						, itemsMaxCount//gridPageSize * 3
+						, gridOffset.value().intValue()
+						, false
+						, false
+						, kuhnya
+						, tochka
+						, false
+						, false
+						//, _receptID
+						, null
+						, null
+						, null
+				);
+				//System.out.println(sql);
+				itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 				//}
 			} else {
 				if (mode.value() == ShowViewNomenklatura) {
@@ -408,7 +408,7 @@ public class Activity_NomenclatureNew extends Activity {
 								, null
 								, null
 						);
-						System.out.println(sqlString);
+						//System.out.println(sqlString);
 						itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sqlString, null));
 					} else {
 						itemsData = new Bough();
@@ -647,7 +647,7 @@ public class Activity_NomenclatureNew extends Activity {
 				String cenaNacenka = Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("Cena").value.property.value(), "р");
 				String minCenaText = itemsData.children.get(ii).child("MinCena").value.property.value();
 				String maxCenaText = itemsData.children.get(ii).child("MaxCena").value.property.value();
-				if (!sweetlife.android10.ui.Activity_Bid.hideStatus) {
+				if (!sweetlife.android10.ui.Activity_Bid.hideNacenkaStatus) {
 					int procent = (int) (100.0 * (CENA - BASE_PRICE) / BASE_PRICE);
 					if (procent >= 25) {
 						cenaBackground = Settings.colorNacenka25;
@@ -681,15 +681,26 @@ public class Activity_NomenclatureNew extends Activity {
 				columnSkidka.cell(Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("Skidka").value.property.value(), "р")
 						, tap
 						, itemsData.children.get(ii).child("VidSkidki").value.property.value());
-				columnPosledniaya.cell(Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("LastPrice").value.property.value(), "р")
-						, tap
-						, Auxiliary.tryReFormatDate(itemsData.children.get(ii).child("LastSell").value.property.value(), "yyyy-MM-dd", "dd.MM.yyyy"));
+				//columnPosledniaya.cell(Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("LastPrice").value.property.value(), "р")
+				//		, tap
+				//		, Auxiliary.tryReFormatDate(itemsData.children.get(ii).child("LastSell").value.property.value(), "yyyy-MM-dd", "dd.MM.yyyy"));
+				String lastDate = Auxiliary.tryReFormatDate(itemsData.children.get(ii).child("LastSell").value.property.value(), "yyyy-MM-dd", "dd.MM.yy");
+				if (lastDate.length()>0) {
+					columnPosledniaya.cell(lastDate
+							, tap
+							, Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("LastPrice").value.property.value(), "р")
+									+ "/" + itemsData.children.get(ii).child("lastSellCount").value.property.value()
+					);
+				} else {
+					columnPosledniaya.cell(" ", tap);
+				}
+
 			}
 		}
 	}
 
 	void resetItemsGrid() {
-		System.out.println("resetItemsGrid");
+		//System.out.println("resetItemsGrid");
 
 		new Expect().status.is("Поиск...").task.is(new Task() {
 			public void doTask() {
@@ -799,9 +810,9 @@ public class Activity_NomenclatureNew extends Activity {
 		if (level3.trim().length() > 0) sql = sql + "\n		or (rod4=x'" + level3 + "' and key5 is null)";
 		if (level4.trim().length() > 0) sql = sql + "\n		or (rod5=x'" + level4 + "')";
 		sql = sql + "\n	order by cat1,cat2,cat3,cat4,cat5;";
-		System.out.println(level1 + "/" + level2 + "/" + level3 + "/" + level4 + "/" + level5 + ": " + sql);
+		//System.out.println(level1 + "/" + level2 + "/" + level3 + "/" + level4 + "/" + level5 + ": " + sql);
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		System.out.println(data.dumpXML());
+		//System.out.println(data.dumpXML());
 		String lastKey1 = "";
 		String lastKey2 = "";
 		String lastKey3 = "";
@@ -935,8 +946,8 @@ public class Activity_NomenclatureNew extends Activity {
 			} else {
 				gridScroll = -this.gridCategoryItems.scrollView.getScrollY() / this.gridCategoryItems.rowHeight.property.value().intValue();
 			}*/
-			//lastGridScroll = this.gridCategoryItems.scrollView.getScrollY();
-			//lastGridOffset = gridOffset.value().intValue();
+		//lastGridScroll = this.gridCategoryItems.scrollView.getScrollY();
+		//lastGridOffset = gridOffset.value().intValue();
 /*
 			double contentHeight = gridCategoryItems.rowHeight.property.value() * (gridCategoryItems.currentPage + 1) * gridCategoryItems.pageSize.property.value();
 			System.out.println("gridCategoryItems.rowHeight.property.value() " + gridCategoryItems.rowHeight.property.value());
@@ -947,8 +958,8 @@ public class Activity_NomenclatureNew extends Activity {
 			*/
 		//}
 		super.onPause();
-		me=null;
-		double newOffset = Math.floor(gridOffset.value() + this.gridItems.scrollView.getScrollY() / Auxiliary.tapSize );
+		me = null;
+		double newOffset = Math.floor(gridOffset.value() + this.gridItems.scrollView.getScrollY() / Auxiliary.tapSize);
 		if (newOffset < 0) {
 			newOffset = 0;
 		}
@@ -958,7 +969,7 @@ public class Activity_NomenclatureNew extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		me=this;
+		me = this;
 		doRefreshData.start();
 		/*if (mode.value() == ShowViewIstoria) {
 			//if(lastGridScroll>0) {

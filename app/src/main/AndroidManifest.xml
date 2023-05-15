@@ -396,5 +396,9 @@
 			android:name="sweetlife.android10.ui.ActivityMenuKlienta"
 			android:label="..."
 			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_Zametki"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
 	</application>
 </manifest>
