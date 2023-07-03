@@ -18,26 +18,26 @@ import android.os.Parcelable;
 
 public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parcelable {
 
-	private Date       mDataOtgruzki;
-	private String     mAktPretenziyPath;
-	private String     mVersion="";
+	private Date mDataOtgruzki;
+	private String mAktPretenziyPath;
+	private String mVersion = "";
 
 	public ZayavkaNaVozvrat(Parcel in) {
 
-		readFromParcel( in );
+		readFromParcel(in);
 	}
 
 	public ZayavkaNaVozvrat(int _id,
-			String     idRRef,
-			Date       date,
-			String     nomer,
-			String     kontragentID,
-			String     kontragentKod,
-			String     kontragentName,
-			Date       dataOtgruzki,
-			String     aktPretenziyPath,
-			boolean    proveden,
-			boolean    New
+							String idRRef,
+							Date date,
+							String nomer,
+							String kontragentID,
+							String kontragentKod,
+							String kontragentName,
+							Date dataOtgruzki,
+							String aktPretenziyPath,
+							boolean proveden,
+							boolean New
 			, String _Version
 	) {
 
@@ -52,10 +52,10 @@ public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parce
 		mAktPretenziyPath = aktPretenziyPath;
 		mProveden = proveden;
 		mNew = New;
-		mVersion=_Version;
+		mVersion = _Version;
 	}
 
-	public ZayavkaNaVozvrat( String clientID, SQLiteDatabase db ) {
+	public ZayavkaNaVozvrat(String clientID, SQLiteDatabase db) {
 
 		Calendar today = Calendar.getInstance();
 
@@ -73,7 +73,7 @@ public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parce
 		mAktPretenziyPath = null;
 		mProveden = false;
 		mNew = true;
-		mVersion="";
+		mVersion = "";
 	}
 
 	@Override
@@ -90,29 +90,29 @@ public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parce
 
 	public void setAktPretenziyPath(String aktPretenziyPath) {
 
-//System.out.println("setAktPretenziyPath "+aktPretenziyPath);
+		//System.out.println("setAktPretenziyPath "+aktPretenziyPath);
 		mAktPretenziyPath = aktPretenziyPath;
 	}
 
 	public String getAktPretenziyPath() {
 
-//System.out.println("getAktPretenziyPath "+mAktPretenziyPath);
+		//System.out.println("getAktPretenziyPath "+mAktPretenziyPath);
 		return mAktPretenziyPath;
 	}
 
 	public void setVersion(String a) {
-//System.out.println("setVersion "+a);
+		//System.out.println("setVersion "+a);
 		mVersion = a;
 	}
 
 	public String getVersion() {
-//System.out.println("getVersion "+mVersion);
+		//System.out.println("getVersion "+mVersion);
 		return mVersion;
 	}
 
 	public String getComment() {
 
-		return ""+mVersion;
+		return "" + mVersion;
 	}
 
 	public Date getDataOtgruzki() {
@@ -130,7 +130,7 @@ public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parce
 	public void writeToParcel(Parcel dest, int flags) {
 
 		super.writeToParcel(dest, flags);
-		
+
 		dest.writeLong(mDataOtgruzki.getTime());
 		dest.writeString(mAktPretenziyPath);
 		dest.writeString(mVersion);
@@ -140,59 +140,58 @@ public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parce
 
 		super.readFromParcel(in);
 
-		mDataOtgruzki =  new Date(in.readLong());
+		mDataOtgruzki = new Date(in.readLong());
 		mAktPretenziyPath = in.readString();
-mVersion = in.readString();
+		mVersion = in.readString();
 	}
 
 	public static final Parcelable.Creator<ZayavkaNaVozvrat> CREATOR =
 			new Parcelable.Creator<ZayavkaNaVozvrat>() {
 
-		public ZayavkaNaVozvrat createFromParcel(Parcel in) {
+				public ZayavkaNaVozvrat createFromParcel(Parcel in) {
 
-			return new ZayavkaNaVozvrat(in);
-		}
+					return new ZayavkaNaVozvrat(in);
+				}
 
-		public ZayavkaNaVozvrat[] newArray(int size) {
+				public ZayavkaNaVozvrat[] newArray(int size) {
 
-			return new ZayavkaNaVozvrat[size];
-		}
-	};
+					return new ZayavkaNaVozvrat[size];
+				}
+			};
 
-	public void writeToDataBase( SQLiteDatabase db ) {
+	public void writeToDataBase(SQLiteDatabase db) {
 
 		ContentValues values = new ContentValues();
 
-		if( mNew ) {
+		if (mNew) {
 
-			values.put("_IDRRef", Hex.decodeHexWithPrefix(mIDRRef) );
-			values.put("Data", DateTimeHelper.SQLDateString(mDate) );
-			values.put("Nomer", mNomer ); 
-			values.put("Proveden", Hex.decodeHexWithPrefix(mProveden ? "x'01'" : "x'00'") );
+			values.put("_IDRRef", Hex.decodeHexWithPrefix(mIDRRef));
+			values.put("Data", DateTimeHelper.SQLDateString(mDate));
+			values.put("Nomer", mNomer);
+			values.put("Proveden", Hex.decodeHexWithPrefix(mProveden ? "x'01'" : "x'00'"));
 			values.put("Kontragent", Hex.decodeHexWithPrefix(mKontragentID));
-			values.put("DataOtgruzki", DateTimeHelper.SQLDateString(mDataOtgruzki) );  
-			values.put("AktPretenziy", mAktPretenziyPath );
-			values.put("_Version", mVersion );
-			values.put("Otvetstvennyy", mOtvetstvennyyKod );
+			values.put("DataOtgruzki", DateTimeHelper.SQLDateString(mDataOtgruzki));
+			values.put("AktPretenziy", mAktPretenziyPath);
+			values.put("_Version", mVersion);
+			values.put("Otvetstvennyy", mOtvetstvennyyKod);
 
-			DatabaseHelper.insertInTranzaction(db,mDocumentTableName, values);
+			DatabaseHelper.insertInTranzaction(db, mDocumentTableName, values);
 
-		}
-		else {
+		} else {
 
-			values.put("Proveden", Hex.decodeHexWithPrefix(mProveden ? "x'01'" : "x'00'") );
-			values.put("DataOtgruzki", DateTimeHelper.SQLDateString(mDataOtgruzki) );  
-			values.put("AktPretenziy", mAktPretenziyPath );
-			values.put("_Version", mVersion );
+			values.put("Proveden", Hex.decodeHexWithPrefix(mProveden ? "x'01'" : "x'00'"));
+			values.put("DataOtgruzki", DateTimeHelper.SQLDateString(mDataOtgruzki));
+			values.put("AktPretenziy", mAktPretenziyPath);
+			values.put("_Version", mVersion);
 
 
-			DatabaseHelper.updateInTranzaction(db,mDocumentTableName, values, "_id="+ String.valueOf(m_id), null);
+			DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id=" + String.valueOf(m_id), null);
 		}
 	}
 
 	@Override
-	public String getSerializedXML(SQLiteDatabase db) throws IllegalArgumentException, 
-	IllegalStateException, IOException {
+	public String getSerializedXML(SQLiteDatabase db) throws IllegalArgumentException,
+			IllegalStateException, IOException {
 
 		ReturnsXMLSerializer serializer = new ReturnsXMLSerializer(db, this);
 
@@ -204,8 +203,8 @@ mVersion = in.readString();
 
 		ContentValues values = new ContentValues();
 
-		values.put("Proveden", Hex.decodeHexWithPrefix("x'01'") );
+		values.put("Proveden", Hex.decodeHexWithPrefix("x'01'"));
 
-		DatabaseHelper.updateInTranzaction(db,mDocumentTableName, values, "_id="+ String.valueOf(m_id), null);
+		DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id=" + String.valueOf(m_id), null);
 	}
 }

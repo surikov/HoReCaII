@@ -1,8 +1,10 @@
 package reactive.ui;
 
 import android.text.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.Task;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -44,14 +46,17 @@ public class RedactNumber extends EditText implements Rake {
 		super(context);
 		init();
 	}
+
 	public RedactNumber(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
+
 	public RedactNumber(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
+
 	void init() {
 		if (initialized) {
 			return;
@@ -67,10 +72,12 @@ public class RedactNumber extends EditText implements Rake {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				//System.out.println("onTextChanged ["+s.toString()+"]"+start+"/"+before+"/"+count);
 			}
+
 			@Override
 			public void afterTextChanged(Editable s) {
 				//System.out.println("afterTextChanged ["+s.toString()+"]"+lock);
@@ -79,12 +86,10 @@ public class RedactNumber extends EditText implements Rake {
 					try {
 						if (s.toString().length() > 0) {
 							number.property.value(Double.parseDouble(s.toString()));
-						}
-						else {
+						} else {
 							number.property.value(0);
 						}
-					}
-					catch (Throwable t) {
+					} catch (Throwable t) {
 						t.printStackTrace();
 					}
 					lock = false;
@@ -107,8 +112,7 @@ public class RedactNumber extends EditText implements Rake {
 			public void doTask() {
 				if (hidden.property.value()) {
 					setVisibility(View.INVISIBLE);
-				}
-				else {
+				} else {
 					setVisibility(View.VISIBLE);
 				}
 			}
@@ -120,30 +124,37 @@ public class RedactNumber extends EditText implements Rake {
 			}
 		});
 	}
+
 	@Override
 	public ToggleProperty<Rake> hidden() {
 		return hidden;
 	}
+
 	@Override
 	public NumericProperty<Rake> left() {
 		return left;
 	}
+
 	@Override
 	public NumericProperty<Rake> top() {
 		return top;
 	}
+
 	@Override
 	public NumericProperty<Rake> width() {
 		return width;
 	}
+
 	@Override
 	public NumericProperty<Rake> height() {
 		return height;
 	}
+
 	@Override
 	public View view() {
 		return this;
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();

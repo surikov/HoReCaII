@@ -1,4 +1,5 @@
 package sweetlife.android10.ui;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +16,7 @@ import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
 import android.widget.TextView;
+
 public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerServiceClient {
 	SimpleDateFormat mPointsDateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 	TextView mTextLatitude;
@@ -26,6 +28,7 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 	TextView mTextDirection;
 	TextView mTextAccuracy;
 	TextView mTextStatus;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,20 +51,24 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 		OnLocationNotAvailable();
 		//System.out.println("done Activity_GpsInfo.onCreate");
 	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		//ApplicationHoreca.getInstance()
 		GPS.DeleteServiceClient();
 	}
+
 	private void SetStatus(String message, int color) {
 		mTextStatus.setText(message);
 		mTextStatus.setTextColor(color);
 	}
+
 	private void SetSatelliteInfo(int number) {
 		Session.setSatelliteCount(number);
 		mTextSatellites.setText(String.valueOf(number));
 	}
+
 	private void DisplayLocationInfo(Location loc) {
 		try {
 			if (loc == null) {
@@ -74,14 +81,12 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 			mTextLongitude.setText(String.valueOf(loc.getLongitude()));
 			if (loc.hasAltitude()) {
 				mTextAltitude.setText(String.valueOf(loc.getAltitude()) + getString(R.string.meters));
-			}
-			else {
+			} else {
 				mTextAltitude.setText(R.string.not_applicable);
 			}
 			if (loc.hasSpeed()) {
 				mTextSpeed.setText(String.valueOf(loc.getSpeed()) + getString(R.string.meters_per_second));
-			}
-			else {
+			} else {
 				mTextSpeed.setText(R.string.not_applicable);
 			}
 			if (loc.hasBearing()) {
@@ -89,8 +94,7 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 				String direction;
 				direction = Utilities.GetBearingDescription(bearingDegrees, getBaseContext());
 				mTextDirection.setText(direction + "(" + String.valueOf(Math.round(bearingDegrees)) + getString(R.string.degree_symbol) + ")");
-			}
-			else {
+			} else {
 				mTextDirection.setText(R.string.not_applicable);
 			}
 			if (!Session.isUsingGps()) {
@@ -100,33 +104,38 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 			if (loc.hasAccuracy()) {
 				float accuracy = loc.getAccuracy();
 				mTextAccuracy.setText(getString(R.string.accuracy_within, String.valueOf(accuracy), getString(R.string.meters)));
-			}
-			else {
+			} else {
 				mTextAccuracy.setText(R.string.not_applicable);
 			}
 		} catch (Exception ex) {
 			SetStatus(getString(R.string.error_displaying, ex.getMessage()), SWLifeGpsService.RED_COLOR);
 		}
 	}
+
 	@Override
 	public void OnStopLogging() {
 	}
+
 	@Override
 	public void OnLocationUpdate(Location loc) {
 		DisplayLocationInfo(loc);
 	}
+
 	@Override
 	public void OnSatelliteCount(int count) {
 		SetSatelliteInfo(count);
 	}
+
 	@Override
 	public void OnStatusMessage(String message, int color) {
 		SetStatus(message, color);
 	}
+
 	@Override
 	public Activity GetActivity() {
 		return this;
 	}
+
 	@Override
 	public void OnLocationNotAvailable() {
 		//System.out.println("OnLocationNotAvailable");

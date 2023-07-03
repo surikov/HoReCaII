@@ -6,6 +6,7 @@ import java.util.*;
 import tee.binding.properties.NoteProperty;
 import tee.binding.properties.NumericProperty;
 import tee.binding.task.Task;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -33,6 +34,7 @@ public class ColumnDate extends Column {
 		}
 		return "";
 	}
+
 	@Override
 	public void update(int row) {
 		if (row >= 0 && row < cells.size()) {
@@ -40,8 +42,7 @@ public class ColumnDate extends Column {
 			if (row > -1 && row < backgrounds.size()) {
 				if (backgrounds.get(row) != null) {
 					cell.background.is(backgrounds.get(row));
-				}
-				else {
+				} else {
 					cell.background.is(null);
 				}
 			}
@@ -50,12 +51,12 @@ public class ColumnDate extends Column {
 				d.setTime(mills.get(row));
 				cell.labelText.is(formater.format(d));*/
 				cell.labelText.is(getValue(mills.get(row)));
-			}
-			else {
+			} else {
 				cell.labelText.is("");
 			}
 		}
 	}
+
 	@Override
 	public Rake item(final int column, int row, Context context) {
 		//linePaint.setColor((int) (Auxiliary.colorLine));
@@ -104,22 +105,22 @@ public class ColumnDate extends Column {
 		cells.add(cell);
 		return cell;
 	}
+
 	String getValue(long t) {
 		if (t == 0) {
 			return "";
-		}
-		else {
+		} else {
 			Date d = new Date();
 			d.setTime(t);
 			if (format.property.value().length() > 1) {
 				//System.out.println(t+": "+(int)t+": "+d+": "+formater.format(d));
 				return formater.format(d);
-			}
-			else {
+			} else {
 				return d.toString();
 			}
 		}
 	}
+
 	public ColumnDate cell(long s, Integer background, Task tap) {
 		mills.add(s);
 		tasks.add(tap);
@@ -127,19 +128,24 @@ public class ColumnDate extends Column {
 		//this.labelStyleMediumNormal();
 		return this;
 	}
+
 	public ColumnDate cell(long s) {
 		return cell(s, null, null);
 	}
+
 	public ColumnDate cell(long s, Task tap) {
 		return cell(s, null, tap);
 	}
+
 	public ColumnDate cell(long s, Integer background) {
 		return cell(s, background, null);
 	}
+
 	@Override
 	public int count() {
 		return mills.size();
 	}
+
 	public ColumnDate() {
 		this.width.is(150);
 		//linePaint.setAntiAlias(true);
@@ -151,14 +157,14 @@ public class ColumnDate extends Column {
 				try {
 					formater = new SimpleDateFormat(format.property.value());
 					formater.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-				}
-				catch (Throwable t) {
+				} catch (Throwable t) {
 					t.printStackTrace();
 					formater = new SimpleDateFormat();
 				}
 			}
 		});
 	}
+
 	@Override
 	public Rake header(Context context) {
 		Decor header = new Decor(context) {
@@ -170,7 +176,7 @@ public class ColumnDate extends Column {
 						, height().property.value().intValue() - 1//
 						, width().property.value().intValue()//
 						, height().property.value().intValue() //
-						), Auxiliary.paintLine);
+				), Auxiliary.paintLine);
 			}
 		};
 		header.setPadding(3, 0, 3, 2);
@@ -179,14 +185,14 @@ public class ColumnDate extends Column {
 		header.labelText.is(title.property.value());
 		return header;
 	}
+
 	@Override
 	public void clear() {
 		if (presell >= 0 && presell < cells.size()) {
 			if (presell >= 0 && presell < backgrounds.size()) {
 				if (backgrounds.get(presell) != null) {
 					cells.get(presell).background.is(backgrounds.get(presell));
-				}
-				else {
+				} else {
 					cells.get(presell).background.is(0);
 				}
 			}
@@ -195,6 +201,7 @@ public class ColumnDate extends Column {
 		backgrounds.removeAllElements();
 		tasks.removeAllElements();
 	}
+
 	@Override
 	public void afterRowsTap(int row) {
 		if (row > -1 && row < tasks.size()) {
@@ -203,19 +210,24 @@ public class ColumnDate extends Column {
 			}
 		}
 	}
+
 	@Override
 	public void highlight(int row) {
 		if (presell >= 0 && presell < cells.size()) {
 			if (presell >= 0 && presell < backgrounds.size()) {
 				if (backgrounds.get(presell) != null) {
 					cells.get(presell).background.is(backgrounds.get(presell));
-				}
-				else {
+				} else {
 					cells.get(presell).background.is(0);
 				}
 			}
 		}
+		this.showHighlight(row);
+	}
+	@Override
+	public void showHighlight(int row) {
 		if (row >= 0 && row < cells.size()) {
+			//System.out.println("3");
 			presell = row;
 			cells.get(row).background.is(Auxiliary.colorSelection);
 		}

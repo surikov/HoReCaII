@@ -138,7 +138,7 @@ public class ZayavkaPokupatelya extends NomenclatureBasedDocument implements Par
 		} else {
 			if (mTipOplaty.compareToIgnoreCase(Cfg.tip_beznal) == 0) {
 				return "БезНал";
-			}else{
+			} else {
 				if (mTipOplaty.compareToIgnoreCase(Cfg.tip_tovcheck) == 0) {
 					return "ТовЧек";
 				}

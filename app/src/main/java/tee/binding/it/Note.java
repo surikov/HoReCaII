@@ -1,16 +1,20 @@
 package tee.binding.it;
+
 import tee.binding.Calculation;
 import tee.binding.task.Task;
 import tee.binding.it.It;
+
 /**
  * @author User
  */
 public class Note extends It<String> {
 	private Note _otherwise = null;
+
 	public Note() {
 		super();
 		this.value("");
 	}
+
 	/**
 	 * @param a
 	 */
@@ -45,21 +49,25 @@ public class Note extends It<String> {
 		System.out.println("forMSSQL: " + forMSSQL.value());
 		System.out.println("forPostgreSQL: " + forPostgreSQL.value());
 	}
+
 	@Override
 	public Note afterChange(Task newValue) {
 		super.afterChange(newValue);
 		return this;
 	}
+
 	@Override
 	public Note afterChange(Task newValue, boolean dontFire) {
 		super.afterChange(newValue, dontFire);
 		return this;
 	}
+
 	@Override
 	public Note value(String newValue) {
 		super.value(newValue);
 		return this;
 	}
+
 	public Note read() {
 		final Note r = new Note().value(value());
 		final Note watcher = new Note().bind(this);
@@ -77,6 +85,7 @@ public class Note extends It<String> {
 		});
 		return r;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -85,11 +94,13 @@ public class Note extends It<String> {
 		super.bind(it);
 		return this;
 	}
+
 	@Override
 	public Note bind(It<String> it) {
 		super.bind(it);
 		return this;
 	}
+
 	/**
 	 * @param bb
 	 * @return
@@ -113,6 +124,7 @@ public class Note extends It<String> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -121,6 +133,7 @@ public class Note extends It<String> {
 		//return new Toggle().same(this, it);
 		return same(new Note().value(it));
 	}
+
 	/**
 	 * @param bb
 	 * @return
@@ -148,6 +161,7 @@ public class Note extends It<String> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -155,6 +169,7 @@ public class Note extends It<String> {
 	public Toggle like(String it) {
 		return like(new Note().value(it));
 	}
+
 	/**
 	 * @param appendString
 	 * @return
@@ -166,23 +181,23 @@ public class Note extends It<String> {
 			public String calculateFirst() {
 				if (second() == null) {
 					return "";
-				}
-				else {
+				} else {
 					return second().value();
 				}
 			}
+
 			@Override
 			public String calculateSecond() {
 				if (first() == null) {
 					return "";
-				}
-				else {
+				} else {
 					return first().value() + appendString;
 				}
 			}
 		}.second());
 		return s;
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -195,6 +210,7 @@ public class Note extends It<String> {
     public static Fork<String> iF(Toggle it) {
     return new Fork<String>().condition(it);
     }*/
+
 	/**
 	 * @param appendNote
 	 * @return
@@ -211,6 +227,7 @@ public class Note extends It<String> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -222,6 +239,7 @@ public class Note extends It<String> {
 		_otherwise.bind(it);
 		return this;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -233,6 +251,7 @@ public class Note extends It<String> {
 		_otherwise.value(it);
 		return this;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -247,8 +266,7 @@ public class Note extends It<String> {
 				if (it.value()) {
 					when.unbind(when._otherwise);
 					when.bind(me);
-				}
-				else {
+				} else {
 					if (when._otherwise == null) {
 						when._otherwise = new Note();
 					}

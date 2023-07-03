@@ -1,130 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
 
-    <RelativeLayout
-        android:id="@+id/search_panel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:paddingTop="2dip" >
-<!--
-        <RadioGroup
-            android:id="@+id/radio_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="7dip"
-            android:orientation="horizontal" >
+	<RelativeLayout
+		android:id="@+id/search_panel"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:paddingTop="2dip">
+		<!--
+				<RadioGroup
+					android:id="@+id/radio_search"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_alignParentLeft="true"
+					android:layout_centerVertical="true"
+					android:layout_marginLeft="7dip"
+					android:orientation="horizontal" >
 
-            <RadioButton
-                android:id="@+id/radio_articule"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dip"
-                android:checked="true"
-                android:text="@string/article" />
+					<RadioButton
+						android:id="@+id/radio_articule"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginRight="10dip"
+						android:checked="true"
+						android:text="@string/article" />
 
-            <RadioButton
-                android:id="@+id/radio_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dip"
-                android:text="@string/naimenovanie" />
+					<RadioButton
+						android:id="@+id/radio_name"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginRight="10dip"
+						android:text="@string/naimenovanie" />
 
-            <RadioButton
-                android:id="@+id/radio_vendor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dip"
-                android:text="@string/vendor" />
-        </RadioGroup>
--->
-
-
-        <Button
-            android:id="@+id/btn_search_kuhnya"
-            android:layout_width="200dip"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="1dip"
-            android:text="Любая кухня" />
-
-        <Button
-            android:id="@+id/btn_search_tochka"
-            android:layout_width="200dip"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="201dip"
-            android:text="Любой тип" />
-        <!--
-        <Button
-            android:id="@+id/btn_receipt"
-            android:layout_width="200dip"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="401dip"
-            android:text="Без рецепта" />
-            -->
-        <Button
-            android:id="@+id/btn_search_mode"
-            android:layout_width="200dip"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="401dip"
-            android:text="Артикул" />
+					<RadioButton
+						android:id="@+id/radio_vendor"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:layout_marginRight="10dip"
+						android:text="@string/vendor" />
+				</RadioGroup>
+		-->
 
 
+		<Button
+			android:id="@+id/btn_search_kuhnya"
+			android:layout_width="200dip"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="1dip"
+			android:text="Любая кухня" />
 
-        <EditText
-            android:id="@+id/edit_search"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btn_search"
-            android:layout_toRightOf="@+id/btn_search_mode"
-            android:inputType="datetime"
-            android:paddingRight="2dip"
-            android:selectAllOnFocus="true" />
+		<Button
+			android:id="@+id/btn_search_tochka"
+			android:layout_width="200dip"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="201dip"
+			android:text="Любой тип" />
+		<!--
+		<Button
+			android:id="@+id/btn_receipt"
+			android:layout_width="200dip"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="401dip"
+			android:text="Без рецепта" />
+			-->
+		<Button
+			android:id="@+id/btn_search_mode"
+			android:layout_width="200dip"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="401dip"
+			android:text="Артикул" />
 
 
+		<EditText
+			android:id="@+id/edit_search"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_toLeftOf="@+id/btn_search"
+			android:layout_toRightOf="@+id/btn_search_mode"
+			android:inputType="datetime"
+			android:paddingRight="2dip"
+			android:selectAllOnFocus="true" />
 
 
+		<Button
+			android:id="@+id/btn_search"
+			android:layout_width="150dip"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_centerVertical="true"
+			android:layout_marginRight="7dip"
+			android:text="Поиск" />
+	</RelativeLayout>
 
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@+id/search_panel">
 
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
 
+			<include
+				android:id="@+id/search_list_header"
+				android:layout_alignParentTop="true"
+				layout="@layout/header_nomenclature" />
 
-        <Button
-            android:id="@+id/btn_search"
-            android:layout_width="150dip"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="7dip"
-            android:text="Поиск" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/search_panel" >
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <include
-                android:id="@+id/search_list_header"
-                android:layout_alignParentTop="true"
-                layout="@layout/header_nomenclature" />
-
-            <ListView
-                android:id="@+id/list_search"
-                android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:layout_alignParentBottom="true"
-                android:layout_below="@+id/search_list_header"
-                android:background="#E3E3E3"
-                android:cacheColorHint="#00000000" />
-        </RelativeLayout>
-    </RelativeLayout>
+			<ListView
+				android:id="@+id/list_search"
+				android:layout_width="match_parent"
+				android:layout_height="fill_parent"
+				android:layout_alignParentBottom="true"
+				android:layout_below="@+id/search_list_header"
+				android:background="#E3E3E3"
+				android:cacheColorHint="#00000000" />
+		</RelativeLayout>
+	</RelativeLayout>
 
 </RelativeLayout>

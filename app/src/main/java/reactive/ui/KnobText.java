@@ -2,9 +2,11 @@ package reactive.ui;
 
 import android.text.*;
 import android.app.*;
+
 import tee.binding.properties.*;
 import tee.binding.properties.*;
 import tee.binding.task.Task;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -55,20 +57,24 @@ public class KnobText extends EditText implements Rake {
 		super(context);
 		init();
 	}
+
 	public KnobText(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
+
 	public KnobText(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		int r = 1 + (int) (Auxiliary.tapSize * 0.05);
 		canvas.drawCircle(width.property.value().intValue() - 3 * r, 3 * r, r, dot);
 	}
+
 	void init() {
 		if (initialized) {
 			return;
@@ -124,17 +130,18 @@ public class KnobText extends EditText implements Rake {
 			public void doTask() {
 				if (hidden.property.value()) {
 					setVisibility(View.INVISIBLE);
-				}
-				else {
+				} else {
 					setVisibility(View.VISIBLE);
 				}
 			}
 		});
 	}
+
 	@Override
 	public ToggleProperty<Rake> hidden() {
 		return hidden;
 	}
+
 	/*void resetLabel() {
 		if (date.property.value() == 0) {
 			setText("");
@@ -150,22 +157,27 @@ public class KnobText extends EditText implements Rake {
 	public NumericProperty<Rake> left() {
 		return left;
 	}
+
 	@Override
 	public NumericProperty<Rake> top() {
 		return top;
 	}
+
 	@Override
 	public NumericProperty<Rake> width() {
 		return width;
 	}
+
 	@Override
 	public NumericProperty<Rake> height() {
 		return height;
 	}
+
 	@Override
 	public View view() {
 		return this;
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();

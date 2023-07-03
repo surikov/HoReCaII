@@ -1,6 +1,7 @@
 package reactive.ui;
 
 import tee.binding.properties.*;
+
 import android.content.*;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -14,6 +15,7 @@ public class SQLiteGridColumn {
 
 	public void tap(int row) {
 	}
+
 	public Rake header(Context context) {
 		Decor header = new Decor(context) {
 			//
@@ -25,7 +27,7 @@ public class SQLiteGridColumn {
 						, height().property.value().intValue() - 1//
 						, width().property.value().intValue()//
 						, height().property.value().intValue() //
-						), Auxiliary.paintLine);
+				), Auxiliary.paintLine);
 			}
 		};
 		header.setPadding(3, 0, 3, 2);
@@ -34,6 +36,7 @@ public class SQLiteGridColumn {
 		header.labelText.is(headerText.property.value());
 		return header;
 	}
+
 	public Rake footer(Context context) {
 		Decor footer = new Decor(context) {
 			//
@@ -45,7 +48,7 @@ public class SQLiteGridColumn {
 						, 0//
 						, width().property.value().intValue()//
 						, 1 //
-						), Auxiliary.paintLine);
+				), Auxiliary.paintLine);
 			}
 		};
 		footer.setPadding(3, 0, 3, 2);

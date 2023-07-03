@@ -21,27 +21,27 @@ import android.widget.TextView;
 
 public class Activity_Doc_Orders extends Activity_BasePeriod {
 
-	private OrderListAdapter 	mOrdersListAdapter;
+	private OrderListAdapter mOrdersListAdapter;
 
-	private ListView 			mOrdersList;
+	private ListView mOrdersList;
 
-	public void onCreate(Bundle savedInstanceState) { 
+	public void onCreate(Bundle savedInstanceState) {
 
 		setContentView(R.layout.act_doc_orders);
 
 		super.onCreate(savedInstanceState);
 
-		setTitle( R.string.doc_orders );
+		setTitle(R.string.doc_orders);
 
-		Cursor cursor = Request_Orders.Request( mDB,
-				DateTimeHelper.SQLDateString(mFromPeriod.getTime()), 
-				DateTimeHelper.SQLDateString(mToPeriod.getTime()) );
+		Cursor cursor = Request_Orders.Request(mDB,
+				DateTimeHelper.SQLDateString(mFromPeriod.getTime()),
+				DateTimeHelper.SQLDateString(mToPeriod.getTime()));
 
 		mOrdersList = (ListView) findViewById(R.id.order_list);
 
-		mOrdersListAdapter = new OrderListAdapter( this, cursor );
+		mOrdersListAdapter = new OrderListAdapter(this, cursor);
 
-		mOrdersList.setAdapter( mOrdersListAdapter );
+		mOrdersList.setAdapter(mOrdersListAdapter);
 
 		mOrdersList.setOnTouchListener(this);
 	}
@@ -49,15 +49,15 @@ public class Activity_Doc_Orders extends Activity_BasePeriod {
 	@Override
 	protected void OnDateChanged(Date fromDate, Date toDate) {
 
-		mOrdersListAdapter.changeCursor(Request_Orders.Request( mDB,
-				DateTimeHelper.SQLDateString(mFromPeriod.getTime()), 
-				DateTimeHelper.SQLDateString(mToPeriod.getTime()) ));
-		mOrdersListAdapter.notifyDataSetChanged();		
+		mOrdersListAdapter.changeCursor(Request_Orders.Request(mDB,
+				DateTimeHelper.SQLDateString(mFromPeriod.getTime()),
+				DateTimeHelper.SQLDateString(mToPeriod.getTime())));
+		mOrdersListAdapter.notifyDataSetChanged();
 	}
 
 	public class OrderListAdapter extends ZoomListCursorAdapter {
 
-		public OrderListAdapter(Context context, Cursor cursor) { 
+		public OrderListAdapter(Context context, Cursor cursor) {
 
 			super(context, cursor);
 
@@ -66,9 +66,9 @@ public class Activity_Doc_Orders extends Activity_BasePeriod {
 		@Override
 		public void bindView(View row, Context context, Cursor cursor) {
 
-			OrderHolder holder = (OrderHolder)row.getTag();
+			OrderHolder holder = (OrderHolder) row.getTag();
 
-			holder.populateFrom( cursor );
+			holder.populateFrom(cursor);
 		}
 
 		@Override
@@ -78,35 +78,35 @@ public class Activity_Doc_Orders extends Activity_BasePeriod {
 
 			View row = inflater.inflate(R.layout.row_orderlist, parent, false);
 
-			OrderHolder holder = new OrderHolder( row );	
+			OrderHolder holder = new OrderHolder(row);
 
 			row.setTag(holder);
 
-			return(row);
+			return (row);
 		}
 
 		public class OrderHolder {
 
-			private TextView date 			= null;
-			private TextView number 		= null;
-			private TextView kontragent		= null;
-			private TextView type_payment	= null;
-			private TextView document_summ	= null;
-			private TextView date_shipment 	= null;
-			private TextView comments 		= null;
+			private TextView date = null;
+			private TextView number = null;
+			private TextView kontragent = null;
+			private TextView type_payment = null;
+			private TextView document_summ = null;
+			private TextView date_shipment = null;
+			private TextView comments = null;
 
 			OrderHolder(View row) {
 
-				date 			= (TextView)row.findViewById(R.id.row_order_date);
-				number 			= (TextView)row.findViewById(R.id.row_order_number);
-				kontragent		= (TextView)row.findViewById(R.id.row_order_kontragent);
-				type_payment 	= (TextView)row.findViewById(R.id.row_order_type_payment);
-				document_summ	= (TextView)row.findViewById(R.id.row_order_document_summ);
-				date_shipment 	= (TextView)row.findViewById(R.id.row_order_date_shipment);
-				comments		= (TextView)row.findViewById(R.id.row_order_comments);
+				date = (TextView) row.findViewById(R.id.row_order_date);
+				number = (TextView) row.findViewById(R.id.row_order_number);
+				kontragent = (TextView) row.findViewById(R.id.row_order_kontragent);
+				type_payment = (TextView) row.findViewById(R.id.row_order_type_payment);
+				document_summ = (TextView) row.findViewById(R.id.row_order_document_summ);
+				date_shipment = (TextView) row.findViewById(R.id.row_order_date_shipment);
+				comments = (TextView) row.findViewById(R.id.row_order_comments);
 			}
 
-			void populateFrom( Cursor cursor  ) {
+			void populateFrom(Cursor cursor) {
 
 				float rowTextFontSize = getRowTextFontSize();
 

@@ -25,7 +25,7 @@ public class ReportVizity extends Report_Base {
     Numeric dateCreateTo = new Numeric();
 
     public static String menuLabel() {
-        return "Визиты";
+        return "Данные локализации (Визиты)";
     }
 
     public static String folderKey() {
@@ -33,7 +33,7 @@ public class ReportVizity extends Report_Base {
     }
 
     public String getMenuLabel() {
-        return "Визиты";
+        return "Данные локализации (Визиты)";
     }
 
     public String getFolderKey() {

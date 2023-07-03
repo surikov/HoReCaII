@@ -1,49 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="1" >
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:weightSum="1">
 
-    <Button
-        android:id="@+id/head_btn_number"
-		android:layout_height="40dip" android:layout_width="0dip"
-        android:layout_weight="0.1"
-        android:text="@string/number" />
+	<Button
+		android:id="@+id/head_btn_number"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight="0.1"
+		android:text="@string/number" />
 
-    <Button
-        android:id="@+id/head_btn_date"
-		android:layout_height="40dip" android:layout_width="0dip"
-        android:layout_weight="0.12"
-        android:text="@string/date" />
+	<Button
+		android:id="@+id/head_btn_date"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight="0.12"
+		android:text="@string/date" />
 
-    <Button
-        android:id="@+id/head_btn_kontragent"
-		android:layout_height="40dip" android:layout_width="0dip"
-        android:layout_weight="0.3"
-        android:text="@string/comment" />
+	<Button
+		android:id="@+id/head_btn_kontragent"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight="0.3"
+		android:text="@string/comment" />
 
-    <Button
-        android:id="@+id/head_btn_date_since"
-		android:layout_height="40dip" android:layout_width="0dip"
-        android:layout_weight="0.12"
-        android:text="@string/date_action_since" />
+	<Button
+		android:id="@+id/head_btn_date_since"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight="0.12"
+		android:text="@string/date_action_since" />
 
-    <Button
-        android:id="@+id/head_btn_date_till"
-		android:layout_height="40dip" android:layout_width="0dip"
-        android:layout_weight="0.12"
-        android:text="@string/date_action_till" />
+	<Button
+		android:id="@+id/head_btn_date_till"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight="0.12"
+		android:text="@string/date_action_till" />
 
-    <Button
-        android:id="@+id/head_btn_comment"
-		android:layout_height="40dip" android:layout_width="0dip"
-        android:layout_weight="0.16"
-        android:text="@string/comment" />
+	<Button
+		android:id="@+id/head_btn_comment"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight="0.16"
+		android:text="@string/comment" />
 
-    <Button
-        android:id="@+id/head_btn_upload"
-		android:layout_height="40dip" android:layout_width="0dip"
-        android:layout_weight="0.09"
-        android:text="@string/upload" />
+	<Button
+		android:id="@+id/head_btn_upload"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight="0.09"
+		android:text="@string/upload" />
 
 </LinearLayout>

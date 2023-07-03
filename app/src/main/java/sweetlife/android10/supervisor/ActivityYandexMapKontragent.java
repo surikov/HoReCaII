@@ -166,7 +166,7 @@ void doRefreshMap(){
 			System.out.println(shirota+"/"+dolgota);
 
 			String dt = Auxiliary.tryReFormatDate(beginTime, "yyyy-MM-dd'T'HH:mm:ss", "HH:mm:ss dd.MM.yy");
-			Auxiliary.pick(this, name + " (" + dt + ")", new SubLayoutless(this)//
+			Auxiliary.pick(this, name + " (GMT:0 " + dt + ")", new SubLayoutless(this)//
 							.child(new Decor(this)
 									.bitmap.is(newPointBitmap)
 									.labelAlignCenterCenter()

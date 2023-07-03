@@ -27,6 +27,7 @@ public class Activity_ReportOrderState extends Activity_ReportBase implements IR
 		mCheckOnlyCompleted = (CheckBox) findViewById(R.id.check_only_not_completed);
 		setTitle(R.string.order_states);
 	}
+
 	protected String reportRequest() throws Exception {
 		ReportInfo reportInfo = new ReportOrderStateInfo(REPORT_TYPE_ORDER_STATES//
 				, DateTimeHelper.SQLDateString(mFromPeriod.getTime()) + "T00:00:00"//
@@ -36,6 +37,7 @@ public class Activity_ReportOrderState extends Activity_ReportBase implements IR
 		);
 		return reportRequest(reportInfo, new ReportOrderStateXMLSerializer(reportInfo));
 	}
+
 	@Override
 	public void htmlHook() {
 		LogHelper.debug(this.getClass().getCanonicalName() + " start htmlHook for " + mReportFilePath);

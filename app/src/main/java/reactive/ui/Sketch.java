@@ -6,8 +6,11 @@ import android.graphics.*;
 import android.graphics.*;
 import android.content.*;
 import android.graphics.*;
+
 import tee.binding.properties.*;
+
 import android.view.*;
+
 import tee.binding.task.*;
 import tee.binding.it.*;
 
@@ -31,6 +34,7 @@ abstract public class Sketch {
 
 	public Sketch() {
 	}
+
 	public void unbind() {
 		/*
 		width.property.unbind();
@@ -39,6 +43,7 @@ abstract public class Sketch {
 		top.property.unbind();
 		*/
 	}
+
 	abstract public void draw(Canvas canvas);/* {
 												int w = 100;
 												int h = 100;

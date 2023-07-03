@@ -16,12 +16,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public abstract class ParserBase implements IParserTags, IParserBase {
-	
+
 	protected EParserResult mParserResult;
 	protected boolean mRequestStatus = false;
 
 	public EParserResult Parse(String xmlString) throws ParserConfigurationException,
-	SAXException, IOException, NumberFormatException, ParseException, Exception {
+			SAXException, IOException, NumberFormatException, ParseException, Exception {
 
 		Document document = InitializeDocument(xmlString);
 
@@ -31,18 +31,18 @@ public abstract class ParserBase implements IParserTags, IParserBase {
 	}
 
 	protected Document InitializeDocument(String xmlString)
-	throws ParserConfigurationException, SAXException, IOException {
+			throws ParserConfigurationException, SAXException, IOException {
 
 		StringReader stringReader = new StringReader(xmlString);
 
 		try {
 
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory
-			.newInstance();
+					.newInstance();
 			docBuilderFactory.setNamespaceAware(true);
 
 			DocumentBuilder documentBuilder = docBuilderFactory
-			.newDocumentBuilder();
+					.newDocumentBuilder();
 
 			InputSource inputSource = new InputSource(stringReader);
 
@@ -73,14 +73,14 @@ public abstract class ParserBase implements IParserTags, IParserBase {
 		for (int i = 0; i < itemsCount; i++) {
 
 			resultString = resultString
-			+ ((Node) elementsList.item(i)).getNodeValue();
+					+ ((Node) elementsList.item(i)).getNodeValue();
 		}
 
 		return resultString;
 	}
 
 	protected void ParseData(Document document) throws NumberFormatException,
-	ParseException, Exception {
+			ParseException, Exception {
 
 	}
 }

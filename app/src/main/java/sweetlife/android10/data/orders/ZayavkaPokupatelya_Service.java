@@ -8,40 +8,40 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class ZayavkaPokupatelya_Service extends NomenclatureBasedCountItem {
 
-	private String  mSoderzhanie;
-	private double  mCena;       
-	private double  mSumma;  
-	
-	public ZayavkaPokupatelya_Service(int _id, 
-			int     nomerStroki,
-			String  nomenklaturaID, 
-			String  artikul,
-			String  nomenklaturaNaimenovanie, 
-			String  zayavka, 
-			String  soderzhanie,
-			double  kolichestvo,
-			double  cena,       
-			double  summa,
-			boolean New//, String skidkaProcent//
-			//, String skidkaNaimenovanie//
-			) {
-		super(_id, nomerStroki, 
-				nomenklaturaID, 
-				artikul, 
+	private String mSoderzhanie;
+	private double mCena;
+	private double mSumma;
+
+	public ZayavkaPokupatelya_Service(int _id,
+									  int nomerStroki,
+									  String nomenklaturaID,
+									  String artikul,
+									  String nomenklaturaNaimenovanie,
+									  String zayavka,
+									  String soderzhanie,
+									  double kolichestvo,
+									  double cena,
+									  double summa,
+									  boolean New//, String skidkaProcent//
+									  //, String skidkaNaimenovanie//
+	) {
+		super(_id, nomerStroki,
+				nomenklaturaID,
+				artikul,
 				nomenklaturaNaimenovanie,
 				zayavka,
 				1,
 				1,
-				"x'00'", 
+				"x'00'",
 				"шт",
-				kolichestvo, 
+				kolichestvo,
 				New
 				//,skidkaProcent
 				//,skidkaNaimenovanie
-				);
-		
+		);
+
 		mSoderzhanie = soderzhanie;
-		mCena = cena;       
+		mCena = cena;
 		mSumma = summa;
 	}
 
@@ -50,28 +50,27 @@ public class ZayavkaPokupatelya_Service extends NomenclatureBasedCountItem {
 
 		ContentValues values = new ContentValues();
 
-		if( mNew ) {
+		if (mNew) {
 
-			values.put("NomerStroki", mNomerStroki );
-			values.put("Nomenklatura", Hex.decodeHexWithPrefix(mNomenklaturaID) );
-			values.put("Soderzhanie", mSoderzhanie );
-			values.put("Kolichestvo", mKolichestvo );
-			values.put("Cena", mCena );
-			values.put("Summa", mSumma );
-			values.put("_ZayavkaPokupatelyaIskhodyaschaya_IDRRef", Hex.decodeHexWithPrefix(mZayavka_IDRRef) );
+			values.put("NomerStroki", mNomerStroki);
+			values.put("Nomenklatura", Hex.decodeHexWithPrefix(mNomenklaturaID));
+			values.put("Soderzhanie", mSoderzhanie);
+			values.put("Kolichestvo", mKolichestvo);
+			values.put("Cena", mCena);
+			values.put("Summa", mSumma);
+			values.put("_ZayavkaPokupatelyaIskhodyaschaya_IDRRef", Hex.decodeHexWithPrefix(mZayavka_IDRRef));
 
-			m_id=(int)db.insert("ZayavkaPokupatelyaIskhodyaschaya_Uslugi", null, values);
-			mNew=false;
-		}
-		else {
+			m_id = (int) db.insert("ZayavkaPokupatelyaIskhodyaschaya_Uslugi", null, values);
+			mNew = false;
+		} else {
 
-			values.put("Nomenklatura", Hex.decodeHexWithPrefix(mNomenklaturaID) );
-			values.put("Soderzhanie", mSoderzhanie );
-			values.put("Kolichestvo", mKolichestvo );
-			values.put("Cena", mCena );
-			values.put("Summa", mSumma );
+			values.put("Nomenklatura", Hex.decodeHexWithPrefix(mNomenklaturaID));
+			values.put("Soderzhanie", mSoderzhanie);
+			values.put("Kolichestvo", mKolichestvo);
+			values.put("Cena", mCena);
+			values.put("Summa", mSumma);
 
-			db.update("ZayavkaPokupatelyaIskhodyaschaya_Uslugi", values, "_id="+ String.valueOf(m_id), null);
+			db.update("ZayavkaPokupatelyaIskhodyaschaya_Uslugi", values, "_id=" + String.valueOf(m_id), null);
 		}
 	}
 
@@ -89,7 +88,7 @@ public class ZayavkaPokupatelya_Service extends NomenclatureBasedCountItem {
 
 	public void setKolichestvo(Integer kolichestvo) {
 		mKolichestvo = kolichestvo;
-		
+
 		mSumma = mCena * mKolichestvo;
 	}
 

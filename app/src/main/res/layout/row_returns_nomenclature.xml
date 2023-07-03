@@ -1,64 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/row"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="1">
+	android:id="@+id/row"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:weightSum="1">
 
-    <ImageView
-        android:id="@+id/image_remove"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.03"
-        android:contentDescription="@string/empty"
-        android:src="@android:drawable/ic_menu_delete"
-        android:scaleType="fitCenter" />
-    
-    <TextView
-        android:id="@+id/text_n"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="7dip"
-        android:layout_weight="0.03" />
+	<ImageView
+		android:id="@+id/image_remove"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.03"
+		android:contentDescription="@string/empty"
+		android:src="@android:drawable/ic_menu_delete"
+		android:scaleType="fitCenter" />
 
-    <TextView
-        android:id="@+id/text_article"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.08" />
+	<TextView
+		android:id="@+id/text_n"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_marginLeft="7dip"
+		android:layout_weight="0.03" />
 
-    <TextView
-        android:id="@+id/text_nomenclature"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.37" />
+	<TextView
+		android:id="@+id/text_article"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.08" />
 
-    <TextView
-        android:id="@+id/text_count"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.09" />
+	<TextView
+		android:id="@+id/text_nomenclature"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.37" />
 
-    <TextView
-        android:id="@+id/text_bill"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.1" />
+	<TextView
+		android:id="@+id/text_count"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.09" />
 
-    <TextView
-        android:id="@+id/text_bill_date"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.12" />
+	<TextView
+		android:id="@+id/text_bill"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.1" />
 
-    <Spinner
-        android:id="@+id/spinner_reason"
-        style="@android:style/Widget.Holo.Light.Spinner"
-        android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:padding="3dp"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight=".18" />
+	<TextView
+		android:id="@+id/text_bill_date"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.12" />
+
+	<Spinner
+		android:id="@+id/spinner_reason"
+		style="@android:style/Widget.Holo.Light.Spinner"
+		android:layout_height="wrap_content"
+		android:layout_width="0dp"
+		android:padding="3dp"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight=".18" />
 
 </LinearLayout>

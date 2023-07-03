@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/bottom_request"
-        android:background="#E3E3E3"
-        android:orientation="vertical" >
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_above="@+id/bottom_request"
+		android:background="#E3E3E3"
+		android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="5dip" >
+		<RelativeLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:paddingTop="5dip">
 
-            <include
-                android:id="@+id/bar_period"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerVertical="true"
-                android:layout_marginBottom="10dip"
-                android:layout_marginLeft="20dip"
-                android:layout_marginTop="10dip"
-                layout="@layout/bar_period" />
+			<include
+				android:id="@+id/bar_period"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentTop="true"
+				android:layout_centerVertical="true"
+				android:layout_marginBottom="10dip"
+				android:layout_marginLeft="20dip"
+				android:layout_marginTop="10dip"
+				layout="@layout/bar_period" />
 
-            <TextView
-                android:id="@+id/text_request_all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginTop="0dip"
-                android:layout_toLeftOf="@+id/check_all"
-                android:text="@string/all" />
+			<TextView
+				android:id="@+id/text_request_all"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_marginTop="0dip"
+				android:layout_toLeftOf="@+id/check_all"
+				android:text="@string/all" />
 
-            <ImageView
-                android:id="@+id/check_all"
-                android:layout_width="40dip"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="35dip"
-                android:contentDescription="@string/point_point_point" />
-        </RelativeLayout>
+			<ImageView
+				android:id="@+id/check_all"
+				android:layout_width="40dip"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:layout_centerVertical="true"
+				android:layout_marginRight="35dip"
+				android:contentDescription="@string/point_point_point" />
+		</RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
+		<RelativeLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent">
 
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
+			<RelativeLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent">
 
-                <include
-                    android:id="@+id/list_header"
-                    layout="@layout/header_returns_upload" />
+				<include
+					android:id="@+id/list_header"
+					layout="@layout/header_returns_upload" />
 
-                <ListView
-                    android:id="@+id/list_returns"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_below="@+id/list_header"
-                    android:cacheColorHint="#00000000" />
-            </RelativeLayout>
-        </RelativeLayout>
-    </LinearLayout>
+				<ListView
+					android:id="@+id/list_returns"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:layout_below="@+id/list_header"
+					android:cacheColorHint="#00000000" />
+			</RelativeLayout>
+		</RelativeLayout>
+	</LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/bottom_request"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#E3E3E3"
-        android:orientation="horizontal" >
+	<RelativeLayout
+		android:id="@+id/bottom_request"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:background="#E3E3E3"
+		android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_upload"
-            android:layout_width="250dip"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="15dip"
-            android:text="@string/upload" />
-    </RelativeLayout>
+		<Button
+			android:id="@+id/btn_upload"
+			android:layout_width="250dip"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_marginRight="15dip"
+			android:text="@string/upload" />
+	</RelativeLayout>
 
 </RelativeLayout>

@@ -16,8 +16,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 
 public abstract class Activity_BasePeriod extends Activity_Base {
-	public  final String SI_FROM_DATE = "from_date";
-	public  final String SI_TO_DATE = "to_date";
+	public final String SI_FROM_DATE = "from_date";
+	public final String SI_TO_DATE = "to_date";
 	public EditText mEditFromDate;
 	public EditText mEditToDate;
 	protected Calendar mFromPeriod;
@@ -33,24 +33,26 @@ public abstract class Activity_BasePeriod extends Activity_Base {
 		btnToDate.setOnClickListener(mToDateClick);
 		InitializeDate(savedInstanceState);
 	}
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		outState.putSerializable(SI_FROM_DATE, mFromPeriod);
 		outState.putSerializable(SI_TO_DATE, mToPeriod);
 		super.onSaveInstanceState(outState);
 	}
+
 	public void InitializeDate(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
 			mToPeriod = (Calendar) savedInstanceState.getSerializable(SI_TO_DATE);
 			mFromPeriod = (Calendar) savedInstanceState.getSerializable(SI_FROM_DATE);
-		}
-		else {
+		} else {
 			mToPeriod = Calendar.getInstance();
 			mFromPeriod = Calendar.getInstance();
 			mEditToDate.setText(DateTimeHelper.UIDateString(mToPeriod.getTime()));
 			mEditFromDate.setText(DateTimeHelper.UIDateString(mFromPeriod.getTime()));
 		}
 	}
+
 	protected void UpdateDate() {
 		mEditToDate.setText(DateTimeHelper.UIDateString(mToPeriod.getTime()));
 		mEditFromDate.setText(DateTimeHelper.UIDateString(mFromPeriod.getTime()));

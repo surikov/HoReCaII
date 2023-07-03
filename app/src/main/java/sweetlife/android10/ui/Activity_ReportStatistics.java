@@ -69,7 +69,7 @@ public class Activity_ReportStatistics extends Activity_ReportBase {
 		}
 	}
 	*/
-	
+
 	@Override
 	protected String reportRequest() throws Exception {
 		ReportStatisticsInfo reportInfo = new ReportStatisticsInfo(REPORT_TYPE_STATISTICS//
@@ -82,13 +82,14 @@ public class Activity_ReportStatistics extends Activity_ReportBase {
 		);
 		return reportRequest(reportInfo, new ReportStatisticsXMLSerializer(reportInfo));
 	}
+
 	@Override
 	protected void InitializeControls() {
 		super.InitializeControls();
 		Button btnClients = (Button) findViewById(R.id.btn_client);
 		btnClients.setOnClickListener(mChooseClientClick);
 		mClientEdit = (EditText) findViewById(R.id.edit_client);
-		
+
 		mBeginOrder = Calendar.getInstance();
 		mEndOrder = Calendar.getInstance();
 		mBeginOrder.roll(Calendar.YEAR, -1);
@@ -97,15 +98,17 @@ public class Activity_ReportStatistics extends Activity_ReportBase {
 		mEndOrder.roll(Calendar.YEAR, 1);
 		mEndOrder.set(Calendar.MONTH, 1);
 		mEndOrder.set(Calendar.DAY_OF_YEAR, 1);
-		
-		
+
+
 		mEditBeginOrder = (EditText) findViewById(R.id.edit_order_from_date);
 		mEditBeginOrder.setText(DateTimeHelper.UIDateString(mBeginOrder.getTime()));
 		mEditEndOrder = (EditText) findViewById(R.id.edit_order_to_date);
 		mEditEndOrder.setText(DateTimeHelper.UIDateString(mEndOrder.getTime()));
 		findViewById(R.id.btn_order_from_date).setOnClickListener(mBeginDateClick);
 		findViewById(R.id.btn_order_to_date).setOnClickListener(mEndDateClick);
-	};
+	}
+
+	;
 
 	private OnClickListener mBeginDateClick = new OnClickListener() {
 		@Override
@@ -152,7 +155,7 @@ public class Activity_ReportStatistics extends Activity_ReportBase {
 				mClientDialog.dismiss();
 			}
 		});
-		ClientsListAdapter clientsListAdapter = new ClientsListAdapter(this, mClientsRequestHelper.Request(mDB, 0,null));
+		ClientsListAdapter clientsListAdapter = new ClientsListAdapter(this, mClientsRequestHelper.Request(mDB, 0, null));
 		clientsList.setAdapter(clientsListAdapter);
 		LogHelper.debug(this.getClass().getCanonicalName() + ".ShowClientsListDialog: " + getString(R.string.choose_client));
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
@@ -161,6 +164,7 @@ public class Activity_ReportStatistics extends Activity_ReportBase {
 		mClientDialog = dialogBuilder.create();
 		mClientDialog.show();
 	}
+
 	private void SetClient(Cursor cursor) {
 		mClientEdit.setText(Request_ClientsList.getClientName(cursor));
 		mClientCode = Request_ClientsList.getClientCode(cursor);

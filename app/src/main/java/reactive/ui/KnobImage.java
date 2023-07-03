@@ -1,6 +1,7 @@
 package reactive.ui;
 
 import tee.binding.properties.*;
+
 import android.graphics.*;
 
 import android.view.*;
@@ -12,9 +13,11 @@ import android.view.*;
 import android.widget.*;
 
 import java.util.*;
+
 import reactive.ui.*;
 
 import android.view.animation.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
@@ -49,14 +52,17 @@ public class KnobImage extends ImageButton implements Rake {
 		super(context);
 		init();
 	}
+
 	public KnobImage(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
+
 	public KnobImage(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
+
 	void init() {
 		if (initialized) {
 			return;
@@ -87,37 +93,43 @@ public class KnobImage extends ImageButton implements Rake {
 			public void doTask() {
 				if (hidden.property.value()) {
 					setVisibility(View.INVISIBLE);
-				}
-				else {
+				} else {
 					setVisibility(View.VISIBLE);
 				}
 			}
 		});
 	}
+
 	@Override
 	public ToggleProperty<Rake> hidden() {
 		return hidden;
 	}
+
 	@Override
 	public NumericProperty<Rake> left() {
 		return left;
 	}
+
 	@Override
 	public NumericProperty<Rake> top() {
 		return top;
 	}
+
 	@Override
 	public NumericProperty<Rake> width() {
 		return width;
 	}
+
 	@Override
 	public NumericProperty<Rake> height() {
 		return height;
 	}
+
 	@Override
 	public View view() {
 		return this;
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();

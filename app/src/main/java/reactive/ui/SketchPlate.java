@@ -11,6 +11,7 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.text.StaticLayout;
 import android.text.Layout.Alignment;
+
 import tee.binding.it.Toggle;
 import tee.binding.properties.*;
 import tee.binding.task.Task;
@@ -122,8 +123,8 @@ public class SketchPlate extends Sketch {
 			return;
 		}
 		cached.property.value(true);
-		
-		
+
+
 		int w = width.property.value().intValue();
 		int h = height.property.value().intValue();
 		int l = left.property.value().intValue();
@@ -185,9 +186,11 @@ public class SketchPlate extends Sketch {
 				bitmapCache=null;
 			}
 		} else {*/
-			if (bitmapCache != null) {
-				canvas.drawBitmap(bitmapCache, src, dest, bmPaint);
-			}
+		if (bitmapCache != null) {
+			canvas.drawBitmap(bitmapCache, src, dest, bmPaint);
+		}
 		//}
-	};
+	}
+
+	;
 }

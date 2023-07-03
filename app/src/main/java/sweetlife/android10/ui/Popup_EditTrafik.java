@@ -1,12 +1,14 @@
 package sweetlife.android10.ui;
 
 import java.util.Calendar;
+
 import sweetlife.android10.data.nomenclature.NomenclatureCountHelper;
 import sweetlife.android10.data.orders.ZayavkaPokupatelya_Trafik;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.widgets.BetterPopupWindow;
 import sweetlife.android10.R;
+
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
@@ -27,6 +29,7 @@ public class Popup_EditTrafik extends BetterPopupWindow {
 	private Calendar mDate;
 	private NomenclatureCountHelper mCountHelper = new NomenclatureCountHelper(0, 0);
 	CheckBox spr;
+
 	public Popup_EditTrafik(View anchor, OnCloseListener closeListener, ZayavkaPokupatelya_Trafik trafik) {
 		super(anchor, closeListener);
 		mTrafik = trafik;
@@ -35,17 +38,17 @@ public class Popup_EditTrafik extends BetterPopupWindow {
 		TextView textName = (TextView) root.findViewById(R.id.text_nomenclature);
 		textName.setText(mTrafik.getNomenklaturaNaimenovanie());
 		if (mTrafik != null) {
-			 spr = (CheckBox) root.findViewById(R.id.chk_vetspravka);
+			spr = (CheckBox) root.findViewById(R.id.chk_vetspravka);
 			spr.setVisibility(View.VISIBLE);
 			//System.out.println(mTrafik);
 			if (mTrafik.vetSpravka) {
 				spr.setChecked(true);
-			}
-			else {
+			} else {
 				spr.setChecked(false);
 			}
 		}
 	}
+
 	private void InitializeCount(View root) {
 		mCountHelper = new NomenclatureCountHelper(mTrafik.getMinNorma(), mTrafik.getKoefMest());
 		mEditCount = (EditText) root.findViewById(R.id.edit_count);
@@ -56,6 +59,7 @@ public class Popup_EditTrafik extends BetterPopupWindow {
 		textCount.setText(res.getString(R.string.count) + "    " + res.getString(R.string.min_quantity) + " " + mTrafik.getMinNorma() + "  " + res.getString(R.string.koef_mest) + " "
 				+ mTrafik.getKoefMest());
 	}
+
 	private void InitializeDate(View root) {
 		mEditDate = (EditText) root.findViewById(R.id.edit_date);
 		mEditDate.setOnClickListener(mDateClick);
@@ -66,6 +70,7 @@ public class Popup_EditTrafik extends BetterPopupWindow {
 		mEditDate.setText(DateTimeHelper.UIDateString(mDate.getTime()));
 		((Button) root.findViewById(R.id.btn_date)).setOnClickListener(mDateClick);
 	}
+
 	private OnClickListener mDateClick = new OnClickListener() {
 		@Override
 		public void onClick(View arg0) {
@@ -79,6 +84,7 @@ public class Popup_EditTrafik extends BetterPopupWindow {
 			new DatePickerDialog(arg0.getContext(), dateSetListener, mDate.get(Calendar.YEAR), mDate.get(Calendar.MONTH), mDate.get(Calendar.DAY_OF_MONTH)).show();
 		}
 	};
+
 	@Override
 	protected void onCreate() {
 		LayoutInflater inflater = (LayoutInflater) anchor.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -86,6 +92,7 @@ public class Popup_EditTrafik extends BetterPopupWindow {
 		setButtons(root);
 		setContentView(root);
 	}
+
 	private void setButtons(View root) {
 		Button btn1 = (Button) root.findViewById(R.id.btn_1);
 		btn1.setOnClickListener(new OnClickListener() {
@@ -193,17 +200,17 @@ public class Popup_EditTrafik extends BetterPopupWindow {
 				CheckInputCount();
 				mTrafik.setKolichestvo(Double.parseDouble(mEditCount.getText().toString()));
 				text = mEditDate.getText().toString();
-				mTrafik.vetSpravka=spr.isChecked();
+				mTrafik.vetSpravka = spr.isChecked();
 				if (text.length() != 0) {
 					mTrafik.setData(mDate.getTime());
-				}
-				else {
+				} else {
 					mTrafik.setData(null);
 				}
 				dismiss(0);
 			}
 		});
 	}
+
 	private void CheckInputCount() {
 		double count = 0.00D;
 		if (mEditCount.getText().toString().length() != 0) {

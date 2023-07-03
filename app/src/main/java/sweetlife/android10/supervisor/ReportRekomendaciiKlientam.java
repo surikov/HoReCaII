@@ -156,7 +156,7 @@ public class ReportRekomendaciiKlientam extends Report_Base {
                 String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
                 terr.item(s);
             }
-            RedactSingleChoice kontr = new RedactSingleChoice(context);
+            RedactFilteredSingleChoice kontr = new RedactFilteredSingleChoice(context);
             kontr.selection.is(whoPlus1);
             //kontr.item("[Все контрагенты]");
 			Bough kontragenty= Cfg.kontragentyForSelectedMarshrut();
@@ -166,13 +166,15 @@ public class ReportRekomendaciiKlientam extends Report_Base {
             }*/
             //kontr.item("[Все контрагенты]");
             for (int i = 0; i < kontragenty.children.size(); i++) {
-                kontr.item(kontragenty.children.get(i).child("naimenovanie").value.property.value());
+                kontr.item(kontragenty.children.get(i).child("kod").value.property.value()
+				+": "+kontragenty.children.get(i).child("naimenovanie").value.property.value()
+				);
             }
 
 
             propertiesForm//
                     .input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
-                    .input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontr)//
+                    .input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontr, Auxiliary.tapSize * 9)//
                     .input(context, 2, Auxiliary.tapSize * 0.3, "Территория", terr)//
             ;
 

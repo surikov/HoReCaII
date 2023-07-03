@@ -56,6 +56,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	private OnCloseListener mOnPopupClose = new OnCloseListener() {
 		@Override
 		public void onClose(int param) {
+			System.out.println("mOnPopupClose.onClose");
 			mReturnNomenclatureListAdapter.notifyDataSetChanged();
 			mHasChanges = true;
 		}
@@ -91,7 +92,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		setContentView(R.layout.act_returns);
 		super.onCreate(savedInstanceState);
 		ReadExtras();
-		setTitle(getString(R.string.returns_request) + "  " + mClient.getName());
+		setTitle("Заявка на возврат от " + mClient.getName());
 		InitializeControls();
 		mCameraHelper = new CameraCaptureHelper();
 	}
@@ -104,7 +105,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item == menuDelete) {
+		if (item == menuDelete) {
 			promptDelete();
 			return true;
 		}
@@ -129,7 +130,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		mZayavka = extras.getParcelable(RETURNS_BID);
 		int p = extras.getInt("prichina");
 		prichinaNum = 0;
-		switch(p) {
+		switch (p) {
 		/*case 1:
 			prichinaNum = ZayavkaNaVozvrat_Tovary.REASON_BRAK;
 			break;*/
@@ -144,10 +145,12 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 				break;
 			case 4:
 				prichinaNum = ZayavkaNaVozvrat_Tovary.REASON_KOROTKIE_SROKI;
+			case 5:
+				prichinaNum = ZayavkaNaVozvrat_Tovary.REASON_OSHIBKA_PRI_ZAKAZE;
 				break;
 		}
 		//System.out.println("prichinaNum "+prichinaNum);
-		if(mZayavka == null) {
+		if (mZayavka == null) {
 			mClient = new ClientInfo(mDB, extras.getString(CLIENT_ID));
 			mZayavka = new ZayavkaNaVozvrat(mClient.getID(), mDB);
 		}
@@ -223,22 +226,21 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		System.out.println("onActivityResult "+requestCode+"/"+resultCode+"/"+data);
+		System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + data);
 
 		super.onActivityResult(requestCode, resultCode, data);
-		if(resultCode == RESULT_OK) {
-			switch(requestCode) {
+		if (resultCode == RESULT_OK) {
+			switch (requestCode) {
 				case ADD_NOMENCATURE:
-					if(mReturnsNomenclatureData.IsNomenclatureAlreadyInList(data.getStringExtra(NOMENCLATURE_ID))) {
+					if (mReturnsNomenclatureData.IsNomenclatureAlreadyInList(data.getStringExtra(NOMENCLATURE_ID))) {
 						CreateErrorDialog(R.string.msg_already_in_list).show();
 						return;
 					}
 					int prichina = 0;
-					if(prichinaNum > 0) {
+					if (prichinaNum > 0) {
 						prichina = prichinaNum;
-					}
-					else {
-						for(int i = 0; i < mReturnsNomenclatureData.mNomenclaureList.size(); i++) {
+					} else {
+						for (int i = 0; i < mReturnsNomenclatureData.mNomenclaureList.size(); i++) {
 							NomenclatureBasedItem nomenclatureBasedItem = mReturnsNomenclatureData.mNomenclaureList.get(i);
 							ZayavkaNaVozvrat_Tovary zayavkaNaVozvrat_Tovary = (ZayavkaNaVozvrat_Tovary) nomenclatureBasedItem;
 							prichina = zayavkaNaVozvrat_Tovary.getPrichina();
@@ -261,10 +263,10 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 						LogHelper.debug(this.getClass().getCanonicalName() + ": " + filePath + " " + e.getMessage());
 					}
 					*/
-					Uri uri=data.getData();
-					filePath=Auxiliary.pathForMediaURI(this,uri);
+					Uri uri = data.getData();
+					filePath = Auxiliary.pathForMediaURI(this, uri);
 
-					if(filePath == null) {
+					if (filePath == null) {
 						showDialog(IDD_BAD_FILE_PATH);
 						return;
 					}
@@ -284,7 +286,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		LogHelper.debug(this.getClass().getCanonicalName() + ".onCreateDialog: " + id);
-		switch(id) {
+		switch (id) {
 			case IDD_DELETE: {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.confirm);
@@ -312,10 +314,9 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 				builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int arg1) {
-						if(mReturnsNomenclatureData.getCount() != 0) {
+						if (mReturnsNomenclatureData.getCount() != 0) {
 							SaveChangesAndExit();
-						}
-						else {
+						} else {
 							showDialog(IDD_IS_EMPTY);
 						}
 					}
@@ -348,7 +349,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_BACK & mHasChanges & mReturnsNomenclatureData.getCount() != 0) {
+		if (keyCode == KeyEvent.KEYCODE_BACK & mHasChanges & mReturnsNomenclatureData.getCount() != 0) {
 			showDialog(IDD_SAVE_CHANGES);
 			return true;
 		}
@@ -357,11 +358,11 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 
 	@SuppressWarnings("deprecation")
 	private void SaveChangesAndExit() {
-		if(mReturnsNomenclatureData.getCount() == 0) {
+		if (mReturnsNomenclatureData.getCount() == 0) {
 			finish();
 			return;
 		}
-		if(!mReturnsNomenclatureData.IsAllDataFilled()) {
+		if (!mReturnsNomenclatureData.IsAllDataFilled()) {
 			showDialog(IDD_EMPTY_FIELDS);
 			return;
 		}
@@ -391,7 +392,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		try {
 			Intent ch = Intent.createChooser(intent, "Выбор");
 			startActivityForResult(ch, GET_GALLERY_PICTURE);
-		} catch(android.content.ActivityNotFoundException ex) {
+		} catch (android.content.ActivityNotFoundException ex) {
 			LogHelper.debug(this.getClass().getCanonicalName() + " " + ex.getMessage());
 			// Potentially direct the user to the Market with a Dialog
 			//Toast.makeText(this, "Please install a File Manager.",                     Toast.LENGTH_SHORT).show();
@@ -403,7 +404,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		try {
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCameraHelper.createImageFile()));
-		} catch(IOException e) {
+		} catch (IOException e) {
 			showDialog(IDD_WORKING_WITH_CAMERA_ERROR);
 			return;
 		}

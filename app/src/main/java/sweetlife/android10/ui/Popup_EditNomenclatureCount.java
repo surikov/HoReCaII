@@ -4,6 +4,7 @@ import sweetlife.android10.data.common.NomenclatureBasedCountItem;
 import sweetlife.android10.data.nomenclature.NomenclatureCountHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.widgets.BetterPopupWindow;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
@@ -20,21 +21,21 @@ import sweetlife.android10.R;
 
 public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 
-	private EditText                     mEditCount;
+	private EditText mEditCount;
 
-	private NomenclatureCountHelper      mCountHelper= new NomenclatureCountHelper(0,0);
-	private NomenclatureBasedCountItem   mNomenclatureBasedCountItem;
+	private NomenclatureCountHelper mCountHelper = new NomenclatureCountHelper(0, 0);
+	private NomenclatureBasedCountItem mNomenclatureBasedCountItem;
 
-	public Popup_EditNomenclatureCount( View anchor, 
-			OnCloseListener closeListener, 
-			NomenclatureBasedCountItem item) {
+	public Popup_EditNomenclatureCount(View anchor,
+									   OnCloseListener closeListener,
+									   NomenclatureBasedCountItem item) {
 
 		super(anchor, closeListener);
 
 		mNomenclatureBasedCountItem = item;
-	
+
 		InitializeCount(root);
-		
+
 		TextView textName = (TextView) root.findViewById(R.id.text_nomenclature);
 		textName.setText(mNomenclatureBasedCountItem.getNomenklaturaNaimenovanie());
 	}
@@ -51,7 +52,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 
-				CheckInputCount();				
+				CheckInputCount();
 
 				return false;
 			}
@@ -60,7 +61,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 		Resources res = anchor.getResources();
 
 		TextView textCount = (TextView) root.findViewById(R.id.text_count);
-		textCount.setText(res.getString(R.string.count) + "    " + 
+		textCount.setText(res.getString(R.string.count) + "    " +
 				res.getString(R.string.min_quantity) + " " +
 				mNomenclatureBasedCountItem.getMinNorma() + "  " +
 				res.getString(R.string.koef_mest) + " " +
@@ -71,7 +72,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 	protected void onCreate() {
 
 		LayoutInflater inflater =
-			(LayoutInflater) anchor.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				(LayoutInflater) anchor.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		ViewGroup root = (ViewGroup) inflater.inflate(R.layout.popup_edit_count, null);
 
@@ -82,7 +83,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 
 	private void setButtons(View root) {
 
-		Button btn1 = (Button)root.findViewById(R.id.btn_1);
+		Button btn1 = (Button) root.findViewById(R.id.btn_1);
 		btn1.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -91,7 +92,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn2 = (Button)root.findViewById(R.id.btn_2);
+		Button btn2 = (Button) root.findViewById(R.id.btn_2);
 		btn2.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -100,7 +101,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn3 = (Button)root.findViewById(R.id.btn_3);
+		Button btn3 = (Button) root.findViewById(R.id.btn_3);
 		btn3.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -109,7 +110,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn4 = (Button)root.findViewById(R.id.btn_4);
+		Button btn4 = (Button) root.findViewById(R.id.btn_4);
 		btn4.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -118,7 +119,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn5 = (Button)root.findViewById(R.id.btn_5);
+		Button btn5 = (Button) root.findViewById(R.id.btn_5);
 		btn5.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -127,7 +128,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn6 = (Button)root.findViewById(R.id.btn_6);
+		Button btn6 = (Button) root.findViewById(R.id.btn_6);
 		btn6.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -136,7 +137,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn7 = (Button)root.findViewById(R.id.btn_7);
+		Button btn7 = (Button) root.findViewById(R.id.btn_7);
 		btn7.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -145,7 +146,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn8 = (Button)root.findViewById(R.id.btn_8);
+		Button btn8 = (Button) root.findViewById(R.id.btn_8);
 		btn8.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -154,7 +155,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn9 = (Button)root.findViewById(R.id.btn_9);
+		Button btn9 = (Button) root.findViewById(R.id.btn_9);
 		btn9.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -163,7 +164,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btn0 = (Button)root.findViewById(R.id.btn_0);
+		Button btn0 = (Button) root.findViewById(R.id.btn_0);
 		btn0.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -172,37 +173,37 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		((Button)root.findViewById(R.id.btn_slash)).setEnabled(false);
+		((Button) root.findViewById(R.id.btn_slash)).setEnabled(false);
 
-		Button btnPoint = (Button)root.findViewById(R.id.btn_point);
+		Button btnPoint = (Button) root.findViewById(R.id.btn_point);
 		btnPoint.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 
 				String inputString = mEditCount.getText().toString();
 
-				if( !inputString.contains(".") ) {
+				if (!inputString.contains(".")) {
 
 					mEditCount.setText(mEditCount.getText().toString() + ".");
 				}
 			}
 		});
 
-		Button btnDel = (Button)root.findViewById(R.id.btn_del);
+		Button btnDel = (Button) root.findViewById(R.id.btn_del);
 		btnDel.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 
-				String searchString = mEditCount.getText().toString();			
+				String searchString = mEditCount.getText().toString();
 
-				if( searchString.length() != 0 ) {
+				if (searchString.length() != 0) {
 
-					mEditCount.setText(searchString.substring(0, searchString.length() -1 ));
+					mEditCount.setText(searchString.substring(0, searchString.length() - 1));
 				}
 			}
 		});
 
-		Button btnClear = (Button)root.findViewById(R.id.btn_clear);
+		Button btnClear = (Button) root.findViewById(R.id.btn_clear);
 		btnClear.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -211,7 +212,7 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 			}
 		});
 
-		Button btnEnter = (Button)root.findViewById(R.id.btn_enter);
+		Button btnEnter = (Button) root.findViewById(R.id.btn_enter);
 		btnEnter.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -219,8 +220,8 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 				CheckInputCount();
 
 				mNomenclatureBasedCountItem.setKolichestvo(Double.parseDouble(mEditCount.getText().toString()));
-				
-				dismiss( 0 );
+
+				dismiss(0);
 			}
 		});
 	}
@@ -229,10 +230,10 @@ public class Popup_EditNomenclatureCount extends BetterPopupWindow {
 
 		double count = 0.00D;
 
-		if( mEditCount.getText().toString().length() != 0 ) {
+		if (mEditCount.getText().toString().length() != 0) {
 
 			count = Double.parseDouble(mEditCount.getText().toString().replace(',', '.'));
 		}
-		mEditCount.setText(DecimalFormatHelper.format(mCountHelper.ReCalculateCount(count)));	
+		mEditCount.setText(DecimalFormatHelper.format(mCountHelper.ReCalculateCount(count)));
 	}
 }

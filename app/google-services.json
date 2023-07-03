@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "594758672574",
+    "project_id": "sweetlifehoreca",
+    "storage_bucket": "sweetlifehoreca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:594758672574:android:b19153734e019dfe85beef",
+        "android_client_info": {
+          "package_name": "com.example.firebasemessagingtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "594758672574-fdela024uuoh4ievav9a4jsvdd8lt4jc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAorATudJjFvr5khe_0YtwPNhs3J5X0HmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "594758672574-fdela024uuoh4ievav9a4jsvdd8lt4jc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:594758672574:android:f9b5b65be436bc2a85beef",
+        "android_client_info": {
+          "package_name": "sweetlife.android10"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "594758672574-fdela024uuoh4ievav9a4jsvdd8lt4jc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAorATudJjFvr5khe_0YtwPNhs3J5X0HmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "594758672574-fdela024uuoh4ievav9a4jsvdd8lt4jc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

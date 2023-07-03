@@ -1,39 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/row"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="1" >
+	android:id="@+id/row"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:weightSum="1">
 
-    <TextView
-        android:id="@+id/text_number"
-		android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_marginLeft="5dip"
-        android:layout_weight="0.2" />
+	<TextView
+		android:id="@+id/text_number"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_marginLeft="5dip"
+		android:layout_weight="0.2" />
 
-    <TextView
-        android:id="@+id/text_contract"
-		android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.45" />
+	<TextView
+		android:id="@+id/text_contract"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.45" />
 
-    <TextView
-        android:id="@+id/text_paymenttype"
-		android:layout_width="0px" android:layout_height="wrap_content"
-       android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.15" />
+	<TextView
+		android:id="@+id/text_paymenttype"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.15" />
 
-    <TextView
-        android:id="@+id/text_shippingdate"
-		android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.1" />
+	<TextView
+		android:id="@+id/text_shippingdate"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.1" />
 
-    <TextView
-        android:id="@+id/text_amount"
-		android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.1" />
+	<TextView
+		android:id="@+id/text_amount"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.1" />
 
 </LinearLayout>

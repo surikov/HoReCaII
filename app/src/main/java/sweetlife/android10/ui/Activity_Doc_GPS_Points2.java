@@ -22,6 +22,7 @@ public class Activity_Doc_GPS_Points2 extends Activity {
 	MenuItem menuResetUpload;
 	Numeric periodFrom = new Numeric();
 	Numeric periodTo = new Numeric();
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//System.out.println("onCreate");
@@ -29,13 +30,15 @@ public class Activity_Doc_GPS_Points2 extends Activity {
 		setContentView(layoutless);
 		this.setTitle("GPS отметки");
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuRefresh = menu.add("Обновить");
 		menuOtchety = menu.add("Отчёты");
-		menuResetUpload= menu.add("Повторить выгрузку");
+		menuResetUpload = menu.add("Повторить выгрузку");
 		return true;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item == menuOtchety) {
@@ -54,13 +57,14 @@ public class Activity_Doc_GPS_Points2 extends Activity {
 		}
 		return true;
 	}
-	void promptResetUpload(){
-		Auxiliary.pickConfirm(this, "Пометить все точки и визиты как невыгруженные", "Да", new Task(){
+
+	void promptResetUpload() {
+		Auxiliary.pickConfirm(this, "Пометить все точки и визиты как невыгруженные", "Да", new Task() {
 			@Override
 			public void doTask() {
-				String sql="update GPSPoints set upload=0;";
+				String sql = "update GPSPoints set upload=0;";
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-				sql="update vizits set upload=0 where date(BeginTime)>date('now','-2 days');";
+				sql = "update vizits set upload=0 where date(BeginTime)>date('now','-2 days');";
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 				//OnDateChanged(mFromPeriod.getTime(), mToPeriod.getTime());
 			}

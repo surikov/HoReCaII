@@ -14,28 +14,28 @@ import android.util.Xml;
 
 
 public class GPSPointsXMLSerializer implements IXMLSerializer {
-	
-	private String ATR_M_SCHEMA          = "http://ws.swlife.ru";
-	private String TAG_GET               = "m:Get";
-	private String TAG_PAKET             = "m:Paket";
-	private String TAG_COORD_GPS         = "m:CoordGPS";
-	private String TAG_TIME              = "m:time";
-	private String TAG_LAT               = "m:lat";
-	private String TAG_LONG              = "m:long";
-	private String TAG_USER              = "m:user";
 
-	private String              mUserKod;
+	private String ATR_M_SCHEMA = "http://ws.swlife.ru";
+	private String TAG_GET = "m:Get";
+	private String TAG_PAKET = "m:Paket";
+	private String TAG_COORD_GPS = "m:CoordGPS";
+	private String TAG_TIME = "m:time";
+	private String TAG_LAT = "m:lat";
+	private String TAG_LONG = "m:long";
+	private String TAG_USER = "m:user";
+
+	private String mUserKod;
 	private ArrayList<CoordGPS> mCoordGPSList;
-	
-	public GPSPointsXMLSerializer( SQLiteDatabase db, ArrayList<CoordGPS> coordGPSList) {
-	
+
+	public GPSPointsXMLSerializer(SQLiteDatabase db, ArrayList<CoordGPS> coordGPSList) {
+
 		//mUserKod = Requests.getTPCode(db
-				//, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()
+		//, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()
 		//		);
 		mUserKod = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
 		mCoordGPSList = coordGPSList;
 	}
-	
+
 	@Override
 	public String SerializeXML() throws IllegalArgumentException,
 			IllegalStateException, IOException {
@@ -53,7 +53,7 @@ public class GPSPointsXMLSerializer implements IXMLSerializer {
 		serializer.startTag(null, TAG_BODY);
 
 		serializer.startTag(null, TAG_GET);
-		serializer.attribute(null, ATR_M, ATR_M_SCHEMA);		
+		serializer.attribute(null, ATR_M, ATR_M_SCHEMA);
 
 		serializer.startTag(null, TAG_PAKET);
 		serializer.attribute(null, ATR_XSD, ATR_XSD_SCHEMA);
@@ -62,45 +62,46 @@ public class GPSPointsXMLSerializer implements IXMLSerializer {
 		SerializeCoords(serializer);
 
 		serializer.startTag(null, TAG_USER);
-		serializer.text( mUserKod );
+		serializer.text(mUserKod);
 		serializer.endTag(null, TAG_USER);
 
 		serializer.endTag(null, TAG_PAKET);
 
-		serializer.endTag(null, TAG_GET);		
+		serializer.endTag(null, TAG_GET);
 
 		serializer.endTag(null, TAG_BODY);
 
-		serializer.endTag(null, TAG_ENVELOPE);       
+		serializer.endTag(null, TAG_ENVELOPE);
 
 		serializer.endDocument();
 
-		return writer.toString();	
+		return writer.toString();
 	}
+
 	private void SerializeCoords(XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 
 		int count = mCoordGPSList.size();
 		CoordGPS coord = null;
 
-		for(int i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++) {
 
 			coord = mCoordGPSList.get(i);
 
 			serializer.startTag(null, TAG_COORD_GPS);
 
 			serializer.startTag(null, TAG_TIME);
-			serializer.text( coord.getTime() );
-			serializer.endTag(null, TAG_TIME);		
+			serializer.text(coord.getTime());
+			serializer.endTag(null, TAG_TIME);
 
 			serializer.startTag(null, TAG_LAT);
-			serializer.text( String.valueOf(coord.getLatitude()) );
-			serializer.endTag(null, TAG_LAT);	
+			serializer.text(String.valueOf(coord.getLatitude()));
+			serializer.endTag(null, TAG_LAT);
 
 			serializer.startTag(null, TAG_LONG);
-			serializer.text( String.valueOf(coord.getLongitude()) );
-			serializer.endTag(null, TAG_LONG);	
+			serializer.text(String.valueOf(coord.getLongitude()));
+			serializer.endTag(null, TAG_LONG);
 
-			serializer.endTag(null, TAG_COORD_GPS); 
+			serializer.endTag(null, TAG_COORD_GPS);
 		}
 	}
 }

@@ -52,7 +52,7 @@ public class Activity_BidSpecificaciya extends Activity {
 	ColumnText columnNacenka;
 	ColumnText columnSebestoimost;
 	DataGrid grid;
-	public static boolean sortByName=false;
+	public static boolean sortByName = false;
 	//boolean isNew = true;
 	Note id = new Note();
 	Numeric status = new Numeric();
@@ -201,24 +201,27 @@ public class Activity_BidSpecificaciya extends Activity {
 			Auxiliary.warn("Не скопированы данные для импорта", this);
 		}
 	}
-void sortModeMenuTitle(){
-	menuSortMode.setTitle(
-			sortByName?"Сортировать по артикулу":"Сортировать по наименованию"
-	);
-}
-	void toggleSortMode(){
-		sortByName=!sortByName;
+
+	void sortModeMenuTitle() {
 		menuSortMode.setTitle(
-				sortByName?"Сортировать по артикулу":"Сортировать по наименованию"
+				sortByName ? "Сортировать по артикулу" : "Сортировать по наименованию"
+		);
+	}
+
+	void toggleSortMode() {
+		sortByName = !sortByName;
+		menuSortMode.setTitle(
+				sortByName ? "Сортировать по артикулу" : "Сортировать по наименованию"
 		);
 		refreshItems();
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuImport = menu.add("Импорт");
 		menuClone = menu.add("Копировать спецификацию");
 		menuDelete = menu.add("Удалить спецификацию");
-		menuSortMode=menu.add("Сортировать");
+		menuSortMode = menu.add("Сортировать");
 		sortModeMenuTitle();
 		return true;
 	}
@@ -503,9 +506,9 @@ void sortModeMenuTitle(){
 					+ " join CenyNomenklaturySklada on nomenklatura._idrref=CenyNomenklaturySklada.nomenklatura and CenyNomenklaturySklada.period=(select max(Period) from CenyNomenklaturySklada where nomenklatura=nomenklatura._idrref)"//
 					+ " join TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura" + " where ZayavkaNaSpecifikasiaNomenklatura.parent=" + id.value()//
 					;
-			if(sortByName) {
+			if (sortByName) {
 				sql = sql + " order by nomenklatura.naimenovanie";
-			}else{
+			} else {
 				sql = sql + " order by ZayavkaNaSpecifikasiaNomenklatura.Artikul";
 			}
 

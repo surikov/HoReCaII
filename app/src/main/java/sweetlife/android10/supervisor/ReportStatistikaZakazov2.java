@@ -8,7 +8,7 @@ import reactive.ui.Auxiliary;
 import reactive.ui.Decor;
 import reactive.ui.Knob;
 import reactive.ui.RedactDate;
-import reactive.ui.RedactSingleChoice;
+import reactive.ui.*;
 import reactive.ui.RedactText;
 import reactive.ui.SubLayoutless;
 import sweetlife.android10.*;
@@ -237,11 +237,11 @@ public class ReportStatistikaZakazov2 extends Report_Base {
 		letuchkaControl.item("Только летучка");
 		letuchkaControl.selection.is(letuchka);
 
-		RedactSingleChoice kontr = new RedactSingleChoice(context);
+		RedactFilteredSingleChoice kontr = new RedactFilteredSingleChoice(context);
 		kontr.selection.is(whoPlus1);
 		kontr.item("[Все контрагенты]");
 		for(int i = 0; i < Cfg.kontragenty().children.size(); i++) {
-			kontr.item(Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
+			kontr.item(Cfg.kontragenty().children.get(i).child("kod").value.property.value()+": "+Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
 		}
 		RedactSingleChoice kinds = new RedactSingleChoice(context);
 		kinds.selection.is(kind);
@@ -253,7 +253,7 @@ public class ReportStatistikaZakazov2 extends Report_Base {
 				.input(context, 1, Auxiliary.tapSize * 0.3, "Доставка с", new RedactDate(context).date.is(dateShipFrom).format.is("dd.MM.yyyy"))//
 				.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateShipTo).format.is("dd.MM.yyyy"))//
 				.input(context, 3, Auxiliary.tapSize * 0.3, "Территория", terr)//
-				.input(context, 4, Auxiliary.tapSize * 0.3, "Контрагент", kontr)//
+				.input(context, 4, Auxiliary.tapSize * 0.3, "Контрагент", kontr, Auxiliary.tapSize * 9)//
 				.input(context, 5, Auxiliary.tapSize * 0.3, "Вариант отчёта", kinds)//
 				.input(context, 6, Auxiliary.tapSize * 0.3, "Летучка", letuchkaControl)//
 		.input(context, 7, Auxiliary.tapSize * 0.3, "Артикул", new RedactText(context).text.is(artikul))//

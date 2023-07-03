@@ -19,132 +19,132 @@ import sweetlife.android10.R;
 
 public class UploadDocumentAsyncTask extends ManagedAsyncTask<String> {
 
-    private int TIMEOUT = 300 * 1000;
+	private int TIMEOUT = 300 * 1000;
 
-    private ArrayList<NomenclatureBasedDocument> mDocumentsForUpload;
-    private String mRequestURL;
-    private IParserBase mParser;
+	private ArrayList<NomenclatureBasedDocument> mDocumentsForUpload;
+	private String mRequestURL;
+	private IParserBase mParser;
 
-    private SQLiteDatabase mDB;
+	private SQLiteDatabase mDB;
 
-    public UploadDocumentAsyncTask(
-            SQLiteDatabase db,
-            Context appContext,
-            String dialogMessage,
-            ArrayList<NomenclatureBasedDocument> documentsForUpload,
-            String requestURL,
-            IParserBase parser) {
+	public UploadDocumentAsyncTask(
+			SQLiteDatabase db,
+			Context appContext,
+			String dialogMessage,
+			ArrayList<NomenclatureBasedDocument> documentsForUpload,
+			String requestURL,
+			IParserBase parser) {
 
-        super(dialogMessage, appContext);
+		super(dialogMessage, appContext);
 
-        mDB = db;
+		mDB = db;
 
-        mProgressDialogMessage = dialogMessage;
-        mDocumentsForUpload = documentsForUpload;
-        mRequestURL = requestURL;
-        mParser = parser;
-    }
+		mProgressDialogMessage = dialogMessage;
+		mDocumentsForUpload = documentsForUpload;
+		mRequestURL = requestURL;
+		mParser = parser;
+	}
 
-    @Override
-    protected String doInBackground(Object... arg0) {
+	@Override
+	protected String doInBackground(Object... arg0) {
 
-        StringBuilder resultString = new StringBuilder();
+		StringBuilder resultString = new StringBuilder();
 
-        for (NomenclatureBasedDocument document : mDocumentsForUpload) {
+		for (NomenclatureBasedDocument document : mDocumentsForUpload) {
 
-            String requestString = null;
-            try {
+			String requestString = null;
+			try {
 
-                requestString = document.getSerializedXML(mDB);
+				requestString = document.getSerializedXML(mDB);
 
-            } catch (IOException e1) {
-                ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
-                ErrorReporter.getInstance().handleSilentException(e1);
-                continue;
-            }
+			} catch (IOException e1) {
+				ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
+				ErrorReporter.getInstance().handleSilentException(e1);
+				continue;
+			}
 
-            if (requestString != null && requestString.length() != 0) {
+			if (requestString != null && requestString.length() != 0) {
 
-                HTTPRequest request = new HTTPRequest(mRequestURL);
-                System.out.println("mRequestURL " + mRequestURL);
-                System.out.println("requestString " + requestString);
-                request.setTimeOut(TIMEOUT);
+				HTTPRequest request = new HTTPRequest(mRequestURL);
+				System.out.println("mRequestURL " + mRequestURL);
+				System.out.println("requestString " + requestString);
+				request.setTimeOut(TIMEOUT);
 
-                try {
+				try {
 
-                    if (request.Execute(requestString) != HttpStatus.SC_OK) {
+					if (request.Execute(requestString) != HttpStatus.SC_OK) {
 
-                        resultString.append(mResources.getString(R.string.bad_server_responce)).append("\n");
+						resultString.append(mResources.getString(R.string.bad_server_responce)).append("\n");
 
-                        //Temporary
-                        try {
-                            ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
-                            ErrorReporter.getInstance().putCustomData("requestString", requestString);
-                            ErrorReporter.getInstance().putCustomData("mRequestURL", mRequestURL);
-                            ErrorReporter.getInstance().putCustomData("Document != SC_OK, request.getResponse() ", request.getResponse());
-                            ErrorReporter.getInstance().handleSilentException(null);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        //Temporary
+						//Temporary
+						try {
+							ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
+							ErrorReporter.getInstance().putCustomData("requestString", requestString);
+							ErrorReporter.getInstance().putCustomData("mRequestURL", mRequestURL);
+							ErrorReporter.getInstance().putCustomData("Document != SC_OK, request.getResponse() ", request.getResponse());
+							ErrorReporter.getInstance().handleSilentException(null);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						//Temporary
 
-                        continue;
-                    }
-                } catch (Exception e) {
+						continue;
+					}
+				} catch (Exception e) {
 
-                    ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
-                    ErrorReporter.getInstance().handleSilentException(e);
+					ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
+					ErrorReporter.getInstance().handleSilentException(e);
 
-                    resultString.append(mResources.getString(R.string.bad_server_responce)).append("\n");
+					resultString.append(mResources.getString(R.string.bad_server_responce)).append("\n");
 
-                    continue;
-                }
+					continue;
+				}
 
-                String responseString = request.getResponse();
+				String responseString = request.getResponse();
 
-                try {
+				try {
 
-                    EParserResult result = mParser.Parse(responseString);
+					EParserResult result = mParser.Parse(responseString);
 
-                    resultString.append(String.format(
-                            mParser.getResponseParseResult(mResources),
-                            document.getNomer()))
-                            .append("\n");
+					resultString.append(String.format(
+							mParser.getResponseParseResult(mResources),
+							document.getNomer()))
+							.append("\n");
 
-                    if (result == EParserResult.EComplete) {
+					if (result == EParserResult.EComplete) {
 
-                        document.writeUploaded(mDB);
-                    }
+						document.writeUploaded(mDB);
+					}
 
-                } catch (Exception e) {
+				} catch (Exception e) {
 
-                    ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
-                    ErrorReporter.getInstance().handleSilentException(e);
-                    resultString.append(mResources.getString(R.string.bad_server_responce))
-                            .append("\n");
+					ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
+					ErrorReporter.getInstance().handleSilentException(e);
+					resultString.append(mResources.getString(R.string.bad_server_responce))
+							.append("\n");
 
-                    continue;
-                }
+					continue;
+				}
 
-            }
-        }
-        return resultString.toString();
-    }
+			}
+		}
+		return resultString.toString();
+	}
 
-    @Override
-    protected void onPostExecute(String result) {
+	@Override
+	protected void onPostExecute(String result) {
 
-        Bundle resultData = new Bundle();
+		Bundle resultData = new Bundle();
 
-        resultData.putString(RESULT_STRING, result);
+		resultData.putString(RESULT_STRING, result);
 
-        mTaskListener.onComplete(resultData);
-    }
+		mTaskListener.onComplete(resultData);
+	}
 
-    @Override
-    public String getProgressMessage() {
+	@Override
+	public String getProgressMessage() {
 
-        return mProgressDialogMessage;
-    }
+		return mProgressDialogMessage;
+	}
 
 }

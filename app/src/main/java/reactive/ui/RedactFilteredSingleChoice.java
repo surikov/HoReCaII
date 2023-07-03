@@ -18,7 +18,7 @@ import java.util.*;
 public class RedactFilteredSingleChoice extends EditText implements Rake {
 	private ToggleProperty<Rake> hidden = new ToggleProperty<Rake>(this);
 	public NumericProperty<RedactFilteredSingleChoice> selection = new NumericProperty<RedactFilteredSingleChoice>(this);
-	public NoteProperty<RedactFilteredSingleChoice> textLabel = new NoteProperty<RedactFilteredSingleChoice>(this);
+	//public NoteProperty<RedactFilteredSingleChoice> textLabel = new NoteProperty<RedactFilteredSingleChoice>(this);
 	public NoteProperty<RedactFilteredSingleChoice> filter = new NoteProperty<RedactFilteredSingleChoice>(this);
 	private NumericProperty<Rake> width = new NumericProperty<Rake>(this);
 	private NumericProperty<Rake> height = new NumericProperty<Rake>(this);
@@ -234,7 +234,7 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-		textLabel.property.unbind();
+		//textLabel.property.unbind();
 		selection.property.unbind();
 		width.property.unbind();
 		height.property.unbind();

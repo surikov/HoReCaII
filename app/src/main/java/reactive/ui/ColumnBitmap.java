@@ -3,6 +3,7 @@ package reactive.ui;
 import java.util.Vector;
 
 import tee.binding.task.Task;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,10 +18,12 @@ public class ColumnBitmap extends Column {
 	//protected Paint linePaint = new Paint();
 	protected Rect sz;
 	int presell = -1;
+
 	@Override
-public String export(int row){
+	public String export(int row) {
 		return "";
 	}
+
 	@Override
 	public void update(int row) {
 		if (row >= 0 && row < cells.size()) {
@@ -28,20 +31,19 @@ public String export(int row){
 			if (row > -1 && row < backgrounds.size()) {
 				if (backgrounds.get(row) != null) {
 					cell.background.is(backgrounds.get(row));
-				}
-				else {
+				} else {
 					cell.background.is(null);
 				}
 			}
 			if (row > -1 && row < bitmaps.size()) {
 				cell.bitmap.is(bitmaps.get(row));
-			}
-			else {
+			} else {
 				cell.bitmap.property.value(null);
 			}
 			cell.invalidate();
 		}
 	}
+
 	@Override
 	public void afterRowsTap(int row) {
 		if (row > -1 && row < tasks.size()) {
@@ -51,6 +53,7 @@ public String export(int row){
 			//System.out.println("label "+strings.get(row));
 		}
 	}
+
 	public ColumnBitmap() {
 		this.width.is(150);
 		//linePaint.setColor(0x33666666);
@@ -58,6 +61,7 @@ public String export(int row){
 		//linePaint.setFilterBitmap(true);
 		//linePaint.setDither(true);
 	}
+
 	@Override
 	public Rake item(final int column, int row, Context context) {
 		//linePaint.setColor((int) (Auxiliary.colorLine));
@@ -104,6 +108,7 @@ public String export(int row){
 		cells.add(cell);
 		return cell;
 	}
+
 	@Override
 	public Rake header(Context context) {
 		Decor header = new Decor(context) {
@@ -116,7 +121,7 @@ public String export(int row){
 						, height().property.value().intValue() - 1//
 						, width().property.value().intValue()//
 						, height().property.value().intValue() //
-						), Auxiliary.paintLine);
+				), Auxiliary.paintLine);
 			}
 		};
 		header.setPadding(3, 0, 3, 2);
@@ -125,18 +130,19 @@ public String export(int row){
 		header.labelText.is(title.property.value());
 		return header;
 	}
+
 	@Override
 	public int count() {
 		return bitmaps.size();
 	}
+
 	@Override
 	public void clear() {
 		if (presell >= 0 && presell < cells.size()) {
 			if (presell >= 0 && presell < backgrounds.size()) {
 				if (backgrounds.get(presell) != null) {
 					cells.get(presell).background.is(backgrounds.get(presell));
-				}
-				else {
+				} else {
 					cells.get(presell).background.is(0);
 				}
 			}
@@ -146,35 +152,44 @@ public String export(int row){
 		tasks.removeAllElements();
 		//cells.removeAllElements();
 	}
+
 	@Override
 	public void highlight(int row) {
 		if (presell >= 0 && presell < cells.size()) {
 			if (presell >= 0 && presell < backgrounds.size()) {
 				if (backgrounds.get(presell) != null) {
 					cells.get(presell).background.is(backgrounds.get(presell));
-				}
-				else {
+				} else {
 					cells.get(presell).background.is(0);
 				}
 			}
 		}
+		this.showHighlight(row);
+	}
+	@Override
+	public void showHighlight(int row) {
 		if (row >= 0 && row < cells.size()) {
+			//System.out.println("3");
 			presell = row;
 			cells.get(row).background.is(Auxiliary.colorSelection);
 		}
 	}
+
 	public ColumnBitmap cell(Bitmap s, Integer background, Task tap) {
 		bitmaps.add(s);
 		tasks.add(tap);
 		backgrounds.add(background);
 		return this;
 	}
+
 	public ColumnBitmap cell(Bitmap s, Integer background) {
 		return cell(s, background, null);
 	}
+
 	public ColumnBitmap cell(Bitmap s, Task tap) {
 		return cell(s, null, tap);
 	}
+
 	public ColumnBitmap cell(Bitmap s) {
 		return cell(s, null, null);
 	}

@@ -39,6 +39,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 	Layoutless layoutless;
 	DataGrid dataGrid;
 	MenuItem menuPechati;
+	MenuItem menuVzaimoraschety;
 	MenuItem menuOtchety;
 	MenuItem menuDostavkaKarta;
 	//MenuItem menuChekList;
@@ -84,6 +85,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuOtchety = menu.add("Отчёты");
 		menuPechati = menu.add("Печати контрагента");
+		menuVzaimoraschety = menu.add("Взаиморасчёты с контрагентом");
 		//menuChekList = menu.add("Чек-лист");
 		//menuKartaKlienta = menu.add("Карта клиента");
 		menuObnoIstoria = menu.add("Обновить историю");
@@ -109,6 +111,10 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item == menuPechati) {
 			showPechati();
+			return true;
+		}
+		if (item == menuVzaimoraschety) {
+			showVzaimoraschety();
 			return true;
 		}
 		/*if(item == menuChekList) {
@@ -1034,6 +1040,31 @@ I/System.out: </>
 		startActivity(intent);
 	}
 
+	void showVzaimoraschety() {
+		String curKod=ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
+		//System.out.println("showVzaimoraschety "+curKod);
+		//ActivityWebServicesReports.goLastPageTempName = "who";
+		int nn = 0;
+		Bough kk = Cfg.kontragentyForSelectedMarshrut();
+		for (int ii = 0; ii < kk.children.size(); ii++) {
+			Bough row=kk.children.get(ii);
+			String rowKod=row.child("kod").value.property.value().trim();
+			//System.out.println("check "+curKod);
+			if (rowKod.equals(curKod)) {
+				nn = ii;
+				//System.out.println(row.dumpXML());
+				break;
+			}
+		}
+		//ActivityWebServicesReports.goLastPageTempValue = "" + nn;
+		ReportVzaioraschetySpokupatelem.temporaryWho=nn;
+		//System.out.println("showVzaimoraschety "+nn);
+		Intent intent = new Intent();
+		intent.setClass(Activity_BidsContractsEtc_2.this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
+		intent.putExtra(ActivityWebServicesReports.goLastPageReportName, ReportVzaioraschetySpokupatelem.folderKey());
+		startActivity(intent);
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -1166,7 +1197,7 @@ I/System.out: </>
 					}
 				})//
 						.labelText.is("Конт.инф.")
-				.left().is(layoutless.width().property.minus(9 * Auxiliary.tapSize))//
+						.left().is(layoutless.width().property.minus(9 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
@@ -1264,8 +1295,8 @@ I/System.out: </>
 					public void doTask() {
 						zametkiOpen();
 					}
-				},null,null
-				);
+				}, null, null
+		);
 
 	}
 
@@ -1627,7 +1658,6 @@ I/System.out: </>
 	}
 
 
-
 	void StartBidsActivity(int requestCode, ZayavkaPokupatelya bid) {
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		Intent intent = new Intent();
@@ -1642,7 +1672,7 @@ I/System.out: </>
 				intent.putExtra("is_editable", false);
 			}
 			//intent.putExtra("doc", "exists");
-		}else{
+		} else {
 			Activity_Bid.unLockCreateNewOrder();
 			//intent.putExtra("doc", "new");
 			//ApplicationHoreca.lastZayavkaPokupatelya=null;

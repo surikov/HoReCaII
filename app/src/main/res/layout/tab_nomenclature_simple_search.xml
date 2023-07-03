@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
 
-    <RelativeLayout
-        android:id="@+id/search_panel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:paddingTop="2dip" >
+	<RelativeLayout
+		android:id="@+id/search_panel"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:paddingTop="2dip">
 
-        <RadioGroup
-            android:id="@+id/radio_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="7dip"
-            android:orientation="horizontal" >
+		<RadioGroup
+			android:id="@+id/radio_search"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:layout_marginLeft="7dip"
+			android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/radio_articule"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dip"
-                android:checked="true"
-                android:text="@string/article" />
+			<RadioButton
+				android:id="@+id/radio_articule"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginRight="10dip"
+				android:checked="true"
+				android:text="@string/article" />
 
-            <RadioButton
-                android:id="@+id/radio_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dip"
-                android:text="@string/naimenovanie" />
+			<RadioButton
+				android:id="@+id/radio_name"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginRight="10dip"
+				android:text="@string/naimenovanie" />
 
-            <RadioButton
-                android:id="@+id/radio_vendor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dip"
-                android:text="@string/vendor" />
+			<RadioButton
+				android:id="@+id/radio_vendor"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginRight="10dip"
+				android:text="@string/vendor" />
 
-        </RadioGroup>
+		</RadioGroup>
 
-        <EditText
-            android:id="@+id/edit_search"
-            android:layout_width="fill_parent"
-            android:layout_height="49dip"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btn_search"
-            android:layout_toRightOf="@+id/radio_search"
-            android:inputType="datetime"
-            android:selectAllOnFocus="true" />
+		<EditText
+			android:id="@+id/edit_search"
+			android:layout_width="fill_parent"
+			android:layout_height="49dip"
+			android:layout_centerVertical="true"
+			android:layout_toLeftOf="@+id/btn_search"
+			android:layout_toRightOf="@+id/radio_search"
+			android:inputType="datetime"
+			android:selectAllOnFocus="true" />
 
-        <Button
-            android:id="@+id/btn_search"
-            android:layout_width="250dip"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="7dip"
-            android:text="@string/search" />
-    </RelativeLayout>
+		<Button
+			android:id="@+id/btn_search"
+			android:layout_width="250dip"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_centerVertical="true"
+			android:layout_marginRight="7dip"
+			android:text="@string/search" />
+	</RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_below="@+id/search_panel" >
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_below="@+id/search_panel">
 
-        <include
-            android:id="@+id/search_list_header"
-            android:layout_width="fill_parent"
-            android:layout_alignParentTop="true"
-            layout="@layout/header_nomenclature_simple" />
+		<include
+			android:id="@+id/search_list_header"
+			android:layout_width="fill_parent"
+			android:layout_alignParentTop="true"
+			layout="@layout/header_nomenclature_simple" />
 
-        <ListView
-            android:id="@+id/list_search"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/search_list_header"
-            android:background="#E3E3E3"
-            android:cacheColorHint="#00000000" />
-    </RelativeLayout>
+		<ListView
+			android:id="@+id/list_search"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_alignParentBottom="true"
+			android:layout_below="@+id/search_list_header"
+			android:background="#E3E3E3"
+			android:cacheColorHint="#00000000" />
+	</RelativeLayout>
 
 </RelativeLayout>

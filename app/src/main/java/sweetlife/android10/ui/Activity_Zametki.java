@@ -40,7 +40,7 @@ public class Activity_Zametki extends Activity {
 		setContentView(layoutless);
 		dataGrid = new DataGrid(this);
 		txt = new ColumnText();
-		dat=new ColumnDate();
+		dat = new ColumnDate();
 		layoutless.child(dataGrid//
 				.beforeFlip.is(new Task() {
 					@Override
@@ -48,9 +48,9 @@ public class Activity_Zametki extends Activity {
 						requeryGridData();
 						flipGrid();
 					}
-				}).noHead.is(true).columns(						new Column[]{
-						dat.format.is("dd.MM.yy").title.is("Дата").width.is(Auxiliary.tapSize*2)
-								,txt.title.is("Сообщения").width.is(layoutless.width().property.minus(Auxiliary.tapSize*2))
+				}).noHead.is(true).columns(new Column[]{
+								dat.format.is("dd.MM.yy").title.is("Дата").width.is(Auxiliary.tapSize * 2)
+								, txt.title.is("Сообщения").width.is(layoutless.width().property.minus(Auxiliary.tapSize * 2))
 						}
 				)//
 				.width().is(layoutless.width().property)//
@@ -86,14 +86,15 @@ public class Activity_Zametki extends Activity {
 		for (int i = 0; i < gridData.children.size(); i++) {
 			Bough row = gridData.children.get(i);
 			final String id = row.child("_id").value.property.value();
+			final String zametka = row.child("zametka").value.property.value();
 			Task tapTask = new Task() {
 				public void doTask() {
 					System.out.println(id);
-					promptDelete(id);
+					promptChangeDelete(id,zametka);
 				}
 			};
-			dat.cell((long)Numeric.string2double(row.child("dateCreate").value.property.value()), tapTask);
-			txt.cell(row.child("zametka").value.property.value(), tapTask);
+			dat.cell((long) Numeric.string2double(row.child("dateCreate").value.property.value()), tapTask);
+			txt.cell(zametka, tapTask);
 		}
 		//System.out.println("after flipGrid gridOffset "+this.gridOffset.value());
 	}
@@ -120,17 +121,42 @@ public class Activity_Zametki extends Activity {
 
 	}
 
-	void promptDelete(final String id) {
-		Auxiliary.pickConfirm(this, "Удалить строку", "Удалить", new Task() {
+	void promptChangeDelete(final String id,final String zametka) {
+		Note txt = new Note().value(zametka);
+		Auxiliary.pickString(this, "Заметка", txt
+				, "Сохранить", new Task() {
+					public void doTask() {
+						doUpdate(id,txt.value());
+						requeryGridData();
+						flipGrid();
+						dataGrid.refresh();
+					}
+				}
+				, "Удалить", new Task() {
+					public void doTask() {
+						doDelete(id);
+						requeryGridData();
+						flipGrid();
+						dataGrid.refresh();
+					}
+				}
+				, null, null
+		);
+		/*Auxiliary.pickConfirm(this, "Удалить строку", "Удалить", new Task() {
 			public void doTask() {
 				doDelete(id);
 				requeryGridData();
 				flipGrid();
 				dataGrid.refresh();
 			}
-		});
+		});*/
 	}
+	void doUpdate(String id,String txt) {
+		String sql = "update Zametki set zametka='"+txt.replace('\'','"')+"' where _id=" + id;
+		System.out.println(sql);
+		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 
+	}
 	void doDelete(String id) {
 		String sql = "delete from Zametki where _id=" + id;
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);

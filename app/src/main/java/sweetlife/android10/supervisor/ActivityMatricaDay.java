@@ -23,6 +23,7 @@ public class ActivityMatricaDay extends Activity {
 	Note data = new Note();
 	Numeric planUtro = new Numeric();
 	Numeric planLetuchka = new Numeric();
+	Numeric planSTM = new Numeric();
 	//Numeric planItogo = new Numeric();
 	//Numeric planNarItog = new Numeric();
 	MenuItem menuSave;
@@ -50,7 +51,7 @@ public class ActivityMatricaDay extends Activity {
 	}
 	void fillData() {
 		String sql = "select"//
-				+ " s.data as data,planUtro as planUtro,planLetuchka as planLetuchka,planItogo as planItogo,planNarItog as planNarItog"//
+				+ " s.data as data,planUtro as planUtro,planLetuchka as planLetuchka,planItogo as planItogo,planNarItog as planNarItog,planSTM as planSTM"//
 				+ " from MatricaSvodX s"//
 				+ " where s._id=" + _id;
 		//System.out.println(sql);
@@ -62,6 +63,7 @@ public class ActivityMatricaDay extends Activity {
 		data.value(format.format(d));
 		planUtro.value(Numeric.string2double(r.child("row").child("planUtro").value.property.value()));
 		planLetuchka.value(Numeric.string2double(r.child("row").child("planLetuchka").value.property.value()));
+		planSTM.value(Numeric.string2double(r.child("row").child("planSTM").value.property.value()));
 		//planItogo.value(Numeric.string2double(r.child("row").child("planItogo").value.property.value()));
 		//planNarItog.value(Numeric.string2double(r.child("row").child("planNarItog").value.property.value()));
 	}
@@ -69,6 +71,7 @@ public class ActivityMatricaDay extends Activity {
 		layoutless.field(this, 0, "дата", new Decor(this).labelText.is("00.00.00").labelAlignLeftCenter().labelText.is(data));
 		layoutless.field(this, 1, "план утро", new RedactNumber(this).number.is(planUtro));
 		layoutless.field(this, 2, "план летучка", new RedactNumber(this).number.is(planLetuchka));
+		layoutless.field(this, 3, "план СТМ", new RedactNumber(this).number.is(planSTM));
 		//layoutless.field(this, 3, "план итого", new RedactNumber(this).number.is(planItogo));
 		//layoutless.field(this, 4, "план нар. итого", new RedactNumber(this).number.is(planNarItog));
 		/*layoutless.field(this, 5, "", new Knob(this).labelText.is("Сохранить").afterTap.is(new Task() {
@@ -88,13 +91,14 @@ public class ActivityMatricaDay extends Activity {
 		String sql = "update MatricaSvodX"//
 				+ "\n	set planUtro=" + planUtro.value()//
 				+ "\n	,planLetuchka=" + planLetuchka.value()//
+				+ "\n	,planSTM=" + planSTM.value()//
 				//+ "\n	,planItogo=" + planItogo.value() //
 				//+ "\n	,planNarItog=" + planNarItog.value()//
 				+ "\n	where _id=" + _id//
 		;
 		//System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-		finish();
+		//finish();
 		finish();
 	}
 	void delete() {

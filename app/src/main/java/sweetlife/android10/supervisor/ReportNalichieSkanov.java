@@ -7,6 +7,7 @@ import java.util.Date;
 import reactive.ui.Auxiliary;
 import reactive.ui.Decor;
 import reactive.ui.Knob;
+import reactive.ui.RedactFilteredSingleChoice;
 import reactive.ui.RedactSingleChoice;
 import reactive.ui.SubLayoutless;
 import sweetlife.android10.Settings;
@@ -192,17 +193,17 @@ public class ReportNalichieSkanov extends Report_Base {
 						+ " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
 				terr.item(s);
 			}
-			RedactSingleChoice kontragent = new RedactSingleChoice(context);
+			RedactFilteredSingleChoice kontragent = new RedactFilteredSingleChoice(context);
 			kontragent.selection.is(whoPlus1);
 			kontragent.item("[Все контрагенты]");
 			for (int i = 0; i < Cfg.kontragenty().children.size(); i++) {
-				kontragent.item(Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
+				kontragent.item(Cfg.kontragenty().children.get(i).child("kod").value.property.value()+":"+Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
 			}
 			propertiesForm//
 					.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
 					//.input(context, 1, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(dateCreateFrom).format.is("dd.MM.yyyy"))//
 					//.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
-					.input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontragent)//
+					.input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontragent, Auxiliary.tapSize * 9)//
 					.input(context, 2, Auxiliary.tapSize * 0.3, "Территория", terr)//
 			/*.input(context, 3, Auxiliary.tapSize * 0.3, "", new Knob(context).labelText.is("Обновить").afterTap.is(new Task() {
 				@Override

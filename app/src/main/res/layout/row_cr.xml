@@ -1,63 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/row"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="1" >
+	android:id="@+id/row"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:weightSum="1">
 
-    <TextView
-        android:id="@+id/text_article"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_marginLeft="7dip"
-        android:layout_weight="0.07" />
+	<TextView
+		android:id="@+id/text_article"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_marginLeft="7dip"
+		android:layout_weight="0.07" />
 
-    <TextView
-        android:id="@+id/text_nomenclature"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.28" />
+	<TextView
+		android:id="@+id/text_nomenclature"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.28" />
 
-    <TextView
-        android:id="@+id/text_vendor"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.2" />
+	<TextView
+		android:id="@+id/text_vendor"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.2" />
 
-    <TextView
-        android:id="@+id/text_min_count"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.07" />
+	<TextView
+		android:id="@+id/text_min_count"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.07" />
 
-    <TextView
-        android:id="@+id/text_place_count"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.06" />
+	<TextView
+		android:id="@+id/text_place_count"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.06" />
 
-    <TextView
-        android:id="@+id/text_unit"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.05" />
+	<TextView
+		android:id="@+id/text_unit"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.05" />
 
-    <TextView
-        android:id="@+id/text_price"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.09" />
+	<TextView
+		android:id="@+id/text_price"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.09" />
 
-    <TextView
-        android:id="@+id/text_minprice"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.09" />
+	<TextView
+		android:id="@+id/text_minprice"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.09" />
 
-    <TextView
-        android:id="@+id/text_maxprice"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.09" />
+	<TextView
+		android:id="@+id/text_maxprice"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.09" />
 
 </LinearLayout>

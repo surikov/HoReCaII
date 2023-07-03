@@ -4,13 +4,17 @@ import reactive.ui.*;
 
 import android.content.*;
 import android.graphics.*;
+
 import tee.binding.properties.*;
+
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.*;
+
 import tee.binding.task.*;
 import tee.binding.it.*;
+
 import android.text.*;
 
 public class TintBitmapTile extends Tint {
@@ -21,6 +25,7 @@ public class TintBitmapTile extends Tint {
 		setAntiAlias(true);
 		bitmap.property.afterChange(postInvalidate);
 	}
+
 	@Override
 	public void unbind() {
 		bitmap.property.unbind();

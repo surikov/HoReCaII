@@ -20,28 +20,28 @@ import android.os.Parcelable;
 
 public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implements Parcelable {
 
-	private double            mSumma;
-	private String            mKommentariy;
-	private boolean           mVygruzhen;
+	private double mSumma;
+	private String mKommentariy;
+	private boolean mVygruzhen;
 	private ArrayList<String> mFiles;
 
 	public RasporyazhenieNaOtgruzku(Parcel in) {
 
-		readFromParcel( in );
+		readFromParcel(in);
 	}
 
 	public RasporyazhenieNaOtgruzku(int _id,
-			String     idRRef,
-			Date       date,
-			String     nomer,
-			String     kontragentID,
-			String     kontragentKod,
-			String     kontragentName,
-			double     summa,
-			String     kommentariy,
-			boolean    vygruzhen,
-			boolean    New,
-			ArrayList<String> files) {
+									String idRRef,
+									Date date,
+									String nomer,
+									String kontragentID,
+									String kontragentKod,
+									String kontragentName,
+									double summa,
+									String kommentariy,
+									boolean vygruzhen,
+									boolean New,
+									ArrayList<String> files) {
 
 
 		m_id = _id;
@@ -86,7 +86,7 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 	public boolean isVygruzhen() {
 
 		return mVygruzhen;
-	}	
+	}
 
 	public void setSumma(double summa) {
 
@@ -123,7 +123,7 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 		return mKommentariy;
 	}
 
-	public RasporyazhenieNaOtgruzku( SQLiteDatabase db ) {
+	public RasporyazhenieNaOtgruzku(SQLiteDatabase db) {
 
 		Calendar today = Calendar.getInstance();
 
@@ -166,7 +166,7 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 
 		int filesListSize = mFiles.size();
 		dest.writeInt(filesListSize);
-		if(filesListSize != 0) {
+		if (filesListSize != 0) {
 
 			dest.writeStringArray(mFiles.toArray(new String[filesListSize]));
 		}
@@ -184,27 +184,27 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 		int filesListSize = in.readInt();
 		mFiles = new ArrayList<String>();
 
-		if(filesListSize != 0) {
+		if (filesListSize != 0) {
 
-			String[] stringsArray = new String[filesListSize]; 
+			String[] stringsArray = new String[filesListSize];
 			in.readStringArray(stringsArray);
-			Collections.addAll(mFiles, stringsArray); 
+			Collections.addAll(mFiles, stringsArray);
 		}
 	}
 
 	public static final Parcelable.Creator<RasporyazhenieNaOtgruzku> CREATOR =
 			new Parcelable.Creator<RasporyazhenieNaOtgruzku>() {
 
-		public RasporyazhenieNaOtgruzku createFromParcel(Parcel in) {
+				public RasporyazhenieNaOtgruzku createFromParcel(Parcel in) {
 
-			return new RasporyazhenieNaOtgruzku(in);
-		}
+					return new RasporyazhenieNaOtgruzku(in);
+				}
 
-		public RasporyazhenieNaOtgruzku[] newArray(int size) {
+				public RasporyazhenieNaOtgruzku[] newArray(int size) {
 
-			return new RasporyazhenieNaOtgruzku[size];
-		}
-	};
+					return new RasporyazhenieNaOtgruzku[size];
+				}
+			};
 
 	private void writeFiles(SQLiteDatabase db) {
 
@@ -212,17 +212,17 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 
 		try {
 
-			for( String file : mFiles ) {
+			for (String file : mFiles) {
 
 				Cursor cursor = db.rawQuery("select * from RasporyazhenieNaOtgruzku_Phayly " +
-						"where Put='"+ file +"' and _RasporyazhenieNaOtgruzku_IDRRef = " + mIDRRef , null);
+						"where Put='" + file + "' and _RasporyazhenieNaOtgruzku_IDRRef = " + mIDRRef, null);
 
-				if(cursor != null) {
+				if (cursor != null) {
 
-					if(!cursor.moveToFirst()){
+					if (!cursor.moveToFirst()) {
 
 						db.execSQL("insert into RasporyazhenieNaOtgruzku_Phayly (Put, _RasporyazhenieNaOtgruzku_IDRRef) " +
-								"values ( '"+ file +"', "+ mIDRRef +" )");
+								"values ( '" + file + "', " + mIDRRef + " )");
 					}
 
 					cursor.close();
@@ -230,8 +230,7 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 			}
 
 			db.setTransactionSuccessful();
-		}
-		finally {
+		} finally {
 
 			db.endTransaction();
 		}
@@ -242,35 +241,34 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 
 		ContentValues values = new ContentValues();
 
-		if( mNew ) {
+		if (mNew) {
 
-			values.put("_IDRRef", Hex.decodeHexWithPrefix(mIDRRef) );
-			values.put("Data", DateTimeHelper.SQLDateString(mDate) );
-			values.put("Nomer", mNomer ); 
-			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'") );
+			values.put("_IDRRef", Hex.decodeHexWithPrefix(mIDRRef));
+			values.put("Data", DateTimeHelper.SQLDateString(mDate));
+			values.put("Nomer", mNomer);
+			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'"));
 			values.put("Kontragent", Hex.decodeHexWithPrefix(mKontragentID));
-			values.put("Summa", mSumma );  
-			values.put("Kommentariy", mKommentariy );
-			values.put("Otvetstvennyy", mOtvetstvennyyKod );
+			values.put("Summa", mSumma);
+			values.put("Kommentariy", mKommentariy);
+			values.put("Otvetstvennyy", mOtvetstvennyyKod);
 
 			DatabaseHelper.insertInTranzaction(db, mDocumentTableName, values);
-		}
-		else {
+		} else {
 
-			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'") );
+			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'"));
 			values.put("Kontragent", Hex.decodeHexWithPrefix(mKontragentID));
-			values.put("Summa", mSumma );  
-			values.put("Kommentariy", mKommentariy );
+			values.put("Summa", mSumma);
+			values.put("Kommentariy", mKommentariy);
 
-			DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id="+ String.valueOf(m_id), null);
+			DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id=" + String.valueOf(m_id), null);
 		}
 
 		writeFiles(db);
 	}
 
 	@Override
-	public String getSerializedXML(SQLiteDatabase db) throws IllegalArgumentException, 
-	IllegalStateException, IOException {
+	public String getSerializedXML(SQLiteDatabase db) throws IllegalArgumentException,
+			IllegalStateException, IOException {
 
 		DisposalsXMLSerializer serializer = new DisposalsXMLSerializer(db, this);
 		return serializer.SerializeXML();
@@ -281,8 +279,8 @@ public class RasporyazhenieNaOtgruzku extends NomenclatureBasedDocument implemen
 
 		ContentValues values = new ContentValues();
 
-		values.put("Vygruzhen", Hex.decodeHexWithPrefix("x'01'") );
+		values.put("Vygruzhen", Hex.decodeHexWithPrefix("x'01'"));
 
-		DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_IDRRef="+ String.valueOf(mIDRRef), null);
+		DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_IDRRef=" + String.valueOf(mIDRRef), null);
 	}
 }

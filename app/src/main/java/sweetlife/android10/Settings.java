@@ -4,9 +4,12 @@ import java.io.File;
 
 import android.os.Environment;
 import android.app.*;
+
 import reactive.ui.Auxiliary;
+import sweetlife.android10.supervisor.Cfg;
 import tee.binding.it.*;
 import tee.binding.*;
+
 import java.net.*;
 import java.util.Vector;
 
@@ -14,16 +17,16 @@ public class Settings {
 	//private String LOGS_EMAIL                   = "horeca.logs@gmail.com";
 	//private String LOGS_PASSWORD                = "qwerty12345678";
 	private final static String _SERVICE_APPROVE_ORDER = "ChangeOfOrders.1cws";
-	public static Note emailToSend=new Note();
-	public static Toggle emailPoINNToSend=new Toggle().value(true);
-	public static Toggle emailGroupingToSend=new Toggle().value(true);
-	public static Toggle emailPoSpecificacii=new Toggle().value(false);
-	public static Numeric startVislatNakladnieNaPochtu=new Numeric();
-	public static Numeric endVislatNakladnieNaPochtu=new Numeric();
+	public static Note emailToSend = new Note();
+	public static Toggle emailPoINNToSend = new Toggle().value(true);
+	public static Toggle emailGroupingToSend = new Toggle().value(true);
+	public static Toggle emailPoSpecificacii = new Toggle().value(false);
+	public static Numeric startVislatNakladnieNaPochtu = new Numeric();
+	public static Numeric endVislatNakladnieNaPochtu = new Numeric();
 	public static boolean DEBUG_MODE = false;
-	public static int colorTop20=0xff9999ff;
-	public static int colorNacenka25=0xffff9966;
-	public static int colorOlder=0xffff6666;
+	public static int colorTop20 = 0xff9999ff;
+	public static int colorNacenka25 = 0xffff9966;
+	public static int colorOlder = 0xffff6666;
 	//private static String _primaryURL = "89.109.7.162";
 	//private  static String _secondaryURL = "95.79.111.216";
 
@@ -36,10 +39,10 @@ public class Settings {
 	private static String _primaryURL = "https://service.swlife.ru";
 	//private static String _primaryURL = "https://testservice.swlife.ru";
 
-	private  static String _secondaryURL = "http://95.79.111.216";//"http://89.109.7.162";
-	private static String _primaryFileStoreURL="https://androbmen.swlife.ru/";//android/Update2.xml";
-	private static String _secondaryFileStoreURL="http://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
-public static boolean isPrimaryGate=true;
+	private static String _secondaryURL = "http://95.79.111.216";//"http://89.109.7.162";
+	private static String _primaryFileStoreURL = "https://androbmen.swlife.ru/";//android/Update2.xml";
+	private static String _secondaryFileStoreURL = "http://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
+	public static boolean isPrimaryGate = true;
 	//http://89.109.7.162/androbmen/android/Update2.xml
 	//https://androbmen.swlife.ru/android/Update2.xml
 
@@ -48,10 +51,10 @@ public static boolean isPrimaryGate=true;
 	private static String _secondaryURL = "https://service.swlife.ru";
 */
 
-	private static String _base1c="hrc120107";
+	private static String _base1c = "hrc120107";
 	//private static String _base1c="shatov";
 	//private static String _base1c="GolovaNew";
-	private static String _wsdlDiff="";
+	private static String _wsdlDiff = "";
 	private static String _baseURL = _primaryURL;
 	private static String _baseFileStoreURL = _primaryFileStoreURL;
 	private static Settings instance = null;
@@ -95,36 +98,51 @@ public static boolean isPrimaryGate=true;
 	private int PERIOD_CLEAR_DB = 604800000;
 
 
-
 	private Settings() {
 		MakeDefaulPaths();
 		//ReadXMLFile(TABLET_WORKING_DIR + SETTINGS_XML_NAME);
 		loadConfig();
 	}
 
-	public static long checkPrimaryAccess(Activity a){
-		long time=-1;
+	public static String check_1C_access() {
+		String result = "";
+		try {
+			String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/surikovimei/" + Cfg.device_id();
+			System.out.println("check_1C_access " + url);
+			result  = Auxiliary.checkPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+
+			System.out.println("check_1C_access " + result);
+
+		} catch (Throwable t) {
+			t.printStackTrace();
+			result=t.getMessage();
+		}
+		return result;
+	}
+
+	public static long checkPrimaryAccess(Activity a) {
+		long time = -1;
 		try {
 			//URL mainURL = new URL("http://" + Settings._primaryURL + ":80");
 			//URL secondURL = new URL("http://" + Settings._secondaryURL + ":80");
 			URL mainURL = new URL("" + Settings._primaryURL + ":80");
 			URL secondURL = new URL("" + Settings._secondaryURL + ":80");
 			//time.value((double) Auxiliary.checkAccessToURL(mainURL, Activity_Login.this));
-			time=Auxiliary.checkAccessToURL(mainURL, a);
+			time = Auxiliary.checkAccessToURL(mainURL, a);
 			//System.out.println("connection delay is " + time);
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 		return time;
 	}
 
-public static String selectedBase1C(){
+	public static String selectedBase1C() {
 		return Settings.getInstance()._base1c;
-}
+	}
 
-public static String selectedWSDL(){
+	public static String selectedWSDL() {
 		return Settings.getInstance()._wsdlDiff;
-}
+	}
 
 	public static int ndsById(String id) {
 		/*
@@ -172,44 +190,41 @@ public static String selectedWSDL(){
 		//System.out.println("Settings.configuration: loadConfig");
 		configuration = null;//new Bough();
 		try {
-			String path=Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/Horeca2.xml";
-			System.out.println("loadConfig from "+path);
-			File file=new File(path);
-			Vector<String> strings=Auxiliary.readTextFromFile(file);
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/Horeca2.xml";
+			System.out.println("loadConfig from " + path);
+			File file = new File(path);
+			Vector<String> strings = Auxiliary.readTextFromFile(file);
 			String xml = Auxiliary.strings2text(strings);
-			System.out.println("configuration is "+xml);
+			System.out.println("configuration is " + xml);
 			try {
 				configuration = Bough.parseXML(xml);
-			}
-			catch (Throwable t) {
+			} catch (Throwable t) {
 				t.printStackTrace();
 			}
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
-		if(configuration == null)
-		{
+		if (configuration == null) {
 			configuration = new Bough();
 		}
 		//System.out.println("Settings.configuration: " + configuration.dumpXML());
-		try{
+		try {
 			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/Horeca2ip.xml")));
 			Bough baseIP = Bough.parseXML(xml);
-			if(baseIP.child("primary").value.property.value().trim().length()>1){
-				_primaryURL=baseIP.child("primary").value.property.value().trim();
+			if (baseIP.child("primary").value.property.value().trim().length() > 1) {
+				_primaryURL = baseIP.child("primary").value.property.value().trim();
 			}
-			if(baseIP.child("secondary").value.property.value().trim().length()>1){
-				_secondaryURL=baseIP.child("secondary").value.property.value().trim();
+			if (baseIP.child("secondary").value.property.value().trim().length() > 1) {
+				_secondaryURL = baseIP.child("secondary").value.property.value().trim();
 			}
-			if(baseIP.child("base1C").value.property.value().trim().length()>1){
-				_base1c=baseIP.child("base1C").value.property.value().trim();
+			if (baseIP.child("base1C").value.property.value().trim().length() > 1) {
+				_base1c = baseIP.child("base1C").value.property.value().trim();
 			}
-			if(baseIP.child("wsdlDiff").value.property.value().trim().length()>1){
-				_wsdlDiff=baseIP.child("wsdlDiff").value.property.value().trim();
+			if (baseIP.child("wsdlDiff").value.property.value().trim().length() > 1) {
+				_wsdlDiff = baseIP.child("wsdlDiff").value.property.value().trim();
 			}
 			_baseURL = _primaryURL;
-		}catch (Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
@@ -225,14 +240,14 @@ public static String selectedWSDL(){
 		_baseURL = _primaryURL;
 		_baseFileStoreURL = _primaryFileStoreURL;
 		//System.out.println("Settings.baseURL " + Settings._baseURL);
-		isPrimaryGate=true;
+		isPrimaryGate = true;
 	}
 
 	public void setSecondaryURL() {
 		_baseURL = _secondaryURL;
 		_baseFileStoreURL = _secondaryFileStoreURL;
 		//System.out.println("Settings.baseURL " + Settings._baseURL);
-		isPrimaryGate=false;
+		isPrimaryGate = false;
 	}
 
 	public String getBaseURL() {
@@ -244,6 +259,7 @@ public static String selectedWSDL(){
 		//return "http://" + _baseURL + "/";
 		return "" + _baseURL + "/";
 	}
+
 	public String getBaseFileStoreURL() {
 		return _baseFileStoreURL;
 	}
@@ -272,6 +288,7 @@ public static String selectedWSDL(){
 		new File(TABLET_RESERVE_DIR).mkdirs();
 		new File(TABLET_DELTA_DIR).mkdirs();
 	}
+
 	/*private boolean DownloadFile(String ftpPath) {
 		try {
 			ftpClient.downloadFile(TABLET_WORKING_DIR, FTP_PATH + SETTINGS_XML_NAME);
@@ -350,66 +367,86 @@ public static String selectedWSDL(){
 	public int getFTP_PORT() {
 		return FTP_PORT;
 	}
+
 	public void setFTP_PORT(int value) {
 		FTP_PORT = value;
 	}
+
 	public String getFTP_SERVER() {
 		return FTP_SERVER;
 	}
+
 	public void setFTP_SERVER(String value) {
 		FTP_SERVER = value;
 	}
+
 	public String getFTP_USER() {
 		return FTP_USER;
 	}
+
 	public void setFTP_USER(String value) {
 		FTP_USER = value;
 	}
+
 	public String getFTP_PASSWORD() {
 		return FTP_PASSWORD;
 	}
+
 	public void setFTP_PASSWORD(String value) {
 		FTP_PASSWORD = value;
 	}
+
 	public String getFTP_PATH() {
 		return FTP_PATH;
 	}
+
 	public void setFTP_PATH(String value) {
 		FTP_PATH = value;
 	}
+
 	public String getFTP_DELTA_NAME() {
 		return FTP_DELTA_NAME;
 	}
+
 	public void setFTP_DELTA_NAME(String value) {
 		FTP_DELTA_NAME = value;
 	}
+
 	public String getUPDATE_XML_NAME() {
 		return UPDATE_XML_NAME;
 	}
+
 	/*public String getSETTINGS_XML_NAME() {
 		return SETTINGS_XML_NAME;
 	}*/
 	public String getSERVICE_DOLGI_PO_NKLADNIM() {
 		return _SERVICE_DOLGI_PO_NKLADNIM;
 	}
+
 	public String getAPPLICATION_NAME() {
 		return APPLICATION_NAME;
 	}
+
 	public String getTABLET_WORKING_DIR() {
 		return TABLET_WORKING_DIR;
 	}
+
 	public String getTABLET_RESERVE_DIR() {
 		return TABLET_RESERVE_DIR;
 	}
+
 	public String getTABLET_DELTA_DIR() {
 		return TABLET_DELTA_DIR;
 	}
+
 	public String getTABLET_DATABASE_FILE() {
 		return TABLET_DATABASE_FILE;
 	}
+
 	public String getTABLET_LOGGING_FILE() {
 		return TABLET_LOGGING_FILE;
 	}
+
 	/*
 		public String getLOGS_EMAIL() {
 
@@ -434,18 +471,21 @@ public static String selectedWSDL(){
 	public String getSERVICE_ORDERS() {
 		return getBaseURL() + _SERVICE_ORDERS;
 	}
+
 	/*public void setSERVICE_ORDERS(String value) {
 		SERVICE_ORDERS = value;
 	}*/
 	public String getSERVICE_CLIENTS_STATUS() {
 		return getBaseURL() + _SERVICE_CLIENTS_STATUS;
 	}
+
 	/*public void setSERVICE_CLIENTS_STATUS(String value) {
 		SERVICE_CLIENTS_STATUS = value;
 	}*/
 	public String getSERVICE_AVAILABLE_AMOUNT() {
 		return getBaseURL() + _SERVICE_AVAILABLE_AMOUNT;
 	}
+
 	/*public void setSERVICE_AVAILABLE_AMOUNT(String value) {
 		SERVICE_AVAILABLE_AMOUNT = value;
 	}*/
@@ -458,72 +498,88 @@ public static String selectedWSDL(){
 	public String getSERVICE_VIZITS() {
 		return getBaseURL() + _SERVICE_VIZITS;
 	}
+
 	/*public void setSERVICE_VIZITS(String value) {
 		SERVICE_VIZITS = value;
 	}*/
 	public String getSERVICE_RETURNS() {
 		return getBaseURL() + _SERVICE_RETURNS;
 	}
+
 	/*public void setSERVICE_RETURNS(String value) {
 		SERVICE_RETURNS = value;
 	}*/
 	public String getSERVICE_APPROVE_ORDER() {
 		return getBaseURL() + _SERVICE_APPROVE_ORDER;
 	}
+
 	/*public  String getSERVICE_DOLGI_PO_NKLADNIM() {
 		return SERVICE_DOLGI_PO_NKLADNIM;
 	}*/
 	public String getSERVICE_FIXED_PRICES() {
 		return getBaseURL() + _SERVICE_FIXED_PRICES;
 	}
+
 	/*public void setSERVICE_FIXED_PRICES(String value) {
 		SERVICE_FIXED_PRICES = value;
 	}*/
 	public String getSERVICE_DISPOSALS() {
 		return getBaseURL() + _SERVICE_DISPOSALS;
 	}
+
 	/*public void setSERVICE_DISPOSALS(String value) {
 		SERVICE_DISPOSALS = value;
 	}*/
 	public String getSERVICE_REPORTS() {
 		return getBaseURL() + _SERVICE_REPORTS;
 	}
+
 	/*public void setSERVICE_REPORTS(String value) {
 		SERVICE_REPORTS = value;
 	}*/
 	public String getSERVICE_CONTRACTS_CODES() {
 		return getBaseURL() + _SERVICE_CONTRACTS_CODES;
 	}
+
 	/*public void setSERVICE_CONTRACTS_CODES(String value) {
 		SERVICE_CONTRACTS_CODES = value;
 	}*/
 	public long getMINIMAL_FREE_SPACE() {
 		return MINIMAL_FREE_SPACE;
 	}
+
 	public void setMINIMAL_FREE_SPACE(long value) {
 		MINIMAL_FREE_SPACE = value;
 	}
+
 	public int getSPY_GPS_PERIOD() {
 		return SPY_GPS_PERIOD;
 	}
+
 	public void setSPY_GPS_PERIOD(int value) {
 		SPY_GPS_PERIOD = value;
 	}
+
 	public long getMAX_DISTANCE_TO_CLIENT() {
 		return MAX_DISTANCE_TO_CLIENT;
 	}
+
 	public void setMAX_DISTANCE_TO_CLIENT(long value) {
 		MAX_DISTANCE_TO_CLIENT = value;
 	}
+
 	public int getPERIOD_CLEAR_GPS_DB_DATA() {
 		return PERIOD_CLEAR_GPS_DB_DATA;
 	}
+
 	public void setPERIOD_CLEAR_GPS_DB_DATA(int value) {
 		PERIOD_CLEAR_GPS_DB_DATA = value;
 	}
+
 	public int getPERIOD_CLEAR_DB() {
 		return PERIOD_CLEAR_DB;
 	}
+
 	public void setPERIOD_CLEAR_DB(int value) {
 		PERIOD_CLEAR_DB = value;
 	}

@@ -1,6 +1,7 @@
 package sweetlife.android10.ui;
 
 import sweetlife.android10.data.orders.*;
+
 import java.io.File;
 import java.util.*;
 
@@ -10,6 +11,7 @@ import sweetlife.android10.reports.IReportConsts;
 import sweetlife.android10.utils.AsyncTaskManager;
 import sweetlife.android10.utils.UIHelper;
 import sweetlife.android10.utils.UIHelper.*;
+
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -22,7 +24,7 @@ import sweetlife.android10.R;
 import tee.binding.Bough;
 
 public class Activity_ReportShowReport extends Activity_Base implements IReportConsts
-//, sweetlife.horeca.utils.ManagedAsyncTask.ITaskListener 
+		//, sweetlife.horeca.utils.ManagedAsyncTask.ITaskListener
 {
 	String mReportFilePath;
 	Activity_ReportShowReport me = this;
@@ -53,6 +55,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 		webView.getSettings().setBuiltInZoomControls(true);
 		webView.setWebViewClient(new ReportWebViewClient());
 	}
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -91,15 +94,15 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 									//LogHelper.debug("approve");
 									UploadApproveOrder task = new UploadApproveOrder("Подтверждение заказа "// 
 											+ documentNumber + " от " + documentDate//
-									, getApplicationContext()//
+											, getApplicationContext()//
 											, mDB//
 											, UploadApproveOrder.ThatDone_APPROVE//
 											, documentNumber//
 											, documentDate//
 											, shipDate//
 											, null
-											,documentComment
-											);
+											, documentComment
+									);
 									//task.setListener(me);
 									AsyncTaskManager.getInstance().addObserver(me);
 									AsyncTaskManager.getInstance().executeTask(me, task);
@@ -111,15 +114,15 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 									//LogHelper.debug("delete");
 									UploadApproveOrder task = new UploadApproveOrder("Пометка заказа "// 
 											+ documentNumber + " от " + documentDate + " на удаление"//
-									, getApplicationContext()//
+											, getApplicationContext()//
 											, mDB//
 											, UploadApproveOrder.ThatDone_DROP//
 											, documentNumber//
 											, documentDate//
 											, shipDate//
 											, null
-											
-											,documentComment);
+
+											, documentComment);
 									//task.setListener(me);
 									AsyncTaskManager.getInstance().addObserver(me);
 									AsyncTaskManager.getInstance().executeTask(me, task);
@@ -133,15 +136,15 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 									changeOrderRowsHook = true;
 									UploadApproveOrder task = new UploadApproveOrder("Данные заказа "// 
 											+ documentNumber + " от " + documentDate //
-									, getApplicationContext()//
+											, getApplicationContext()//
 											, mDB//
 											, UploadApproveOrder.ThatDone_GET//
 											, documentNumber//
 											, documentDate//
 											, shipDate//
 											, null
-											,documentComment
-											);
+											, documentComment
+									);
 									//task.setListener(me);
 									AsyncTaskManager.getInstance().addObserver(me);
 									AsyncTaskManager.getInstance().executeTask(me, task);
@@ -149,8 +152,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 							}//
 					);
 				}
-			}
-			catch (Throwable t) {
+			} catch (Throwable t) {
 				LogHelper.debug(this.getClass().getCanonicalName() + " " + t.getMessage());
 			}
 			return true;
@@ -165,6 +167,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 			}
 		}
 	}
+
 	void resetDescription() {
 		descriptions = new Vector<String>();
 		for (int i = 0; i < name.size(); i++) {
@@ -172,17 +175,18 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 					+ ": " + name.get(i)//
 					+ ", цена " + cena.get(i)//
 					+ " (" + kolvo.get(i) + " шт.)"//
-			;
+					;
 			descriptions.add(row);
 		}
 	}
+
 	void fillChangeOrder(String resultString) {
 		//System.out.println("------------------------"+);
 		Bough bough;
-		try{
-		 bough = Bough.parseXML(resultString);
-		}catch(Throwable t){
-			 bough=new Bough ();
+		try {
+			bough = Bough.parseXML(resultString);
+		} catch (Throwable t) {
+			bough = new Bough();
 			UIHelper.quickWarning("Невозможно прочитать заявку", me);
 		}
 		article = new Vector<String>();
@@ -207,6 +211,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 		}
 		resetDescription();
 	}
+
 	void sendChangeOrder() {
 		changeOrderRowsHook = false;
 		Bough b = new Bough().name.is("Table");
@@ -219,26 +224,27 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 		}
 		UploadApproveOrder task = new UploadApproveOrder("Сохранение заказа "// 
 				+ documentNumber + " от " + documentDate //
-		, getApplicationContext()//
+				, getApplicationContext()//
 				, mDB//
 				, UploadApproveOrder.ThatDone_CHANGE//
 				, documentNumber//
 				, documentDate//
-				
+
 				, shipDate//
 				, b
-				,this.documentComment
-				);
+				, this.documentComment
+		);
 		//task.setListener(me);
 		AsyncTaskManager.getInstance().addObserver(me);
 		AsyncTaskManager.getInstance().executeTask(me, task);
 	}
+
 	void showChangeOrder() {
 		String cm = documentComment;
 		if (cm.length() > 0)
 			cm = " (" + documentComment + ")";
 		UIHelper.MsgBoxList("Заказ №" + documentNumber //
-				+ " от " + documentDate + cm, me, descriptions//
+						+ " от " + documentDate + cm, me, descriptions//
 				, new IMessageBoxCallbackInteger() {
 					@Override
 					public void MessageBoxResult(int which) {
@@ -260,9 +266,10 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 					}
 				});
 	}
+
 	void showChangeComment() {
 		UIHelper.MsgBoxString("Заказ №" + documentNumber + " от " + documentDate//
-		, "Комментарий"//
+				, "Комментарий"//
 				, me//
 				, documentComment//
 				, "Изменить", new IMessageBoxCallbackString() {
@@ -274,6 +281,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 				}//
 		);
 	}
+
 	void showChangeItem(final int which) {
 		UIHelper.MsgBoxDouble(//				
 				"Заказ №" + documentNumber + " от " + documentDate//
@@ -309,6 +317,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 				}//
 		);
 	}
+
 	@Override
 	public void update(Observable observable, Object data) {
 		observable.deleteObserver(me);
@@ -317,8 +326,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 		if (changeOrderRowsHook) {
 			fillChangeOrder(resultString);
 			showChangeOrder();
-		}
-		else {
+		} else {
 			UIHelper.MsgBox("Результат", "" + resultString, me, new IMessageBoxCallbackInteger() {
 				@Override
 				public void MessageBoxResult(int which) {
@@ -327,6 +335,7 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 			});
 		}
 	}
+
 	/*@Override
 	public void onProgressUpdate(String message) {
 		LogHelper.debug(this.getClass().getCanonicalName() + " onProgressUpdate " + message);
@@ -340,14 +349,15 @@ public class Activity_ReportShowReport extends Activity_Base implements IReportC
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		//LogHelper.debug(this.getClass().getCanonicalName() + " onCreateOptionsMenu");
-		menuSaveAs=menu.add("Сохранить в файл");
+		menuSaveAs = menu.add("Сохранить в файл");
 		return true;
 	}
+
 	@Override
-	public boolean onOptionsItemSelected( MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		//super.onOptionsItemSelected( item);
-		LogHelper.debug(this.getClass().getCanonicalName() + " onOptionsItemSelected "+item.getTitle());
-		if(item==menuSaveAs){
+		LogHelper.debug(this.getClass().getCanonicalName() + " onOptionsItemSelected " + item.getTitle());
+		if (item == menuSaveAs) {
 			UIHelper.quickWarning("Not implemented yet.", this);
 			return true;
 		}

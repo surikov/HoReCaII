@@ -166,7 +166,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 		Cursor cursor = null;
 		//TimeZone cuTZ = TimeZone.getDefault();
 		try {
-			String mUserKod =Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
+			String mUserKod = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
 			/*String mUserKod = Requests.getTPCode(mDB
 					//, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()
 			);
@@ -198,13 +198,13 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 					String endTime = null;
 					String activity = null;
 					String endField = cursor.getString(cursor.getColumnIndex(END_TIME));
-					if(endField==null){
-						endField="";
+					if (endField == null) {
+						endField = "";
 					}
 					if (
-							//(endField != null)
-							//		&&
-									(endField.length() > 0)
+						//(endField != null)
+						//		&&
+							(endField.length() > 0)
 					) {
 						endTime = endField;
 						activity = cursor.getString(cursor.getColumnIndex(ACTIVITY));

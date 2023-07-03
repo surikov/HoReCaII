@@ -35,6 +35,7 @@ public abstract class NomenclatureBasedDocument implements Parcelable {
 		mDocumentNumberPrefix = ApplicationHoreca.getInstance().getCurrentAgent().getAgentKodTrim();
 		setDocumentNumberProperties();
 	}
+
 	protected void readFromParcel(Parcel in) {
 		m_id = in.readInt();
 		mIDRRef = in.readString();
@@ -49,6 +50,7 @@ public abstract class NomenclatureBasedDocument implements Parcelable {
 		mProveden = array[0];
 		mNew = array[1];
 	}
+
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeInt(m_id);
 		dest.writeString(mIDRRef);
@@ -58,11 +60,14 @@ public abstract class NomenclatureBasedDocument implements Parcelable {
 		dest.writeString(mKontragentID);
 		dest.writeString(mKontragentKod);
 		dest.writeString(mKontragentName);
-		dest.writeBooleanArray(new boolean[] { mProveden, mNew });
+		dest.writeBooleanArray(new boolean[]{mProveden, mNew});
 	}
+
 	public abstract String getSerializedXML(SQLiteDatabase db) throws IllegalArgumentException, IllegalStateException, IOException;
+
 	protected void setDocumentNumberProperties() {
 	}
+
 	private void _readDocumentNomer(SQLiteDatabase db) {
 		Cursor cursor = null;
 		try {
@@ -71,46 +76,53 @@ public abstract class NomenclatureBasedDocument implements Parcelable {
 				String nomer = cursor.getString(0);
 				try {
 					mDocumentNumber = Integer.parseInt(nomer.substring(mDocumentNumberPrefix.length(), nomer.length()));
-				}
-				catch (Throwable t) {
+				} catch (Throwable t) {
 					//t.printStackTrace();
 					System.out.println("readDocumentNomer: can't parse " + nomer);
 					mDocumentNumber = Math.round(0);
 				}
 				cursor.close();
 			}
-		}
-		finally {
+		} finally {
 			if (cursor != null && !cursor.isClosed()) {
 				cursor.close();
 			}
 		}
 	}
+
 	public abstract void writeUploaded(SQLiteDatabase db);
+
 	public abstract void writeToDataBase(SQLiteDatabase db);
+
 	public String getOtvetstvennyyKod() {
 		return mOtvetstvennyyKod;
 	}
+
 	public String getIDRRef() {
 		return mIDRRef;
 	}
+
 	public Date getDate() {
 		return mDate;
 	}
+
 	public void setDate(Date date) {
 		mDate = date;
 	}
+
 	public boolean isNew() {
 		return mNew;
 	}
+
 	public void setNew(boolean New) {
 		mNew = New;
 	}
+
 	protected String generateDocumentNumber(SQLiteDatabase db) {
-		String s=mDocumentNumberPrefix;
+		String s = mDocumentNumberPrefix;
 		SimpleDateFormat format = new SimpleDateFormat("MMddHHmmssSSS");
 		format.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-		s=s+"-"+format.format(new java.util.Date());
+		s = s + "-" + format.format(new java.util.Date());
 		//s=s+"-"+new java.util.Date().getTime();
 		//System.out.println("generateDocumentNumber "+s);
 		/*
@@ -123,35 +135,42 @@ public abstract class NomenclatureBasedDocument implements Parcelable {
 		return resultNumber.toString();*/
 		return s;
 	}
+
 	public static Date nextWorkingDate(Calendar chosedDay) {
 		Calendar rigthNow = DateTimeHelper.getOnlyDateInfo(chosedDay);
 		switch (rigthNow.get(Calendar.DAY_OF_WEEK)) {
-		case Calendar.SATURDAY:
-			rigthNow.roll(Calendar.DAY_OF_YEAR, 2);
-			break;
-		default:
-			rigthNow.roll(Calendar.DAY_OF_YEAR, 1);
-			break;
+			case Calendar.SATURDAY:
+				rigthNow.roll(Calendar.DAY_OF_YEAR, 2);
+				break;
+			default:
+				rigthNow.roll(Calendar.DAY_OF_YEAR, 1);
+				break;
 		}
 		return rigthNow.getTime();
 	}
+
 	public String getNomer() {
 		return mNomer;
 	}
+
 	public void setClient(String id, String kod, String name) {
 		mKontragentID = id;
 		mKontragentName = name;
 		mKontragentKod = kod;
 	}
+
 	public String getClientID() {
 		return mKontragentID;
 	}
+
 	public String getClientKod() {
 		return mKontragentKod;
 	}
+
 	public String getClientName() {
 		return mKontragentName;
 	}
+
 	public boolean isProveden() {
 		return mProveden;
 	}

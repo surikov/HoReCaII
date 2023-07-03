@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:weightSum="1"
+	android:layout_width="fill_parent"
+	android:weightSum="1"
 	android:layout_height="wrap_content">
 
-	<Button android:id="@+id/head_btn_articul" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".15" android:text="Артикул" />
-		
-	<Button android:id="@+id/head_btn_naimenovanie" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".55" android:text="Наименование" />
+	<Button
+		android:id="@+id/head_btn_articul"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".15"
+		android:text="Артикул" />
 
-	<Button android:id="@+id/head_btn_price" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".15" android:text="Цена" />
-		
-	<Button android:id="@+id/head_btn_unit" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".15" android:text="Единица" />
-		
+	<Button
+		android:id="@+id/head_btn_naimenovanie"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".55"
+		android:text="Наименование" />
+
+	<Button
+		android:id="@+id/head_btn_price"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".15"
+		android:text="Цена" />
+
+	<Button
+		android:id="@+id/head_btn_unit"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".15"
+		android:text="Единица" />
+
 </LinearLayout>

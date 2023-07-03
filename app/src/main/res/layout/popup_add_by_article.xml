@@ -1,74 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroller"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:drawable/alert_light_frame"
-    android:orientation="vertical" >
+	android:id="@+id/scroller"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:background="@android:drawable/alert_light_frame"
+	android:orientation="vertical">
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dip"
-        android:layout_marginRight="7dip"
-        android:layout_marginTop="10dip"
-        android:text="@string/nomenclature" />
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="7dip"
+		android:layout_marginTop="10dip"
+		android:text="@string/nomenclature" />
 
-    <EditText
-        android:id="@+id/edit_article"
-        android:layout_width="600dp"
-        android:layout_height="match_parent"
-        android:layout_margin="7dip"
-        android:editable="false"
-        android:focusable="false"
-        android:inputType="none" />
+	<EditText
+		android:id="@+id/edit_article"
+		android:layout_width="600dp"
+		android:layout_height="match_parent"
+		android:layout_margin="7dip"
+		android:editable="false"
+		android:focusable="false"
+		android:inputType="none" />
 
-    <TextView
-        android:id="@+id/text_count"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dip"
-        android:layout_marginRight="7dip"
-        android:text="@string/count" />
+	<TextView
+		android:id="@+id/text_count"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="7dip"
+		android:text="@string/count" />
 
-    <RelativeLayout
-        android:layout_width="600dp"
-        android:layout_height="match_parent"
-        android:layout_margin="9dip"
-        android:orientation="horizontal" >
+	<RelativeLayout
+		android:layout_width="600dp"
+		android:layout_height="match_parent"
+		android:layout_margin="9dip"
+		android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/edit_count"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btn_minus"
-            android:editable="false"
-            android:focusable="false"
-            android:inputType="none" />
+		<EditText
+			android:id="@+id/edit_count"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:layout_toLeftOf="@+id/btn_minus"
+			android:editable="false"
+			android:focusable="false"
+			android:inputType="none" />
 
-        <Button
-            android:id="@+id/btn_minus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/btn_plus"
-            android:text="@string/minus" />
+		<Button
+			android:id="@+id/btn_minus"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toLeftOf="@+id/btn_plus"
+			android:text="@string/minus" />
 
-        <Button
-            android:id="@+id/btn_plus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="@string/plus" />
-    </RelativeLayout>
+		<Button
+			android:id="@+id/btn_plus"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:text="@string/plus" />
+	</RelativeLayout>
 
-    <include
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dip"
-        android:layout_marginLeft="8dip"
-        android:layout_marginRight="8dip"
-        layout="@layout/popup_buttons" />
+	<include
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="8dip"
+		android:layout_marginLeft="8dip"
+		android:layout_marginRight="8dip"
+		layout="@layout/popup_buttons" />
 
 </LinearLayout>

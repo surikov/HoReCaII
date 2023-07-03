@@ -2,8 +2,10 @@ package reactive.ui;
 
 import android.text.*;
 import android.app.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.Task;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -15,7 +17,8 @@ import android.widget.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-public class RedactTime  extends EditText implements Rake {
+
+public class RedactTime extends EditText implements Rake {
 	private ToggleProperty<Rake> hidden = new ToggleProperty<Rake>(this);
 	public NumericProperty<RedactTime> time = new NumericProperty<RedactTime>(this);
 	public NoteProperty<RedactTime> format = new NoteProperty<RedactTime>(this);//dd.MM.yyyy, yyyy-MM-dd
@@ -45,24 +48,29 @@ public class RedactTime  extends EditText implements Rake {
 			RedactTime.this.setMinHeight(height.property.value().intValue());
 		}
 	};
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		int r = 1 + (int) (Auxiliary.tapSize * 0.05);
 		canvas.drawCircle(width.property.value().intValue() - 3 * r, 3 * r, r, dot);
 	}
+
 	public RedactTime(Context context) {
 		super(context);
 		init();
 	}
+
 	public RedactTime(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
+
 	public RedactTime(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
+
 	void init() {
 		if (initialized) {
 			return;
@@ -86,7 +94,7 @@ public class RedactTime  extends EditText implements Rake {
 					Calendar c = Calendar.getInstance();
 					c.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 					c.setTimeInMillis(time.property.value().longValue());
-					if(time.property.value()==0){
+					if (time.property.value() == 0) {
 						c.setTimeInMillis(new Date().getTime());
 					}
 					//c.set(Calendar.YEAR, 0);
@@ -134,50 +142,56 @@ public class RedactTime  extends EditText implements Rake {
 			public void doTask() {
 				if (hidden.property.value()) {
 					setVisibility(View.INVISIBLE);
-				}
-				else {
+				} else {
 					setVisibility(View.VISIBLE);
 				}
 			}
 		});
 	}
+
 	@Override
 	public ToggleProperty<Rake> hidden() {
 		return hidden;
 	}
+
 	void resetLabel() {
 		if (time.property.value() == 0) {
 			setText("");
-		}
-		else {
+		} else {
 			DateFormat to = new SimpleDateFormat(format.property.value());
 			to.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-			
+
 			Calendar c = Calendar.getInstance();
 			c.setTimeInMillis(time.property.value().longValue());
 			setText(to.format(c.getTime()));
 		}
 	}
+
 	@Override
 	public NumericProperty<Rake> left() {
 		return left;
 	}
+
 	@Override
 	public NumericProperty<Rake> top() {
 		return top;
 	}
+
 	@Override
 	public NumericProperty<Rake> width() {
 		return width;
 	}
+
 	@Override
 	public NumericProperty<Rake> height() {
 		return height;
 	}
+
 	@Override
 	public View view() {
 		return this;
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();

@@ -2,6 +2,7 @@ package sweetlife.android10.ui;
 
 import java.util.Calendar;
 import java.util.Date;
+
 import sweetlife.android10.data.fixedprices.*;
 import reactive.ui.Auxiliary;
 import sweetlife.android10.ApplicationHoreca;
@@ -93,40 +94,42 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item == menuDelete) {
+		if (item == menuDelete) {
 			promptDelete();
 			return true;
 		}
-		if(item == menuClone) {
+		if (item == menuClone) {
 			promptClone();
 			return true;
 		}
 		return false;
 	}
-	void doClone(){
+
+	void doClone() {
 
 		//Parcel dest=new Parcel();
 		//mZayavka.writeToParcel( dest, 0);
 		//mZayavka = extras.getParcelable(FIXED_PRICES_BID);
-		ZayavkaNaSkidki clone=new ZayavkaNaSkidki(mZayavka.getClientID(),mDB);
+		ZayavkaNaSkidki clone = new ZayavkaNaSkidki(mZayavka.getClientID(), mDB);
 		clone.setKommentariy(mZayavka.getKommentariy());
 		clone.setVremyaNachalaSkidkiPhiksCen(mZayavka.getVremyaNachalaSkidkiPhiksCen());
 		clone.setVremyaOkonchaniyaSkidkiPhiksCen(mZayavka.getVremyaOkonchaniyaSkidkiPhiksCen());
 		clone.writeToDataBase(mDB);
-		FixedPricesNomenclatureData cloneData =new FixedPricesNomenclatureData(mDB,clone);
+		FixedPricesNomenclatureData cloneData = new FixedPricesNomenclatureData(mDB, clone);
 
 		//mFixedPricesNomenclatureData.mNomenclaureList
-		int cnt=mFixedPricesNomenclatureData.getCount();
-		for(int i=0;i<cnt;i++){
-			ZayavkaNaSkidki_TovaryPhiksCen one=mFixedPricesNomenclatureData.getNomenclature(i);
-			cloneData.newFixedPriceNomenclature(one.getNomenklaturaID(),one.getArtikul(),one.getNomenklaturaNaimenovanie());
-			ZayavkaNaSkidki_TovaryPhiksCen nz=cloneData.getNomenclature(cloneData.getCount()-1);
+		int cnt = mFixedPricesNomenclatureData.getCount();
+		for (int i = 0; i < cnt; i++) {
+			ZayavkaNaSkidki_TovaryPhiksCen one = mFixedPricesNomenclatureData.getNomenclature(i);
+			cloneData.newFixedPriceNomenclature(one.getNomenklaturaID(), one.getArtikul(), one.getNomenklaturaNaimenovanie());
+			ZayavkaNaSkidki_TovaryPhiksCen nz = cloneData.getNomenclature(cloneData.getCount() - 1);
 			nz.setCena(one.getCena());
 			nz.setObyazatelstva(one.getObyazatelstva());
 			//nz.WriteToDataBase(mDB);
 		}
 		cloneData.WriteToDataBase(mDB);
 	}
+
 	void promptClone() {
 		Auxiliary.pickConfirm(this, "Сделать копию заявки на фикс.цены", "Копировать", new Task() {
 			@Override
@@ -136,6 +139,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 			}
 		});
 	}
+
 	void promptDelete() {
 		Auxiliary.pickConfirm(this, "Удаление заявки на фикс.цены", "Удалить", new Task() {
 			@Override
@@ -156,7 +160,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 		mClient = new ClientInfo(mDB, extras.getString(CLIENT_ID));
 		mIsEditable = extras.getBoolean(IS_EDITABLE);
 		mZayavka = extras.getParcelable(FIXED_PRICES_BID);
-		if(mZayavka == null) {
+		if (mZayavka == null) {
 			mZayavka = new ZayavkaNaSkidki(mClient.getID(), mDB);
 		}
 		mFromPeriod = Calendar.getInstance();
@@ -174,10 +178,9 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	private void InitializeListView() {
 		@SuppressWarnings("deprecation")
 		Object savedObj = (Object) getLastNonConfigurationInstance();
-		if(savedObj != null) {
+		if (savedObj != null) {
 			mFixedPricesNomenclatureData = (FixedPricesNomenclatureData) savedObj;
-		}
-		else {
+		} else {
 			mFixedPricesNomenclatureData = new FixedPricesNomenclatureData(mDB, mZayavka);
 		}
 		mFixedPricesNomenclatureListAdapter = new FixedPricesNomenclatureListAdapter(mFixedPricesNomenclatureData);
@@ -219,7 +222,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onContextItemSelected(MenuItem menu) {
-		switch(menu.getItemId()) {
+		switch (menu.getItemId()) {
 			case IDM_LIST_DELETE:
 				AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) menu.getMenuInfo();
 				mListPositionForDelete = menuInfo.position;
@@ -233,7 +236,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		LogHelper.debug(this.getClass().getCanonicalName() + ".onCreateDialog: " + id);
-		switch(id) {
+		switch (id) {
 			case IDD_DELETE: {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.confirm);
@@ -261,10 +264,9 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 				builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int arg1) {
-						if(mFixedPricesNomenclatureData.getCount() != 0) {
+						if (mFixedPricesNomenclatureData.getCount() != 0) {
 							SaveChangesAndExit();
-						}
-						else {
+						} else {
 							showDialog(IDD_IS_EMPTY);
 						}
 					}
@@ -291,10 +293,10 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if(resultCode == RESULT_OK) {
-			switch(requestCode) {
+		if (resultCode == RESULT_OK) {
+			switch (requestCode) {
 				case ADD_NOMENCATURE:
-					if(mFixedPricesNomenclatureData.IsNomenclatureAlreadyInList(data.getStringExtra(NOMENCLATURE_ID))) {
+					if (mFixedPricesNomenclatureData.IsNomenclatureAlreadyInList(data.getStringExtra(NOMENCLATURE_ID))) {
 						CreateErrorDialog(R.string.msg_already_in_list).show();
 						return;
 					}
@@ -309,7 +311,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_BACK & mHasChanges & mFixedPricesNomenclatureData.getCount() != 0) {
+		if (keyCode == KeyEvent.KEYCODE_BACK & mHasChanges & mFixedPricesNomenclatureData.getCount() != 0) {
 			showDialog(IDD_SAVE_CHANGES);
 			return true;
 		}
@@ -320,30 +322,29 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	private void SaveChangesAndExit() {
 
 
-
-		if(mFixedPricesNomenclatureData.getCount() == 0) {
+		if (mFixedPricesNomenclatureData.getCount() == 0) {
 			finish();
 			return;
 		}
-		if(!mFixedPricesNomenclatureData.IsAllDataFilled()) {
+		if (!mFixedPricesNomenclatureData.IsAllDataFilled()) {
 			showDialog(IDD_EMPTY_FIELDS);
 			return;
 		}
 
-		System.out.println("klient "+mZayavka.getClientID());
-		CheckBox check_owner_too=((CheckBox) findViewById(R.id.check_owner_too));
-		if(check_owner_too.isChecked()){
-			String sql="select k2.kod as kod,k2.naimenovanie as name,k2._idrref as idrf"
-					+" from Kontragenty k1"
-					+" join Kontragenty k2 on k2._IDRRef=k1.GolovnoyKontragent"
-					+" where k1._IDRRef="+mZayavka.getClientID();
+		System.out.println("klient " + mZayavka.getClientID());
+		CheckBox check_owner_too = ((CheckBox) findViewById(R.id.check_owner_too));
+		if (check_owner_too.isChecked()) {
+			String sql = "select k2.kod as kod,k2.naimenovanie as name,k2._idrref as idrf"
+					+ " from Kontragenty k1"
+					+ " join Kontragenty k2 on k2._IDRRef=k1.GolovnoyKontragent"
+					+ " where k1._IDRRef=" + mZayavka.getClientID();
 			Bough owner = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-			System.out.println("change "+"x'"+owner.child("row").child("idrf").value.property.value()+"'"
-					+"/"+owner.child("row").child("kod").value.property.value()
-					+"/"+owner.child("row").child("name").value.property.value());
-			mZayavka.setClient("x'"+owner.child("row").child("idrf").value.property.value()+"'"
-					,owner.child("row").child("kod").value.property.value()
-					,owner.child("row").child("name").value.property.value()
+			System.out.println("change " + "x'" + owner.child("row").child("idrf").value.property.value() + "'"
+					+ "/" + owner.child("row").child("kod").value.property.value()
+					+ "/" + owner.child("row").child("name").value.property.value());
+			mZayavka.setClient("x'" + owner.child("row").child("idrf").value.property.value() + "'"
+					, owner.child("row").child("kod").value.property.value()
+					, owner.child("row").child("name").value.property.value()
 			);
 		}
 

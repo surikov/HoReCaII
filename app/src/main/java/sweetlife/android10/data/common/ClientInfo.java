@@ -13,61 +13,63 @@ public class ClientInfo {
 	private double mLat;
 	private double mLon;
 	public String dolgMessage;
-	public boolean neMarshrut=false;
+	public boolean neMarshrut = false;
 
 	private ArrayList<ContractInfo> mContracts;
 
-	public ClientInfo( SQLiteDatabase db, String clientID ) {
+	public ClientInfo(SQLiteDatabase db, String clientID) {
 
-		ReadClientInfo( db, clientID );
-		
+		ReadClientInfo(db, clientID);
+
 		mContracts = null;
 	}
-	
-	public ClientInfo( SQLiteDatabase db, String clientID, ArrayList<ContractInfo> contracts ) {
 
-		ReadClientInfo( db, clientID );
+	public ClientInfo(SQLiteDatabase db, String clientID, ArrayList<ContractInfo> contracts) {
+
+		ReadClientInfo(db, clientID);
 
 		mContracts = contracts;
 	}
 
-	private void ReadClientInfo( SQLiteDatabase db, String clientID ) {
-		
+	private void ReadClientInfo(SQLiteDatabase db, String clientID) {
+
 		String sqlStr = "SELECT _IDRRef, Kod, Naimenovanie, GeographicheskayaShirota, " +
-		"GeographicheskayaDolgota FROM Kontragenty WHERE _IDRRef = " + clientID;
+				"GeographicheskayaDolgota FROM Kontragenty WHERE _IDRRef = " + clientID;
 
-		Cursor cursor = db.rawQuery( sqlStr, null );
+		Cursor cursor = db.rawQuery(sqlStr, null);
 
-		if ( cursor.moveToFirst() ) {
-			
-			mID   = clientID;
-			mKod  = cursor.getString(1);
+		if (cursor.moveToFirst()) {
+
+			mID = clientID;
+			mKod = cursor.getString(1);
 			mName = cursor.getString(2);
-			mLat  = cursor.getDouble(3);
-			mLon  = cursor.getDouble(4);
+			mLat = cursor.getDouble(3);
+			mLon = cursor.getDouble(4);
 		}
-		if(cursor!=null){
+		if (cursor != null) {
 			cursor.close();
 		}
-		setNeMarshrut(db,clientID);
+		setNeMarshrut(db, clientID);
 	}
-	void setNeMarshrut(SQLiteDatabase db, String clientID){
-		String sql="select kontragent from marshrutyagentov where kontragent="+clientID;
-		Cursor cursor = db.rawQuery( sql, null );
 
-		if ( cursor.moveToFirst() ) {neMarshrut=false;}else{
-			neMarshrut=true;
+	void setNeMarshrut(SQLiteDatabase db, String clientID) {
+		String sql = "select kontragent from marshrutyagentov where kontragent=" + clientID;
+		Cursor cursor = db.rawQuery(sql, null);
+
+		if (cursor.moveToFirst()) {neMarshrut = false;} else {
+			neMarshrut = true;
 		}
-		if(cursor!=null){
+		if (cursor != null) {
 			cursor.close();
 		}
 	}
+
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
 
-		if( mContracts != null ) {
-		
+		if (mContracts != null) {
+
 			mContracts.clear();
 		}
 	}
@@ -101,13 +103,13 @@ public class ClientInfo {
 
 		return mContracts;
 	}
-	
+
 	public int getContractsCount() {
 
 		return mContracts.size();
 	}
 
-	public ContractInfo getContract( int index ) {
+	public ContractInfo getContract(int index) {
 
 		return mContracts.get(index);
 	}

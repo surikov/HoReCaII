@@ -1,127 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="#E3E3E3" >
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="#E3E3E3">
 
-    <include
-        android:id="@+id/bar_period"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dip"
-        android:layout_marginTop="10dip"
-        layout="@layout/bar_period" />
+	<include
+		android:id="@+id/bar_period"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="20dip"
+		android:layout_marginTop="10dip"
+		layout="@layout/bar_period" />
 
-    <ExpandableListView
-        android:id="@+id/list_clients"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/layout_filter_btns"
-        android:layout_below="@+id/bar_period"
-        android:layout_margin="10dip"
-         />
+	<ExpandableListView
+		android:id="@+id/list_clients"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_above="@+id/layout_filter_btns"
+		android:layout_below="@+id/bar_period"
+		android:layout_margin="10dip" />
 
-    <LinearLayout
-        android:id="@+id/layout_filter_btns"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/group_report_type"
-        android:orientation="horizontal"
-        android:weightSum="1" >
+	<LinearLayout
+		android:id="@+id/layout_filter_btns"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@+id/group_report_type"
+		android:orientation="horizontal"
+		android:weightSum="1">
 
-        <Button
-            android:id="@+id/btn_by_clients"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
-            android:layout_marginRight="10dip"
-            android:layout_weight=".3"
-            android:text="@string/filter_by_clients" />
+		<Button
+			android:id="@+id/btn_by_clients"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:layout_marginRight="10dip"
+			android:layout_weight=".3"
+			android:text="@string/filter_by_clients" />
 
-        <Button
-            android:id="@+id/btn_by_contracts_groups"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dip"
-            android:layout_weight=".3"
-            android:text="@string/filter_by_contracts_group" />
+		<Button
+			android:id="@+id/btn_by_contracts_groups"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginRight="10dip"
+			android:layout_weight=".3"
+			android:text="@string/filter_by_contracts_group" />
 
-        <CheckBox
-            android:id="@+id/check_only_group_contracts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight=".4"
-            android:checked="true"
-            android:text="@string/only_group_contracts" />
-    </LinearLayout>
+		<CheckBox
+			android:id="@+id/check_only_group_contracts"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight=".4"
+			android:checked="true"
+			android:text="@string/only_group_contracts" />
+	</LinearLayout>
 
-    <RadioGroup
-        android:id="@+id/group_report_type"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_generate"
-        android:layout_margin="10dip"
-        android:layout_marginRight="10dip"
+	<RadioGroup
+		android:id="@+id/group_report_type"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_above="@+id/btn_generate"
+		android:layout_margin="10dip"
+		android:layout_marginRight="10dip"
 
-        android:orientation="horizontal"
-        android:weightSum="1" >
+		android:orientation="horizontal"
+		android:weightSum="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_margin="10dip"
-            android:gravity="center_vertical"
-            android:text="@string/report_type" />
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:layout_margin="10dip"
+			android:gravity="center_vertical"
+			android:text="@string/report_type" />
 
-        <RadioButton
-            android:id="@+id/radio_expanded"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dip"
-            android:checked="true"
-            android:text="@string/expanded" />
+		<RadioButton
+			android:id="@+id/radio_expanded"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dip"
+			android:checked="true"
+			android:text="@string/expanded" />
 
-        <RadioButton
-            android:id="@+id/radio_combined"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dip"
-            android:checked="false"
-            android:text="@string/combined" />
+		<RadioButton
+			android:id="@+id/radio_combined"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dip"
+			android:checked="false"
+			android:text="@string/combined" />
 
-        <RadioButton
-            android:id="@+id/radio_collapsed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dip"
-            android:checked="false"
-            android:text="@string/collapsed" />
-        
-        <RadioButton
-            android:id="@+id/radio_expanded_by_contracts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dip"
-            android:text="@string/expanded_by_contracts" />
+		<RadioButton
+			android:id="@+id/radio_collapsed"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dip"
+			android:checked="false"
+			android:text="@string/collapsed" />
 
-        <RadioButton
-            android:id="@+id/radio_collapsed_by_contracts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dip"
-            android:checked="false"
-            android:text="@string/collapsed_by_contracts" />
-        
-    </RadioGroup>
+		<RadioButton
+			android:id="@+id/radio_expanded_by_contracts"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dip"
+			android:text="@string/expanded_by_contracts" />
 
-    <Button
-        android:id="@+id/btn_generate"
-        android:layout_width="250dip"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="10dip"
-        android:layout_marginRight="10dip"
-        android:text="@string/generate_report" />
+		<RadioButton
+			android:id="@+id/radio_collapsed_by_contracts"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dip"
+			android:checked="false"
+			android:text="@string/collapsed_by_contracts" />
+
+	</RadioGroup>
+
+	<Button
+		android:id="@+id/btn_generate"
+		android:layout_width="250dip"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"
+		android:layout_marginBottom="10dip"
+		android:layout_marginRight="10dip"
+		android:text="@string/generate_report" />
 
 </RelativeLayout>

@@ -33,8 +33,8 @@ public class RedactDate extends EditText implements Rake {
 		@Override
 		public void doTask() {
 			RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(//
-					                                                                    width.property.value().intValue()//
-					                                                                    , height.property.value().intValue());
+					width.property.value().intValue()//
+					, height.property.value().intValue());
 			params.leftMargin = left.property.value().intValue();
 			params.topMargin = top.property.value().intValue();
 			params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -73,7 +73,7 @@ public class RedactDate extends EditText implements Rake {
 	}
 
 	void init() {
-		if(initialized) {
+		if (initialized) {
 			return;
 		}
 		initialized = true;
@@ -91,11 +91,11 @@ public class RedactDate extends EditText implements Rake {
 		setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View view, MotionEvent motionEvent) {
-				if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
+				if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
 					Calendar c = Calendar.getInstance();
 					//c.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 					c.setTimeInMillis(date.property.value().longValue());
-					if(date.property.value() == 0) {
+					if (date.property.value() == 0) {
 						c.setTimeInMillis(new Date().getTime());
 					}
 					/*c.set(Calendar.HOUR, 0);
@@ -144,10 +144,9 @@ public class RedactDate extends EditText implements Rake {
 		hidden.property.afterChange(new Task() {
 			@Override
 			public void doTask() {
-				if(hidden.property.value()) {
+				if (hidden.property.value()) {
 					setVisibility(View.INVISIBLE);
-				}
-				else {
+				} else {
 					setVisibility(View.VISIBLE);
 				}
 			}
@@ -161,14 +160,13 @@ public class RedactDate extends EditText implements Rake {
 	}
 
 	void resetLabel() {
-		if(date.property.value() == 0) {
+		if (date.property.value() == 0) {
 			setText("");
-		}
-		else {
+		} else {
 			DateFormat to = new SimpleDateFormat(format.property.value());
 			Calendar c = Calendar.getInstance();
 			c.setTimeInMillis(date.property.value().longValue());
-			String v=to.format(c.getTime());
+			String v = to.format(c.getTime());
 			setText(v);
 			//System.out.println("resetLabel "+c);
 			//System.out.println("date "+c.getTime());

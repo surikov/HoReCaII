@@ -1,41 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
 	android:background="#E3E3E3">
 
 	<RelativeLayout
-		android:layout_above="@+id/layout_bottom" android:layout_width="fill_parent"
+		android:layout_above="@+id/layout_bottom"
+		android:layout_width="fill_parent"
 		android:layout_height="fill_parent">
-		<include android:id="@+id/list_header" layout="@layout/header_services_list"
+
+		<include
+			android:id="@+id/list_header"
+			layout="@layout/header_services_list"
 			android:layout_alignParentTop="true" />
-		<ListView android:id="@+id/list_services"
-			android:layout_width="fill_parent" android:layout_height="fill_parent"
-			android:layout_below="@+id/list_header" android:cacheColorHint="#00000000" />
+
+		<ListView
+			android:id="@+id/list_services"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_below="@+id/list_header"
+			android:cacheColorHint="#00000000" />
 	</RelativeLayout>
-	
-	<RelativeLayout android:id="@+id/layout_bottom"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:layout_alignParentBottom="true" >
-		<RelativeLayout android:layout_alignParentLeft="true"
-			android:layout_width="fill_parent" android:layout_height="wrap_content"
-			android:layout_toLeftOf="@+id/btn_save" android:layout_centerVertical="true">
-			<TextView android:id="@+id/text_service_content"
-				android:text="Содержание услуги" android:layout_width="85dip"
-				android:layout_height="wrap_content" android:layout_centerVertical="true"
-				android:layout_alignParentLeft="true" android:layout_marginLeft="7dip"/>
-			<EditText android:id="@+id/edit_service_content"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
+
+	<RelativeLayout
+		android:id="@+id/layout_bottom"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true">
+
+		<RelativeLayout
+			android:layout_alignParentLeft="true"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_toLeftOf="@+id/btn_save"
+			android:layout_centerVertical="true">
+
+			<TextView
+				android:id="@+id/text_service_content"
+				android:text="Содержание услуги"
+				android:layout_width="85dip"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_alignParentLeft="true"
+				android:layout_marginLeft="7dip" />
+
+			<EditText
+				android:id="@+id/edit_service_content"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
 				android:layout_toRightOf="@+id/text_service_content"
 				android:layout_toLeftOf="@+id/text_count" />
-			<TextView android:id="@+id/text_count" android:text="@string/count"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:layout_centerVertical="true" android:layout_toLeftOf="@+id/edit_count" />
-			<EditText android:id="@+id/edit_count"
-				android:layout_alignParentRight="true" android:layout_width="250dip"
-				android:layout_height="wrap_content" android:numeric="integer" />
+
+			<TextView
+				android:id="@+id/text_count"
+				android:text="@string/count"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerVertical="true"
+				android:layout_toLeftOf="@+id/edit_count" />
+
+			<EditText
+				android:id="@+id/edit_count"
+				android:layout_alignParentRight="true"
+				android:layout_width="250dip"
+				android:layout_height="wrap_content"
+				android:numeric="integer" />
 		</RelativeLayout>
-		<Button android:id="@+id/btn_save" android:layout_width="250dip"
-			android:layout_height="wrap_content" android:text="@string/save"
-			android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+
+		<Button
+			android:id="@+id/btn_save"
+			android:layout_width="250dip"
+			android:layout_height="wrap_content"
+			android:text="@string/save"
+			android:layout_alignParentRight="true"
+			android:layout_centerVertical="true" />
 	</RelativeLayout>
 </RelativeLayout>

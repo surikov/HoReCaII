@@ -1,24 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:weightSum="1"
+	android:layout_width="fill_parent"
+	android:weightSum="1"
 	android:layout_height="wrap_content">
 
-	<Button android:id="@+id/head_btn_number" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".04" android:text="№" />
+	<Button
+		android:id="@+id/head_btn_number"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".04"
+		android:text="№" />
 
-	<Button android:id="@+id/head_btn_nomenclature" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".33" android:text="Номенклатура" />
+	<Button
+		android:id="@+id/head_btn_nomenclature"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".33"
+		android:text="Номенклатура" />
 
-	<Button android:id="@+id/head_btn_servicecontent" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".33" android:text="Содержание услуги" />
+	<Button
+		android:id="@+id/head_btn_servicecontent"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".33"
+		android:text="Содержание услуги" />
 
-	<Button android:id="@+id/head_btn_count" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".1" android:text="Кол-во" />
+	<Button
+		android:id="@+id/head_btn_count"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".1"
+		android:text="Кол-во" />
 
-	<Button android:id="@+id/head_btn_price" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".1" android:text="Цена" />
+	<Button
+		android:id="@+id/head_btn_price"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".1"
+		android:text="Цена" />
 
-	<Button android:id="@+id/head_btn_amount" android:layout_height="40dip" android:layout_width="0dip"
-		android:layout_weight=".1" android:text="Сумма" />
+	<Button
+		android:id="@+id/head_btn_amount"
+		android:layout_height="40dip"
+		android:layout_width="0dip"
+		android:layout_weight=".1"
+		android:text="Сумма" />
 
 </LinearLayout>

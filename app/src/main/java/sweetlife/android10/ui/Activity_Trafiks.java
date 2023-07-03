@@ -8,6 +8,7 @@ import sweetlife.android10.data.nomenclature.NomenclatureSimpleSavedData;
 import sweetlife.android10.data.nomenclature.TrafiksListAdapter;
 import sweetlife.android10.database.nomenclature.ISearchBy;
 import sweetlife.android10.database.nomenclature.Request_Trafiks;
+
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -36,18 +37,18 @@ import sweetlife.android10.R;
 
 public class Activity_Trafiks extends Activity_Base implements ITableColumnsNames, OnTabChangeListener, ISearchBy {
 
-	private TabHost                       mTabHost;
-	private EditText                      mEditSearch;
-	private RadioButton                   mRadioActicule;
-	private RadioButton                   mRadioName;
-	private RadioButton                   mRadioVendor;
-	private EditText                      mEditComment;
+	private TabHost mTabHost;
+	private EditText mEditSearch;
+	private RadioButton mRadioActicule;
+	private RadioButton mRadioName;
+	private RadioButton mRadioVendor;
+	private EditText mEditComment;
 
 	private NomenclatureGroupsListAdapter mNomenclatureGroupsListAdapter;
-	private TrafiksListAdapter            mNomenclatureListAdapter;
-	private TrafiksListAdapter            mSearchListAdapter;
+	private TrafiksListAdapter mNomenclatureListAdapter;
+	private TrafiksListAdapter mSearchListAdapter;
 
-	private ZoomListCursorAdapter         mCurrentListAdapter;
+	private ZoomListCursorAdapter mCurrentListAdapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,10 +59,10 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 		InitializeTabHost();
 
-		((Button)findViewById(R.id.btn_save)).setOnClickListener(mSaveClick);
+		((Button) findViewById(R.id.btn_save)).setOnClickListener(mSaveClick);
 
 		mCurrentListAdapter = mNomenclatureListAdapter;
-		
+
 		mEditComment = (EditText) findViewById(R.id.edit_comment);
 	}
 
@@ -73,7 +74,7 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 		mTabHost.addTab(mTabHost.newTabSpec("tab_trafiks").setIndicator(makeTabIndicator("Номенклатура")).setContent(R.id.trafiks));
 		mTabHost.addTab(mTabHost.newTabSpec("tab_search").setIndicator(makeTabIndicator("Поиск")).setContent(R.id.search));
 
-		mTabHost.setOnTabChangedListener( this );
+		mTabHost.setOnTabChangedListener(this);
 
 		InitializeNomeclatureTab();
 		InitializeSearchTab();
@@ -91,15 +92,15 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 		NomenclatureSimpleSavedData savedData = new NomenclatureSimpleSavedData();
 
-		mEditSearch = (EditText)findViewById(R.id.edit_search);
+		mEditSearch = (EditText) findViewById(R.id.edit_search);
 		mEditSearch.setText(savedData.getSearchString());
-		mEditSearch.setOnEditorActionListener( new EditText.OnEditorActionListener() {
+		mEditSearch.setOnEditorActionListener(new EditText.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 
 				if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE ||
-						(event != null && event.getAction() == KeyEvent.ACTION_DOWN && 	event.getKeyCode() 
-						== KeyEvent.KEYCODE_ENTER)) {
+						(event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode()
+								== KeyEvent.KEYCODE_ENTER)) {
 
 					SearchBtnClick();
 					return true;
@@ -109,7 +110,7 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 			}
 		});
 
-		Button btnSearch = (Button)findViewById(R.id.btn_search);
+		Button btnSearch = (Button) findViewById(R.id.btn_search);
 		btnSearch.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
@@ -117,12 +118,12 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 			}
 		});
 
-		mRadioActicule = (RadioButton)findViewById(R.id.radio_articule);
+		mRadioActicule = (RadioButton) findViewById(R.id.radio_articule);
 		mRadioActicule.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if( isChecked ){
+				if (isChecked) {
 					mEditSearch.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_NORMAL);
 
 					mEditSearch.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_SEARCH);
@@ -133,12 +134,12 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 			}
 		});
 
-		mRadioVendor = (RadioButton)findViewById(R.id.radio_vendor);
+		mRadioVendor = (RadioButton) findViewById(R.id.radio_vendor);
 		mRadioVendor.setOnCheckedChangeListener(mSearchRadioTextType);
-		mRadioName = (RadioButton)findViewById(R.id.radio_name);	
+		mRadioName = (RadioButton) findViewById(R.id.radio_name);
 		mRadioName.setOnCheckedChangeListener(mSearchRadioTextType);
 
-		if( savedData.getSearchBy() == SEARCH_ARTICLE ) {
+		if (savedData.getSearchBy() == SEARCH_ARTICLE) {
 
 			mRadioActicule.setChecked(true);
 			mEditSearch.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_NORMAL);
@@ -147,11 +148,10 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 			InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			keyboard.restartInput(mEditSearch);
-		}
-		else if( savedData.getSearchBy() == SEARCH_NAME ) {
+		} else if (savedData.getSearchBy() == SEARCH_NAME) {
 
 			mRadioName.setChecked(true);
-			mEditSearch.setInputType(InputType.TYPE_CLASS_TEXT | 
+			mEditSearch.setInputType(InputType.TYPE_CLASS_TEXT |
 					InputType.TYPE_TEXT_VARIATION_NORMAL | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 
 			mEditSearch.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_SEARCH);
@@ -159,11 +159,10 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 			InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			keyboard.restartInput(mEditSearch);
 
-		}
-		else {
+		} else {
 
 			mRadioVendor.setChecked(true);
-			mEditSearch.setInputType(InputType.TYPE_CLASS_TEXT | 
+			mEditSearch.setInputType(InputType.TYPE_CLASS_TEXT |
 					InputType.TYPE_TEXT_VARIATION_NORMAL | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 
 			mEditSearch.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_SEARCH);
@@ -179,12 +178,12 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 		String searchString = mEditSearch.getText().toString().toUpperCase();
 
-		if( searchString.length() != 0 ) {
+		if (searchString.length() != 0) {
 
 			mSearchListAdapter.setSelectedPosition(-1);
 
 			mSearchListAdapter.changeCursor(Request_Trafiks
-					.RequestNomenclatureBySearchString(mDB, searchString,  getSearchByType(),false));
+					.RequestNomenclatureBySearchString(mDB, searchString, getSearchByType(), false));
 
 			mSearchListAdapter.notifyDataSetChanged();
 		}
@@ -192,15 +191,13 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 	private int getSearchByType() {
 
-		if(mRadioActicule.isChecked()) {
+		if (mRadioActicule.isChecked()) {
 
 			return SEARCH_ARTICLE;
-		}
-		else if(mRadioName.isChecked()) {
+		} else if (mRadioName.isChecked()) {
 
 			return SEARCH_NAME;
-		}
-		else {
+		} else {
 
 			return SEARCH_VENDOR;
 		}
@@ -210,8 +207,8 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-			if( isChecked ){
-				mEditSearch.setInputType(InputType.TYPE_CLASS_TEXT | 
+			if (isChecked) {
+				mEditSearch.setInputType(InputType.TYPE_CLASS_TEXT |
 						InputType.TYPE_TEXT_VARIATION_NORMAL | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 
 				mEditSearch.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_ACTION_SEARCH);
@@ -222,18 +219,18 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 		}
 	};
 
-	private void InitializeSearchListView(){
+	private void InitializeSearchListView() {
 
 		ListView listView = (ListView) findViewById(R.id.list_search);
 
 		mSearchListAdapter = new TrafiksListAdapter(this, null);
 
-		listView.setOnItemClickListener( mOnListItemClick );
+		listView.setOnItemClickListener(mOnListItemClick);
 
 		listView.setAdapter(mSearchListAdapter);
-	}	
+	}
 
-	private void InitializeGroupsListView(){
+	private void InitializeGroupsListView() {
 
 		ExpandableListView listView = (ExpandableListView) findViewById(R.id.list_groups);
 
@@ -245,22 +242,22 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 		listView.setAdapter(mNomenclatureGroupsListAdapter);
 	}
 
-	private void InitializeTrafiksListView(){
+	private void InitializeTrafiksListView() {
 
 		ListView listView = (ListView) findViewById(R.id.list_trafiks);
 
 		mNomenclatureListAdapter = new TrafiksListAdapter(this, null);
 
-		listView.setOnItemClickListener( mOnListItemClick );
+		listView.setOnItemClickListener(mOnListItemClick);
 
 		listView.setAdapter(mNomenclatureListAdapter);
 	}
 
-	OnChildClickListener mOnChildGroupClickListener = new OnChildClickListener(){
+	OnChildClickListener mOnChildGroupClickListener = new OnChildClickListener() {
 
 		@Override
 		public boolean onChildClick(ExpandableListView parent, View v,
-				int groupPosition, int childPosition, long id) {
+									int groupPosition, int childPosition, long id) {
 
 			Cursor cursor = mNomenclatureGroupsListAdapter.getChild(groupPosition, childPosition);
 
@@ -271,18 +268,18 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 	};
 
-	private void UpdateNomenclatureListView( String parentID ) {
+	private void UpdateNomenclatureListView(String parentID) {
 
 		mNomenclatureListAdapter.setSelectedPosition(-1);
 		mNomenclatureListAdapter.changeCursor(Request_Trafiks.RequestNomenclatureByParent(mDB, parentID//
-				,false
-				));
+				, false
+		));
 	}
 
 	private OnItemClickListener mOnListItemClick = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> listView, View view, int position,
-				long arg3) {
+								long arg3) {
 
 			mCurrentListAdapter.setSelectedPosition(position);
 			mCurrentListAdapter.getCursor().moveToPosition(position);
@@ -296,9 +293,9 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 			Intent intent = SetActivityResult();
 
-			if( intent != null ) {
+			if (intent != null) {
 
-				setResult( RESULT_OK, intent );
+				setResult(RESULT_OK, intent);
 
 				finish();
 			}
@@ -307,7 +304,7 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 	private Intent SetActivityResult() {
 
-		if( mCurrentListAdapter.getSelectedPosition() == -1 ) {
+		if (mCurrentListAdapter.getSelectedPosition() == -1) {
 
 			CreateErrorDialog(R.string.msg_error_nomenclature_id).show();
 			return null;
@@ -318,21 +315,21 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 
 		Intent resultIntent = new Intent();
 
-		resultIntent.putExtra( NOMENCLATURE_ID, Request_Trafiks.getIDRRef(cursor) );
-		resultIntent.putExtra( NAIMENOVANIE, Request_Trafiks.getNaimenovanie(cursor) );
-		resultIntent.putExtra( ARTIKUL, Request_Trafiks.getArtikul(cursor) );
-		resultIntent.putExtra( EDINICY_IZMERENIYA_ID, Request_Trafiks.getEdinicyIzmereniyaID(cursor) );
-		resultIntent.putExtra( EDINICY_IZMERENIYA_NAIMENOVANIE, Request_Trafiks.getEdinicyIzmereniyaNaimenovanie(cursor) );
-		resultIntent.putExtra( MIN_NORMA, Request_Trafiks.getMinNorma(cursor) );
-		resultIntent.putExtra( KOEPHICIENT, Request_Trafiks.getKoephphicient(cursor) );
-		
-		resultIntent.putExtra( KOMMENTARIY, mEditComment.getText().toString() );
+		resultIntent.putExtra(NOMENCLATURE_ID, Request_Trafiks.getIDRRef(cursor));
+		resultIntent.putExtra(NAIMENOVANIE, Request_Trafiks.getNaimenovanie(cursor));
+		resultIntent.putExtra(ARTIKUL, Request_Trafiks.getArtikul(cursor));
+		resultIntent.putExtra(EDINICY_IZMERENIYA_ID, Request_Trafiks.getEdinicyIzmereniyaID(cursor));
+		resultIntent.putExtra(EDINICY_IZMERENIYA_NAIMENOVANIE, Request_Trafiks.getEdinicyIzmereniyaNaimenovanie(cursor));
+		resultIntent.putExtra(MIN_NORMA, Request_Trafiks.getMinNorma(cursor));
+		resultIntent.putExtra(KOEPHICIENT, Request_Trafiks.getKoephphicient(cursor));
+
+		resultIntent.putExtra(KOMMENTARIY, mEditComment.getText().toString());
 
 
-		resultIntent.putExtra( COUNT, 
+		resultIntent.putExtra(COUNT,
 				new NomenclatureCountHelper(
-						Request_Trafiks.getMinNorma(cursor), 
-						Request_Trafiks.getKoephphicient(cursor)).ReCalculateCount(0) );
+						Request_Trafiks.getMinNorma(cursor),
+						Request_Trafiks.getKoephphicient(cursor)).ReCalculateCount(0));
 
 		return resultIntent;
 	}
@@ -343,11 +340,10 @@ public class Activity_Trafiks extends Activity_Base implements ITableColumnsName
 		mNomenclatureListAdapter.setSelectedPosition(-1);
 		mSearchListAdapter.setSelectedPosition(-1);
 
-		if( tabSpec.compareToIgnoreCase("tab_search") == 0 ) {
+		if (tabSpec.compareToIgnoreCase("tab_search") == 0) {
 
 			mCurrentListAdapter = mSearchListAdapter;
-		}
-		else if( tabSpec.compareToIgnoreCase("tab_trafiks") == 0 ) {
+		} else if (tabSpec.compareToIgnoreCase("tab_trafiks") == 0) {
 
 			mCurrentListAdapter = mNomenclatureListAdapter;
 		}

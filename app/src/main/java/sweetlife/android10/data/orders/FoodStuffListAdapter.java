@@ -167,7 +167,7 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy()));
 			} else {
 				//int fakt = (int) (100 * (foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice());
-				double fakt = 100*(foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice();
+				double fakt = 100 * (foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice();
 				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy()) + "р.\n" + String.format("%.2f", fakt) + "%");
 				mTextPricewithsale.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize() - 5);
 			}
@@ -255,10 +255,10 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 				ZayavkaPokupatelya_Foodstaff zz1 = (ZayavkaPokupatelya_Foodstaff) o1;
 				ZayavkaPokupatelya_Foodstaff zz2 = (ZayavkaPokupatelya_Foodstaff) o2;
 
-				double fakt1 =  (zz1.getCenaSoSkidkoy() - zz1.getBasePrice()) / zz1.getBasePrice();
-				double fakt2 =  (zz2.getCenaSoSkidkoy() - zz2.getBasePrice()) / zz2.getBasePrice();
+				double fakt1 = (zz1.getCenaSoSkidkoy() - zz1.getBasePrice()) / zz1.getBasePrice();
+				double fakt2 = (zz2.getCenaSoSkidkoy() - zz2.getBasePrice()) / zz2.getBasePrice();
 
-				return (int) (1000 * (fakt1-fakt2));
+				return (int) (1000 * (fakt1 - fakt2));
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}

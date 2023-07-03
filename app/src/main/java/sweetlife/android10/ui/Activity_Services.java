@@ -7,6 +7,7 @@ import sweetlife.android10.utils.Hex;
 
 import sweetlife.android10.ApplicationHoreca;
 import sweetlife.android10.R;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -64,6 +65,7 @@ public class Activity_Services extends Activity_Base implements ITableColumnsNam
 			}
 		});
 	}
+
 	private Cursor RequestDataBaseData() {
 		/*String sqlStr = "select n._id, n.[_IDRRef], n.[Artikul], n.[Naimenovanie], c.Cena "+
 				"from Nomenklatura n "+

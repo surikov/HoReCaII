@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
+
 import java.util.*;
 /*
 import org.apache.http.*;
@@ -22,11 +23,15 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 */
 import android.content.*;
+
 import java.net.*;
+
 import android.view.animation.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
+
 import java.io.*;
 import java.text.*;
 
@@ -36,28 +41,31 @@ public class Preferences {
 	static Hashtable<String, Toggle> toggles = new Hashtable<String, Toggle>();
 	//static Preferences me;
 	static SharedPreferences preferences;
+
 	private Preferences() {
 	}
+
 	public static void init(Context context) {
 		if (preferences == null) {
 			preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		}
 	}
+
 	public static void save() {
 		try {
 			//System.out.println("save preferences");
 			SharedPreferences.Editor editor = preferences.edit();
-			for (Enumeration<String> e = integers.keys(); e.hasMoreElements();) {
+			for (Enumeration<String> e = integers.keys(); e.hasMoreElements(); ) {
 				String k = e.nextElement();
 				editor.putInt(k, integers.get(k).value().intValue());
 				//System.out.println("save preference: "+k+"="+integers.get(k).value().intValue());
 			}
-			for (Enumeration<String> e = strings.keys(); e.hasMoreElements();) {
+			for (Enumeration<String> e = strings.keys(); e.hasMoreElements(); ) {
 				String k = e.nextElement();
 				editor.putString(k, strings.get(k).value());
 				//System.out.println("save preference: "+k+"="+integers.get(k).value().intValue());
 			}
-			for (Enumeration<String> e = toggles.keys(); e.hasMoreElements();) {
+			for (Enumeration<String> e = toggles.keys(); e.hasMoreElements(); ) {
 				String k = e.nextElement();
 				editor.putBoolean(k, toggles.get(k).value());
 				//System.out.println("save preference: "+k+"="+integers.get(k).value().intValue());
@@ -67,6 +75,7 @@ public class Preferences {
 			t.printStackTrace();
 		}
 	}
+
 	public static Numeric integer(String name, int minValue, int defaultValue, int maxValue) {
 		Numeric n = integer(name, defaultValue);
 		if (n.value() < minValue) {
@@ -77,6 +86,7 @@ public class Preferences {
 		}
 		return n;
 	}
+
 	public static Numeric integer(String name, int defaultValue) {
 		//System.out.println("read preference: "+name);
 		Numeric n = integers.get(name);
@@ -88,6 +98,7 @@ public class Preferences {
 		}
 		return n;
 	}
+
 	public static Note string(String name, String defaultValue) {
 		Note n = strings.get(name);
 		if (n == null) {
@@ -97,6 +108,7 @@ public class Preferences {
 		}
 		return n;
 	}
+
 	public static Toggle toggle(String name, boolean defaultValue) {
 		Toggle n = toggles.get(name);
 		if (n == null) {

@@ -136,7 +136,7 @@ public class ActivityMenuKlienta extends Activity {
 			String Recipes = "";
 			for (int i = 0; i < dataItems.child("document").children.size(); i++) {
 				if (dataItems.child("document").children.get(i).name.property.value().equals("Recipes")) {
-					String idrref=dataItems.child("document").children.get(i).value.property.value();
+					String idrref = dataItems.child("document").children.get(i).value.property.value();
 					String sql = "select naimenovanie as naimenovanie from receptii where _idrref="
 							+ dataItems.child("document").children.get(i).value.property.value() + ";";
 					Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -255,7 +255,7 @@ I/System.out: </>
 	public void flipItemsGrid() {
 		itemsGrid.clearColumns();
 		if (dataItems != null) {
-			System.out.println("dataItems "+dataItems.dumpXML());
+			System.out.println("dataItems " + dataItems.dumpXML());
 			for (int i = 0; i < dataItems.child("document").children.size(); i++) {
 				final int nn = i;
 				Task tap = new Task() {

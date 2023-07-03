@@ -1,86 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="10dip" >
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_margin="10dip">
 
-    <Button
-        android:id="@+id/btn_balance"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="@string/partner_balance" />
+	<Button
+		android:id="@+id/btn_balance"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_centerHorizontal="true"
+		android:text="@string/partner_balance" />
 
-    <Button
-        android:id="@+id/btn_statistics"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_balance"
-        android:layout_centerHorizontal="true"
-        android:text="@string/orders_statistics" />
+	<Button
+		android:id="@+id/btn_statistics"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_balance"
+		android:layout_centerHorizontal="true"
+		android:text="@string/orders_statistics" />
 
-    <Button
-        android:id="@+id/btn_order_state"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_statistics"
-        android:layout_centerHorizontal="true"
-        android:text="@string/order_states" />
+	<Button
+		android:id="@+id/btn_order_state"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_statistics"
+		android:layout_centerHorizontal="true"
+		android:text="@string/order_states" />
 
-    <Button
-        android:id="@+id/btn_distribution"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_order_state"
-        android:layout_centerHorizontal="true"
-        android:text="@string/distribution" />
+	<Button
+		android:id="@+id/btn_distribution"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_order_state"
+		android:layout_centerHorizontal="true"
+		android:text="@string/distribution" />
 
-    <Button
-        android:id="@+id/btn_trafiks"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_distribution"
-        android:layout_centerHorizontal="true"
-        android:text="@string/trafiks" />
+	<Button
+		android:id="@+id/btn_trafiks"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_distribution"
+		android:layout_centerHorizontal="true"
+		android:text="@string/trafiks" />
 
-    <Button
-        android:id="@+id/btn_disposal_states"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_trafiks"
-        android:layout_centerHorizontal="true"
-        android:text="@string/disposal_states" />
+	<Button
+		android:id="@+id/btn_disposal_states"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_trafiks"
+		android:layout_centerHorizontal="true"
+		android:text="@string/disposal_states" />
 
-    <Button
-        android:id="@+id/btn_fixed_prices"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_disposal_states"
-        android:layout_centerHorizontal="true"
-        android:text="@string/fixed_prices" />
+	<Button
+		android:id="@+id/btn_fixed_prices"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_disposal_states"
+		android:layout_centerHorizontal="true"
+		android:text="@string/fixed_prices" />
 
-    <Button
-        android:id="@+id/btn_kpi"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_fixed_prices"
-        android:layout_centerHorizontal="true"
-        android:text="@string/kpi" />
+	<Button
+		android:id="@+id/btn_kpi"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_fixed_prices"
+		android:layout_centerHorizontal="true"
+		android:text="@string/kpi" />
 
-    <Button
-        android:id="@+id/btn_drivers"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_kpi"
-        android:layout_centerHorizontal="true"
-        android:text="@string/drivers_delivery" />
-    
-    <Button
-        android:id="@+id/btn_PredzakazTrafik"
-        android:layout_width="500dip"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_drivers"
-        android:layout_centerHorizontal="true"
-        android:text="Предзаказы на трафики" />
+	<Button
+		android:id="@+id/btn_drivers"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_kpi"
+		android:layout_centerHorizontal="true"
+		android:text="@string/drivers_delivery" />
+
+	<Button
+		android:id="@+id/btn_PredzakazTrafik"
+		android:layout_width="500dip"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/btn_drivers"
+		android:layout_centerHorizontal="true"
+		android:text="Предзаказы на трафики" />
 
 </RelativeLayout>

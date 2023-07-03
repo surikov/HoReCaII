@@ -1,6 +1,7 @@
 package reactive.ui;
 
 import tee.binding.properties.*;
+
 import android.view.*;
 import android.app.Activity;
 import android.content.*;
@@ -9,8 +10,10 @@ import android.graphics.Rect;
 import android.os.*;
 import android.util.*;
 import android.widget.*;
+
 import java.io.File;
 import java.util.*;
+
 import tee.binding.task.*;
 import tee.binding.it.*;
 
@@ -37,7 +40,7 @@ public class DataGrid2 extends SubLayoutless {
 	private SubLayoutless header;
 	private SubLayoutless footer;
 
-	public int extraRowScrollCount=5;
+	public int extraRowScrollCount = 5;
 
 	public DataGrid2(Context context) {
 		super(context);
@@ -114,6 +117,7 @@ public class DataGrid2 extends SubLayoutless {
 			return;
 		}
 		if (columnsArray.length > 0) {
+			//System.out.println("DataGrid2.append");
 			lockAppend = true;
 			scrollView.setOverScrollMode(OVER_SCROLL_NEVER);
 			for (int y = 0; y < columnsArray[0].count() && y < pageSize.property.value(); y++) {
@@ -152,9 +156,17 @@ public class DataGrid2 extends SubLayoutless {
 			scrollView.setOverScrollMode(OVER_SCROLL_IF_CONTENT_SCROLLS);
 		}
 	}
-
-	public void tapColumnRow(int row, int column) {
+	public void highlight(int row){
 		for (int x = 0; x < columnsArray.length; x++) {
+			//System.out.println(""+x+": "+columnsArray[x].title.property.value()+" tapColumnRow "+row+"x"+column);
+			//columnsArray[x].clear();
+			columnsArray[x].showHighlight(row);
+		}
+	}
+	public void tapColumnRow(int row, int column) {
+		//System.out.println("tapColumnRow "+row+"x"+column);
+		for (int x = 0; x < columnsArray.length; x++) {
+			//System.out.println(""+x+": "+columnsArray[x].title.property.value()+" tapColumnRow "+row+"x"+column);
 			columnsArray[x].highlight(row);
 		}
 		if (column < columnsArray.length) {
@@ -191,7 +203,7 @@ public class DataGrid2 extends SubLayoutless {
 	}
 
 	public void flipPrev() {
-		System.out.println("flipPrev currentPage " + dataOffset.property.value());
+		//System.out.println("flipPrev currentPage " + dataOffset.property.value());
 		double off = dataOffset.property.value() - pageSize.property.value();
 		if (pageSize.property.value() > extraRowScrollCount) off = off + extraRowScrollCount;
 		if (off < 0) {

@@ -1,14 +1,16 @@
 package sweetlife.android10.supervisor;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
+import android.app.*;
+import android.content.*;
+import android.os.*;
 import android.os.Environment;
+import android.view.Menu;
+import android.view.*;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
+import java.io.*;
+import java.text.*;
 
-import reactive.ui.Auxiliary;
+import reactive.ui.*;
 import reactive.ui.Column;
 import reactive.ui.ColumnDescription;
 import reactive.ui.DataGrid;
@@ -21,6 +23,7 @@ public class Activity_FireBaseMessages extends Activity {
 	Layoutless layoutless;
 	Bough data;
 	ColumnDescription kod;
+	MenuItem menuRegisterDevice1c;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +42,22 @@ public class Activity_FireBaseMessages extends Activity {
 		);
 		fillData();
 	}
-
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menuRegisterDevice1c = menu.add("Проверить соединение");
+		return true;
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item == menuRegisterDevice1c) {
+			doRegisterDevice1c();
+		}
+		return true;
+	}
+	void doRegisterDevice1c(){
+		//Context c;
+		Cfg.requeryFirebaseToken(this);
+	}
 	void deleteOldFiles(File folder) {
 		File[] files = folder.listFiles();
 		for (int i = 0; i < files.length; i++) {

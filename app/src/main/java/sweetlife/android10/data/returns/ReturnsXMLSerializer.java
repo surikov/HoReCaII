@@ -44,6 +44,7 @@ public class ReturnsXMLSerializer implements IXMLSerializer {
 		mZayavka = zayavka;
 		mReturnsNomenclatureData = new ReturnsNomenclatureData(db, mZayavka);
 	}
+
 	@Override
 	public String SerializeXML() throws IllegalArgumentException, IllegalStateException, IOException {
 		XmlSerializer serializer = Xml.newSerializer();
@@ -68,6 +69,7 @@ public class ReturnsXMLSerializer implements IXMLSerializer {
 		//System.out.println("ReturnsXMLSerializer "+writer.toString());
 		return writer.toString();
 	}
+
 	private void SerializeZayavkaNaVozvrat(XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startTag(null, TAG_HEADER_DOC);
 		serializer.attribute(null, ATR_COD_CLIENT, mZayavka.getClientKod());
@@ -81,14 +83,26 @@ public class ReturnsXMLSerializer implements IXMLSerializer {
 		serializer.endTag(null, TAG_HELD);
 		serializer.endTag(null, TAG_HEADER_DOC);
 	}
+
 	private void SerializeZayavkaNaVozvrat_Tovary(XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startTag(null, TAG_TP_DOC);
 		int count = mReturnsNomenclatureData.getCount();
 		ZayavkaNaVozvrat_Tovary tovar = null;
 		for (int i = 0; i < count; i++) {
 			tovar = mReturnsNomenclatureData.getNomenclature(i);
+
+			int prichina = tovar.getPrichina();
+			int TovarnyVid = 0;
+			if (prichina >= 100) {
+				prichina = prichina - 100;
+				TovarnyVid = 1;
+			}
+
 			serializer.startTag(null, TAG_STRING_TP);
+			serializer.attribute(null, "TovarnyVid", ("" + TovarnyVid));
+
 			serializer.attribute(null, ATR_DATE_NAC, DateTimeHelper.SQLDateString(tovar.getDataNakladnoy().getTime()));
+
 			serializer.attribute(null, ATR_NUMBER_NAC, tovar.getNomerNakladnoy());
 			serializer.startTag(null, TAG_ARTICLE);
 			serializer.text(tovar.getArtikul());
@@ -97,7 +111,9 @@ public class ReturnsXMLSerializer implements IXMLSerializer {
 			serializer.text(DecimalFormatHelper.format3(tovar.getKolichestvo()));
 			serializer.endTag(null, TAG_QUANTITY);
 			serializer.startTag(null, TAG_PRIM);
-			serializer.text(String.valueOf(tovar.getPrichina()));
+			//serializer.text(String.valueOf(tovar.getPrichina()));
+			serializer.text(String.valueOf(prichina));
+
 			serializer.endTag(null, TAG_PRIM);
 			/*
 			String path = mZayavka.getAktPretenziyPath();
@@ -127,13 +143,13 @@ public class ReturnsXMLSerializer implements IXMLSerializer {
 
 		String fileName = CameraCaptureHelper.getFileName(path);
 		if (fileName.length() != 0) {
-			String encodedFile="";
-			String rash=".txt";
-			try{
-				encodedFile=Base64.encodeToString(SystemHelper.readBytesFromFile(new File(path)), Base64.DEFAULT);
+			String encodedFile = "";
+			String rash = ".txt";
+			try {
+				encodedFile = Base64.encodeToString(SystemHelper.readBytesFromFile(new File(path)), Base64.DEFAULT);
 				String[] nameSplit = path.split("[.]");
-				rash="."+nameSplit[nameSplit.length-1];				
-			}catch(Throwable t){
+				rash = "." + nameSplit[nameSplit.length - 1];
+			} catch (Throwable t) {
 				t.printStackTrace();
 			}
 			serializer.startTag(null, "m:tpString");
@@ -142,7 +158,7 @@ public class ReturnsXMLSerializer implements IXMLSerializer {
 			serializer.endTag(null, "m:File");
 			serializer.startTag(null, "m:rassh");
 			serializer.text(rash);
-			serializer.endTag(null, "m:rassh");			
+			serializer.endTag(null, "m:rassh");
 			serializer.endTag(null, "m:tpString");
 		}
 		serializer.endTag(null, "m:tpFile");

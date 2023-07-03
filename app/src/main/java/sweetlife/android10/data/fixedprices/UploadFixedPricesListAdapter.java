@@ -19,45 +19,45 @@ import android.widget.TextView;
 import sweetlife.android10.R;
 
 public class UploadFixedPricesListAdapter extends ZoomListCursorAdapter {
-	
-	private ArrayList<Boolean> mStateList = new ArrayList<Boolean>(); 
+
+	private ArrayList<Boolean> mStateList = new ArrayList<Boolean>();
 
 	private IStateChanged mStateChangedHandler;
-	
-	public UploadFixedPricesListAdapter(Context context, Cursor cursor, IStateChanged stateChangedHandler ) {
+
+	public UploadFixedPricesListAdapter(Context context, Cursor cursor, IStateChanged stateChangedHandler) {
 		super(context, cursor);
 
 		mStateChangedHandler = stateChangedHandler;
 
-		if( cursor.moveToFirst() ) {
+		if (cursor.moveToFirst()) {
 
 			int count = cursor.getCount();
 
-			for( int i = 0; i < count; i++ ) {
+			for (int i = 0; i < count; i++) {
 
-				mStateList.add( new Boolean(true));
+				mStateList.add(new Boolean(true));
 			}
 		}
 	}
 
 	@Override
 	public void changeCursor(Cursor cursor) {
-	
+
 		mStateList.clear();
-		
-		if( cursor.moveToFirst() ) {
+
+		if (cursor.moveToFirst()) {
 
 			int count = cursor.getCount();
 
-			for( int i = 0; i < count; i++ ) {
+			for (int i = 0; i < count; i++) {
 
-				mStateList.add( new Boolean(true));
+				mStateList.add(new Boolean(true));
 			}
 		}
-		
+
 		super.changeCursor(cursor);
 	}
-	
+
 	public void finallize() {
 
 		mStateList.clear();
@@ -71,9 +71,9 @@ public class UploadFixedPricesListAdapter extends ZoomListCursorAdapter {
 	@Override
 	public void bindView(View row, Context context, Cursor cursor) {
 
-		BidHolder holder = (BidHolder)row.getTag();
+		BidHolder holder = (BidHolder) row.getTag();
 
-		holder.populateFrom( cursor, cursor.getPosition() );
+		holder.populateFrom(cursor, cursor.getPosition());
 	}
 
 	@Override
@@ -81,48 +81,47 @@ public class UploadFixedPricesListAdapter extends ZoomListCursorAdapter {
 
 		View row = LayoutInflater.from(context).inflate(R.layout.row_fixed_prices_upload, view, false);
 
-		BidHolder holder = new BidHolder(row);	
+		BidHolder holder = new BidHolder(row);
 
 		row.setTag(holder);
 
-		return(row);
+		return (row);
 	}
 
 	public class BidHolder {
 
-		private TextView mTextNumber=null;
-		private TextView mTextDate=null;
-		private TextView mTextKontragent=null;
-		private TextView mTextComment=null;
-		private TextView mTextBeginDate=null;
-		private TextView mTextEndDate=null;
-		public  ImageView mState	 	 = null;
+		private TextView mTextNumber = null;
+		private TextView mTextDate = null;
+		private TextView mTextKontragent = null;
+		private TextView mTextComment = null;
+		private TextView mTextBeginDate = null;
+		private TextView mTextEndDate = null;
+		public ImageView mState = null;
 
-		BidHolder(View row) { 
+		BidHolder(View row) {
 
-			mTextNumber       = (TextView)row.findViewById(R.id.text_number);
-			mTextDate         = (TextView)row.findViewById(R.id.text_date);
-			mTextComment       = (TextView)row.findViewById(R.id.text_comment);
-			mTextKontragent       = (TextView)row.findViewById(R.id.text_kontragent);
-			mTextBeginDate       = (TextView)row.findViewById(R.id.text_date_since);
-			mTextEndDate = (TextView)row.findViewById(R.id.text_date_till);
-			mState	 		= (ImageView)row.findViewById(R.id.image_upload);
+			mTextNumber = (TextView) row.findViewById(R.id.text_number);
+			mTextDate = (TextView) row.findViewById(R.id.text_date);
+			mTextComment = (TextView) row.findViewById(R.id.text_comment);
+			mTextKontragent = (TextView) row.findViewById(R.id.text_kontragent);
+			mTextBeginDate = (TextView) row.findViewById(R.id.text_date_since);
+			mTextEndDate = (TextView) row.findViewById(R.id.text_date_till);
+			mState = (ImageView) row.findViewById(R.id.image_upload);
 
 			mState.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View view) {
 
-					ImageView imState = (ImageView)view;
+					ImageView imState = (ImageView) view;
 
-					if( mStateList.get( (Integer)mState.getTag()) ) {
+					if (mStateList.get((Integer) mState.getTag())) {
 
 						imState.setImageResource(android.R.drawable.checkbox_off_background);
-						mStateList.set((Integer)mState.getTag(), false);
-					}
-					else {
+						mStateList.set((Integer) mState.getTag(), false);
+					} else {
 
 						imState.setImageResource(android.R.drawable.checkbox_on_background);
-						mStateList.set((Integer)mState.getTag(), true);
+						mStateList.set((Integer) mState.getTag(), true);
 					}
 
 					mStateChangedHandler.onChange();
@@ -130,7 +129,7 @@ public class UploadFixedPricesListAdapter extends ZoomListCursorAdapter {
 			});
 		}
 
-		void populateFrom(Cursor cursor, int position ) {
+		void populateFrom(Cursor cursor, int position) {
 
 			float rowTextFontSize = getRowTextFontSize();
 
@@ -139,36 +138,34 @@ public class UploadFixedPricesListAdapter extends ZoomListCursorAdapter {
 
 			mTextDate.setText(DateTimeHelper.UIDateString(Request_FixedPrices.getData(cursor)));
 			mTextDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
+
 			mTextKontragent.setText(Request_FixedPrices.getKontragentNaimanovanie(cursor));
 			mTextKontragent.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
+
 			mTextComment.setText(Request_FixedPrices.getKommentariy(cursor));
 			mTextComment.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
+
 			mTextBeginDate.setText(DateTimeHelper.UIDateString(Request_FixedPrices.getVremyaNachalaSkidkiPhiksCen(cursor)));
 			mTextBeginDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
+
 			mTextEndDate.setText(DateTimeHelper.UIDateString(Request_FixedPrices.getVremyaOkonchaniyaSkidkiPhiksCen(cursor)));
 			mTextEndDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
 
-			if( mStateList.size() == cursor.getCount() ) {
+			if (mStateList.size() == cursor.getCount()) {
 
-				if( mStateList.get(position) ) {
+				if (mStateList.get(position)) {
 
 					mState.setImageResource(android.R.drawable.checkbox_on_background);
-				}
-				else {
+				} else {
 
-					mState.setImageResource(android.R.drawable.checkbox_off_background);				
+					mState.setImageResource(android.R.drawable.checkbox_off_background);
 				}
-			}
-			else {
+			} else {
 
 				mState.setImageResource(android.R.drawable.checkbox_on_background);
 			}
 
-			mState.setTag( new Integer(position) );
+			mState.setTag(new Integer(position));
 		}
 	}
 }

@@ -2,6 +2,7 @@ package reactive.ui;
 
 import tee.binding.properties.NumericProperty;
 import tee.binding.task.Task;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -11,7 +12,7 @@ public class SketchContour extends Sketch {
 	public NumericProperty<SketchContour> height = new NumericProperty<SketchContour>(this);
 	public NumericProperty<SketchContour> left = new NumericProperty<SketchContour>(this);
 	public NumericProperty<SketchContour> top = new NumericProperty<SketchContour>(this);
-	
+
 	public NumericProperty<SketchContour> strokeColor = new NumericProperty<SketchContour>(this);
 	public NumericProperty<SketchContour> strokeWidth = new NumericProperty<SketchContour>(this);
 	public NumericProperty<SketchContour> arcX = new NumericProperty<SketchContour>(this);
@@ -34,6 +35,7 @@ public class SketchContour extends Sketch {
 		arcX.property.unbind();
 		arcY.property.unbind();
 	}
+
 	//Paint paint = new Paint();
 	public SketchContour() {
 		//paint.property.value(new Paint());
@@ -71,6 +73,7 @@ public class SketchContour extends Sketch {
 		arcY.property.afterChange(postInvalidate);
 		//paint.property.afterChange(postInvalidate);
 	}
+
 	public void draw(Canvas canvas) {
 		//System.out.println("draw "+paint.property.value().getColor());
 		int w = width.property.value().intValue();
@@ -92,5 +95,7 @@ public class SketchContour extends Sketch {
 				, arcX.property.value().floatValue()//
 				, arcY.property.value().floatValue()//
 				, paint);
-	};
+	}
+
+	;
 }

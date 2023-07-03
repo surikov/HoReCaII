@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 https://stackoverflow.com/questions/69335670/cant-send-http-with-axios-even-set-androidusescleartexttraffic-true-and-netw
 -->
 <network-security-config>
-	<base-config cleartextTrafficPermitted="true">
-	</base-config>
+	<base-config cleartextTrafficPermitted="true"></base-config>
 </network-security-config>

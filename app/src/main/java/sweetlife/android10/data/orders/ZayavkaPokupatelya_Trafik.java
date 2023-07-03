@@ -1,9 +1,11 @@
 package sweetlife.android10.data.orders;
 
 import java.util.Date;
+
 import sweetlife.android10.data.common.NomenclatureBasedCountItem;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.Hex;
+
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -11,6 +13,7 @@ public class ZayavkaPokupatelya_Trafik extends NomenclatureBasedCountItem {
 	private Date mData;
 	private String mKommentariy;
 	public boolean vetSpravka = false;
+
 	public ZayavkaPokupatelya_Trafik(int _id//
 			, int nomerStroki//
 			, String nomenklaturaID//
@@ -18,14 +21,14 @@ public class ZayavkaPokupatelya_Trafik extends NomenclatureBasedCountItem {
 			, String nomenklaturaNaimenovanie//
 			, String zayavka//
 			, String edinicaIzmereniyaID,//
-			String edinicaIzmereniyaName//
+									 String edinicaIzmereniyaName//
 			, double kolichestvo//
 			, Date data//
 			, String kommentariy//
 			, double minNorma//
 			, double koefMest//
 			, boolean New//, String skidkaProcent//
-			//, String skidkaNaimenovanie//
+									 //, String skidkaNaimenovanie//
 			, boolean vSpravka) {
 		super(_id//
 				, nomerStroki//
@@ -39,12 +42,13 @@ public class ZayavkaPokupatelya_Trafik extends NomenclatureBasedCountItem {
 				, edinicaIzmereniyaName//
 				, kolichestvo//
 				, New//,skidkaProcent
-																																											//,skidkaNaimenovanie
+				//,skidkaNaimenovanie
 		);
-		vetSpravka=vSpravka;
+		vetSpravka = vSpravka;
 		mData = data;
 		mKommentariy = kommentariy;
 	}
+
 	@Override
 	public void setToDataBase(SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
@@ -59,8 +63,7 @@ public class ZayavkaPokupatelya_Trafik extends NomenclatureBasedCountItem {
 			values.put("_ZayavkaPokupatelyaIskhodyaschaya_IDRRef", Hex.decodeHexWithPrefix(mZayavka_IDRRef));
 			m_id = (int) db.insert("ZayavkaPokupatelyaIskhodyaschaya_Traphiki", null, values);
 			mNew = false;
-		}
-		else {
+		} else {
 			values.put("Kolichestvo", mKolichestvo);
 			values.put("Data", DateTimeHelper.SQLDateString(mData));
 			values.put("Kommentariy", mKommentariy);
@@ -68,15 +71,19 @@ public class ZayavkaPokupatelya_Trafik extends NomenclatureBasedCountItem {
 			db.update("ZayavkaPokupatelyaIskhodyaschaya_Traphiki", values, "_id=" + String.valueOf(m_id), null);
 		}
 	}
+
 	public Date getData() {
 		return mData;
 	}
+
 	public void setData(Date data) {
 		mData = data;
 	}
+
 	public String getKommentariy() {
 		return mKommentariy;
 	}
+
 	public void setKommentariy(String kommentariy) {
 		mKommentariy = kommentariy;
 	}

@@ -18,20 +18,20 @@ import android.widget.TextView;
 
 @SuppressWarnings("rawtypes")
 public class ContractsAdapter extends ArrayAdapter {
-	
+
 	private ArrayList<ContractInfo> mData = new ArrayList<ContractInfo>();
-	
+
 	private int mPosition = 0;
-	String clientID="";
+	String clientID = "";
 	private SQLiteDatabase mDB;
 
-	public ContractsAdapter( SQLiteDatabase db, Context context, int resource, String clientID ) {
-		super(context,resource );
-		this.clientID=clientID;
+	public ContractsAdapter(SQLiteDatabase db, Context context, int resource, String clientID) {
+		super(context, resource);
+		this.clientID = clientID;
 		mDB = db;
-		
-		Request_Contracts requestContracts = new Request_Contracts( mDB, clientID );
-		
+
+		Request_Contracts requestContracts = new Request_Contracts(mDB, clientID);
+
 		mData = requestContracts.getContractsList();
 	}
 
@@ -40,20 +40,19 @@ public class ContractsAdapter extends ArrayAdapter {
 		TextView view = null;
 
 		if (convertView == null) {
-			
-			convertView = (View)LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_item, null );
+
+			convertView = (View) LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_item, null);
 		}
 
 		view = (TextView) convertView.findViewById(android.R.id.text1);
-		view.setText( mData.get(position).getNaimenovanie() );
+		view.setText(mData.get(position).getNaimenovanie());
 		//LogHelper.debug(this.getClass().getCanonicalName()+ ".getView "+position+": "+mData.get(position).getNaimenovanie());
-		if( 
-				mData.get(position).isClosed() ) {
-			
+		if (
+				mData.get(position).isClosed()) {
+
 			view.setTextColor(Color.RED);
-		}
-		else {
-			
+		} else {
+
 			view.setTextColor(Color.BLACK);
 		}
 		//view.setTextColor(Color.MAGENTA);
@@ -64,23 +63,22 @@ public class ContractsAdapter extends ArrayAdapter {
 
 	@Override
 	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-		
+
 		TextView view = null;
 
 		if (convertView == null) {
-			
-			convertView = (View)LayoutInflater.from(getContext()).inflate(R.layout.spinner_elem, null );
+
+			convertView = (View) LayoutInflater.from(getContext()).inflate(R.layout.spinner_elem, null);
 		}
 
 		view = (TextView) convertView.findViewById(android.R.id.text1);
-		view.setText( mData.get(position).getNaimenovanie() );
+		view.setText(mData.get(position).getNaimenovanie());
 		//LogHelper.debug(this.getClass().getCanonicalName()+ ".getDropDownView "+position+": "+mData.get(position).getNaimenovanie());
-		if( mData.get(position).isClosed() ) {
-			
+		if (mData.get(position).isClosed()) {
+
 			view.setTextColor(Color.RED);
-		}
-		else {
-			
+		} else {
+
 			view.setTextColor(Color.BLACK);
 		}
 
@@ -89,7 +87,7 @@ public class ContractsAdapter extends ArrayAdapter {
 
 	@Override
 	public int getCount() {
-		
+
 		return mData.size();
 	}
 
@@ -97,16 +95,16 @@ public class ContractsAdapter extends ArrayAdapter {
 		//LogHelper.debug(this.getClass().getCanonicalName()+" getSelectedItem "+mPosition +" of "+mData.size()+" for "+clientID);
 		return mData.get(mPosition);
 	}
-	
-	public void setPosition( int position ) {
-		
+
+	public void setPosition(int position) {
+
 		mPosition = position;
 	}
 
 
 	@Override
-	public Object getItem( int position ) {
-		
+	public Object getItem(int position) {
+
 		return mData.get(position);
 	}
 }

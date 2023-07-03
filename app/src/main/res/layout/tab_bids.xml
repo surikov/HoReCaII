@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="#E3E3E3" >
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:background="#E3E3E3">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical" >
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_above="@+id/layout_add"
-            android:layout_alignParentTop="true" >
+		<RelativeLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_above="@+id/layout_add"
+			android:layout_alignParentTop="true">
 
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
+			<RelativeLayout
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent">
 
-                <include
-                    android:id="@+id/list_header"
-                    android:layout_width="fill_parent"
-                    layout="@layout/header_bids" />
+				<include
+					android:id="@+id/list_header"
+					android:layout_width="fill_parent"
+					layout="@layout/header_bids" />
 
-                <ListView
-                    android:id="@+id/list_bids"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_below="@+id/list_header"
-                    android:cacheColorHint="#00000000" />
-            </RelativeLayout>
-        </RelativeLayout>
+				<ListView
+					android:id="@+id/list_bids"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:layout_below="@+id/list_header"
+					android:cacheColorHint="#00000000" />
+			</RelativeLayout>
+		</RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/layout_add"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" >
+		<RelativeLayout
+			android:id="@+id/layout_add"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true">
 
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="5dip"
-                android:orientation="horizontal" >
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:layout_centerVertical="true"
+				android:layout_marginLeft="5dip"
+				android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/btn_beginvisit"
-                    android:layout_width="250dip"
-                    android:layout_height="wrap_content"
-                    android:text="@string/visit_begin" />
+				<Button
+					android:id="@+id/btn_beginvisit"
+					android:layout_width="250dip"
+					android:layout_height="wrap_content"
+					android:text="@string/visit_begin" />
 
-                <Button
-                    android:id="@+id/btn_endvisit"
-                    android:layout_width="250dip"
-                    android:layout_height="wrap_content"
-                    android:text="@string/visit_end" />
+				<Button
+					android:id="@+id/btn_endvisit"
+					android:layout_width="250dip"
+					android:layout_height="wrap_content"
+					android:text="@string/visit_end" />
 
-                <TextView
-                    android:id="@+id/amount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="  Доступная сумма заказа  "
-                    android:visibility="gone" />
+				<TextView
+					android:id="@+id/amount"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_centerVertical="true"
+					android:text="  Доступная сумма заказа  "
+					android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/text_total"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:visibility="gone" />
-            </LinearLayout>
+				<TextView
+					android:id="@+id/text_total"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_centerVertical="true"
+					android:visibility="gone" />
+			</LinearLayout>
 
-            <Button
-                android:id="@+id/btn_add"
-                android:layout_width="250dip"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="@string/new_order" />
-        </RelativeLayout>
-    </RelativeLayout>
+			<Button
+				android:id="@+id/btn_add"
+				android:layout_width="250dip"
+				android:layout_height="wrap_content"
+				android:layout_alignParentRight="true"
+				android:text="@string/new_order" />
+		</RelativeLayout>
+	</RelativeLayout>
 
 </FrameLayout>

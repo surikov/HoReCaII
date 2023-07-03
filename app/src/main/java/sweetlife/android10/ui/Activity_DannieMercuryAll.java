@@ -1,4 +1,5 @@
 package sweetlife.android10.ui;
+
 import android.app.*;
 import android.content.*;
 import android.database.sqlite.*;
@@ -11,6 +12,7 @@ import sweetlife.android10.supervisor.Cfg;
 import tee.binding.*;
 import tee.binding.it.*;
 import tee.binding.task.Task;
+
 public class Activity_DannieMercuryAll extends Activity {
 	Layoutless layoutless;
 	ColumnDescription columnWhoGuid;
@@ -21,6 +23,7 @@ public class Activity_DannieMercuryAll extends Activity {
 	Bough data;
 	MenuItem menuDobavit;
 	Numeric sel = new Numeric();
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		layoutless = new Layoutless(this);
@@ -29,6 +32,7 @@ public class Activity_DannieMercuryAll extends Activity {
 		composeGUI();
 		requery();
 	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -36,6 +40,7 @@ public class Activity_DannieMercuryAll extends Activity {
 		requery();
 		grid.refresh();
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item == menuDobavit) {
@@ -43,17 +48,20 @@ public class Activity_DannieMercuryAll extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuDobavit = menu.add("Добавить");
 		return true;
 	}
-	void openOne(String id){
+
+	void openOne(String id) {
 		Intent intent = new Intent();
 		intent.putExtra("id", "" + id);
 		intent.setClass(Activity_DannieMercuryAll.this, Activity_DannieMercuryOne.class);
 		Activity_DannieMercuryAll.this.startActivity(intent);
 	}
+
 	void promptiDobavit() {
 		String[] names = new String[Cfg.kontragenty().children.size()];
 		for (int i = 0; i < Cfg.kontragenty().children.size(); i++) {
@@ -68,7 +76,7 @@ public class Activity_DannieMercuryAll extends Activity {
 				//System.out.println(sql);
 
 				long inserted = statement.executeInsert();
-				openOne(""+inserted);
+				openOne("" + inserted);
 				/*
 				Intent intent = new Intent();
 				intent.putExtra("id", "" + id);
@@ -78,11 +86,12 @@ public class Activity_DannieMercuryAll extends Activity {
 			}
 		}, null, null, null, null);
 	}
+
 	void requery() {
-		String sql="select DannieMercury._id as id,comment,klient,guid,file,saved,kontragenty.naimenovanie as naimenovanie"//
-				+" from DannieMercury"//
-				+" join kontragenty on kontragenty.kod=DannieMercury.klient"//
-				+" order by kontragenty.naimenovanie,comment"//
+		String sql = "select DannieMercury._id as id,comment,klient,guid,file,saved,kontragenty.naimenovanie as naimenovanie"//
+				+ " from DannieMercury"//
+				+ " join kontragenty on kontragenty.kod=DannieMercury.klient"//
+				+ " order by kontragenty.naimenovanie,comment"//
 				+ " limit " + (pageSize * 3) + " offset " + gridOffset.value().intValue()//
 				;
 		//System.out.println(sql);
@@ -90,17 +99,18 @@ public class Activity_DannieMercuryAll extends Activity {
 		for (int i = 0; i < data.children.size(); i++) {
 			Bough row = data.children.get(i);
 			//System.out.println(row.dumpXML());
-			final String id=row.child("id").value.property.value();
+			final String id = row.child("id").value.property.value();
 			Task tap = new Task() {
 				@Override
 				public void doTask() {
-					openOne(""+id);
+					openOne("" + id);
 				}
 			};
-			columnWhoGuid.cell(row.child("naimenovanie").value.property.value(), tap,row.child("guid").value.property.value());
-			columnFileComment.cell(row.child("file").value.property.value(), tap,row.child("comment").value.property.value());
+			columnWhoGuid.cell(row.child("naimenovanie").value.property.value(), tap, row.child("guid").value.property.value());
+			columnFileComment.cell(row.child("file").value.property.value(), tap, row.child("comment").value.property.value());
 		}
 	}
+
 	void composeGUI() {
 		columnWhoGuid = new ColumnDescription();
 		columnFileComment = new ColumnDescription();

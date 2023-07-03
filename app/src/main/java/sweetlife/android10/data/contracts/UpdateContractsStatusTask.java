@@ -18,16 +18,16 @@ import android.os.Bundle;
 
 public class UpdateContractsStatusTask extends ManagedAsyncTask<Integer> {
 
-	private int TIMEOUT = 300*1000;
+	private int TIMEOUT = 300 * 1000;
 
 	public static int SUCCESS = 0;
 	public static int ERROR = 1;
 
-	private SQLiteDatabase   mDB;
+	private SQLiteDatabase mDB;
 
 	public UpdateContractsStatusTask(String progressDialogMessage,
-			Context appContext,
-			SQLiteDatabase db) {
+									 Context appContext,
+									 SQLiteDatabase db) {
 		super(progressDialogMessage, appContext);
 
 		mDB = db;
@@ -46,14 +46,13 @@ public class UpdateContractsStatusTask extends ManagedAsyncTask<Integer> {
 
 			requestString = serializer.SerializeXML();
 
-		} 
-		catch (IOException e1) {
+		} catch (IOException e1) {
 			ErrorReporter.getInstance().putCustomData("handled", "serialize except");
 			ErrorReporter.getInstance().handleSilentException(e1);
 			return ERROR;
 		}
 
-		if( requestString != null && requestString.length() != 0 ) {
+		if (requestString != null && requestString.length() != 0) {
 
 			HTTPRequest request = new HTTPRequest(Settings.getInstance().getSERVICE_CONTRACTS_CODES());
 
@@ -63,17 +62,16 @@ public class UpdateContractsStatusTask extends ManagedAsyncTask<Integer> {
 				if (request.Execute(requestString) != HttpStatus.SC_OK) {
 
 					ErrorReporter.getInstance().putCustomData("handled", "execute except");
-					ErrorReporter.getInstance().putCustomData("Contracts != SC_OK ", request.getResponse() );
+					ErrorReporter.getInstance().putCustomData("Contracts != SC_OK ", request.getResponse());
 					ErrorReporter.getInstance().handleSilentException(null);
 					return ERROR;
 				}
-			} 
-			catch (Exception e) {
+			} catch (Exception e) {
 
 				ErrorReporter.getInstance().putCustomData("handled", "execute except");
 				ErrorReporter.getInstance().handleSilentException(e);
 				return ERROR;
-			} 
+			}
 
 			String responseString = request.getResponse();
 
@@ -82,8 +80,7 @@ public class UpdateContractsStatusTask extends ManagedAsyncTask<Integer> {
 				ContractsXMLParser parser = new ContractsXMLParser();
 
 				Request_Contracts.updateStatus(mDB, parser.Parse(responseString));
-			} 
-			catch (Exception e) {
+			} catch (Exception e) {
 
 				ErrorReporter.getInstance().putCustomData("handled", "parse except");
 				ErrorReporter.getInstance().handleSilentException(e);
@@ -94,20 +91,20 @@ public class UpdateContractsStatusTask extends ManagedAsyncTask<Integer> {
 
 		return SUCCESS;
 	}
-	
+
 	@Override
 	protected void onPostExecute(Integer result) {
 
 		Bundle resultData = new Bundle();
-		
+
 		resultData.putInt(RESULT_INTEGER, result);
-		
+
 		mTaskListener.onComplete(resultData);
 	}
 
 	@Override
 	public String getProgressMessage() {
-		
+
 		return mProgressDialogMessage;
 	}
 

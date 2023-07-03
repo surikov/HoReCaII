@@ -103,7 +103,7 @@ public class Dialog_Upload extends Activity_Base implements Observer {
 		setTitle(R.string.upload);
 		final Button btnGPSData = (Button) findViewById(R.id.btn_gps_data);
 		//btnGPSData.setText("GPS ("+")");
-		System.out.println("btnGPSData "+btnGPSData.getText());
+		System.out.println("btnGPSData " + btnGPSData.getText());
 
 		btnGPSData.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -113,8 +113,8 @@ public class Dialog_Upload extends Activity_Base implements Observer {
 				//	showEasterEgg();
 				//}
 				//else {
-					UploadTask task = new UploadTask(mDB, SystemHelper.getDiviceID(Dialog_Upload.this), getApplicationContext());
-					AsyncTaskManager.getInstance().executeTask(Dialog_Upload.this, task);
+				UploadTask task = new UploadTask(mDB, SystemHelper.getDiviceID(Dialog_Upload.this), getApplicationContext());
+				AsyncTaskManager.getInstance().executeTask(Dialog_Upload.this, task);
 				//}
 			}
 		});
@@ -149,6 +149,7 @@ public class Dialog_Upload extends Activity_Base implements Observer {
 			}
 		});
 	}
+
 	@Override
 	public void update(Observable observable, Object data) {
 		String result = ((Bundle) data).getString(ManagedAsyncTask.RESULT_STRING);

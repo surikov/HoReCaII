@@ -203,7 +203,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	public static void lockCreateNewOrder(String key) {
-		ApplicationHoreca.getInstance().getDataBase().execSQL("update consts set TekKatalog='"+key+"';");
+		ApplicationHoreca.getInstance().getDataBase().execSQL("update consts set TekKatalog='" + key + "';");
 	}
 
 	CannyTask _updateExtraChargeInfoTask = new CannyTask() {
@@ -803,7 +803,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		mBidData.setChoosedDay(choosedDay);
 		ZayavkaPokupatelya bid = extras.getParcelable(BID);
 		if (bid == null) {
-			if(!canCreateNewOrder()){
+			if (!canCreateNewOrder()) {
 				finish();
 			}
 			double dateShip = Numeric.string2double(Auxiliary.activityExatras(this).child("dateShip").value.property.value());
@@ -2579,7 +2579,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	void doHistoryPaneExport() {
 		//gridHistory.exportCurrentDataCSV(Activity_Bid.this, "history.csv", "windows-1251");
 		try {
-			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export.xls";
+			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export"+Math.floor(Math.random()*10000)+".xls";
 			File xfile = new File(xname);
 			jxl.WorkbookSettings wbSettings = new jxl.WorkbookSettings();
 			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
@@ -2751,7 +2751,11 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 
 	void doMenuExport() {
 		try {
-			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export.xls";
+			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
+					+ "/Заказ "
+					+ApplicationHoreca.getInstance().getClientInfo().getName()
+					+Math.floor(Math.random()*10000)
+					+".xls";
 			File xfile = new File(xname);
 			jxl.WorkbookSettings wbSettings = new jxl.WorkbookSettings();
 			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
@@ -4059,7 +4063,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 								//.hidden().is(selection.equals(0))//
 								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 3).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize * 4)//
+						.height().is(Auxiliary.tapSize * 7)//
 				, "Получить", new Task() {
 					@Override
 					public void doTask() {

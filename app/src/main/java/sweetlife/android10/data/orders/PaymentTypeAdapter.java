@@ -1,6 +1,7 @@
 package sweetlife.android10.data.orders;
 
 import java.util.ArrayList;
+
 import sweetlife.android10.log.*;
 import sweetlife.android10.R;
 import sweetlife.android10.supervisor.Cfg;
@@ -25,6 +26,7 @@ public class PaymentTypeAdapter extends ArrayAdapter {
 		mDB = db;
 		UpdatePaymentTypes(contactID);
 	}
+
 	public int GetItemPositionByID(String paymentType) {
 		for (int i = 0; i < mData.size(); i++) {
 			if (mData.get(i).getID().compareToIgnoreCase(paymentType) == 0) {
@@ -33,11 +35,12 @@ public class PaymentTypeAdapter extends ArrayAdapter {
 		}
 		return -1;
 	}
+
 	public void UpdatePaymentTypes(String contactID) {
 		mData.clear();
 		String sqlStr = "select"
-				+" case when (Podrazdelenie = x'00000000000000000000000000000000' or Podrazdelenie = x'00') then 0 else 1 end Podrazdelenie"
-				+",ProcentPredoplaty from DogovoryKontragentov_strip where [PometkaUdaleniya]=x'00' and _IDRref = "
+				+ " case when (Podrazdelenie = x'00000000000000000000000000000000' or Podrazdelenie = x'00') then 0 else 1 end Podrazdelenie"
+				+ ",ProcentPredoplaty from DogovoryKontragentov_strip where [PometkaUdaleniya]=x'00' and _IDRref = "
 				//+",ProcentPredoplaty from DogovoryKontragentov_strip where 1=2 and _IDRref = "
 				+ contactID;
 		//System.out.println(sqlStr);
@@ -48,18 +51,16 @@ public class PaymentTypeAdapter extends ArrayAdapter {
 			//String REFnalID = "x'B8A71648BE9E99D3492DAB9257E5D773'";
 			//String REFbezNalID = "x'838D51B55D9490754FB77F3D5FE02C1E'";
 			//String REFtovCheckID = "x'AB638B5B4E5DAB774EDC12B2542FFFED'";
-			if ((Podrazdelenie==0 )&& (ProcentPredoplaty == 0)) {
+			if ((Podrazdelenie == 0) && (ProcentPredoplaty == 0)) {
 				LogHelper.debug(this.getClass().getCanonicalName() + " это договор оплаты по факту");
 				mData.add(new PaymentTypeInfo(Cfg.tip_nalichnie, getContext().getString(R.string.cash)));
 				mData.add(new PaymentTypeInfo(Cfg.tip_tovcheck, getContext().getString(R.string.cash_memo)));
-			}
-			else {
-				if ((Podrazdelenie==0) && (ProcentPredoplaty == 100)) {
+			} else {
+				if ((Podrazdelenie == 0) && (ProcentPredoplaty == 100)) {
 					LogHelper.debug(this.getClass().getCanonicalName() + " это договор по предоплате");
 					mData.add(new PaymentTypeInfo(Cfg.tip_nalichnie, getContext().getString(R.string.cash)));
 					mData.add(new PaymentTypeInfo(Cfg.tip_beznal, getContext().getString(R.string.noncash)));
-				}
-				else {
+				} else {
 					LogHelper.debug(this.getClass().getCanonicalName() + " это договор с отсрочкой");
 					//mData.add(new PaymentTypeInfo(Cfg.tip_nalichnie, getContext().getString(R.string.cash)));
 					mData.add(new PaymentTypeInfo(Cfg.tip_beznal, getContext().getString(R.string.noncash)));
@@ -111,6 +112,7 @@ public class PaymentTypeAdapter extends ArrayAdapter {
 			mData.add(0, new PaymentTypeInfo("x'00'", ""));
 		}*/
 	}
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		TextView view = null;
@@ -122,6 +124,7 @@ public class PaymentTypeAdapter extends ArrayAdapter {
 		mPosition = position;
 		return convertView;
 	}
+
 	@Override
 	public View getDropDownView(int position, View convertView, ViewGroup parent) {
 		TextView view = null;
@@ -132,17 +135,21 @@ public class PaymentTypeAdapter extends ArrayAdapter {
 		view.setText(mData.get(position).getName());
 		return convertView;
 	}
+
 	@Override
 	public int getCount() {
 		return mData.size();
 	}
+
 	@Override
 	public Object getItem(int position) {
 		return mData.get(position);
 	}
+
 	public PaymentTypeInfo GetSelectedItem() {
 		return mData.get(mPosition);
 	}
+
 	public boolean RemoveEmptyItem() {
 		for (int i = 0; i < mData.size(); i++) {
 			if (mData.get(i).getName().compareTo("") == 0) {

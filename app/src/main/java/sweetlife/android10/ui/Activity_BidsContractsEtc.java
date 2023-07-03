@@ -111,22 +111,21 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		public void onClick(View v) {
 			LogHelper.debug("mBtnBeginVizit");
 			//ApplicationHoreca.getInstance().StartGPSLog();
-			if(!mGPSInfo.estDalnieVizity(mAppInstance.getClientInfo())) {
+			if (!mGPSInfo.estDalnieVizity(mAppInstance.getClientInfo())) {
 				long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
-				if(distanceToClient == GPSInfo.GPS_NOT_AVAILABLE) {
+				if (distanceToClient == GPSInfo.GPS_NOT_AVAILABLE) {
 					CreateErrorDialog(R.string.gps_vizit_not_available).show();
-				}
-				else {
+				} else {
 					final String timeString = mGPSInfo.getVizitTimeString();
-					if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
+					if (distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
 						String warning = "Удаление от контрагента " + distanceToClient + " метров. Начать визит?";
-						if(mAppInstance.getClientInfo().getLat() == 0) {
+						if (mAppInstance.getClientInfo().getLat() == 0) {
 							warning = "У клиента не зафиксированы координаты. Начать визит?";
 						}
 						UIHelper.MsgBox(getString(R.string.confirm), warning, Activity_BidsContractsEtc.this, new IMessageBoxCallbackInteger() {
 							@Override
 							public void MessageBoxResult(int which) {
-								if(!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
+								if (!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
 									UIHelper.MsgBox(getString(R.string.confirm), "Сегодня уже был визит. Начать визит заново?", Activity_BidsContractsEtc.this, new IMessageBoxCallbackInteger() {
 										@Override
 										public void MessageBoxResult(int which) {
@@ -135,17 +134,15 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 											//Toast.makeText(getApplicationContext(), getString(R.string.visit_begin), Toast.LENGTH_SHORT).show();
 										}
 									}, null);
-								}
-								else {
+								} else {
 									mGPSInfo.BeginVizit(mAppInstance.getClientInfo().getKod());
 									UIHelper.quickWarning(getString(R.string.visit_begin) + ": " + timeString, Activity_BidsContractsEtc.this);
 									//Toast.makeText(getApplicationContext(), getString(R.string.visit_begin), Toast.LENGTH_SHORT).show();
 								}
 							}
 						}, null);
-					}
-					else {
-						if(!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
+					} else {
+						if (!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
 							UIHelper.MsgBox(getString(R.string.confirm), "Сегодня уже был визит. Начать визит заново?", Activity_BidsContractsEtc.this, new IMessageBoxCallbackInteger() {
 								@Override
 								public void MessageBoxResult(int which) {
@@ -154,16 +151,14 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 									//Toast.makeText(getApplicationContext(), getString(R.string.visit_begin), Toast.LENGTH_SHORT).show();
 								}
 							}, null);
-						}
-						else {
+						} else {
 							mGPSInfo.BeginVizit(mAppInstance.getClientInfo().getKod());
 							UIHelper.quickWarning(getString(R.string.visit_begin) + ": " + timeString, Activity_BidsContractsEtc.this);
 							//Toast.makeText(getApplicationContext(), getString(R.string.visit_begin), Toast.LENGTH_SHORT).show();
 						}
 					}
 				}
-			}
-			else {
+			} else {
 				UIHelper.quickWarning("Сначала нужно закончить предыдущий визит " + mGPSInfo.kontragentyVizitov(mAppInstance.getClientInfo()), Activity_BidsContractsEtc.this);
 				//Toast.makeText(getApplicationContext(), "Сначала нужно закончить предыдущий визит.", Toast.LENGTH_SHORT).show();
 			}
@@ -178,7 +173,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		setContentView(R.layout.act_bids_contracts_etc);
 		mAppInstance = ApplicationHoreca.getInstance();
 		mGPSInfo = GPS.getGPSInfo();
-		if(savedInstanceState != null) {
+		if (savedInstanceState != null) {
 			mIsNeedRequeryTempTables = savedInstanceState.getBoolean(IS_NEED_REQUERY_TEMP_TABLES, true);
 		}
 		ReadExtras();
@@ -189,7 +184,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		ConstructReturnsList();
 		//UpdateTablesAfterClientChoose.getDolgiPoDocumentam();
 		String neMarshrut = "";
-		if(mAppInstance.getClientInfo().neMarshrut) {
+		if (mAppInstance.getClientInfo().neMarshrut) {
 			neMarshrut = "(не в маршруте)";
 		}
 		setTitle(neMarshrut + mAppInstance.getClientInfo().getName() + " " + mAppInstance.getClientInfo().dolgMessage);
@@ -236,23 +231,21 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		mChosedDay = Calendar.getInstance();
 		mChosedDay.setTimeInMillis(extras.getLong(CHOOSED_DAY, mChosedDay.getTimeInMillis()));
 		mIsEditable = DateTimeHelper.getOnlyDateInfo(mChosedDay)//
-				              .compareTo(DateTimeHelper.getOnlyDateInfo(Calendar.getInstance()))//
-				              == 0
-				              ? true
-				              : false;
-		if(mIsEditable) {
-			if(Requests.IsSyncronizationDateLater(-5)) {
+				.compareTo(DateTimeHelper.getOnlyDateInfo(Calendar.getInstance()))//
+				== 0
+				? true
+				: false;
+		if (mIsEditable) {
+			if (Requests.IsSyncronizationDateLater(-5)) {
 				//LogHelper.debug("Requests.IsSyncronizationDateLater( -5 ) true");
 				findViewById(R.id.layout_add).setVisibility(View.GONE);
 				findViewById(R.id.secondtab).setVisibility(View.GONE);
 				CreateErrorDialog(R.string.msg_sync_date_later5).show();
 				mIsEditable = false;
-			}
-			else {
+			} else {
 				//LogHelper.debug("Requests.IsSyncronizationDateLater( -5 ) false");
 			}
-		}
-		else {
+		} else {
 			UIHelper.quickWarning("Заявки на " + DateTimeHelper.UIDateString(mChosedDay.getTime()), this);
 		}
 	}
@@ -261,7 +254,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		TabHost tabHost = (TabHost) findViewById(R.id.tab_host);
 		tabHost.setup();
 		tabHost.addTab(tabHost.newTabSpec("tab_orders").setIndicator(makeTabIndicator(getString(R.string.orders))).setContent(R.id.firsttab));
-		if(mIsEditable) {
+		if (mIsEditable) {
 			tabHost.addTab(tabHost.newTabSpec("tab_contracts").setIndicator(makeTabIndicator(getString(R.string.available_amount))).setContent(R.id.secondtab));
 		}
 		tabHost.addTab(tabHost.newTabSpec("tab_fixed_prices").setIndicator(makeTabIndicator(getString(R.string.fixed_prices))).setContent(R.id.thirdtab));
@@ -287,44 +280,44 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				Layoutless specLayoutless = new Layoutless(Activity_BidsContractsEtc.this);
 				degustaciaGrid = new DataGrid(Activity_BidsContractsEtc.this);
 				specLayoutless.child(new Decor(Activity_BidsContractsEtc.this)//
-						                     .sketch(new SketchPlate()//
-								                             .tint(new TintLinearGradient()//
-										                                   .fromColor.is(0xff768594)//
-										                                   .toColor.is(0xffdddede)//
-										                                   .fromX.is(0)//
-										                                   .fromY.is(0)//
-										                                   .toX.is(0)//
-										                                   .toY.is(38)//
-								                             )//
-								                             .width.is(w)//
-								                             .height.is(38)//
-						                     )//
-						                     .background.is(0xff00ff00)//
-						                     .width().is(w)//
-						                     .height().is(38)//
+						.sketch(new SketchPlate()//
+								.tint(new TintLinearGradient()//
+										.fromColor.is(0xff768594)//
+										.toColor.is(0xffdddede)//
+										.fromX.is(0)//
+										.fromY.is(0)//
+										.toX.is(0)//
+										.toY.is(38)//
+								)//
+								.width.is(w)//
+								.height.is(38)//
+						)//
+						.background.is(0xff00ff00)//
+						.width().is(w)//
+						.height().is(38)//
 				);
 				specLayoutless.child(degustaciaGrid//
-						                     .headerHeight.is(38)//
-						                     .columns(new Column[]{//
-								                     degustaciaStatus.title.is("Выгружена").width.is(w * 0.1)//
-								                     , degustaciaData.title.is("Дата отгр.").width.is(w * 0.1)//
-								                     , degustaciaKomment.title.is("Комментарий").width.is(w * 0.8) //
-						                     })//
-						                     .width().is(specLayoutless.width().property)//
-						                     .height().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
+						.headerHeight.is(38)//
+						.columns(new Column[]{//
+								degustaciaStatus.title.is("Выгружена").width.is(w * 0.1)//
+								, degustaciaData.title.is("Дата отгр.").width.is(w * 0.1)//
+								, degustaciaKomment.title.is("Комментарий").width.is(w * 0.8) //
+						})//
+						.width().is(specLayoutless.width().property)//
+						.height().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
 				);
 				specLayoutless.child(new Knob(Activity_BidsContractsEtc.this)//
-						                     .afterTap.is(new Task() {
+						.afterTap.is(new Task() {
 							@Override
 							public void doTask() {
 								dobavitDegustaciu();
 							}
 						})//
-						                     .labelText.is("Добавить")//
-						                     .left().is(specLayoutless.width().property.minus(250))//
-						                     .top().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
-						                     .width().is(250)//
-						                     .height().is(0.8 * Auxiliary.tapSize)//
+						.labelText.is("Добавить")//
+						.left().is(specLayoutless.width().property.minus(250))//
+						.top().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
+						.width().is(250)//
+						.height().is(0.8 * Auxiliary.tapSize)//
 				);
 				requeryDegustaciaGrid();
 				return specLayoutless;
@@ -380,37 +373,37 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 						);*/
 				specificaciaGrid = new DataGrid(Activity_BidsContractsEtc.this);
 				specLayoutless.child(new Decor(Activity_BidsContractsEtc.this)//
-						                     .sketch(new SketchPlate()//
-								                             .tint(new TintLinearGradient()//
-										                                   .fromColor
-										                                   //.is(0xffff0000)
-										                                   .is(0xff768594)//
-										                                   .toColor.is(0xffdddede)//
-										                                   //.is(0xff0000ff)//
-										                                   .fromX.is(0)//
-										                                   .fromY.is(0)//
-										                                   .toX.is(0)//
-										                                   .toY.is(38)//
-								                             )//
-								                             .width.is(w)//
-								                             .height.is(38)//
-						                     )//
-						                     .background.is(0xff00ff00)//
-						                     .width().is(w)//
-						                     .height().is(38)//
+						.sketch(new SketchPlate()//
+								.tint(new TintLinearGradient()//
+										.fromColor
+										//.is(0xffff0000)
+										.is(0xff768594)//
+										.toColor.is(0xffdddede)//
+										//.is(0xff0000ff)//
+										.fromX.is(0)//
+										.fromY.is(0)//
+										.toX.is(0)//
+										.toY.is(38)//
+								)//
+								.width.is(w)//
+								.height.is(38)//
+						)//
+						.background.is(0xff00ff00)//
+						.width().is(w)//
+						.height().is(38)//
 				);
 				specLayoutless.child(specificaciaGrid//
-						                     .headerHeight.is(38)//
-						                     .columns(new Column[]{//
-								                     specificaciaStatus.title.is("Выгружена").width.is(w * 0.1)//
-								                     , specificaciaDate.title.is("Дата").width.is(w * 0.1)//
-								                     , specificaciaFrom.title.is("Время действия начало").width.is(w * 0.1)//
-								                     , specificaciaTo.title.is("Время действия конец").width.is(w * 0.1)//
-								                     , specificaciaComment.title.is("Комментарий").width.is(w * 0.6) //
-						                     })//
-						                     //.top().is(0.8 * Layoutless.tapSize)//
-						                     .width().is(specLayoutless.width().property)//
-						                     .height().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
+						.headerHeight.is(38)//
+						.columns(new Column[]{//
+								specificaciaStatus.title.is("Выгружена").width.is(w * 0.1)//
+								, specificaciaDate.title.is("Дата").width.is(w * 0.1)//
+								, specificaciaFrom.title.is("Время действия начало").width.is(w * 0.1)//
+								, specificaciaTo.title.is("Время действия конец").width.is(w * 0.1)//
+								, specificaciaComment.title.is("Комментарий").width.is(w * 0.6) //
+						})//
+						//.top().is(0.8 * Layoutless.tapSize)//
+						.width().is(specLayoutless.width().property)//
+						.height().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
 				);
 				/*specLayoutless.child(new Knob(Activity_BidsContractsEtc.this)//
 						.labelText.is("Найти")//
@@ -419,17 +412,17 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 								.height().is(0.8 * Layoutless.tapSize)//
 						);*/
 				specLayoutless.child(new Knob(Activity_BidsContractsEtc.this)//
-						                     .afterTap.is(new Task() {
+						.afterTap.is(new Task() {
 							@Override
 							public void doTask() {
 								dobavitSpecificaciu();
 							}
 						})//
-						                     .labelText.is("Добавить")//
-						                     .left().is(specLayoutless.width().property.minus(250))//
-						                     .top().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
-						                     .width().is(250)//
-						                     .height().is(0.8 * Auxiliary.tapSize)//
+						.labelText.is("Добавить")//
+						.left().is(specLayoutless.width().property.minus(250))//
+						.top().is(specLayoutless.height().property.minus(0.8 * Auxiliary.tapSize))//
+						.width().is(250)//
+						.height().is(0.8 * Auxiliary.tapSize)//
 				);
 				//Button v = new Button(Activity_BidsContractsEtc.this);
 				//System.out.println("createTabContent " + specLayoutless.getWidth());
@@ -442,20 +435,20 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 
 	void requeryDegustaciaGrid() {
 		LogHelper.debug(this.getClass().getCanonicalName() + ".requeryDegustaciaGrid");
-		if(degustaciaGrid == null) {
+		if (degustaciaGrid == null) {
 			return;
 		}
 		String sql = "select _id,otgruzka,comment,kontragent,status"//
-				             + " from ZayavkaNaDegustaciu "//
-				             + " where kontragent=" + ApplicationHoreca.getInstance().getClientInfo().getID().trim()//
-				             + " order by status,otgruzka desc"//
-				             + " limit 50";
+				+ " from ZayavkaNaDegustaciu "//
+				+ " where kontragent=" + ApplicationHoreca.getInstance().getClientInfo().getID().trim()//
+				+ " order by status,otgruzka desc"//
+				+ " limit 50";
 		//System.out.println("requeryDegustaciaGrid " + sql);
 		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		degustaciaStatus.clear();
 		degustaciaData.clear();
 		degustaciaKomment.clear();
-		for(int i = 0; i < b.children.size(); i++) {
+		for (int i = 0; i < b.children.size(); i++) {
 			Bough row = b.children.get(i);
 			final String _id = row.child("_id").value.property.value();
 			Task tap = new Task() {
@@ -466,7 +459,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 			};
 			int statusNum = (int) Numeric.string2double(row.child("status").value.property.value());
 			String statusText = "Не выгружен";
-			if(statusNum == 1) {
+			if (statusNum == 1) {
 				statusText = "Выгружен";
 			}
 			degustaciaStatus.cell(statusText, tap);
@@ -480,21 +473,21 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 
 	void requerySpecificaciaGrid() {
 		LogHelper.debug(this.getClass().getCanonicalName() + ".requerySpecificaciaGrid");
-		if(specificaciaGrid == null) {
+		if (specificaciaGrid == null) {
 			return;
 		}
 		String sql = "select _id,createDate,fromDate,toDate,comment,hrc,kod,status"//
-				             + " from ZayavkaNaSpecifikasia"//
-				             + " where kod='" + ApplicationHoreca.getInstance().getClientInfo().getKod().trim() + "'"//
-				             + " order by toDate desc,fromDate desc"//
-				             + " limit 50";
+				+ " from ZayavkaNaSpecifikasia"//
+				+ " where kod='" + ApplicationHoreca.getInstance().getClientInfo().getKod().trim() + "'"//
+				+ " order by toDate desc,fromDate desc"//
+				+ " limit 50";
 		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		specificaciaStatus.clear();
 		specificaciaDate.clear();
 		specificaciaFrom.clear();
 		specificaciaTo.clear();
 		specificaciaComment.clear();
-		for(int i = 0; i < b.children.size(); i++) {
+		for (int i = 0; i < b.children.size(); i++) {
 			Bough row = b.children.get(i);
 			final String _id = row.child("_id").value.property.value();
 			Task tap = new Task() {
@@ -506,7 +499,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 			};
 			int statusNum = (int) Numeric.string2double(row.child("status").value.property.value());
 			String statusText = "Не выгружен";
-			if(statusNum == 1) {
+			if (statusNum == 1) {
 				statusText = "Выгружен";
 			}
 			specificaciaStatus.cell(statusText, tap);
@@ -563,7 +556,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode == KeyEvent.KEYCODE_BACK) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			/*
 			if (mGPSInfo.IsVizitBegin(mAppInstance.getClientInfo().getKod()) && mIsEditable) {
 				String msg=getString(R.string.vizit_not_complete);
@@ -601,22 +594,22 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				Cursor cursor = mBidsListAdapter.getCursor();
 				cursor.moveToPosition(position);
 				ZayavkaPokupatelya bid = new ZayavkaPokupatelya(//
-						                                               Request_Bids.get_id(cursor)//
-						                                               , Request_Bids.getIDRRef(cursor)//
-						                                               , Request_Bids.getData(cursor)//
-						                                               , Request_Bids.getNomer(cursor)//
-						                                               , Request_Bids.isProveden(cursor)//
-						                                               , Request_Bids.getDataOtgruzki(cursor)//
-						                                               , Request_Bids.getDogovorKontragenta(cursor)//
-						                                               , Request_Bids.getKommentariy(cursor)//
-						                                               , Request_Bids.getKontragentID(cursor)//
-						                                               , Request_Bids.getKontragentKod(cursor)//
-						                                               , Request_Bids.getKontragentNaimanovanie(cursor)//
-						                                               , Request_Bids.getSumma(cursor)//
-						                                               , Request_Bids.getTipOplaty(cursor)//
-						                                               , Request_Bids.getTipOplatyPoryadok(cursor)//
-						                                               , Request_Bids.getSebestoimost(cursor)//
-						                                               , false);
+						Request_Bids.get_id(cursor)//
+						, Request_Bids.getIDRRef(cursor)//
+						, Request_Bids.getData(cursor)//
+						, Request_Bids.getNomer(cursor)//
+						, Request_Bids.isProveden(cursor)//
+						, Request_Bids.getDataOtgruzki(cursor)//
+						, Request_Bids.getDogovorKontragenta(cursor)//
+						, Request_Bids.getKommentariy(cursor)//
+						, Request_Bids.getKontragentID(cursor)//
+						, Request_Bids.getKontragentKod(cursor)//
+						, Request_Bids.getKontragentNaimanovanie(cursor)//
+						, Request_Bids.getSumma(cursor)//
+						, Request_Bids.getTipOplaty(cursor)//
+						, Request_Bids.getTipOplatyPoryadok(cursor)//
+						, Request_Bids.getSebestoimost(cursor)//
+						, false);
 				double amount = mAvailableAmount + bid.getSumma() - Request_Bids.getBidsAmount(mDB, DateTimeHelper.SQLDateString(Calendar.getInstance().getTime()));
 				StartBidsActivity(ORDER_UPDATE, bid, amount);
 			}
@@ -629,9 +622,9 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		intent.setClass(Activity_BidsContractsEtc.this, Activity_Bid.class);
 		intent.putExtra(CLIENT_ID, mAppInstance.getClientInfo().getID());
 		intent.putExtra(AVAILABLE_AMOUNT, mAvailableAmount - Request_Bids.getBidsAmount(mDB, DateTimeHelper.SQLDateString(Calendar.getInstance().getTime())));
-		if(bid != null) {
+		if (bid != null) {
 			intent.putExtra(BID, bid);
-			if(!mIsEditable || bid.isProveden()) {
+			if (!mIsEditable || bid.isProveden()) {
 				intent.putExtra(IS_EDITABLE, false);
 			}
 		}
@@ -653,17 +646,17 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				Cursor cursor = mFixedPricesListAdapter.getCursor();
 				cursor.moveToPosition(position);
 				ZayavkaNaSkidki bid = new ZayavkaNaSkidki(Request_FixedPrices.get_id(cursor)
-						                                         , Request_FixedPrices.getIDRRef(cursor)
-						                                         , Request_FixedPrices.getData(cursor)
-						                                         , Request_FixedPrices.getNomer(cursor)
-						                                         , mAppInstance.getClientInfo().getID()
-						                                         , mAppInstance.getClientInfo().getKod()
-						                                         , mAppInstance.getClientInfo().getName()
-						                                         , Request_FixedPrices.getVremyaNachalaSkidkiPhiksCen(cursor)
-						                                         , Request_FixedPrices.getVremyaOkonchaniyaSkidkiPhiksCen(cursor)
-						                                         , Request_FixedPrices.getKommentariy(cursor)
-						                                         , Request_FixedPrices.isUploaded(cursor)
-						                                         , false);
+						, Request_FixedPrices.getIDRRef(cursor)
+						, Request_FixedPrices.getData(cursor)
+						, Request_FixedPrices.getNomer(cursor)
+						, mAppInstance.getClientInfo().getID()
+						, mAppInstance.getClientInfo().getKod()
+						, mAppInstance.getClientInfo().getName()
+						, Request_FixedPrices.getVremyaNachalaSkidkiPhiksCen(cursor)
+						, Request_FixedPrices.getVremyaOkonchaniyaSkidkiPhiksCen(cursor)
+						, Request_FixedPrices.getKommentariy(cursor)
+						, Request_FixedPrices.isUploaded(cursor)
+						, false);
 				StartFixedPricesActivity(!Request_FixedPrices.isUploaded(cursor), bid);
 			}
 		});
@@ -684,28 +677,28 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				Cursor cursor = mReturnsListAdapter.getCursor();
 				cursor.moveToPosition(position);
 				ZayavkaNaVozvrat bid = new ZayavkaNaVozvrat(Request_Returns.get_id(cursor)
-						                                           , Request_Returns.getIDRRef(cursor)
-						                                           , Request_Returns.getData(cursor)
-						                                           , Request_Returns.getNomer(cursor)
-						                                           , mAppInstance.getClientInfo().getID()
-						                                           , mAppInstance.getClientInfo().getKod()
-						                                           , mAppInstance.getClientInfo().getName()
-						                                           , Request_Returns.getDataOtgruzki(cursor)
-						                                           , Request_Returns.getAktPretenziyPath(cursor)
-						                                           , Request_Returns.isUploaded(cursor)
-						                                           , false, Request_Returns.getVersion(cursor));
+						, Request_Returns.getIDRRef(cursor)
+						, Request_Returns.getData(cursor)
+						, Request_Returns.getNomer(cursor)
+						, mAppInstance.getClientInfo().getID()
+						, mAppInstance.getClientInfo().getKod()
+						, mAppInstance.getClientInfo().getName()
+						, Request_Returns.getDataOtgruzki(cursor)
+						, Request_Returns.getAktPretenziyPath(cursor)
+						, Request_Returns.isUploaded(cursor)
+						, false, Request_Returns.getVersion(cursor));
 				StartReturnsActivity(!Request_Returns.isUploaded(cursor), bid);
 			}
 		});
 	}
 
 	private void StartReturnsActivity(final boolean isEditable, ZayavkaNaVozvrat bid) {
-		if(bid == null) {
+		if (bid == null) {
 			final Numeric defaultSelection = new Numeric();
 			Auxiliary.pickSingleChoice(this, ZayavkaNaVozvrat_Tovary.ReasonsTypes, defaultSelection, "Причина", new Task() {
 				@Override
 				public void doTask() {
-					if(defaultSelection.value() > 0) {
+					if (defaultSelection.value() > 0) {
 						Intent intent = new Intent();
 						intent.setClass(Activity_BidsContractsEtc.this, Activity_Returns.class);
 						intent.putExtra(CLIENT_ID, mAppInstance.getClientInfo().getID());
@@ -715,8 +708,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 					}
 				}
 			}, null, null, null, null);
-		}
-		else {
+		} else {
 			Intent intent = new Intent();
 			intent.setClass(Activity_BidsContractsEtc.this, Activity_Returns.class);
 			intent.putExtra(CLIENT_ID, mAppInstance.getClientInfo().getID());
@@ -731,14 +723,14 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		intent.setClass(Activity_BidsContractsEtc.this, Activity_FixedPrices.class);
 		intent.putExtra(CLIENT_ID, mAppInstance.getClientInfo().getID());
 		intent.putExtra(IS_EDITABLE, isEditable);
-		if(bid != null) {
+		if (bid != null) {
 			intent.putExtra(FIXED_PRICES_BID, bid);
 		}
 		startActivityForResult(intent, FIXED_PRICES_ADD);
 	}
 
 	private void ConstructButtons() {
-		if(!mIsEditable) {
+		if (!mIsEditable) {
 			findViewById(R.id.layout_add).setVisibility(View.GONE);
 			findViewById(R.id.secondtab).setVisibility(View.GONE);
 			((Button) findViewById(R.id.btn_beginvisit)).setVisibility(View.GONE);
@@ -746,9 +738,8 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 			((Button) findViewById(R.id.btn_add_returns)).setVisibility(View.GONE);
 			((Button) findViewById(R.id.btn_add_fixed_price)).setVisibility(View.GONE);
 			return;
-		}
-		else {
-			if(mAppInstance.getClientInfo().neMarshrut) {
+		} else {
+			if (mAppInstance.getClientInfo().neMarshrut) {
 				((Button) findViewById(R.id.btn_beginvisit)).setVisibility(View.GONE);
 				((Button) findViewById(R.id.btn_endvisit)).setVisibility(View.GONE);
 				((Button) findViewById(R.id.btn_add_returns)).setVisibility(View.GONE);
@@ -763,7 +754,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 			((Button) findViewById(R.id.btn_endvisit)).setOnClickListener(new View.OnClickListener() {
 				@SuppressWarnings("deprecation")
 				public void onClick(View v) {
-					if(mojnoZakrytVizit()) {
+					if (mojnoZakrytVizit()) {
 						showDialog(IDD_END_VISIT);
 					}
 					//ApplicationHoreca.getInstance().StartGPSLog();
@@ -786,7 +777,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		String sql = "select BeginTime from Vizits where EndTime is null and Client = " + mAppInstance.getClientInfo().getKod();
 		//mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod());
 		Cursor cursor = mDB.rawQuery(sql, null);
-		if(cursor.moveToFirst()) {
+		if (cursor.moveToFirst()) {
 			//DateFormat df;
 			SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			mDateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -797,23 +788,23 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				//System.out.println(beginDate);
 				//System.out.println(now);
 				//System.out.println(duration);
-			} catch(Throwable t) {
+			} catch (Throwable t) {
 				t.printStackTrace();
 			}
 		}
 		cursor.close();
 		//if (duration < 1000 * 60 * 15) {
-		if(duration < 1000 * 60 * 5) {
+		if (duration < 1000 * 60 * 5) {
 			coarse = (int) (duration / (1000.0 * 60));
 			Auxiliary.warn("Визит должен длиться не меньше 5 мин., прошло только " + coarse + " мин.", Activity_BidsContractsEtc.this);
 			return false;
 		}
 		long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
-		if(distanceToClient == GPSInfo.GPS_NOT_AVAILABLE) {
+		if (distanceToClient == GPSInfo.GPS_NOT_AVAILABLE) {
 			Auxiliary.warn("GPS данные недоступны.", Activity_BidsContractsEtc.this);
 			return false;
 		}
-		if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
+		if (distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
 			Auxiliary.warn("Удаление от контрагента " + distanceToClient + " метров.", Activity_BidsContractsEtc.this);
 			return false;
 		}
@@ -837,7 +828,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onContextItemSelected(MenuItem menu) {
-		switch(menu.getItemId()) {
+		switch (menu.getItemId()) {
 			case IDM_LIST_DELETE:
 				//System.out.println("delete record?");
 				Auxiliary.pick3Choice(this, "Удаление заказа", "Вы уверены?", "Удалить", new Task() {
@@ -850,7 +841,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 							mBidsListAdapter.getCursor().requery();
 							mBidsListAdapter.notifyDataSetChanged();
 							UpdateAvailableAmount();
-						} catch(Throwable t) {
+						} catch (Throwable t) {
 							t.printStackTrace();
 						}
 					}
@@ -864,7 +855,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		LogHelper.debug(this.getClass().getCanonicalName() + ".onCreateDialog: " + id);
-		switch(id) {
+		switch (id) {
 			case IDD_END_VISIT: {
 				/*if (GPSInfo.isTPNearClient(mClient.getLat(), mClient.getLon()) == GPSInfo.GPS_NOT_AVAILABLE) {
 					CreateErrorDialog(R.string.gps_end_vizit_not_available).show();
@@ -889,22 +880,20 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						String result = autoCompleteTextViewVizit.getText().toString();
-						if(result.trim().length() > 3) {
+						if (result.trim().length() > 3) {
 							mGPSInfo.EndVisit(mAppInstance.getClientInfo().getKod()//
 									//, mVizitsResults.get(mSpinnerVizitsResults.getSelectedItemPosition())//
 									//, autoCompleteTextViewVizit.getText().toString());
 									, result);
-							if(!mWantExit) {
+							if (!mWantExit) {
 								UIHelper.quickWarning(getString(R.string.vizit_complete), Activity_BidsContractsEtc.this);
 								//Toast.makeText(getApplicationContext(), getString(R.string.vizit_complete), 
 								//		Toast.LENGTH_SHORT).show();
 								dialog.dismiss();
-							}
-							else {
+							} else {
 								finish();
 							}
-						}
-						else {
+						} else {
 							Auxiliary.warn("Заполните результат визита!", Activity_BidsContractsEtc.this);
 						}
 					}
@@ -927,9 +916,9 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		LogHelper.debug(this.getClass().getCanonicalName() + ".onActivityResult");
-		switch(requestCode) {
+		switch (requestCode) {
 			case ORDER_UPDATE:
-				if(resultCode == RESULT_OK) {
+				if (resultCode == RESULT_OK) {
 					mBidsListAdapter.getCursor().requery();
 					mBidsListAdapter.notifyDataSetChanged();
 					UpdateAvailableAmount();
@@ -937,13 +926,13 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				NomenclatureSavedData.getInstance().CleanData();
 				break;
 			case RETURNS_ADD:
-				if(resultCode == RESULT_OK) {
+				if (resultCode == RESULT_OK) {
 					mReturnsListAdapter.getCursor().requery();
 					mReturnsListAdapter.notifyDataSetChanged();
 				}
 				break;
 			case FIXED_PRICES_ADD:
-				if(resultCode == RESULT_OK) {
+				if (resultCode == RESULT_OK) {
 					mFixedPricesListAdapter.getCursor().requery();
 					mFixedPricesListAdapter.notifyDataSetChanged();
 				}
@@ -969,13 +958,13 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		TextView textLimit = null;
 		TextView textDelay = null;
 		String sqlStr = "select distinct gd._id [_id], gd.[_IDRRef], gd.[Naimenovanie] [GruppyDogovorovNaimenovanie], l.[Limit], l.[Otsrochka] "// 
-				                + "from DogovoryKontragentov dk "//
-				                + "inner join GruppyDogovorov gd on dk.[GruppaDogovorov] = gd.[_IDRRef] "//
-				                + "inner join Cur_Limity l on gd.[_IDRRef] = l.SpisokDogovorov "//
-				                + "where dk.[Vladelec]="//
-				                + mAppInstance.getClientInfo().getID();// + " and dk.PometkaUdaleniya = x'00'";
+				+ "from DogovoryKontragentov dk "//
+				+ "inner join GruppyDogovorov gd on dk.[GruppaDogovorov] = gd.[_IDRRef] "//
+				+ "inner join Cur_Limity l on gd.[_IDRRef] = l.SpisokDogovorov "//
+				+ "where dk.[Vladelec]="//
+				+ mAppInstance.getClientInfo().getID();// + " and dk.PometkaUdaleniya = x'00'";
 		Cursor cursor = mDB.rawQuery(sqlStr, null);
-		if(cursor.moveToFirst()) {
+		if (cursor.moveToFirst()) {
 			do {
 				row = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_contracts_0, null).findViewById(R.id.contracts_tablerow_0);
 				textContractsGroup = (TextView) row.findViewById(R.id.text_contracts_group);
@@ -986,7 +975,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				textDelay.setText(cursor.getString(4));
 				layout.addView(row, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 			}
-			while(cursor.moveToNext());
+			while (cursor.moveToNext());
 		}
 		cursor.close();
 	}
@@ -999,7 +988,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		TextView textAmount = null;
 		String sqlStr = "select dsz.[Period], case when dsz.[_RecordKind] = 0 then dsz.[Summa] else -dsz.[Summa] end [Summa], ifnull(gd.[Naimenovanie], '') [GruppyDogovorovNaimenovanie], " + "case when dsz.[Registrator_0] = x'00000086' then 'Доступная сумма ' ||  gd.[Naimenovanie] || ' от ' || strftime('%d.%m.%Y', dsz.[Period]) " + "when dsz.[Registrator_0] = x'00000091' then ifnull('Заказ покупателя исходящий ' || zpi.Nomer || ' от ' || strftime('%d.%m.%Y %H:%M:%S', zpi.[Data]), '') " + "else '' end Naimenovanie " + "from DostupnayaSummaZakaza dsz " + "inner join (select date(c.[RaschitannyyDolg], '+1 day') [date] from Consts c) cday on dsz.[Period] >= cday.[date] " + "left join GruppyDogovorov gd on dsz.[GruppaDogovorov_2] = gd.[_IDRRef] " + "inner join DogovoryKontragentov dk on dk.[GruppaDogovorov] = gd.[_IDRRef] " + "left join DolgiKlientov dok on dsz.[Registrator_0] = x'00000086' and dsz.[Registrator_1] = dok._IDRRef " + "left join ZayavkaPokupatelyaIskhodyaschaya zpi on dsz.[Registrator_0] = x'00000091' and dsz.[Registrator_1] = zpi._IDRRef " + "where dsz.Aktivnost = x'01' and dsz.[_RecordKind] = 0 and dk.[Vladelec] = " + mAppInstance.getClientInfo().getID();
 		Cursor contractsAmountCursor = mDB.rawQuery(sqlStr, null);
-		if(contractsAmountCursor.moveToFirst()) {
+		if (contractsAmountCursor.moveToFirst()) {
 			do {
 				row = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_contracts_1, null).findViewById(R.id.contracts_tablerow_1);
 				textDate = (TextView) row.findViewById(R.id.text_date);
@@ -1010,10 +999,10 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				textAmount.setText(DecimalFormatHelper.format(contractsAmountCursor.getDouble(1)));
 				layout.addView(row, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 			}
-			while(contractsAmountCursor.moveToNext());
+			while (contractsAmountCursor.moveToNext());
 		}
 		SetAvailableAmount(contractsAmountCursor);
-		if(contractsAmountCursor != null && !contractsAmountCursor.isClosed()) {
+		if (contractsAmountCursor != null && !contractsAmountCursor.isClosed()) {
 			contractsAmountCursor.close();
 		}
 	}
@@ -1026,11 +1015,11 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		TextView textName = null;
 		TextView textContractsGroup = null;
 		String sqlStr = "select dk._id, dk.[_IDRRef], dk.[Kod], dk.[Naimenovanie] [DogovoryKontragentovNaimenovanie], dk.Zakryt, " + "ifnull(gd.[Naimenovanie], '') [GruppyDogovorovNaimenovanie] "//
-				                + "from DogovoryKontragentov_strip dk " //
-				                + "left join GruppyDogovorov gd on dk.[GruppaDogovorov] = gd.[_IDRRef] " //
-				                + "where dk.[Vladelec]=" + mAppInstance.getClientInfo().getID();
+				+ "from DogovoryKontragentov_strip dk " //
+				+ "left join GruppyDogovorov gd on dk.[GruppaDogovorov] = gd.[_IDRRef] " //
+				+ "where dk.[Vladelec]=" + mAppInstance.getClientInfo().getID();
 		Cursor cursor = mDB.rawQuery(sqlStr, null);
-		if(cursor.moveToFirst()) {
+		if (cursor.moveToFirst()) {
 			do {
 				row = (TableRow) getLayoutInflater().inflate(R.layout.tablerow_contracts_2, null).findViewById(R.id.contracts_tablerow_2);
 				textCode = (TextView) row.findViewById(R.id.text_code);
@@ -1040,32 +1029,31 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 				textContractsGroup = (TextView) row.findViewById(R.id.text_contracts_group);
 				textContractsGroup.setText(cursor.getString(5));
 				imClose = (ImageView) row.findViewById(R.id.img_close);
-				if(cursor.getBlob(4)[0] == 1) {
+				if (cursor.getBlob(4)[0] == 1) {
 					imClose.setImageResource(android.R.drawable.checkbox_on_background);
-				}
-				else {
+				} else {
 					imClose.setImageResource(android.R.drawable.checkbox_off_background);
 				}
 				layout.addView(row, new TableLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 			}
-			while(cursor.moveToNext());
+			while (cursor.moveToNext());
 		}
 		cursor.close();
 	}
 
 	private void UpdateAvailableAmount() {
-		if(mAmount != null) {
+		if (mAmount != null) {
 			mAmount.setText(DecimalFormatHelper.format(mAvailableAmount - Request_Bids.getBidsAmount(mDB, DateTimeHelper.SQLDateString(Calendar.getInstance().getTime()))));
 		}
 	}
 
 	private void SetAvailableAmount(Cursor cursor) {
 		mAvailableAmount = 0.00;
-		if(cursor.moveToFirst()) {
+		if (cursor.moveToFirst()) {
 			do {
 				mAvailableAmount += cursor.getDouble(3);
 			}
-			while(cursor.moveToNext());
+			while (cursor.moveToNext());
 		}
 		UpdateAvailableAmount();
 	}
@@ -1076,51 +1064,52 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		intent.setClass(this, Activity_Pechati.class);
 		startActivity(intent);
 	}
-/*
-	void startCheckList() {
-		long id = ActivityCheckDocs.findOrCreateNew(checkTerriKod);
-		String cuKl = mAppInstance.getClientInfo().getKod().trim();
-		ActivityCheckList.addForKontragent(cuKl, checkTerriKod, "" + id);
-		Intent intent = new Intent(Activity_BidsContractsEtc.this, ActivityCheckList.class);
-		intent.putExtra("doc_id", "" + id);
-		intent.putExtra("kontragent", "" + cuKl);
-		startActivity(intent);
-	}
 
-	void showChekList() {
-
-		if(checkTerriKod != null) {
-			startCheckList();
-			return;
+	/*
+		void startCheckList() {
+			long id = ActivityCheckDocs.findOrCreateNew(checkTerriKod);
+			String cuKl = mAppInstance.getClientInfo().getKod().trim();
+			ActivityCheckList.addForKontragent(cuKl, checkTerriKod, "" + id);
+			Intent intent = new Intent(Activity_BidsContractsEtc.this, ActivityCheckList.class);
+			intent.putExtra("doc_id", "" + id);
+			intent.putExtra("kontragent", "" + cuKl);
+			startActivity(intent);
 		}
-		final Numeric nn = new Numeric().value(0);
-		final Vector<Bough> names = new Vector<Bough>();
-		for(int i = 0; i < Cfg.territory().children.size(); i++) {
-			if(!ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().equals(//
-					Cfg.territory().children.get(i).child("hrc").value.property.value().trim())) {
-				names.add(Cfg.territory().children.get(i));
-			}
-		}
-		if(names.size() > 0) {
-			final String[] ters = new String[names.size()];
-			for(int i = 0; i < names.size(); i++) {
-				ters[i] = names.get(i).child("territory").value.property.value()// 
-						          + " (" + names.get(i).child("hrc").value.property.value().trim() + ")";
-			}
-			Auxiliary.pickSingleChoice(Activity_BidsContractsEtc.this, ters, nn, null, new Task() {
-				@Override
-				public void doTask() {
-					checkTerriKod = names.get(nn.value().intValue()).child("kod").value.property.value().trim();
 
-					startCheckList();
+		void showChekList() {
+
+			if(checkTerriKod != null) {
+				startCheckList();
+				return;
+			}
+			final Numeric nn = new Numeric().value(0);
+			final Vector<Bough> names = new Vector<Bough>();
+			for(int i = 0; i < Cfg.territory().children.size(); i++) {
+				if(!ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().equals(//
+						Cfg.territory().children.get(i).child("hrc").value.property.value().trim())) {
+					names.add(Cfg.territory().children.get(i));
 				}
-			}, null, null, null, null);
+			}
+			if(names.size() > 0) {
+				final String[] ters = new String[names.size()];
+				for(int i = 0; i < names.size(); i++) {
+					ters[i] = names.get(i).child("territory").value.property.value()//
+									  + " (" + names.get(i).child("hrc").value.property.value().trim() + ")";
+				}
+				Auxiliary.pickSingleChoice(Activity_BidsContractsEtc.this, ters, nn, null, new Task() {
+					@Override
+					public void doTask() {
+						checkTerriKod = names.get(nn.value().intValue()).child("kod").value.property.value().trim();
+
+						startCheckList();
+					}
+				}, null, null, null, null);
+			}
+			else {
+				Auxiliary.warn("Нет подчинённых территорий", this);
+			}
 		}
-		else {
-			Auxiliary.warn("Нет подчинённых территорий", this);
-		}
-	}
-*/
+	*/
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuOtchety = menu.add("Отчёты");
@@ -1129,30 +1118,30 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		menuKartaKlienta = menu.add("Карта клиента");
 		menuObnoIstoria = menu.add("Обновить историю");
 		menuShoMap = menu.add("Показать на карте");
-		menuRequestMailList=menu.add("Выслать шаблон заказа");
+		menuRequestMailList = menu.add("Выслать шаблон заказа");
 		return true;
 	}
 
 	void doObnoIstoria() {//http://89.109.7.162/GolovaNew/hs/ObnovlenieInfo/Istoriya?klient=82496
-		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()+"/hs/ObnovlenieInfo/Istoriya?klient=" + mAppInstance.getClientInfo().getKod().trim();
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ObnovlenieInfo/Istoriya?klient=" + mAppInstance.getClientInfo().getKod().trim();
 		//final String url = Settings.getInstance().getBaseURL() + "GolovaNew/hs/ObnovlenieInfo/DannyeMarshruta?hrc=" + mAppInstance.getCurrentAgent().getAgentName().trim();
 		//System.out.println(url);
 		new Expect().task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
-					byte[] b = Auxiliary.loadFileFromPrivateURL(url,Cfg.whoCheckListOwner(),Cfg.hrcPersonalPassword());
+					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String s = new String(b, "utf-8");
 					String[] commands = s.split("\n");
-					for(int i = 0; i < commands.length; i++) {
+					for (int i = 0; i < commands.length; i++) {
 						String sql = commands[i].trim();
-						if(sql.length() > 1) {
+						if (sql.length() > 1) {
 							//System.out.println(i + ": " + sql);
 							Activity_BidsContractsEtc.this.mDB.execSQL(sql);
 						}
 					}
 					UpdateTask.refreshProdazhi_last(Activity_BidsContractsEtc.this.mDB);
-				} catch(Exception e) {
+				} catch (Exception e) {
 					//
 					e.printStackTrace();
 				}
@@ -1164,18 +1153,20 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 			}
 		}).status.is("Обновление БД").start(this);
 	}
-void doRequestMailList(){
+
+	void doRequestMailList() {
 		//Note email=new Note();
-		Auxiliary.pickText(this,"E-mail для отправки",Settings.emailToSend,"Отправить",new Task(){
+		Auxiliary.pickText(this, "E-mail для отправки", Settings.emailToSend, "Отправить", new Task() {
 			@Override
 			public void doTask() {
 				//System.out.println(Settings.emailToSend.value());
 			}
 		});
-}
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item == menuPechati) {
+		if (item == menuPechati) {
 			showPechati();
 			return true;
 		}
@@ -1183,30 +1174,30 @@ void doRequestMailList(){
 			showChekList();
 			return true;
 		}*/
-		if(item == menuObnoIstoria) {
+		if (item == menuObnoIstoria) {
 			doObnoIstoria();
 			return true;
 		}
-		if(item == menuOtchety) {
+		if (item == menuOtchety) {
 			Intent intent = new Intent();
 			intent.setClass(Activity_BidsContractsEtc.this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
 			startActivity(intent);
 			return true;
 		}
-		if(item == menuKartaKlienta) {
+		if (item == menuKartaKlienta) {
 			Intent intent = new Intent();
 			//intent.putExtra("_id", "" +mAppInstance.getClientInfo().getKod());
 			intent.setClass(Activity_BidsContractsEtc.this, sweetlife.android10.supervisor.ActivityKartaKlienta.class);
 			startActivity(intent);
 			return true;
 		}
-		if(item == menuShoMap) {
+		if (item == menuShoMap) {
 			Intent intent = new Intent();
 			intent.setClass(this, sweetlife.android10.supervisor.ActivityGPSMap.class);
 			this.startActivityForResult(intent, 0);
 			return true;
 		}
-		if(item == menuRequestMailList) {
+		if (item == menuRequestMailList) {
 			doRequestMailList();
 			return true;
 		}

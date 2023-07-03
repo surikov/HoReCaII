@@ -1,160 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="20dip" >
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_margin="20dip">
 
-    <LinearLayout
-        android:id="@+id/layout_period"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" >
-
-        <TextView
-            android:id="@+id/text_from_date"
-            android:layout_width="110dip"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dip"
-            android:text="Дата отгрузки" />
+	<LinearLayout
+		android:id="@+id/layout_period"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentTop="true"
+		android:layout_centerHorizontal="true">
 
-        <EditText
-            android:id="@+id/edit_from_date"
-            android:layout_width="match_parent"
-            android:layout_height="48dip"
-            android:layout_weight="1"
-            android:editable="false"
-            android:focusable="false"
-            android:inputType="text" />
 
-        <Button
-            android:id="@+id/btn_from_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/point_point_point" />
+		<TextView
+			android:id="@+id/text_from_date"
+			android:layout_width="110dip"
+			android:layout_height="wrap_content"
+			android:layout_marginRight="10dip"
+			android:text="Дата отгрузки" />
 
-        <TextView
-            android:id="@+id/text_to_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
-            android:layout_marginRight="10dip"
-            android:text="@string/period_till" />
+		<EditText
+			android:id="@+id/edit_from_date"
+			android:layout_width="match_parent"
+			android:layout_height="48dip"
+			android:layout_weight="1"
+			android:editable="false"
+			android:focusable="false"
+			android:inputType="text" />
 
-        <EditText
-            android:id="@+id/edit_to_date"
-            android:layout_width="match_parent"
-            android:layout_height="48dip"
-            android:layout_weight="1"
-            android:editable="false"
-            android:focusable="false"
-            android:inputType="text" />
+		<Button
+			android:id="@+id/btn_from_date"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/point_point_point" />
 
-        <Button
-            android:id="@+id/btn_to_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/point_point_point" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_order_dates"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/layout_period"
-        android:layout_centerHorizontal="true" >
-
-        <TextView
-            android:layout_width="110dip"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dip"
-            android:text="Дата заказа" />
-
-        <EditText
-            android:id="@+id/edit_order_from_date"
-            android:layout_width="match_parent"
-            android:layout_height="48dip"
-            android:layout_weight="1"
-            android:editable="false"
-            android:focusable="false"
-            android:inputType="text" />
-
-        <Button
-            android:id="@+id/btn_order_from_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/point_point_point" />
+		<TextView
+			android:id="@+id/text_to_date"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:layout_marginRight="10dip"
+			android:text="@string/period_till" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
-            android:layout_marginRight="10dip"
-            android:text="@string/period_till" />
-
-        <EditText
-            android:id="@+id/edit_order_to_date"
-            android:layout_width="match_parent"
-            android:layout_height="48dip"
-            android:layout_weight="1"
-            android:editable="false"
-            android:focusable="false"
-            android:inputType="text" />
-
-        <Button
-            android:id="@+id/btn_order_to_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/point_point_point" />
+		<EditText
+			android:id="@+id/edit_to_date"
+			android:layout_width="match_parent"
+			android:layout_height="48dip"
+			android:layout_weight="1"
+			android:editable="false"
+			android:focusable="false"
+			android:inputType="text" />
 
-    </LinearLayout>
+		<Button
+			android:id="@+id/btn_to_date"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/point_point_point" />
+	</LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/layout_client"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/layout_order_dates"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dip" >
 
-        <TextView
-            android:id="@+id/text_client"
-            android:layout_width="110dip"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dip"
-            android:text="@string/client" />
+	<LinearLayout
+		android:id="@+id/layout_order_dates"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@+id/layout_period"
+		android:layout_centerHorizontal="true">
 
-        <EditText
-            android:id="@+id/edit_client"
-            android:layout_width="fill_parent"
-            android:layout_height="48dip"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btn_client"
-            android:layout_toRightOf="@+id/text_client"
-            android:editable="false"
-            android:focusable="false"
-            android:inputType="text" />
 
-        <Button
-            android:id="@+id/btn_client"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="@string/point_point_point" />
-    </RelativeLayout>
+		<TextView
+			android:layout_width="110dip"
+			android:layout_height="wrap_content"
+			android:layout_marginRight="10dip"
+			android:text="Дата заказа" />
 
-    <Button
-        android:id="@+id/btn_generate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/layout_client"
-        android:layout_marginTop="10dip"
-        android:text="@string/generate_report" />
+
+		<EditText
+			android:id="@+id/edit_order_from_date"
+			android:layout_width="match_parent"
+			android:layout_height="48dip"
+			android:layout_weight="1"
+			android:editable="false"
+			android:focusable="false"
+			android:inputType="text" />
+
+
+		<Button
+			android:id="@+id/btn_order_from_date"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/point_point_point" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:layout_marginRight="10dip"
+			android:text="@string/period_till" />
+
+
+		<EditText
+			android:id="@+id/edit_order_to_date"
+			android:layout_width="match_parent"
+			android:layout_height="48dip"
+			android:layout_weight="1"
+			android:editable="false"
+			android:focusable="false"
+			android:inputType="text" />
+
+
+		<Button
+			android:id="@+id/btn_order_to_date"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/point_point_point" />
+
+	</LinearLayout>
+
+	<RelativeLayout
+		android:id="@+id/layout_client"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@+id/layout_order_dates"
+		android:layout_centerHorizontal="true"
+		android:layout_marginTop="10dip">
+
+		<TextView
+			android:id="@+id/text_client"
+			android:layout_width="110dip"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:layout_marginRight="10dip"
+			android:text="@string/client" />
+
+		<EditText
+			android:id="@+id/edit_client"
+			android:layout_width="fill_parent"
+			android:layout_height="48dip"
+			android:layout_centerVertical="true"
+			android:layout_toLeftOf="@+id/btn_client"
+			android:layout_toRightOf="@+id/text_client"
+			android:editable="false"
+			android:focusable="false"
+			android:inputType="text" />
+
+		<Button
+			android:id="@+id/btn_client"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:text="@string/point_point_point" />
+	</RelativeLayout>
+
+	<Button
+		android:id="@+id/btn_generate"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true"
+		android:layout_below="@+id/layout_client"
+		android:layout_marginTop="10dip"
+		android:text="@string/generate_report" />
 
 </RelativeLayout>

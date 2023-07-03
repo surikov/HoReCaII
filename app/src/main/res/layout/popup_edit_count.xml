@@ -1,105 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scroller"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@android:drawable/alert_light_frame"
-    android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/text_nomenclature"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dip"
-        android:layout_marginRight="7dip"
-        android:layout_marginTop="10dip"
-        android:ellipsize="end"
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/text_count"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dip"
-        android:layout_marginRight="7dip"
-        android:layout_marginTop="7dip"
-        android:text="@string/count" />
-
-    <RelativeLayout
-        android:layout_width="600dp"
-        android:layout_height="match_parent"
-        android:layout_margin="9dip"
-        android:orientation="horizontal" >
-
-        <EditText
-            android:id="@+id/edit_count"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/btn_minus"
-            android:editable="false"
-            android:focusable="false"
-            android:inputType="none" />
-
-        <Button
-            android:id="@+id/btn_minus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/btn_plus"
-            android:text="@string/minus" />
-
-        <Button
-            android:id="@+id/btn_plus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="@string/plus" />
-    </RelativeLayout>
-
-    <TextView
-        android:id="@+id/text_price"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dip"
-        android:layout_marginRight="7dip"
-        android:visibility="gone" />
-
-    <EditText
-        android:id="@+id/edit_price"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="9dip"
-        android:editable="false"
-        android:focusable="false"
-        android:inputType="none"
-        android:visibility="gone" />
-
-    <include
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dip"
-        android:layout_marginLeft="8dip"
-        android:layout_marginRight="8dip"
-        layout="@layout/popup_buttons" />
+	android:id="@+id/scroller"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:background="@android:drawable/alert_light_frame"
+	android:orientation="vertical">
 
 	<TextView
-        android:text="   "
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dip"
-        android:layout_marginRight="7dip"
-        android:layout_marginTop="10dip"
-        android:ellipsize="end"
-        android:textSize="18sp" />
+		android:id="@+id/text_nomenclature"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="7dip"
+		android:layout_marginTop="10dip"
+		android:ellipsize="end"
+		android:textSize="18sp" />
+
 	<TextView
-        android:text="   "
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dip"
-        android:layout_marginRight="7dip"
-        android:layout_marginTop="10dip"
-        android:ellipsize="end"
-        android:textSize="18sp" />
+		android:id="@+id/text_count"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="7dip"
+		android:layout_marginTop="7dip"
+		android:text="@string/count" />
+
+	<RelativeLayout
+		android:layout_width="600dp"
+		android:layout_height="match_parent"
+		android:layout_margin="9dip"
+		android:orientation="horizontal">
+
+		<EditText
+			android:id="@+id/edit_count"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"
+			android:layout_toLeftOf="@+id/btn_minus"
+			android:editable="false"
+			android:focusable="false"
+			android:inputType="none" />
+
+		<Button
+			android:id="@+id/btn_minus"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toLeftOf="@+id/btn_plus"
+			android:text="@string/minus" />
+
+		<Button
+			android:id="@+id/btn_plus"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+			android:text="@string/plus" />
+	</RelativeLayout>
+
+	<TextView
+		android:id="@+id/text_price"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="7dip"
+		android:visibility="gone" />
+
+	<EditText
+		android:id="@+id/edit_price"
+		android:layout_width="fill_parent"
+		android:layout_height="match_parent"
+		android:layout_margin="9dip"
+		android:editable="false"
+		android:focusable="false"
+		android:inputType="none"
+		android:visibility="gone" />
+
+	<include
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="8dip"
+		android:layout_marginLeft="8dip"
+		android:layout_marginRight="8dip"
+		layout="@layout/popup_buttons" />
+
+	<TextView
+		android:text="   "
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="7dip"
+		android:layout_marginTop="10dip"
+		android:ellipsize="end"
+		android:textSize="18sp" />
+
+	<TextView
+		android:text="   "
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="7dip"
+		android:layout_marginTop="10dip"
+		android:ellipsize="end"
+		android:textSize="18sp" />
 
 </LinearLayout>

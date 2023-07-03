@@ -1,7 +1,9 @@
 package reactive.ui;
 
 import java.util.*;
+
 import android.os.*;
+
 import tee.binding.properties.NumericProperty;
 import tee.binding.task.*;
 
@@ -13,12 +15,15 @@ public abstract class CannyTask extends Task {
 	public CannyTask() {
 		laziness.is(50);
 	}
+
 	public void start(int lazy) {
 		laziness.is(lazy);
 		start();
 	}
+
 	public void doBackground() {
 	}
+
 	@Override
 	public void start() {
 		key = Math.random();
@@ -28,8 +33,7 @@ public abstract class CannyTask extends Task {
 			protected Void doInBackground(Void... params) {
 				try {
 					Thread.sleep(laziness.property.value().intValue());
-				}
-				catch (Throwable t) {
+				} catch (Throwable t) {
 					//
 				}
 				if (started == key) {
@@ -37,6 +41,7 @@ public abstract class CannyTask extends Task {
 				}
 				return null;
 			}
+
 			@Override
 			protected void onPostExecute(Void v) {
 				if (started == key) {

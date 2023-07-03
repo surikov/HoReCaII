@@ -1,8 +1,10 @@
 package reactive.ui;
 
 import android.os.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.*;
+
 import android.app.*;
 import android.content.*;
 import android.content.DialogInterface.*;
@@ -10,7 +12,7 @@ import android.content.DialogInterface.*;
 abstract class RealAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 	public void realPublishProgress(Progress... values) {
 
-		publishProgress( values);
+		publishProgress(values);
 	}
 }
 
@@ -35,6 +37,7 @@ public class Expect //extends AsyncTask<Void, Void, Void>
 			}
 		});
 	}
+
 	/*@Override
 	protected Void doInBackground(Void... params) {
 		if (task.property.value() != null) {
@@ -76,13 +79,13 @@ public class Expect //extends AsyncTask<Void, Void, Void>
 				if (task.property.value() != null) {
 					try {
 						task.property.value().start();
-					}
-					catch (Throwable t) {
+					} catch (Throwable t) {
 						t.printStackTrace();
 					}
 				}
 				return null;
 			}
+
 			@Override
 			protected void onProgressUpdate(Void... values) {
 				//System.out.println("RealAsyncTask.onProgressUpdate");
@@ -90,6 +93,7 @@ public class Expect //extends AsyncTask<Void, Void, Void>
 					dialog.setMessage(status.property.value());
 				}
 			}
+
 			@Override
 			protected void onPostExecute(Void v) {
 				//System.out.println("RealAsyncTask.onPostExecute");
@@ -110,6 +114,7 @@ public class Expect //extends AsyncTask<Void, Void, Void>
 		asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		//System.out.println(this.getClass().getCanonicalName()+" started");
 	}
+
 	public boolean silentStart() {
 		if (lock) {
 			return false;
@@ -118,6 +123,7 @@ public class Expect //extends AsyncTask<Void, Void, Void>
 		executeTask();
 		return true;
 	}
+
 	public boolean start(Context context) {
 		//System.out.println("Expect.start");
 		if (lock) {
@@ -145,6 +151,7 @@ public class Expect //extends AsyncTask<Void, Void, Void>
 		//System.out.println(this.getClass().getCanonicalName()+" return");
 		return true;
 	}
+
 	public void unbind() {
 		afterDone.property.unbind();
 		afterCancel.property.unbind();

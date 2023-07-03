@@ -26,60 +26,59 @@ public class ReturnsListAdapter extends ZoomListCursorAdapter {
 	@Override
 	public void bindView(View row, Context context, Cursor cursor) {
 
-		ReturnHolder holder = (ReturnHolder)row.getTag();
+		ReturnHolder holder = (ReturnHolder) row.getTag();
 
-		holder.populateFrom( cursor, getRowTextFontSize() );
+		holder.populateFrom(cursor, getRowTextFontSize());
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup view) {
 
-		View row=LayoutInflater.from(context).inflate(R.layout.row_returns, view, false);
+		View row = LayoutInflater.from(context).inflate(R.layout.row_returns, view, false);
 
-		ReturnHolder holder = new ReturnHolder(row);	
+		ReturnHolder holder = new ReturnHolder(row);
 
 		row.setTag(holder);
 
-		return(row);
+		return (row);
 	}
 
 	public class ReturnHolder {
 
-		private ImageView mImageUploaded=null;
-		private TextView mTextNumber=null;
-		private TextView mTextDate=null;
-		private TextView mTextClient=null;
-		private TextView mTextShippingDate=null;
+		private ImageView mImageUploaded = null;
+		private TextView mTextNumber = null;
+		private TextView mTextDate = null;
+		private TextView mTextClient = null;
+		private TextView mTextShippingDate = null;
 
 		ReturnHolder(View row) {
 
-			mImageUploaded    = (ImageView)row.findViewById(R.id.image_uploaded);
-			mTextNumber       = (TextView)row.findViewById(R.id.text_number);
-			mTextDate         = (TextView)row.findViewById(R.id.text_date);
-			mTextClient       = (TextView)row.findViewById(R.id.text_kontragent);
-			mTextShippingDate = (TextView)row.findViewById(R.id.text_shipping_date);
+			mImageUploaded = (ImageView) row.findViewById(R.id.image_uploaded);
+			mTextNumber = (TextView) row.findViewById(R.id.text_number);
+			mTextDate = (TextView) row.findViewById(R.id.text_date);
+			mTextClient = (TextView) row.findViewById(R.id.text_kontragent);
+			mTextShippingDate = (TextView) row.findViewById(R.id.text_shipping_date);
 		}
 
 		void populateFrom(Cursor cursor, float rowTextFontSize) {
 
-			if( Request_Returns.isUploaded(cursor) ) {
-				
+			if (Request_Returns.isUploaded(cursor)) {
+
 				mImageUploaded.setImageResource(android.R.drawable.checkbox_on_background);
-			}
-			else { 
-			
+			} else {
+
 				mImageUploaded.setImageResource(android.R.drawable.checkbox_off_background);
 			}
-			
+
 			mTextNumber.setText(Request_Returns.getNomer(cursor));
 			mTextNumber.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
 
 			mTextDate.setText(DateTimeHelper.UIDateString(Request_Returns.getData(cursor)));
 			mTextDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
+
 			mTextClient.setText(Request_Returns.getKontragentNaimanovanie(cursor));
 			mTextClient.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
+
 			mTextShippingDate.setText(DateTimeHelper.UIDateString(Request_Returns.getDataOtgruzki(cursor)));
 			mTextShippingDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
 		}

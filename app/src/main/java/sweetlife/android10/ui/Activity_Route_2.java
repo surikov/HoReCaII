@@ -249,7 +249,7 @@ public class Activity_Route_2 extends Activity {
 		columnCh = new ColumnText();
 		columnPt = new ColumnText();
 		columnSb = new ColumnText();
-		columnMenu= new ColumnText();
+		columnMenu = new ColumnText();
 		//System.out.println("columnClient "+columnClient);
 		layoutless.child(dataGrid//
 				.headerHeight.is(0.5 * Auxiliary.tapSize)//
@@ -276,7 +276,7 @@ public class Activity_Route_2 extends Activity {
 						//
 						, columnSb.title.is("Сб").width.is(0.5 * Auxiliary.tapSize)
 						//
-						,columnMenu.title.is(" ").width.is(1 * Auxiliary.tapSize)
+						, columnMenu.title.is(" ").width.is(1 * Auxiliary.tapSize)
 				})//
 				.left().is(0)//
 				.top().is(1 * Auxiliary.tapSize)//
@@ -455,7 +455,7 @@ public class Activity_Route_2 extends Activity {
 					public void doTask() {
 						Intent intent = new Intent();
 						intent.setClass(Activity_Route_2.this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
-						intent.putExtra("startup", ReportStatusyZakazov.folderKey());
+						intent.putExtra(ActivityWebServicesReports.goLastPageReportName, ReportStatusyZakazov.folderKey());
 						startActivity(intent);
 					}
 				})//
@@ -470,7 +470,7 @@ public class Activity_Route_2 extends Activity {
 					public void doTask() {
 						Intent intent = new Intent();
 						intent.setClass(Activity_Route_2.this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
-						intent.putExtra("startup", ReportStatistikaZakazov2.folderKey());
+						intent.putExtra(ActivityWebServicesReports.goLastPageReportName, ReportStatistikaZakazov2.folderKey());
 						startActivity(intent);
 					}
 				})//
@@ -1170,7 +1170,8 @@ public class Activity_Route_2 extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	void promptZayavkaNaPerevodVdosudebnye(){
+
+	void promptZayavkaNaPerevodVdosudebnye() {
 		String sql = "select kontragenty.kod as kod,kontragenty.naimenovanie as naimenovanie from kontragenty"//
 				+ " group by kontragenty.kod"//
 				+ " order by kontragenty.naimenovanie";
@@ -1179,8 +1180,8 @@ public class Activity_Route_2 extends Activity {
 		final Vector<String> kods = new Vector<String>();
 		for (int i = 0; i < bough.children.size(); i++) {
 			Bough row = bough.children.get(i);
-				names.add(bough.children.get(i).child("kod").value.property.value() + ": " + bough.children.get(i).child("naimenovanie").value.property.value());
-				kods.add(bough.children.get(i).child("kod").value.property.value());
+			names.add(bough.children.get(i).child("kod").value.property.value() + ": " + bough.children.get(i).child("naimenovanie").value.property.value());
+			kods.add(bough.children.get(i).child("kod").value.property.value());
 		}
 		final Numeric sel = new Numeric();
 		Auxiliary.pickFilteredChoice(this, names.toArray(new String[0]), sel//
@@ -1188,31 +1189,33 @@ public class Activity_Route_2 extends Activity {
 					@Override
 					public void doTask() {
 						final String kod = kods.get(sel.value().intValue());
-						String msg="Отправить "+( names.get(sel.value().intValue()))+" в досудебные?";
-						Auxiliary.pickConfirm(Activity_Route_2.this,msg,"Отправить заявку", new Task() {
-							@Override
-							public void doTask() {
-								sendZayavkaNaPerevodVdosudebnye(kod);
-							}}
+						String msg = "Отправить " + (names.get(sel.value().intValue())) + " в досудебные?";
+						Auxiliary.pickConfirm(Activity_Route_2.this, msg, "Отправить заявку", new Task() {
+									@Override
+									public void doTask() {
+										sendZayavkaNaPerevodVdosudebnye(kod);
+									}
+								}
 
-								);
+						);
 
 					}
 				});
 	}
-	void sendZayavkaNaPerevodVdosudebnye(final String selectedKlientKod){
+
+	void sendZayavkaNaPerevodVdosudebnye(final String selectedKlientKod) {
 
 		final Note result = new Note();
 		new Expect().task.is(new Task() {
 			@Override
 			public void doTask() {
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/CreateClientTransferRequest/"
-						+selectedKlientKod;
-						//+ ApplicationHoreca.getInstance().getClientInfo().getKod() ;
+						+ selectedKlientKod;
+				//+ ApplicationHoreca.getInstance().getClientInfo().getKod() ;
 				//url="https://testservice.swlife.ru/okunev_hrc/hs/Planshet/CreateClientTransferRequest/277793";
 				try {
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					Bough rr=Bough.parseJSON(new String(b, "UTF-8"));
+					Bough rr = Bough.parseJSON(new String(b, "UTF-8"));
 					//result.value(new String(b, "UTF-8"));
 					result.value(rr.child("Message").value.property.value());
 				} catch (Throwable t) {
@@ -1227,6 +1230,7 @@ public class Activity_Route_2 extends Activity {
 			}
 		}).status.is("Подождите...").start(this);
 	}
+
 	void doKontaktnayaInformacia() {
 		final Bough result = new Bough();
 		new Expect().task.is(new Task() {
@@ -1329,7 +1333,7 @@ I/System.out: </>
 								.width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.7))//
 
 						.width().is(Auxiliary.tapSize * 9)//
-						.height().is(Auxiliary.tapSize *6)//
+						.height().is(Auxiliary.tapSize * 6)//
 				, "Обновить", new Task() {
 					@Override
 					public void doTask() {
@@ -1676,10 +1680,10 @@ I/System.out: </>
 			columnCh.cell(formatDayToggle(row.child("Den4").value.property.value()), bg4, tapTask);
 			columnPt.cell(formatDayToggle(row.child("Den5").value.property.value()), bg5, tapTask);
 			columnSb.cell(formatDayToggle(row.child("Den6").value.property.value()), bg6, tapTask);
-			columnMenu.cell("...",new Task(){
+			columnMenu.cell("...", new Task() {
 				public void doTask() {
 
-					Auxiliary.pickConfirm(Activity_Route_2.this,"Распоряжение на отгрузку","Создать",new Task(){
+					Auxiliary.pickConfirm(Activity_Route_2.this, "Распоряжение на отгрузку", "Создать", new Task() {
 						public void doTask() {
 							pickRaspOt("x'" + kk + "'");
 						}
@@ -1689,7 +1693,8 @@ I/System.out: </>
 		}
 		//System.out.println("after flipGrid gridOffset "+this.gridOffset.value());
 	}
-	void pickRaspOt(String hexKlient){
+
+	void pickRaspOt(String hexKlient) {
 		Intent intent = new Intent();
 		intent.setClass(Activity_Route_2.this, Dialog_EditDisposal.class);
 		intent.putExtra("hexKlient", hexKlient);
@@ -1913,7 +1918,7 @@ I/System.out: </>
 		//System.out.println("scrollToOldPosition gridOffset "+this.gridOffset.value()+"/"+lastGridY+"/"+more+"/"+dataGrid.getScrollY());
 		//dataGrid.scrollToOldPosition(lastGridY+more);
 		//System.out.println("scroll Position  "+dataGrid.getScrollY());
-		this.dataGrid.lockScroll=false;
+		this.dataGrid.lockScroll = false;
 	}
 
 	/*
@@ -2019,7 +2024,7 @@ I/System.out: </>
 		//System.out.println("requery started");
 		//System.out.println("IMEI ------------------------------ " + Cfg.hrc_imei());
 		//reShowGrid();
-		this.dataGrid.lockScroll=true;
+		this.dataGrid.lockScroll = true;
 		requery22222.start(this);
 
 		Date now = new Date();
@@ -2039,7 +2044,7 @@ I/System.out: </>
 	@Override
 	protected void onPause() {
 		System.out.println("onPause " + (this.dataGrid.scrollView.getScrollY() / Auxiliary.tapSize) + "+" + gridOffset.value());
-		double newOffset = Math.floor(gridOffset.value() + this.dataGrid.scrollView.getScrollY() / Auxiliary.tapSize );
+		double newOffset = Math.floor(gridOffset.value() + this.dataGrid.scrollView.getScrollY() / Auxiliary.tapSize);
 		//newOffset=newOffset+ dataGrid.extraRowScrollCount;
 		if (newOffset < 0) {
 			newOffset = 0;

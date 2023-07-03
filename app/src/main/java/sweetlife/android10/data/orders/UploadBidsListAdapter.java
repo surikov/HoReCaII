@@ -19,45 +19,45 @@ import android.widget.TextView;
 import sweetlife.android10.R;
 
 public class UploadBidsListAdapter extends ZoomListCursorAdapter {
-	
-	private ArrayList<Boolean> mStateList = new ArrayList<Boolean>(); 
+
+	private ArrayList<Boolean> mStateList = new ArrayList<Boolean>();
 
 	private IStateChanged mStateChangedHandler;
-	
-	public UploadBidsListAdapter(Context context, Cursor cursor, IStateChanged stateChangedHandler ) {
+
+	public UploadBidsListAdapter(Context context, Cursor cursor, IStateChanged stateChangedHandler) {
 		super(context, cursor);
 
 		mStateChangedHandler = stateChangedHandler;
 
-		if( cursor.moveToFirst() ) {
+		if (cursor.moveToFirst()) {
 
 			int count = cursor.getCount();
 
-			for( int i = 0; i < count; i++ ) {
+			for (int i = 0; i < count; i++) {
 
-				mStateList.add( new Boolean(true));
+				mStateList.add(new Boolean(true));
 			}
 		}
 	}
 
 	@Override
 	public void changeCursor(Cursor cursor) {
-	
+
 		mStateList.clear();
-		
-		if( cursor.moveToFirst() ) {
+
+		if (cursor.moveToFirst()) {
 
 			int count = cursor.getCount();
 
-			for( int i = 0; i < count; i++ ) {
+			for (int i = 0; i < count; i++) {
 
-				mStateList.add( new Boolean(true));
+				mStateList.add(new Boolean(true));
 			}
 		}
-		
+
 		super.changeCursor(cursor);
 	}
-	
+
 	public void finallize() {
 
 		mStateList.clear();
@@ -71,9 +71,9 @@ public class UploadBidsListAdapter extends ZoomListCursorAdapter {
 	@Override
 	public void bindView(View row, Context context, Cursor cursor) {
 
-		BidHolder holder = (BidHolder)row.getTag();
+		BidHolder holder = (BidHolder) row.getTag();
 
-		holder.populateFrom( cursor, cursor.getPosition() );
+		holder.populateFrom(cursor, cursor.getPosition());
 	}
 
 	@Override
@@ -81,44 +81,43 @@ public class UploadBidsListAdapter extends ZoomListCursorAdapter {
 
 		View row = LayoutInflater.from(context).inflate(R.layout.row_uploadbids, view, false);
 
-		BidHolder holder = new BidHolder(row);	
+		BidHolder holder = new BidHolder(row);
 
 		row.setTag(holder);
 
-		return(row);
+		return (row);
 	}
 
 	public class BidHolder {
 
-		private TextView mTextNumber       = null;
-		private TextView mTextDate         = null;
-		private TextView mTextKontragent   = null;
+		private TextView mTextNumber = null;
+		private TextView mTextDate = null;
+		private TextView mTextKontragent = null;
 		private TextView mTextShipmentDate = null;
-		public  ImageView mState	 	   = null;
+		public ImageView mState = null;
 
-		BidHolder(View row) { 
+		BidHolder(View row) {
 
-			mTextNumber       = (TextView)row.findViewById(R.id.text_number);
-			mTextDate         = (TextView)row.findViewById(R.id.text_date);
-			mTextKontragent   = (TextView)row.findViewById(R.id.text_kontragent);
-			mTextShipmentDate = (TextView)row.findViewById(R.id.text_date_shipment);
-			mState	 		  = (ImageView)row.findViewById(R.id.image_upload);
+			mTextNumber = (TextView) row.findViewById(R.id.text_number);
+			mTextDate = (TextView) row.findViewById(R.id.text_date);
+			mTextKontragent = (TextView) row.findViewById(R.id.text_kontragent);
+			mTextShipmentDate = (TextView) row.findViewById(R.id.text_date_shipment);
+			mState = (ImageView) row.findViewById(R.id.image_upload);
 
 			mState.setOnClickListener(new View.OnClickListener() {
 
 				public void onClick(View view) {
 
-					ImageView imState = (ImageView)view;
+					ImageView imState = (ImageView) view;
 
-					if( mStateList.get( (Integer)mState.getTag()) ) {
+					if (mStateList.get((Integer) mState.getTag())) {
 
 						imState.setImageResource(android.R.drawable.checkbox_off_background);
-						mStateList.set((Integer)mState.getTag(), false);
-					}
-					else {
+						mStateList.set((Integer) mState.getTag(), false);
+					} else {
 
 						imState.setImageResource(android.R.drawable.checkbox_on_background);
-						mStateList.set((Integer)mState.getTag(), true);
+						mStateList.set((Integer) mState.getTag(), true);
 					}
 
 					mStateChangedHandler.onChange();
@@ -126,7 +125,7 @@ public class UploadBidsListAdapter extends ZoomListCursorAdapter {
 			});
 		}
 
-		void populateFrom(Cursor cursor, int position ) {
+		void populateFrom(Cursor cursor, int position) {
 
 			float rowTextFontSize = getRowTextFontSize();
 
@@ -135,30 +134,28 @@ public class UploadBidsListAdapter extends ZoomListCursorAdapter {
 
 			mTextDate.setText(DateTimeHelper.UIDateString(Request_Bids.getData(cursor)));
 			mTextDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
+
 			mTextKontragent.setText(Request_Bids.getKontragentNaimanovanie(cursor));
 			mTextKontragent.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
-			
-    		mTextShipmentDate.setText(DateTimeHelper.UIDateString(Request_Bids.getDataOtgruzki(cursor)));
+
+			mTextShipmentDate.setText(DateTimeHelper.UIDateString(Request_Bids.getDataOtgruzki(cursor)));
 			mTextShipmentDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
 
-			if( mStateList.size() == cursor.getCount() ) {
+			if (mStateList.size() == cursor.getCount()) {
 
-				if( mStateList.get(position) ) {
+				if (mStateList.get(position)) {
 
 					mState.setImageResource(android.R.drawable.checkbox_on_background);
-				}
-				else {
+				} else {
 
-					mState.setImageResource(android.R.drawable.checkbox_off_background);				
+					mState.setImageResource(android.R.drawable.checkbox_off_background);
 				}
-			}
-			else {
+			} else {
 
 				mState.setImageResource(android.R.drawable.checkbox_on_background);
 			}
 
-			mState.setTag( new Integer(position) );
+			mState.setTag(new Integer(position));
 		}
 	}
 }

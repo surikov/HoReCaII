@@ -36,11 +36,13 @@ public class Activity_Disposals extends Activity_BasePeriod {
 		setTitle(R.string.disposals_for_shipment);
 		InitializeListView();
 	}
+
 	@Override
 	protected void OnDateChanged(Date fromDate, Date toDate) {
 		mDisposalsListAdapter.changeCursor(Request_Disposals.Request(mDB, DateTimeHelper.SQLDateString(fromDate), DateTimeHelper.SQLDateString(toDate)));
 		mDisposalsListAdapter.notifyDataSetChanged();
 	}
+
 	private void InitializeListView() {
 		((Button) findViewById(R.id.btn_add_disposal)).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -62,6 +64,7 @@ public class Activity_Disposals extends Activity_BasePeriod {
 			}
 		});
 	}
+
 	private void StartEditDisposalActivity(boolean isEditable, RasporyazhenieNaOtgruzku disposal) {
 		Intent intent = new Intent();
 		intent.setClass(Activity_Disposals.this, Dialog_EditDisposal.class);
@@ -71,22 +74,25 @@ public class Activity_Disposals extends Activity_BasePeriod {
 		}
 		startActivityForResult(intent, DISPOSAL_ADD);
 	}
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
-		case DISPOSAL_ADD:
-			mDisposalsListAdapter.getCursor().requery();
-			mDisposalsListAdapter.notifyDataSetChanged();
-			break;
+			case DISPOSAL_ADD:
+				mDisposalsListAdapter.getCursor().requery();
+				mDisposalsListAdapter.notifyDataSetChanged();
+				break;
 		}
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuOtchety = menu.add("Отчёты");
 		return true;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item == menuOtchety) {

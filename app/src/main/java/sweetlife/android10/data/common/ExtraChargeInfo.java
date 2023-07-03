@@ -20,35 +20,39 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 		mClientID = clientID;
 		UpdateClientPlan();
 	}
+
 	public boolean IsExtraChargeInfoAvailable() {
 		if (mClientPlanPercent != 0) {
 			return true;
 		}
 		return false;
 	}
+
 	public void Update(String editOrderID, double basePriceAmount, double amount, double vozvrat) {
 		//System.out.println(this.getClass().getCanonicalName()+": Update: "+editOrderID+"/"+basePriceAmount+"/"+amount);
 		UpdateFactCalculatePart(basePriceAmount, amount, vozvrat);
 	}
+
 	public void UpdateFactCalculatePart(double basePriceAmount, double amount, double vozvrat) {
 		UpdateOrderFactCalculatePart(basePriceAmount, amount, vozvrat);
 	}
+
 	private void UpdateOrderFactCalculatePart(double basePriceAmount, double amount, double vozvrat) {
 		if (basePriceAmount != 0) {
-			
-			double summaSVozvr=amount-vozvrat;
+
+			double summaSVozvr = amount - vozvrat;
 			//System.out.println("summaSVozvr " + amount + "-"+vozvrat+"="+summaSVozvr);
 			//System.out.println( amount + "-"+vozvrat+"="+(amount-vozvrat));
-			mOrderFactPercent = (summaSVozvr - basePriceAmount ) / basePriceAmount * 100.0;
+			mOrderFactPercent = (summaSVozvr - basePriceAmount) / basePriceAmount * 100.0;
 			//System.out.println( "("+summaSVozvr + " - "+basePriceAmount+") / "+basePriceAmount+" * 100 = "+mOrderFactPercent);
 			//System.out.println("new " + mOrderFactPercent + "%");
 			//System.out.println("old " + ((amount - basePriceAmount) / basePriceAmount * 100) + "%");
-		}
-		else {
+		} else {
 			mOrderFactPercent = 0;
 		}
 		//System.out.println(this.getClass().getCanonicalName()+": mOrderFactPercent: "+mOrderFactPercent);
 	}
+
 	private void UpdateClientPlan() {
 		/*
 		String sqlStr = "select p.Nacenka from PlanovyeNacenkiNaMesyac p "// 
@@ -61,7 +65,7 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 				+ "where p.Klient = "// 
 				+ mClientID;
 		*/
-		mClientPlanPercent=0;
+		mClientPlanPercent = 0;
 		//System.out.println("skip mClientPlanPercent");
 		/*
 		String sqlStr = "select p.Nacenka from PlanovyeNacenkiNaMesyac p "// 
@@ -107,7 +111,7 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 				+ "\n\t ) mx"//
 				+ "\n\t on mx.Klient=PlanovyeNacenkiNaMesyac .klient and mx.period=PlanovyeNacenkiNaMesyac  .period";
 		*/
-		planPodrazdeleniaNaMesiac=0;
+		planPodrazdeleniaNaMesiac = 0;
 		//System.out.println("skip planPodrazdeleniaNaMesiac");
 		/*
 		sqlStr = "select sum(ValovyyDokhod)/(sum(Tovarooborot)-sum(ValovyyDokhod)) as rez"//
@@ -149,7 +153,7 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 				+ "\n\t ) mx on mx.kontragent=DlyaRaschetaNacenkiVNetbuke.kontragent and DlyaRaschetaNacenkiVNetbuke.period=mx.period";
 		*/
 		String
-		sqlStr = "select (sum(SummaProdazhi)-sum(Sebestoimost))/sum(SummaProdazhi) from DlyaRaschetaNacenkiVNetbuke join"//
+				sqlStr = "select (sum(SummaProdazhi)-sum(Sebestoimost))/sum(SummaProdazhi) from DlyaRaschetaNacenkiVNetbuke join"//
 				+ "\n\t ("//
 				+ "\n\t select max(DlyaRaschetaNacenkiVNetbuke.period) as period,DlyaRaschetaNacenkiVNetbuke.kontragent as kontragent"//
 				+ "\n\t from DlyaRaschetaNacenkiVNetbuke "//
@@ -164,23 +168,23 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 			if (cursor.moveToFirst()) {
 				nacenkaFactPodrzdelenia = cursor.getDouble(0);
 				cursor.close();
-			}
-			else {
+			} else {
 				LogHelper.debug("nacenkaFactPodrzdelenia not found");
 			}
 			//System.out.println("nacenkaFactPodrzdelenia done");
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			LogHelper.debug("nacenkaFactPodrzdelenia: " + t.getMessage());
 		}
 		//LogHelper.debug("mClientPlanPercent for " + mClientID + " is " + mClientPlanPercent);
 	}
+
 	public String getOrderFactPersent() {
 		/*if (!IsExtraChargeInfoAvailable()) {
 			return null;
 		}*/
 		return DecimalFormatHelper.format(mOrderFactPercent) + "%";
 	}
+
 	public String getClientPlanPersent() {
 		if (!IsExtraChargeInfoAvailable() || mClientPlanPercent == 0) {
 			return null;

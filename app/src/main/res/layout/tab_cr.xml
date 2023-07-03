@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_above="@+id/layout_add"
-    android:layout_alignParentTop="true" >
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:layout_above="@+id/layout_add"
+	android:layout_alignParentTop="true">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+	<RelativeLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
 
-        <include
-            android:id="@+id/cr_list_header"
-            android:layout_alignParentTop="true"
-            layout="@layout/header_cr" />
+		<include
+			android:id="@+id/cr_list_header"
+			android:layout_alignParentTop="true"
+			layout="@layout/header_cr" />
 
-        <ListView
-            android:id="@+id/list_cr"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@+id/cr_list_header"
-            android:background="#E3E3E3"
-            android:cacheColorHint="#00000000"
-            android:fastScrollAlwaysVisible="true"
-            android:fastScrollEnabled="true" />
-    </RelativeLayout>
+		<ListView
+			android:id="@+id/list_cr"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_alignParentBottom="true"
+			android:layout_below="@+id/cr_list_header"
+			android:background="#E3E3E3"
+			android:cacheColorHint="#00000000"
+			android:fastScrollAlwaysVisible="true"
+			android:fastScrollEnabled="true" />
+	</RelativeLayout>
 
 </RelativeLayout>

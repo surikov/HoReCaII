@@ -43,23 +43,23 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
 			Bough b = Bough.parseXML(xml);
 			//Bough kontragenty= Cfg.kontragenty();
-			Bough kontragenty= Cfg.kontragentyForSelectedMarshrut();
+			Bough kontragenty = Cfg.kontragentyForSelectedMarshrut();
 			//if (ApplicationHoreca.getInstance().currentKodPodrazdelenia.length() > 0) {
 			//if (Cfg.isChangedHRC()) {
-				//kontragenty= Cfg.kontragentyByKod(ApplicationHoreca.getInstance().currentKodPodrazdelenia);
-				//kontragenty= Cfg.kontragentyByKod(Cfg.selectedKodPodrazdelenia());
+			//kontragenty= Cfg.kontragentyByKod(ApplicationHoreca.getInstance().currentKodPodrazdelenia);
+			//kontragenty= Cfg.kontragentyByKod(Cfg.selectedKodPodrazdelenia());
 			//}
-			int nn=(int)Numeric.string2double(b.child("who").value.property.value());
-					//whoPlus1.value().intValue();
-			if(nn >= 0 && nn < kontragenty.children.size()) {
+			int nn = (int) Numeric.string2double(b.child("who").value.property.value());
+			//whoPlus1.value().intValue();
+			if (nn >= 0 && nn < kontragenty.children.size()) {
 
-			}else{
-				nn=0;
+			} else {
+				nn = 0;
 			}
-			String name=kontragenty.children.get(nn).child("naimenovanie").value.property.value();
+			String name = kontragenty.children.get(nn).child("naimenovanie").value.property.value();
 			//System.out.println("---getOtherDescription "+whoPlus1.value());
 			return name;
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
 		return "?";
@@ -71,10 +71,10 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
 		try {
 			b = Bough.parseXML(xml);
-			String tolko = b.child("tolkoIndiv").value.property.value().equals("yes")?"только индивидуальные":"все";
-//(tolkoIndiv.value()?"Истина":"Ложь")
+			String tolko = b.child("tolkoIndiv").value.property.value().equals("yes") ? "только индивидуальные" : "все";
+			//(tolkoIndiv.value()?"Истина":"Ложь")
 			return tolko;
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
 		return "?";
@@ -87,10 +87,10 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 		//System.out.println("readForm " + xml);
 		try {
 			b = Bough.parseXML(xml);
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
-		if(b == null) {
+		if (b == null) {
 			b = new Bough();
 		}
 		tolkoIndiv.value(b.child("tolkoIndiv").value.property.value().equals("yes"));
@@ -100,7 +100,7 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 	@Override
 	public void writeForm(String instanceKey) {
 		Bough b = new Bough().name.is(getFolderKey());
-		b.child("tolkoIndiv").value.is("" + (tolkoIndiv.value()?"yes":""));
+		b.child("tolkoIndiv").value.is("" + (tolkoIndiv.value() ? "yes" : ""));
 		b.child("who").value.is("" + who.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		//System.out.println("writeForm " + xml);
@@ -118,7 +118,7 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 
 	private String kod(int nn) {
 		String r = "-123456789";
-		if(nn >= 0 && nn < Cfg.kontragenty().children.size()) {
+		if (nn >= 0 && nn < Cfg.kontragenty().children.size()) {
 			r = Cfg.kontragenty().children.get(nn).child("kod").value.property.value();
 		}
 		return r;
@@ -133,45 +133,45 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 	public String composeGetQuery(int queryKind) {
 		//int i = territory.value().intValue();
 		//String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-		Bough kontragenty= Cfg.kontragentyForSelectedMarshrut();
+		Bough kontragenty = Cfg.kontragentyForSelectedMarshrut();
 		/*Bough kontragenty= Cfg.kontragenty();
 		if (ApplicationHoreca.getInstance().currentKodPodrazdelenia.length() > 0) {
 			kontragenty= Cfg.kontragentyByKod(ApplicationHoreca.getInstance().currentKodPodrazdelenia);
 		}*/
-		int nn=who.value().intValue();
-		nn=(nn < 0 ||nn >= kontragenty.children.size())?0:nn;
+		int nn = who.value().intValue();
+		nn = (nn < 0 || nn >= kontragenty.children.size()) ? 0 : nn;
 
-		String kod=kontragenty.children.get(nn).child("kod").value.property.value();
+		String kod = kontragenty.children.get(nn).child("kod").value.property.value();
 		String p = "{"
-				           +"\"ТолькоИндивидуальные\":\"" + (tolkoIndiv.value()?"Истина":"Ложь") + "\""//
-						   +",\"Контрагент\":\""+kod+"\""//
-				           +"}";
-		System.out.println("param: "+p);
+				+ "\"ТолькоИндивидуальные\":\"" + (tolkoIndiv.value() ? "Истина" : "Ложь") + "\""//
+				+ ",\"Контрагент\":\"" + kod + "\""//
+				+ "}";
+		System.out.println("param: " + p);
 
 		String e = "";
 
 		try {
 			e = URLEncoder.encode(p, "UTF-8");
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 			e = t.getMessage();
 		}
-		String serviceName="АкцииДляКлиентов";
+		String serviceName = "АкцииДляКлиентов";
 		try {
 			serviceName = URLEncoder.encode(serviceName, "UTF-8");
 		} catch (Throwable t) {
 			t.printStackTrace();
-			serviceName=t.getMessage();
+			serviceName = t.getMessage();
 		}
 		String q = Settings.getInstance().getBaseURL()//
-				           //+ "GolovaNew"//
-				           +Settings.selectedBase1C()//
-				           + "/hs/Report/"//
-				           + serviceName//
-				           +"/" + Cfg.whoCheckListOwner()//
-				           + "?param=" + e//
+				//+ "GolovaNew"//
+				+ Settings.selectedBase1C()//
+				+ "/hs/Report/"//
+				+ serviceName//
+				+ "/" + Cfg.whoCheckListOwner()//
+				+ "?param=" + e//
 				;
-		q=q+tagForFormat( queryKind);
+		q = q + tagForFormat(queryKind);
 
 		System.out.println("composeGetQuery " + q);
 		return q;
@@ -179,7 +179,7 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 
 	@Override
 	public SubLayoutless getParametersView(Context context) {
-		if(propertiesForm == null) {
+		if (propertiesForm == null) {
 			propertiesForm = new SubLayoutless(context);
 			/*RedactSingleChoice terr = new RedactSingleChoice(context);
 			terr.selection.is(territory);
@@ -187,17 +187,17 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 				String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
 				terr.item(s);
 			}*/
-			RedactSingleChoice kontragent = new RedactSingleChoice(context);
+			RedactFilteredSingleChoice kontragent = new RedactFilteredSingleChoice(context);
 			kontragent.selection.is(who);
 			//kontragent.item("[Все контрагенты]");
-			for(int i = 0; i < Cfg.kontragenty().children.size(); i++) {
-				kontragent.item(Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
+			for (int i = 0; i < Cfg.kontragenty().children.size(); i++) {
+				kontragent.item(Cfg.kontragenty().children.get(i).child("kod").value.property.value()+": "+Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
 			}
 			propertiesForm//
 					.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
-					.input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontragent)//
+					.input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontragent, 9 * Auxiliary.tapSize)//
 					//.input(context, 2, Auxiliary.tapSize * 0.3, "Только индивидуальные", tolkoIndiv)//
-			.input(context, 2, Auxiliary.tapSize * 0.3, "", new RedactToggle(context).labelText.is("только индивидуальные").yes.is(tolkoIndiv))//
+					.input(context, 2, Auxiliary.tapSize * 0.3, "", new RedactToggle(context).labelText.is("только индивидуальные").yes.is(tolkoIndiv))//
 			//.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
 			/*.input(context, 3, Auxiliary.tapSize * 0.3, "", new Knob(context).labelText.is("Обновить").afterTap.is(new Task() {
 				@Override
@@ -206,8 +206,8 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 				}
 			}), Auxiliary.tapSize * 3)*/;
 			propertiesForm.child(new Knob(context)//
-					                     .labelText.is("На сегодня")//
-					                     .afterTap.is(new Task() {
+					.labelText.is("На сегодня")//
+					.afterTap.is(new Task() {
 						@Override
 						public void doTask() {
 							//Date mb = new Date();
@@ -220,38 +220,38 @@ public class ReportAcciiDlyaKlientov extends Report_Base {
 							expectRequery.start(activityReports);
 						}
 					})//
-					                     .left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					                     .top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 0.5)))//
-					                     .width().is(Auxiliary.tapSize * 2.5)//
-					                     .height().is(Auxiliary.tapSize * 0.8)//
+					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 0.5)))//
+					.width().is(Auxiliary.tapSize * 2.5)//
+					.height().is(Auxiliary.tapSize * 0.8)//
 			);
 			propertiesForm.child(new Knob(context)//
-					                     .labelText.is("Обновить")//
-					                     .afterTap.is(new Task() {
+					.labelText.is("Обновить")//
+					.afterTap.is(new Task() {
 						@Override
 						public void doTask() {
 							//checkHolding();
 							expectRequery.start(activityReports);
 						}
 					})//
-					                     .left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					                     .top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 1 + 0.5)))//
-					                     .width().is(Auxiliary.tapSize * 2.5)//
-					                     .height().is(Auxiliary.tapSize * 0.8)//
+					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 1 + 0.5)))//
+					.width().is(Auxiliary.tapSize * 2.5)//
+					.height().is(Auxiliary.tapSize * 0.8)//
 			);
 			propertiesForm.child(new Knob(context)//
-					                     .labelText.is("Удалить")//
-					                     .afterTap.is(new Task() {
+					.labelText.is("Удалить")//
+					.afterTap.is(new Task() {
 						@Override
 						public void doTask() {
 							//expectRequery.start(activityReports);
 							activityReports.promptDeleteRepoort(ReportAcciiDlyaKlientov.this, currentKey);
 						}
 					})//
-					                     .left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					                     .top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 2 + 0.5)))//
-					                     .width().is(Auxiliary.tapSize * 2.5)//
-					                     .height().is(Auxiliary.tapSize * 0.8)//
+					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 2 + 0.5)))//
+					.width().is(Auxiliary.tapSize * 2.5)//
+					.height().is(Auxiliary.tapSize * 0.8)//
 			);
 		}
 		return propertiesForm;

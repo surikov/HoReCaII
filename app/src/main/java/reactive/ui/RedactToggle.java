@@ -1,8 +1,10 @@
 package reactive.ui;
 
 import android.text.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.Task;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -44,14 +46,17 @@ public class RedactToggle extends CheckBox implements Rake {
 		super(context);
 		init();
 	}
+
 	public RedactToggle(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
+
 	public RedactToggle(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
+
 	void init() {
 		if (initialized) {
 			return;
@@ -92,37 +97,43 @@ public class RedactToggle extends CheckBox implements Rake {
 			public void doTask() {
 				if (hidden.property.value()) {
 					setVisibility(View.INVISIBLE);
-				}
-				else {
+				} else {
 					setVisibility(View.VISIBLE);
 				}
 			}
 		});
 	}
+
 	@Override
 	public ToggleProperty<Rake> hidden() {
 		return hidden;
 	}
+
 	@Override
 	public NumericProperty<Rake> left() {
 		return left;
 	}
+
 	@Override
 	public NumericProperty<Rake> top() {
 		return top;
 	}
+
 	@Override
 	public NumericProperty<Rake> width() {
 		return width;
 	}
+
 	@Override
 	public NumericProperty<Rake> height() {
 		return height;
 	}
+
 	@Override
 	public View view() {
 		return this;
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();

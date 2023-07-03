@@ -36,129 +36,129 @@ import android.widget.ListView;
 
 public class Activity_UploadReturns extends Activity_BasePeriod implements ImageView.OnClickListener, IStateChanged, Observer {
 
-    private static UploadReturnsListAdapter mListAdapter;
-    private static ListView mList;
-    private static ImageView mCheckAll;
-    MenuItem menuOtchety;
+	private static UploadReturnsListAdapter mListAdapter;
+	private static ListView mList;
+	private static ImageView mCheckAll;
+	MenuItem menuOtchety;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menuOtchety = menu.add("Отчёты");
-        return true;
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menuOtchety = menu.add("Отчёты");
+		return true;
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item == menuOtchety) {
-            Intent intent = new Intent();
-            intent.setClass(this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
-            startActivity(intent);
-            return true;
-        }
-        return true;
-    }
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item == menuOtchety) {
+			Intent intent = new Intent();
+			intent.setClass(this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
+			startActivity(intent);
+			return true;
+		}
+		return true;
+	}
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 
-        setContentView(R.layout.act_returns_upload);
+		setContentView(R.layout.act_returns_upload);
 
-        super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 
-        setTitle(R.string.returns_upload);
+		setTitle("Выгрузка возвратов");
 
-        InitializeControls();
-    }
+		InitializeControls();
+	}
 
-    private void InitializeControls() {
+	private void InitializeControls() {
 
-        mCheckAll = (ImageView) findViewById(R.id.check_all);
-        mCheckAll.setImageResource(android.R.drawable.checkbox_on_background);
-        mCheckAll.setTag(Boolean.TRUE);
-        mCheckAll.setOnClickListener(this);
+		mCheckAll = (ImageView) findViewById(R.id.check_all);
+		mCheckAll.setImageResource(android.R.drawable.checkbox_on_background);
+		mCheckAll.setTag(Boolean.TRUE);
+		mCheckAll.setOnClickListener(this);
 
-        ((Button) findViewById(R.id.btn_upload)).setOnClickListener(mUploadClick);
+		((Button) findViewById(R.id.btn_upload)).setOnClickListener(mUploadClick);
 
-        InitializeListView();
-    }
+		InitializeListView();
+	}
 
-    private void InitializeListView() {
+	private void InitializeListView() {
 
-        mList = (ListView) findViewById(R.id.list_returns);
+		mList = (ListView) findViewById(R.id.list_returns);
 
-        mListAdapter = new UploadReturnsListAdapter(this,
-                Request_Returns.RequestUploaded(mDB, DateTimeHelper.SQLDateString(mFromPeriod.getTime()),
-                        DateTimeHelper.SQLDateString(mToPeriod.getTime())), this);
+		mListAdapter = new UploadReturnsListAdapter(this,
+				Request_Returns.RequestUploaded(mDB, DateTimeHelper.SQLDateString(mFromPeriod.getTime()),
+						DateTimeHelper.SQLDateString(mToPeriod.getTime())), this);
 
-        mList.setAdapter(mListAdapter);
+		mList.setAdapter(mListAdapter);
 
-        mList.setOnTouchListener(this);
-    }
+		mList.setOnTouchListener(this);
+	}
 
-    private View.OnClickListener mUploadClick = new OnClickListener() {
+	private View.OnClickListener mUploadClick = new OnClickListener() {
 
-        @Override
-        public void onClick(View v) {
+		@Override
+		public void onClick(View v) {
 
-            if (!SystemHelper.IsNetworkAvailable(Activity_UploadReturns.this)) {
+			if (!SystemHelper.IsNetworkAvailable(Activity_UploadReturns.this)) {
 
-                CreateErrorDialog(R.string.network_isnot_available).show();
-                return;
-            }
-
-            ArrayList<Boolean> stateList = mListAdapter.getStateList();
-
-            int count = stateList.size();
-            boolean documentsSelected = false;
-
-            for (int i = 0; i < count; i++) {
-
-                if (stateList.get(i)) {
-
-                    documentsSelected = true;
-                    break;
-                }
-            }
-
-            if (!documentsSelected) {
-
-                CreateErrorDialog(R.string.documents_not_selected).show();
-                return;
-            }
-
-            ArrayList<NomenclatureBasedDocument> dataRequestList = new ArrayList<NomenclatureBasedDocument>();
-            Cursor cursor = null;
-
-            for (int i = 0; i < count; i++) {
-
-                if (stateList.get(i)) {
-
-                    cursor = mListAdapter.getCursor();
-                    cursor.moveToPosition(i);
-//System.out.println("Request_Returns.getVersion(cursor) "+Request_Returns.getVersion(cursor));
-                    dataRequestList.add(new ZayavkaNaVozvrat(
-                            Request_Returns.get_id(cursor),
-                            Request_Returns.getIDRRef(cursor),
-                            Request_Returns.getData(cursor),
-                            Request_Returns.getNomer(cursor),
-                            Request_Returns.getKontragentID(cursor),
-                            Request_Returns.getKontragentKod(cursor),
-                            Request_Returns.getKontragentNaimanovanie(cursor),
-                            Request_Returns.getDataOtgruzki(cursor),
-                            Request_Returns.getAktPretenziyPath(cursor),
-                            Request_Returns.isUploaded(cursor),
-                            false
-                            , Request_Returns.getVersion(cursor)
-
-                    ));
-                }
-            }
-            //System.out.println(Auxiliary.fromCursor(mListAdapter.getCursor(),false).dumpXML());
-			String url=Settings.getInstance().getBaseURL()+"WsUploadOrders/wsuploadvozvHRC.1cws";
-			if(Settings.getInstance().isPrimaryGate){
-				url=Settings.getInstance().getBaseURL() + "wsuploadvozvHRC.1cws";
+				CreateErrorDialog(R.string.network_isnot_available).show();
+				return;
 			}
-            System.out.println(url);
+
+			ArrayList<Boolean> stateList = mListAdapter.getStateList();
+
+			int count = stateList.size();
+			boolean documentsSelected = false;
+
+			for (int i = 0; i < count; i++) {
+
+				if (stateList.get(i)) {
+
+					documentsSelected = true;
+					break;
+				}
+			}
+
+			if (!documentsSelected) {
+
+				CreateErrorDialog(R.string.documents_not_selected).show();
+				return;
+			}
+
+			ArrayList<NomenclatureBasedDocument> dataRequestList = new ArrayList<NomenclatureBasedDocument>();
+			Cursor cursor = null;
+
+			for (int i = 0; i < count; i++) {
+
+				if (stateList.get(i)) {
+
+					cursor = mListAdapter.getCursor();
+					cursor.moveToPosition(i);
+					//System.out.println("Request_Returns.getVersion(cursor) "+Request_Returns.getVersion(cursor));
+					dataRequestList.add(new ZayavkaNaVozvrat(
+							Request_Returns.get_id(cursor),
+							Request_Returns.getIDRRef(cursor),
+							Request_Returns.getData(cursor),
+							Request_Returns.getNomer(cursor),
+							Request_Returns.getKontragentID(cursor),
+							Request_Returns.getKontragentKod(cursor),
+							Request_Returns.getKontragentNaimanovanie(cursor),
+							Request_Returns.getDataOtgruzki(cursor),
+							Request_Returns.getAktPretenziyPath(cursor),
+							Request_Returns.isUploaded(cursor),
+							false
+							, Request_Returns.getVersion(cursor)
+
+					));
+				}
+			}
+			//System.out.println(Auxiliary.fromCursor(mListAdapter.getCursor(),false).dumpXML());
+			String url = Settings.getInstance().getBaseURL() + "WsUploadOrders/wsuploadvozvHRC.1cws";
+			if (Settings.getInstance().isPrimaryGate) {
+				url = Settings.getInstance().getBaseURL() + "wsuploadvozvHRC.1cws";
+			}
+			System.out.println(url);
 			UploadDocumentAsyncTask task = new UploadDocumentAsyncTask(mDB,
 					getApplicationContext(),
 					getString(R.string.returns_upload_points),
@@ -173,107 +173,107 @@ public class Activity_UploadReturns extends Activity_BasePeriod implements Image
                     Settings.getInstance().getSERVICE_RETURNS(),
                     new ReturnsXMLParser());
 */
-            AsyncTaskManager.getInstance().executeTask(Activity_UploadReturns.this, task);
-        }
-    };
+			AsyncTaskManager.getInstance().executeTask(Activity_UploadReturns.this, task);
+		}
+	};
 
-    @Override
-    public void update(Observable observable, Object data) {
+	@Override
+	public void update(Observable observable, Object data) {
 
-        String result = ((Bundle) data).getString(ManagedAsyncTask.RESULT_STRING);
+		String result = ((Bundle) data).getString(ManagedAsyncTask.RESULT_STRING);
 
-        if (result != null) {
-            LogHelper.debug(this.getClass().getCanonicalName() + ".update: " + this.getString(R.string.confirm));
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		if (result != null) {
+			LogHelper.debug(this.getClass().getCanonicalName() + ".update: " + this.getString(R.string.confirm));
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-            builder.setTitle(R.string.confirm);
-            builder.setMessage(result);
+			builder.setTitle(R.string.confirm);
+			builder.setMessage(result);
 
-            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                @Override
+			builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+				@Override
 
-                public void onClick(DialogInterface dialog, int arg1) {
+				public void onClick(DialogInterface dialog, int arg1) {
 
-                    dialog.dismiss();
+					dialog.dismiss();
 
-                    Requery();
-                }
-            });
+					Requery();
+				}
+			});
 
-            builder.create().show();
-        }
-    }
+			builder.create().show();
+		}
+	}
 
-    @Override
-    public void onClick(View v) {
+	@Override
+	public void onClick(View v) {
 
-        boolean newState = false;
+		boolean newState = false;
 
-        ArrayList<Boolean> stateList = mListAdapter.getStateList();
+		ArrayList<Boolean> stateList = mListAdapter.getStateList();
 
-        if ((Boolean) mCheckAll.getTag()) {
+		if ((Boolean) mCheckAll.getTag()) {
 
-            newState = false;
-            mCheckAll.setImageResource(android.R.drawable.checkbox_off_background);
-        } else {
+			newState = false;
+			mCheckAll.setImageResource(android.R.drawable.checkbox_off_background);
+		} else {
 
-            newState = true;
-            mCheckAll.setImageResource(android.R.drawable.checkbox_on_background);
-        }
+			newState = true;
+			mCheckAll.setImageResource(android.R.drawable.checkbox_on_background);
+		}
 
-        int count = stateList.size();
+		int count = stateList.size();
 
-        for (int i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++) {
 
-            stateList.set(i, newState);
-        }
+			stateList.set(i, newState);
+		}
 
-        mCheckAll.setTag(newState);
+		mCheckAll.setTag(newState);
 
-        mListAdapter.notifyDataSetChanged();
-    }
+		mListAdapter.notifyDataSetChanged();
+	}
 
-    private void setCheckAllState() {
+	private void setCheckAllState() {
 
-        ArrayList<Boolean> stateList = mListAdapter.getStateList();
+		ArrayList<Boolean> stateList = mListAdapter.getStateList();
 
-        int count = stateList.size();
+		int count = stateList.size();
 
-        for (int i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++) {
 
-            if (!stateList.get(i)) {
+			if (!stateList.get(i)) {
 
-                mCheckAll.setImageResource(android.R.drawable.checkbox_off_background);
-                mCheckAll.setTag(false);
-                return;
-            }
-        }
-        mCheckAll.setImageResource(android.R.drawable.checkbox_on_background);
-        mCheckAll.setTag(true);
+				mCheckAll.setImageResource(android.R.drawable.checkbox_off_background);
+				mCheckAll.setTag(false);
+				return;
+			}
+		}
+		mCheckAll.setImageResource(android.R.drawable.checkbox_on_background);
+		mCheckAll.setTag(true);
 
-        mListAdapter.notifyDataSetChanged();
-    }
+		mListAdapter.notifyDataSetChanged();
+	}
 
-    @Override
-    protected void OnDateChanged(Date fromDate, Date toDate) {
+	@Override
+	protected void OnDateChanged(Date fromDate, Date toDate) {
 
-        Requery();
-    }
+		Requery();
+	}
 
-    private void Requery() {
+	private void Requery() {
 
-        mListAdapter.changeCursor(Request_Returns.RequestUploaded(mDB,
-                DateTimeHelper.SQLDateString(mFromPeriod.getTime()),
-                DateTimeHelper.SQLDateString(mToPeriod.getTime())));
+		mListAdapter.changeCursor(Request_Returns.RequestUploaded(mDB,
+				DateTimeHelper.SQLDateString(mFromPeriod.getTime()),
+				DateTimeHelper.SQLDateString(mToPeriod.getTime())));
 
-        mListAdapter.notifyDataSetChanged();
+		mListAdapter.notifyDataSetChanged();
 
-        setCheckAllState();
-    }
+		setCheckAllState();
+	}
 
-    @Override
-    public void onChange() {
+	@Override
+	public void onChange() {
 
-        setCheckAllState();
-    }
+		setCheckAllState();
+	}
 }

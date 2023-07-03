@@ -35,6 +35,7 @@ public class Activity_Doc_Bids extends Activity_BasePeriod {
 		menuOtchety = menu.add("Отчёты");
 		return true;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item == menuOtchety) {
@@ -45,6 +46,7 @@ public class Activity_Doc_Bids extends Activity_BasePeriod {
 		}
 		return true;
 	}
+
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.act_doc_bids);
 		super.onCreate(savedInstanceState);
@@ -85,10 +87,12 @@ public class Activity_Doc_Bids extends Activity_BasePeriod {
 			}
 		});
 	}
+
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		mBidsListAdapter.changeCursor(Request_Bids.RequestPeriod(mDB, DateTimeHelper.SQLDateString(mFromPeriod.getTime()), DateTimeHelper.SQLDateString(mToPeriod.getTime()), false));
 		mBidsListAdapter.notifyDataSetChanged();
 	}
+
 	@Override
 	protected void OnDateChanged(Date fromDate, Date toDate) {
 		mBidsListAdapter.changeCursor(Request_Bids.RequestPeriod(mDB, DateTimeHelper.SQLDateString(fromDate), DateTimeHelper.SQLDateString(toDate), false));
@@ -99,11 +103,13 @@ public class Activity_Doc_Bids extends Activity_BasePeriod {
 		public BidsListAdapter(Context context, Cursor cursor) {
 			super(context, cursor);
 		}
+
 		@Override
 		public void bindView(View row, Context context, Cursor cursor) {
 			BidsHolder holder = (BidsHolder) row.getTag();
 			holder.populateFrom(cursor);
 		}
+
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			LayoutInflater inflater = LayoutInflater.from(context);
@@ -129,6 +135,7 @@ public class Activity_Doc_Bids extends Activity_BasePeriod {
 				date_shipment = (TextView) row.findViewById(R.id.row_bids_date_shipment);
 				comments = (TextView) row.findViewById(R.id.row_bids_comments);
 			}
+
 			void populateFrom(Cursor cursor) {
 				float rowTextFontSize = getRowTextFontSize();
 				date.setText(DateTimeHelper.UIDateString(Request_Bids.getData(cursor)));
@@ -136,8 +143,7 @@ public class Activity_Doc_Bids extends Activity_BasePeriod {
 				number.setText(Request_Bids.getNomer(cursor));
 				if (Request_Bids.isProveden(cursor)) {
 					number.setTextColor(0xff000000);
-				}
-				else {
+				} else {
 					number.setTextColor(0xff000099);
 				}
 				number.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);

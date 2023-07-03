@@ -4,9 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.*;
 
-import android.app.Activity;
+import android.app.*;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.content.*;
 //import android.telephony.TelephonyManager;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,10 @@ import tee.binding.Bough;
 import tee.binding.it.Note;
 import tee.binding.it.Numeric;
 import tee.binding.task.Task;
+
+import com.google.firebase.messaging.*;
+import com.google.firebase.*;
+
 
 public class Cfg {
 
@@ -114,15 +119,16 @@ public class Cfg {
 	}
 
 
-	public static void setCurrentFirebaseToken(String token) {
+	public static void setCurrentFirebaseToken(final Context context, String token) {
 		Cfg.currentFirebaseToken = token;
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/IDPlanshet";
 		//final String url = "https://service.swlife.ru/hrc120107/ru_RU/hs/Planshet/IDPlanshet";
 		final String params = "{\"Данные\":[{\"ТорговыйПредставитель\":\"" + Cfg.whoCheckListOwner() + "\",\"IDПланшета\":\"" + token + "\"}]}";
-		System.out.println(url);
-		System.out.println(params);
-
-		new Expect().task.is(new Task() {
+		System.out.println("setCurrentFirebaseToken " + url);
+		System.out.println("params " + params);
+		Note msg = new Note();
+		new Expect()
+				.task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
@@ -131,11 +137,21 @@ public class Cfg {
 							, true
 					);
 					System.out.println(b.dumpXML());
+					msg.value(b.child("message").value.property.value());
 				} catch (Throwable t) {
+
 					t.printStackTrace();
 				}
 			}
-		}).status.is("Ждите...").silentStart();
+		})
+				.afterDone.is(new Task() {
+			@Override
+			public void doTask() {
+				Auxiliary.warn("Результат: " + msg.value(), context);
+			}
+		})
+				.status.is("Ждите...")
+				.silentStart();
 
        /* try {
             Bough b = Auxiliary.loadTextFromPrivatePOST(url
@@ -150,28 +166,30 @@ public class Cfg {
 	}
 
 
-	public static void requeryFirebaseToken() {//final Task afterDone) {
-		if (Cfg.currentFirebaseToken == null) {
+	public static void requeryFirebaseToken(Context context) {//final Task afterDone) {
+		//if (Cfg.currentFirebaseToken == null) {
 			System.out.println("requeryFirebaseToken start");
 
 			new Expect().task.is(new Task() {
 				@Override
 				public void doTask() {
-					com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<String>() {
-						@Override
-						public void onComplete(@NonNull com.google.android.gms.tasks.Task<String> task) {
-							if (!task.isSuccessful()) {
-								System.out.println(task.getException());
-								return;
-							}
-							String token = task.getResult();
-							System.out.println("requeryFirebaseToken token ====================");
-							//cYvgX8ihSMyFeEU_VpPPvZ:APA91bG2osDBV_qyAGb4wzu369Hu1EyaIq7DMqPIm5vu_y35GpnVouSYjBlE2_dOB4B1Us0WPmq8cFGplqX2dx96sKHwDJT3juuLbsCSrIwEuSKZ2Uht6_NkZ34ExG4HEnjUA9okHr29
-							Cfg.setCurrentFirebaseToken(token);
-							System.out.println(token);
-							//afterDone.start();
-						}
-					});
+					FirebaseApp.initializeApp(context);
+					FirebaseMessaging.getInstance().getToken()
+							.addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<String>() {
+								@Override
+								public void onComplete(@NonNull com.google.android.gms.tasks.Task<String> task) {
+									if (!task.isSuccessful()) {
+										System.out.println(task.getException());
+										return;
+									}
+									String token = task.getResult();
+									//System.out.println("requeryFirebaseToken token ====================");
+									//cYvgX8ihSMyFeEU_VpPPvZ:APA91bG2osDBV_qyAGb4wzu369Hu1EyaIq7DMqPIm5vu_y35GpnVouSYjBlE2_dOB4B1Us0WPmq8cFGplqX2dx96sKHwDJT3juuLbsCSrIwEuSKZ2Uht6_NkZ34ExG4HEnjUA9okHr29
+									Cfg.setCurrentFirebaseToken(context, token);
+									//System.out.println(token);
+									//afterDone.start();
+								}
+							});
 				}
 			}).status.is("Ждите...").silentStart();
 
@@ -192,10 +210,10 @@ public class Cfg {
                     //afterDone.start();
                 }
             });*/
-		} else {
+		//} else {
 			//afterDone.start();
-			System.out.println("requeryFirebaseToken skip");
-		}
+			//System.out.println("requeryFirebaseToken skip");
+		//}
 	}
 
 	public static String findFizLicoKod(String hrc) {
@@ -381,14 +399,15 @@ public class Cfg {
 	public static String workFolder(String reportKey) {
 		return Cfg.workFolder + "supervisor/reports/" + reportKey;
 	}
-	public static int lastSQLiteChanesCount(){
-		int rr=0;
-		Bough data= Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select changes() as changesCount;", null));
-		rr=(int)Numeric.string2double(data.child("row").child("changesCount").value.property.value());
+
+	public static int lastSQLiteChanesCount() {
+		int rr = 0;
+		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select changes() as changesCount;", null));
+		rr = (int) Numeric.string2double(data.child("row").child("changesCount").value.property.value());
 		return rr;
 	}
 
-	public static void sendRequestPriceNew(Activity activity,Vector<String> artikuls, int timeout, final Note resultMessage, final Task afterFinishOrCancel) {
+	public static void sendRequestPriceNew(Activity activity, Vector<String> artikuls, int timeout, final Note resultMessage, final Task afterFinishOrCancel) {
 		final String soapXML = Cfg.composeXMLpriceRenew(artikuls);
 		final RawSOAP rr = new RawSOAP().timeout.is(timeout);
 		new Expect().status.is(resultMessage).task.is(new Task() {
@@ -419,7 +438,7 @@ public class Cfg {
 							);
 							r = r + kkk;
 						}
-						resultMessage.value(resultMessage.value() + "\n" + "Всего обновлено строк: " +((int) r));
+						resultMessage.value(resultMessage.value() + "\n" + "Всего обновлено строк: " + ((int) r));
 
 					} else {
 						resultMessage.value(resultMessage.value() + "\n" + "Ошибка: " + rr.statusCode.property.value() + ": " + rr.statusDescription.property.value() + ", statusCode " + rr.statusCode.property.value());
@@ -435,6 +454,7 @@ public class Cfg {
 			}
 		}).start(activity);
 	}
+
 	public static String composeXMLpriceRenew(Vector<String> artikuls) {
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"//
 				+ "\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns1=\"http://ws.swl/DanniePoTovaram\" xmlns:ns2=\"DanniePoTovaram\">"//
@@ -458,6 +478,7 @@ public class Cfg {
 				+ "\n</SOAP-ENV:Envelope>";
 		return xml;
 	}
+
 	public static int updateMinMaxPriceForArtikul(String Artikul, String TekuhayaCena, String Prais, String MinPorog) {
 		System.out.println("updateByRequestNew: " + Artikul + ", " + TekuhayaCena + ", " + Prais + ", " + MinPorog + ".");
 		/*ApplicationHoreca.getInstance().getDataBase().execSQL("delete from CenyNomenklaturySklada_last"//
@@ -483,7 +504,7 @@ public class Cfg {
 				+ "\n	;");*/
 		int r = 0;
 		if (Prais.trim().length() > 0) {
-			r=1;
+			r = 1;
 			String sql = "update CenyNomenklaturySklada_last"//
 					+ "\n		set cena=" + Prais//
 					+ "\n		where _id in ("//
@@ -515,7 +536,7 @@ public class Cfg {
 			}
 		}
 		if (TekuhayaCena.trim().length() > 0) {
-			r=1;
+			r = 1;
 			String sql = "update TekuschieCenyOstatkovPartiy_strip"//
 					+ "\n		set cena=" + TekuhayaCena//
 					+ "\n		where _id in ("//
@@ -539,7 +560,7 @@ public class Cfg {
 			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			if (Cfg.lastSQLiteChanesCount() < 1) {
-				r=1;
+				r = 1;
 				sql = "insert into TekuschieCenyOstatkovPartiy (nomenklatura,cena)"
 						+ " select nn._idrref as nomenklatura," + TekuhayaCena + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
 				//System.out.println(sql);
@@ -558,6 +579,7 @@ public class Cfg {
 		}
 		return r;
 	}
+
 	private static void fillTerritoriesCache() {
 		//System.out.println("fillTerritoriesCache " + ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase());
 		/*

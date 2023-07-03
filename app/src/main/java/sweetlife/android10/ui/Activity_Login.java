@@ -40,16 +40,17 @@ public class Activity_Login extends Activity {
 	Layoutless layoutless;
 	Note loginHRC = new Note().value("");
 	Note password = new Note().value("");
+	Toggle showPassword = new Toggle().value(false);
 	Toggle mainProxy = new Toggle().value(true);
 	Toggle stopUpdate = new Toggle();
 	Toggle downloadDB = new Toggle();
 	Toggle stopVacuum = new Toggle();
-	Note updateWarning=new Note();
+	Note updateWarning = new Note();
 	public static String hrcpasswordName = "hrcpassword";
 	static String coarse = "";
 	final static public int ResultFromPermission = 3883783;
 	public static boolean noVacuum = false;
-public static String packageVersion="0";
+	public static String packageVersion = "0";
 	boolean skipPrepareLogin = false;
 	Task taskPersonalLogin = new Task() {
 
@@ -226,6 +227,11 @@ public static String packageVersion="0";
 	}
 
 	void appLogin() {
+
+		appLoginNext();
+	}
+
+	void appLoginNext() {
 		/*if (1 == 1) {
 			try {
 				sweetlife.android10.update.AppUpdater.reinstall(this,"/sdcard/horeca/Horeca3.apk");
@@ -244,7 +250,7 @@ public static String packageVersion="0";
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString(hrcpasswordName, password.value());
 		editor.commit();
-		Cfg.requeryFirebaseToken();
+		//Cfg.requeryFirebaseToken();
 		System.out.println("saved password " + password.value());
 
 
@@ -310,6 +316,24 @@ public static String packageVersion="0";
 			}
 		});
 		return;
+	}
+
+
+	public void startCheckAccess() {
+		System.out.println("startCheckAccess");
+		Note result = new Note().value("!");
+		new Expect().status.is("Проверка доступа").task.is(new Task() {
+			public void doTask() {
+				String access = Settings.check_1C_access();
+				result.value(access);
+			}
+		}).afterDone.is(new Task() {
+			public void doTask() {
+				if (result.value().length() > 0) {
+					Auxiliary.warn("Неверный пароль или нет доступа, просмотр отчётов и выгрузка документов недоступны:\n\n" + result.value(), Activity_Login.this);
+				}
+			}
+		}).start(this);
 	}
 /*
 	@Override
@@ -820,7 +844,21 @@ supernn_hrc - JRA61P
 				.width().is(5 * Auxiliary.tapSize)
 				.height().is(1 * Auxiliary.tapSize)
 		);
-		layoutless.child(new RedactText(this).text.is(password).password.is(true)
+		layoutless.child(new Knob(this).labelText.is("Показать пароль").afterTap.is(new Task() {
+					public void doTask() {
+						showPassword.value(true);
+					}
+				})
+
+						.hidden().is(showPassword)
+						.top().is(4.5 * Auxiliary.tapSize)
+						.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
+						.width().is(5 * Auxiliary.tapSize)
+						.height().is(1 * Auxiliary.tapSize)
+		);
+		layoutless.child(new RedactText(this).text.is(password)
+				.hidden().is(showPassword.not())
+				//.password.is(true)
 				.top().is(4.5 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
@@ -857,6 +895,7 @@ supernn_hrc - JRA61P
 		System.out.println("::::::::::::::::"+ms+"/"+i1+"/"+lo+"/"+i2+"/"+Integer.MIN_VALUE+"/"+Integer.MAX_VALUE);
 		*/
 		checkPermissionAndPrepare();
+		startCheckAccess();
 	}
 
 
@@ -871,7 +910,7 @@ supernn_hrc - JRA61P
 								, null));
 				chOwner = chOwner + "/" + data.child("row").child("name").value.property.value();
 			}
-			packageVersion=getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+			packageVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 			setTitle(chOwner
 					+ "/" + getString(R.string.app_name)//
 					//+ "  " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName
@@ -893,10 +932,10 @@ supernn_hrc - JRA61P
 			loginHRC.value("Вход для " + Cfg.whoCheckListOwner());
 
 			boolean noCRAvailable = Requests.IsSyncronizationDateLater(0);
-			if(noCRAvailable) {
+			if (noCRAvailable) {
 				Calendar syncCalendar = LogHelper.getLastSuccessfulUpdate();
 				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-				updateWarning.value("Последнее успешное обновление " + sdf.format(syncCalendar.getTime())+".\nНеобходимо обновить данные.");
+				updateWarning.value("Последнее успешное обновление " + sdf.format(syncCalendar.getTime()) + ".\nНеобходимо обновить данные.");
 			}
 		} catch (Throwable e) {
 			setTitle(e.getMessage());

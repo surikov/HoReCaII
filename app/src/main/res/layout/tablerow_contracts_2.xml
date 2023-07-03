@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/contracts_tablerow_2"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:weightSum="1" >
+	android:id="@+id/contracts_tablerow_2"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:weightSum="1">
 
-    <TextView
-        android:id="@+id/text_code"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_marginLeft="7dip"
-        android:layout_weight="0.25" />
+	<TextView
+		android:id="@+id/text_code"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_marginLeft="7dip"
+		android:layout_weight="0.25" />
 
-    <TextView
-        android:id="@+id/text_name"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.25" />
+	<TextView
+		android:id="@+id/text_name"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.25" />
 
-    <ImageView
-        android:id="@+id/img_close"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.25"
-        android:contentDescription="@string/uploaded" />
+	<ImageView
+		android:id="@+id/img_close"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.25"
+		android:contentDescription="@string/uploaded" />
 
-    <TextView
-        android:id="@+id/text_contracts_group"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight="0.25" />
+	<TextView
+		android:id="@+id/text_contracts_group"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight="0.25" />
 
 </TableRow>

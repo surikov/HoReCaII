@@ -2,6 +2,7 @@ package reactive.ui;
 
 import android.content.*;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
@@ -14,7 +15,7 @@ import tee.binding.properties.NumericProperty;
 import tee.binding.task.*;
 
 public class ColumnText extends Column {
-	public  Vector<String> strings = new Vector<String>();
+	public Vector<String> strings = new Vector<String>();
 	public Vector<Task> tasks = new Vector<Task>();
 	public Vector<Decor> cells = new Vector<Decor>();
 	public Vector<Integer> backgrounds = new Vector<Integer>();
@@ -22,14 +23,16 @@ public class ColumnText extends Column {
 	protected Rect sz;
 	int presell = -1;
 	public NumericProperty<ColumnText> headerBackground = new NumericProperty<ColumnText>(this);
+
 	@Override
 	public String export(int row) {
 		if (row > -1 && row < strings.size()) {
-			
+
 			return strings.get(row);
 		}
 		return "";
 	}
+
 	@Override
 	public void update(int row) {
 		if (row >= 0 && row < cells.size()) {
@@ -37,19 +40,18 @@ public class ColumnText extends Column {
 			if (row > -1 && row < backgrounds.size()) {
 				if (backgrounds.get(row) != null) {
 					cell.background.is(backgrounds.get(row));
-				}
-				else {
+				} else {
 					cell.background.is(null);
 				}
 			}
 			if (row > -1 && row < strings.size()) {
 				cell.labelText.is(strings.get(row));
-			}
-			else {
+			} else {
 				cell.labelText.is("");
 			}
 		}
 	}
+
 	@Override
 	public Rake item(final int column, int row, Context context) {
 		//linePaint.setColor((int) (Auxiliary.colorLine));
@@ -96,26 +98,32 @@ public class ColumnText extends Column {
 		cells.add(cell);
 		return cell;
 	}
+
 	public ColumnText cell(String s, Integer background, Task tap) {
 		strings.add(s);
 		tasks.add(tap);
 		backgrounds.add(background);
 		return this;
 	}
+
 	public ColumnText cell(String s) {
 		//System.out.println(s);
 		return cell(s, null, null);
 	}
+
 	public ColumnText cell(String s, Task tap) {
 		return cell(s, null, tap);
 	}
+
 	public ColumnText cell(String s, Integer background) {
 		return cell(s, background, null);
 	}
+
 	@Override
 	public int count() {
 		return strings.size();
 	}
+
 	public ColumnText() {
 		this.width.is(150);
 		//this.labelStyleMediumNormal();
@@ -135,6 +143,7 @@ public class ColumnText extends Column {
 		//linePaint.setst
 		//linePaint.setStyle(Style.STROKE);
 	}
+
 	@Override
 	public Rake header(Context context) {
 		//Knob k = new Knob(context).labelText.is(title.property.value());
@@ -149,7 +158,7 @@ public class ColumnText extends Column {
 						, height().property.value().intValue() - 1//
 						, width().property.value().intValue()//
 						, height().property.value().intValue() //
-						), Auxiliary.paintLine);
+				), Auxiliary.paintLine);
 			}
 		};
 		header.setPadding(3, 0, 3, 2);
@@ -158,14 +167,14 @@ public class ColumnText extends Column {
 		header.labelText.is(title.property.value());
 		return header;
 	}
+
 	@Override
 	public void clear() {
 		if (presell >= 0 && presell < cells.size()) {
 			if (presell >= 0 && presell < backgrounds.size()) {
 				if (backgrounds.get(presell) != null) {
 					cells.get(presell).background.is(backgrounds.get(presell));
-				}
-				else {
+				} else {
 					cells.get(presell).background.is(0);
 				}
 			}
@@ -175,6 +184,7 @@ public class ColumnText extends Column {
 		tasks.removeAllElements();
 		//cells.removeAllElements();
 	}
+
 	@Override
 	public void afterRowsTap(int row) {
 		if (row > -1 && row < tasks.size()) {
@@ -185,24 +195,33 @@ public class ColumnText extends Column {
 		}
 	}
 	@Override
+	public void showHighlight(int row) {
+		if (row >= 0 && row < cells.size()) {
+			//System.out.println("3");
+			presell = row;
+			cells.get(row).background.is(Auxiliary.colorSelection);
+		}
+	}
+	@Override
 	public void highlight(int row) {
+		//System.out.println("text "+this.title.property.value()+" highlight "+row);
 		if (presell >= 0 && presell < cells.size()) {
 			if (presell >= 0 && presell < backgrounds.size()) {
-				//System.out.println(cells.get(presell));
-				//int b=backgrounds.get(presell);
-				//System.out.println(backgrounds.get(presell));
-				//System.out.println(backgrounds.get(presell));
 				if (backgrounds.get(presell) != null) {
+					//System.out.println("1");
 					cells.get(presell).background.is(backgrounds.get(presell));
-				}
-				else {
+				} else {
+					//System.out.println("2");
 					cells.get(presell).background.is(0);
 				}
 			}
 		}
-		if (row >= 0 && row < cells.size()) {
+		this.showHighlight(row);
+		/*if (row >= 0 && row < cells.size()) {
+			//System.out.println("3");
 			presell = row;
 			cells.get(row).background.is(Auxiliary.colorSelection);
-		}
+		}*/
+		//System.out.println("text "+this.title.property.value()+" highlight "+row+"/"+cells.get(row).background.property.value());
 	}
 }

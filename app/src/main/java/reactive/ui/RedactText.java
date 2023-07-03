@@ -1,8 +1,10 @@
 package reactive.ui;
 
 import android.text.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.Task;
+
 import android.content.Context;
 import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
@@ -48,18 +50,21 @@ public class RedactText extends EditText implements Rake {
 		super(context);
 		init();
 	}
+
 	public RedactText(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
+
 	public RedactText(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
-	void reSetInputMethod(){
-		if(password.property.value()){
-			this.setInputType(InputType.TYPE_CLASS_TEXT |InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		}else{
+
+	void reSetInputMethod() {
+		if (password.property.value()) {
+			this.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		} else {
 			this.setInputType(InputType.TYPE_CLASS_TEXT);
 		}
 	}
@@ -72,22 +77,23 @@ public class RedactText extends EditText implements Rake {
 		//this.setSingleLine(true);
 
 
-
 		width.property.afterChange(reFit).value(100);
 		height.property.afterChange(reFit).value(100);
 		left.property.afterChange(reFit);
 		top.property.afterChange(reFit);
 		//setSingleLine(singleLine.property.value());
-		this.setMaxLines(singleLine.property.value()?1:10);
+		this.setMaxLines(singleLine.property.value() ? 1 : 10);
 		reSetInputMethod();
 		this.setSelectAllOnFocus(selectAllOnFocus.property.value());
 		addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
+
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
+
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (!lock) {
@@ -111,7 +117,7 @@ public class RedactText extends EditText implements Rake {
 			@Override
 			public void doTask() {
 				//setSingleLine(singleLine.property.value());
-				setMaxLines(singleLine.property.value()?1:10);
+				setMaxLines(singleLine.property.value() ? 1 : 10);
 			}
 		});
 
@@ -133,8 +139,7 @@ public class RedactText extends EditText implements Rake {
 			public void doTask() {
 				if (hidden.property.value()) {
 					setVisibility(View.INVISIBLE);
-				}
-				else {
+				} else {
 					setVisibility(View.VISIBLE);
 				}
 			}
@@ -145,30 +150,37 @@ public class RedactText extends EditText implements Rake {
 		//this.setSelection(this.getText().length());
 		//System.out.println("----------------------------------->");
 	}
+
 	@Override
 	public ToggleProperty<Rake> hidden() {
 		return hidden;
 	}
+
 	@Override
 	public NumericProperty<Rake> left() {
 		return left;
 	}
+
 	@Override
 	public NumericProperty<Rake> top() {
 		return top;
 	}
+
 	@Override
 	public NumericProperty<Rake> width() {
 		return width;
 	}
+
 	@Override
 	public NumericProperty<Rake> height() {
 		return height;
 	}
+
 	@Override
 	public View view() {
 		return this;
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();

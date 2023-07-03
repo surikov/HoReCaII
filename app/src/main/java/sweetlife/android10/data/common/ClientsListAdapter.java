@@ -23,9 +23,9 @@ public class ClientsListAdapter extends CursorAdapter {
 	@Override
 	public void bindView(View row, Context context, Cursor cursor) {
 
-		ClientHolder holder=(ClientHolder)row.getTag();
+		ClientHolder holder = (ClientHolder) row.getTag();
 
-		holder.populateFrom( cursor );
+		holder.populateFrom(cursor);
 	}
 
 	@Override
@@ -35,25 +35,25 @@ public class ClientsListAdapter extends CursorAdapter {
 
 		View row = inflater.inflate(R.layout.list_element, parent, false);
 
-		ClientHolder holder=new ClientHolder(row);	
+		ClientHolder holder = new ClientHolder(row);
 
 		row.setTag(holder);
 
-		return(row);
+		return (row);
 	}
 
 	private class ClientHolder {
 
 		private TextView textName = null;
 
-		ClientHolder( View row ) {
+		ClientHolder(View row) {
 
-			textName = (TextView)row.findViewById(R.id.text);
+			textName = (TextView) row.findViewById(R.id.text);
 		}
 
-		void populateFrom(Cursor cursor ) {
+		void populateFrom(Cursor cursor) {
 
-			textName.setText( Request_ClientsList.getClientName(cursor) );
+			textName.setText(Request_ClientsList.getClientName(cursor));
 		}
 	}
 }

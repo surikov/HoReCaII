@@ -6,6 +6,7 @@ import java.net.*;
 import reactive.ui.Auxiliary;
 import reactive.ui.Decor;
 import reactive.ui.Knob;
+import reactive.ui.RedactFilteredSingleChoice;
 import reactive.ui.RedactSingleChoice;
 import reactive.ui.SubLayoutless;
 import sweetlife.android10.*;
@@ -49,7 +50,7 @@ public class ReportObjedineniaKlientov extends Report_Base {
 			b = Bough.parseXML(xml);
 			//String dfrom = Cfg.formatMills(Numeric.string2double(b.child("docFrom").value.property.value()), "dd.MM.yyyy");
 			return "";
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
 		return "?";
@@ -63,12 +64,12 @@ public class ReportObjedineniaKlientov extends Report_Base {
 			b = Bough.parseXML(xml);
 			String kontr = "все контрагенты";
 			int wh = (int) Numeric.string2double(b.child("who").value.property.value());
-			if(wh > 0) {
+			if (wh > 0) {
 				int nn = wh - 1;
 				kontr = ActivityWebServicesReports.naimenovanieKontragenta(nn);
 			}
 			return kontr;
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
 		return "?";
@@ -81,10 +82,10 @@ public class ReportObjedineniaKlientov extends Report_Base {
 		//System.out.println("readForm " + xml);
 		try {
 			b = Bough.parseXML(xml);
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
-		if(b == null) {
+		if (b == null) {
 			b = new Bough();
 		}
 
@@ -115,7 +116,7 @@ public class ReportObjedineniaKlientov extends Report_Base {
 
 	private String kod(int nn) {
 		String r = "-123456789";
-		if(nn >= 0 && nn < Cfg.kontragenty().children.size()) {
+		if (nn >= 0 && nn < Cfg.kontragenty().children.size()) {
 			r = Cfg.kontragenty().children.get(nn).child("kod").value.property.value();
 		}
 		return r;
@@ -130,39 +131,38 @@ public class ReportObjedineniaKlientov extends Report_Base {
 	public String composeGetQuery(int queryKind) {
 
 
-
 		String p = "{\"Контрагент\":\"";
-		if(whoPlus1.value().intValue() > 0) {
+		if (whoPlus1.value().intValue() > 0) {
 			int nn = whoPlus1.value().intValue() - 1;
 			p = p + "" + kod(nn) + "";
 		}
 
-p = p +  "\"}";
+		p = p + "\"}";
 		String e = "";
 		try {
 			e = URLEncoder.encode(p, "UTF-8");
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 			e = t.getMessage();
 		}
 		String serviceName = "ОбъединенияКлиентов";
 		try {
 			serviceName = URLEncoder.encode(serviceName, "UTF-8");
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 			serviceName = t.getMessage();
 		}
 		String q = Settings.getInstance().getBaseURL()//
-				           //+ "GolovaNew"//
-						   //+"cehan_hrc"//
-				           + Settings.selectedBase1C()//
-				           + "/hs/Report/"//
-				           + serviceName + "/" //
-						   +Cfg.whoCheckListOwner()//
-				           //+ Cfg.currentHRC()//
-				           + "?param=" + e//
+				//+ "GolovaNew"//
+				//+"cehan_hrc"//
+				+ Settings.selectedBase1C()//
+				+ "/hs/Report/"//
+				+ serviceName + "/" //
+				+ Cfg.whoCheckListOwner()//
+				//+ Cfg.currentHRC()//
+				+ "?param=" + e//
 				;
-		q=q+tagForFormat( queryKind);
+		q = q + tagForFormat(queryKind);
 		System.out.println("composeGetQuery " + q);
 		return q;
 	}
@@ -173,46 +173,48 @@ p = p +  "\"}";
 		propertiesForm = new SubLayoutless(context);
 
 
-		RedactSingleChoice kontr = new RedactSingleChoice(context);
+		RedactFilteredSingleChoice kontr = new RedactFilteredSingleChoice(context);
 		kontr.selection.is(whoPlus1);
 		kontr.item("[Все контрагенты]");
-		for(int i = 0; i < Cfg.kontragenty().children.size(); i++) {
-			kontr.item(Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
+		for (int i = 0; i < Cfg.kontragenty().children.size(); i++) {
+			kontr.item(Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value()
+			+": "+Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value()
+			);
 		}
 
 		propertiesForm//
 				.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
 
-				.input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontr)//
-				;
+				.input(context, 1, Auxiliary.tapSize * 0.3, "Контрагент", kontr, Auxiliary.tapSize * 9)//
+		;
 
 
 		propertiesForm.child(new Knob(context)//
-				                     .labelText.is("Обновить")//
-				                     .afterTap.is(new Task() {
+				.labelText.is("Обновить")//
+				.afterTap.is(new Task() {
 					@Override
 					public void doTask() {
 						expectRequery.start(activityReports);
 					}
 				})//
-				                     .left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-				                     .top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 1 + 1 + 0.5)))//
-				                     .width().is(Auxiliary.tapSize * 2.5)//
-				                     .height().is(Auxiliary.tapSize * 0.8)//
+				.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
+				.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 1 + 1 + 0.5)))//
+				.width().is(Auxiliary.tapSize * 2.5)//
+				.height().is(Auxiliary.tapSize * 0.8)//
 		);
 		propertiesForm.child(new Knob(context)//
-				                     .labelText.is("Удалить")//
-				                     .afterTap.is(new Task() {
+				.labelText.is("Удалить")//
+				.afterTap.is(new Task() {
 					@Override
 					public void doTask() {
 						//expectRequery.start(activityReports);
 						activityReports.promptDeleteRepoort(ReportObjedineniaKlientov.this, currentKey);
 					}
 				})//
-				                     .left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-				                     .top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 *1 + 2 + 0.5)))//
-				                     .width().is(Auxiliary.tapSize * 2.5)//
-				                     .height().is(Auxiliary.tapSize * 0.8)//
+				.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
+				.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 1 + 2 + 0.5)))//
+				.width().is(Auxiliary.tapSize * 2.5)//
+				.height().is(Auxiliary.tapSize * 0.8)//
 		);
 		//}
 		propertiesForm.innerHeight.is(Auxiliary.tapSize * 14);

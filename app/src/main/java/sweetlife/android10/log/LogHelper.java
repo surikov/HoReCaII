@@ -51,21 +51,23 @@ public class LogHelper {
 	public static final String LOG_OWNER_UPLOAD_LOG = "Логирование";
 	public static final String LOG_TYPE_SUCCESS = "Успешно";
 	public static final String LOG_TYPE_ERROR = "Ошибка";
+
 	public static void setLastSuccessfulUpdate(Calendar syncCalendar) {
-		SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//"YYYY-MM-DD HH:MM:SS.SSS"
-		String date=f.format(syncCalendar.getTime());
-		String sql="insert into SyncLog (endTime) values ('"+date+"');";
-		System.out.println("=====> setLastSuccessfulUpdate "+sql);
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//"YYYY-MM-DD HH:MM:SS.SSS"
+		String date = f.format(syncCalendar.getTime());
+		String sql = "insert into SyncLog (endTime) values ('" + date + "');";
+		System.out.println("=====> setLastSuccessfulUpdate " + sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
+
 	public static Calendar getLastSuccessfulUpdate() {
 
 		ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog where _id>=2494 and _id<=2498");
 
 
-		String sqlLog="select endTime from SyncLog order by endTime desc limit 1;";
+		String sqlLog = "select endTime from SyncLog order by endTime desc limit 1;";
 		Cursor cursor = null;
-		Calendar syncCalendar =Calendar.getInstance();
+		Calendar syncCalendar = Calendar.getInstance();
 		syncCalendar.add(Calendar.DAY_OF_MONTH, -30);
 		//System.out.println("getLastSuccessfulUpdate set fake "+syncCalendar);
 		try {
@@ -76,14 +78,14 @@ public class LogHelper {
 				syncCalendar = DateTimeHelper.getOnlyDateInfo(syncCalendar);
 				//System.out.println("getLastSuccessfulUpdate found "+syncCalendar);
 			}
-		}
-		finally {
+		} finally {
 			if (cursor != null && !cursor.isClosed()) {
 				cursor.close();
 			}
 		}
 		return syncCalendar;
 	}
+
 	/*public static Calendar _getLastSuccessfulUpdate() {
 		String sqlLog = "select max(date(dateadded))"//
 				+ " from " + LoggingOpenHelper.LOG_TABLE_NAME// 
@@ -108,20 +110,21 @@ public class LogHelper {
 		return syncCalendar;
 	}*/
 	public static void _logUpdateEnd() {
-		SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//"YYYY-MM-DD HH:MM:SS.SSS"
-		String date=f.format(new Date());
-		String sql="insert into SyncLog (endTime) values ('"+date+"');";
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//"YYYY-MM-DD HH:MM:SS.SSS"
+		String date = f.format(new Date());
+		String sql = "insert into SyncLog (endTime) values ('" + date + "');";
 		//System.out.println("logUpdateEnd "+sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
+
 	public static void _logUpdateStart() {
-		SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//"YYYY-MM-DD HH:MM:SS.SSS"
-		String date=f.format(new Date());
-		String sql="insert into SyncLog (startTime) values ('"+date+"');";
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//"YYYY-MM-DD HH:MM:SS.SSS"
+		String date = f.format(new Date());
+		String sql = "insert into SyncLog (startTime) values ('" + date + "');";
 		//System.out.println("logUpdateStart "+sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
-	
+
 	/*
 	public static void setLastUpdateStatus(String type, SQLiteDatabase db) {
 		debug("setLastUpdateStatus "+type);
@@ -163,8 +166,9 @@ public class LogHelper {
 		}//игнорируем ошибки
 		*/
 	}
+
 	public synchronized static void debug(String sMessage) {
-		System.out.println("LogHelper.debug "+sMessage);
+		System.out.println("LogHelper.debug " + sMessage);
 		/*
 		try {
 			Log.d("sw", sMessage);

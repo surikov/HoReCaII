@@ -31,7 +31,7 @@ public class DataGrid extends SubLayoutless {
 	//public int lastClickedRow = -1;
 
 	//public NumericProperty<DataGrid> lastManualScrollY;
-	public  Numeric margin;
+	public Numeric margin;
 	public ItProperty<DataGrid, Task> beforeFlip = new ItProperty<DataGrid, Task>(this);
 	public ItProperty<DataGrid, Task> afterPluck = new ItProperty<DataGrid, Task>(this);
 	public ItProperty<DataGrid, Task> afterTap = new ItProperty<DataGrid, Task>(this);
@@ -44,7 +44,7 @@ public class DataGrid extends SubLayoutless {
 	Column[] columnsArray = null;
 	ProgressBar progressBar;
 	public boolean lockScroll = false;
-	public  int currentPage = 0;
+	public int currentPage = 0;
 	TableLayout tableLayout;
 	public GridScroll scrollView;
 	Vector<TableRow> rows = new Vector<TableRow>();
@@ -156,7 +156,7 @@ public class DataGrid extends SubLayoutless {
 		//System.err.println("scrollView "+scrollView.getScrollY());
 	}
 
-	public  void append() {
+	public void append() {
 		if (lockAppend) {
 			//System.out.println("append locked");
 			return;
@@ -389,12 +389,13 @@ public class DataGrid extends SubLayoutless {
 			t.printStackTrace();
 		}
 	}
-/*
-	public void scrollToOldPosition(int yy) {
-		//System.out.println("scrollToOldPosition " + yy);
-		this.scrollView.scrollTo(0,yy);
-	}
-*/
+
+	/*
+		public void scrollToOldPosition(int yy) {
+			//System.out.println("scrollToOldPosition " + yy);
+			this.scrollView.scrollTo(0,yy);
+		}
+	*/
 	@Override
 	protected void init() {
 		super.init();
@@ -436,7 +437,7 @@ public class DataGrid extends SubLayoutless {
 			rowHeight = new NumericProperty<DataGrid>(this);
 			rowHeight.is(Auxiliary.tapSize);
 			tableLayout = new TableLayout(this.getContext());
-			scrollView = new GridScroll(this.getContext(),this);
+			scrollView = new GridScroll(this.getContext(), this);
 
 			scrollView.addView(tableLayout);
 			this.addView(scrollView);

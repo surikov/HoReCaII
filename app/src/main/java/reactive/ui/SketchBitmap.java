@@ -1,6 +1,7 @@
 package reactive.ui;
 
 import android.graphics.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.*;
 
@@ -11,12 +12,14 @@ public class SketchBitmap extends Sketch {
 	public NumericProperty<SketchBitmap> height = new NumericProperty<SketchBitmap>(this);
 	public NumericProperty<SketchBitmap> left = new NumericProperty<SketchBitmap>(this);
 	public NumericProperty<SketchBitmap> top = new NumericProperty<SketchBitmap>(this);
+
 	public SketchBitmap() {
 		paint.setColor(0xff000000);
 		paint.setAntiAlias(true);
 		paint.setFilterBitmap(true);
 		paint.setDither(true);
 	}
+
 	@Override
 	public void draw(Canvas canvas) {
 		if (bitmap.property.value() != null) {
@@ -29,6 +32,7 @@ public class SketchBitmap extends Sketch {
 			canvas.drawBitmap(bitmap.property.value(), l, t, paint);
 		}
 	}
+
 	@Override
 	public void unbind() {
 		super.unbind();

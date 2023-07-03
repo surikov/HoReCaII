@@ -20,7 +20,7 @@ public class Dialog_Documents extends Activity {
 
 		setTitle(R.string.documents);
 
-		final Button btnVisits = (Button)findViewById(R.id.btn_visits);
+		final Button btnVisits = (Button) findViewById(R.id.btn_visits);
 		btnVisits.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -48,7 +48,7 @@ public class Dialog_Documents extends Activity {
 			}
 		});
 */
-		final Button btnBids = (Button)findViewById(R.id.btn_bids);
+		final Button btnBids = (Button) findViewById(R.id.btn_bids);
 		btnBids.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -62,7 +62,7 @@ public class Dialog_Documents extends Activity {
 			}
 		});
 
-		final Button btnGPSPoints = (Button)findViewById(R.id.btn_gps_points);
+		final Button btnGPSPoints = (Button) findViewById(R.id.btn_gps_points);
 		btnGPSPoints.setOnClickListener(new View.OnClickListener() {
 
 			@Override

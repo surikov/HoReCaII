@@ -1,4 +1,5 @@
 package sweetlife.android10.ui;
+
 import android.app.Activity;
 import android.content.*;
 import android.net.*;
@@ -10,12 +11,14 @@ import android.view.*;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+
 import sweetlife.android10.supervisor.*;
 import reactive.ui.*;
 import sweetlife.android10.*;
 import tee.binding.*;
 import tee.binding.it.*;
 import tee.binding.task.Task;
+
 public class Activity_DannieMercuryOne extends Activity {
 	final int RETURN_FROM_GALLERY = 123;
 	final int RETURN_FROM_PHOTO = 321;
@@ -35,12 +38,15 @@ public class Activity_DannieMercuryOne extends Activity {
 		//a80c2ef5-155-c-43fd-a9cf-badc527d5294
 		//72954a5c-4d9b-4d39-bbbe-f3b54e7a2db0
 		boolean lock;
+
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		}
+
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 		}
+
 		@Override
 		public void afterTextChanged(Editable s) {
 			if (!lock) {
@@ -69,6 +75,7 @@ public class Activity_DannieMercuryOne extends Activity {
 			}
 		}
 	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -101,6 +108,7 @@ public class Activity_DannieMercuryOne extends Activity {
 				)//
 		;
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuUpload = menu.add("Выгрузить");
@@ -108,6 +116,7 @@ public class Activity_DannieMercuryOne extends Activity {
 		menuFile = menu.add("Выбрать файл");
 		return true;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item == menuUpload) {
@@ -121,24 +130,26 @@ public class Activity_DannieMercuryOne extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	boolean checkGUID(){
-		String guid = mercuryGUID.value().trim().replace(' ','+').replace('\n','+');
+
+	boolean checkGUID() {
+		String guid = mercuryGUID.value().trim().replace(' ', '+').replace('\n', '+');
 		//http://api.vetrf.ru/docs/
-		String pattern="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
+		String pattern = "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";
 		return guid.matches(pattern);
 
 	}
+
 	void promptUpload() {
-		if(!checkGUID()){
-			Auxiliary.warn("Неверный GUID. Пример заполнения: \n12345678-abcd-eeee-ffff-1234567890ab",this);
-			return ;
+		if (!checkGUID()) {
+			Auxiliary.warn("Неверный GUID. Пример заполнения: \n12345678-abcd-eeee-ffff-1234567890ab", this);
+			return;
 		}
 		new Expect().status.is("Выгрузка...").task.is(new Task() {
 			@Override
 			public void doTask() {
 				saveOne();
 				String hrc = ApplicationHoreca.getInstance().getCurrentAgent().getAgentName().trim();
-				String guid = mercuryGUID.value().trim().replace(' ','+').replace('\n','+');
+				String guid = mercuryGUID.value().trim().replace(' ', '+').replace('\n', '+');
 				String rash = "";
 				String kod = data.child("row").child("klient").value.property.value();
 
@@ -146,13 +157,13 @@ public class Activity_DannieMercuryOne extends Activity {
 				//String url = "http://89.109.7.162/GolovaNew/hs/danniemercury/hrc23/80104?guid=72954a5c-4d9b-4d39-bbbe-f3b54e7a2db0&rash=jpeg";
 				//              http://89.109.7.162/GolovaNew/hs/danniemercury/х0085/101075?guid=ggfff
 				String file = filePath.value();
-				byte[]bytes=null;
-				String comment="";
+				byte[] bytes = null;
+				String comment = "";
 				try {
 					if (filePath.value().length() > 1) {
 						String filenameArray[] = filePath.value().split("\\.");
-						String extension = filenameArray[filenameArray.length-1];
-						rash = "&rash=" +extension.toLowerCase().trim();
+						String extension = filenameArray[filenameArray.length - 1];
+						rash = "&rash=" + extension.toLowerCase().trim();
 						File iofile = new File(filePath.value());
 						int length = (int) iofile.length();
 						bytes = new byte[length];
@@ -162,20 +173,20 @@ public class Activity_DannieMercuryOne extends Activity {
 						dataInputStream.close();
 					}
 					//String url = sweetlife.horeca.Settings.getInstance().getBaseURL() + "/GolovaNew/hs/danniemercury/" + hrc + "/" + kod + "?guid=" + guid +  rash;
-					String url = sweetlife.android10.Settings.getInstance().getBaseURL() + sweetlife.android10.Settings.getInstance().selectedBase1C()+"/hs/danniemercury/" + hrc + "/" + kod + "?guid=" + guid +  rash;
+					String url = sweetlife.android10.Settings.getInstance().getBaseURL() + sweetlife.android10.Settings.getInstance().selectedBase1C() + "/hs/danniemercury/" + hrc + "/" + kod + "?guid=" + guid + rash;
 					//String url = "http://89.109.7.162/GolovaNew/hs/danniemercury/" + hrc + "/" + kod + "?guid=" + guid +  rash;
 					//System.out.println(url);
 					//Bough txt = Auxiliary.loadTextFromPOST(url, bytes, 300 * 1000);
-					Bough txt = Auxiliary.loadTextFromPrivatePOST(url, bytes, 300 * 1000, Cfg.whoCheckListOwner(),Cfg.hrcPersonalPassword());
+					Bough txt = Auxiliary.loadTextFromPrivatePOST(url, bytes, 300 * 1000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 
 					//System.out.println(txt.dumpXML());
-					comment = txt.child("message").value.property.value()+": "+txt.child("raw").value.property.value();
-				}catch(Throwable t){
+					comment = txt.child("message").value.property.value() + ": " + txt.child("raw").value.property.value();
+				} catch (Throwable t) {
 					t.printStackTrace();
 				}
-				String sql="update DannieMercury set comment='"//
-						+comment.replace('\n',' ').replace('\'','"').replace('\r',' ').trim()//
-						+"' where _id="+extras.child("id").value.property.value();
+				String sql = "update DannieMercury set comment='"//
+						+ comment.replace('\n', ' ').replace('\'', '"').replace('\r', ' ').trim()//
+						+ "' where _id=" + extras.child("id").value.property.value();
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 		}).afterDone.is(new Task() {
@@ -186,6 +197,7 @@ public class Activity_DannieMercuryOne extends Activity {
 		})//
 				.start(this);
 	}
+
 	void promptDelete() {
 		Auxiliary.pickConfirm(this, "Удалить запись?", "Удалить", new Task() {
 			@Override
@@ -198,6 +210,7 @@ public class Activity_DannieMercuryOne extends Activity {
 			}
 		});
 	}
+
 	void promptFile() {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("*/*");
@@ -210,6 +223,7 @@ public class Activity_DannieMercuryOne extends Activity {
 			t.printStackTrace();
 		}
 	}
+
 	void saveOne() {
 		String sql = "update DannieMercury set"//
 				+ " file='" + filePath.value() + "'"//
@@ -218,6 +232,7 @@ public class Activity_DannieMercuryOne extends Activity {
 				;
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
+
 	void doPhoto() throws Exception {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -228,11 +243,13 @@ public class Activity_DannieMercuryOne extends Activity {
 			startActivityForResult(takePictureIntent, RETURN_FROM_PHOTO);
 		}
 	}
+
 	@Override
 	public void onStop() {
 		saveOne();
 		super.onStop();
 	}
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);

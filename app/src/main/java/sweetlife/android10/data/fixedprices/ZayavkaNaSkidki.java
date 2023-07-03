@@ -17,30 +17,30 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcelable {
-	
-	private Date       mVremyaNachalaSkidkiPhiksCen;
-	private Date       mVremyaOkonchaniyaSkidkiPhiksCen;
-	private String     mKommentariy;
-	private boolean    mVygruzhen;
+
+	private Date mVremyaNachalaSkidkiPhiksCen;
+	private Date mVremyaOkonchaniyaSkidkiPhiksCen;
+	private String mKommentariy;
+	private boolean mVygruzhen;
 
 	public ZayavkaNaSkidki(Parcel in) {
 
-		readFromParcel( in );
+		readFromParcel(in);
 	}
 
 	public ZayavkaNaSkidki(int _id,
-			String     idRRef,
-			Date       date,
-			String     nomer,
-			String     kontragentID,
-			String     kontragentKod,
-			String     kontragentName,
-			Date       vremyaNachalaSkidkiPhiksCen,
-			Date       vremyaOkonchaniyaSkidkiPhiksCen,
-			String     kommentariy,
-			boolean    vygruzhen,
-			boolean    New) {
-		
+						   String idRRef,
+						   Date date,
+						   String nomer,
+						   String kontragentID,
+						   String kontragentKod,
+						   String kontragentName,
+						   Date vremyaNachalaSkidkiPhiksCen,
+						   Date vremyaOkonchaniyaSkidkiPhiksCen,
+						   String kommentariy,
+						   boolean vygruzhen,
+						   boolean New) {
+
 		m_id = _id;
 		mIDRRef = idRRef;
 		mDate = date;
@@ -56,13 +56,13 @@ public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcel
 		mKommentariy = kommentariy;
 		mVygruzhen = vygruzhen;
 	}
-	
-	public ZayavkaNaSkidki( String clientID, SQLiteDatabase db ) {
-		
+
+	public ZayavkaNaSkidki(String clientID, SQLiteDatabase db) {
+
 		Calendar today = Calendar.getInstance();
 
 		ClientInfo client = new ClientInfo(db, clientID);
-		
+
 		m_id = 0;
 		mIDRRef = Hex.generateIDRRefString();
 		mDate = today.getTime();
@@ -77,15 +77,15 @@ public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcel
 		mProveden = false;
 		mNew = true;
 	}
-	
+
 	@Override
 	protected void setDocumentNumberProperties() {
 
 		mDocumentTableName = "ZayavkaNaSkidki";
-		mDocumentNumberLenght = 5;	
-		mDocumentNumberPrefix = "";	
+		mDocumentNumberLenght = 5;
+		mDocumentNumberPrefix = "";
 	}
-	
+
 	@Override
 	public int describeContents() {
 
@@ -95,7 +95,7 @@ public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcel
 	public void writeToParcel(Parcel dest, int flags) {
 
 		super.writeToParcel(dest, flags);
-		
+
 		dest.writeLong(mVremyaNachalaSkidkiPhiksCen.getTime());
 		dest.writeLong(mVremyaOkonchaniyaSkidkiPhiksCen.getTime());
 		dest.writeString(mKommentariy);
@@ -105,8 +105,8 @@ public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcel
 
 		super.readFromParcel(in);
 
-		mVremyaNachalaSkidkiPhiksCen =  new Date(in.readLong());
-		mVremyaOkonchaniyaSkidkiPhiksCen =  new Date(in.readLong());
+		mVremyaNachalaSkidkiPhiksCen = new Date(in.readLong());
+		mVremyaOkonchaniyaSkidkiPhiksCen = new Date(in.readLong());
 		mKommentariy = in.readString();
 		mVygruzhen = mProveden;
 	}
@@ -114,63 +114,62 @@ public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcel
 	public static final Parcelable.Creator<ZayavkaNaSkidki> CREATOR =
 			new Parcelable.Creator<ZayavkaNaSkidki>() {
 
-		public ZayavkaNaSkidki createFromParcel(Parcel in) {
+				public ZayavkaNaSkidki createFromParcel(Parcel in) {
 
-			return new ZayavkaNaSkidki(in);
-		}
+					return new ZayavkaNaSkidki(in);
+				}
 
-		public ZayavkaNaSkidki[] newArray(int size) {
+				public ZayavkaNaSkidki[] newArray(int size) {
 
-			return new ZayavkaNaSkidki[size];
-		}
-	};
-	
-	public void writeToDataBase( SQLiteDatabase db ) {
+					return new ZayavkaNaSkidki[size];
+				}
+			};
+
+	public void writeToDataBase(SQLiteDatabase db) {
 
 		ContentValues values = new ContentValues();
-		
-		if( mNew ) {
 
-			values.put("_IDRRef", Hex.decodeHexWithPrefix(mIDRRef) );
-			values.put("Data", DateTimeHelper.SQLDateString(mDate) );
-			values.put("Nomer", mNomer ); 
-			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'") );
+		if (mNew) {
+
+			values.put("_IDRRef", Hex.decodeHexWithPrefix(mIDRRef));
+			values.put("Data", DateTimeHelper.SQLDateString(mDate));
+			values.put("Nomer", mNomer);
+			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'"));
 			values.put("Kontragent", Hex.decodeHexWithPrefix(mKontragentID));//
-			values.put("VremyaNachalaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaNachalaSkidkiPhiksCen) );  
-			values.put("VremyaOkonchaniyaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaOkonchaniyaSkidkiPhiksCen) ); 
-			values.put("Kommentariy", mKommentariy );
-			values.put("Otvetstvennyy", mOtvetstvennyyKod );
+			values.put("VremyaNachalaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaNachalaSkidkiPhiksCen));
+			values.put("VremyaOkonchaniyaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaOkonchaniyaSkidkiPhiksCen));
+			values.put("Kommentariy", mKommentariy);
+			values.put("Otvetstvennyy", mOtvetstvennyyKod);
 
-			m_id=(int)DatabaseHelper.insertInTranzaction(db, mDocumentTableName, values);
+			m_id = (int) DatabaseHelper.insertInTranzaction(db, mDocumentTableName, values);
 
-			mNew=false;
-		}
-		else {
+			mNew = false;
+		} else {
 
-			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'") );
-			values.put("VremyaNachalaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaNachalaSkidkiPhiksCen) );  
-			values.put("VremyaOkonchaniyaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaOkonchaniyaSkidkiPhiksCen) ); 
-			values.put("Kommentariy", mKommentariy );
+			values.put("Vygruzhen", Hex.decodeHexWithPrefix(mVygruzhen ? "x'01'" : "x'00'"));
+			values.put("VremyaNachalaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaNachalaSkidkiPhiksCen));
+			values.put("VremyaOkonchaniyaSkidkiPhiksCen", DateTimeHelper.SQLDateString(mVremyaOkonchaniyaSkidkiPhiksCen));
+			values.put("Kommentariy", mKommentariy);
 
-			DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id="+ String.valueOf(m_id), null);
+			DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id=" + String.valueOf(m_id), null);
 		}
 	}
-	
+
 	public void setVremyaNachalaSkidkiPhiksCen(Date date) {
 
 		mVremyaNachalaSkidkiPhiksCen = date;
 	}
-	
+
 	public void setVremyaOkonchaniyaSkidkiPhiksCen(Date date) {
 
 		mVremyaOkonchaniyaSkidkiPhiksCen = date;
 	}
-	
+
 	public void setKommentariy(String kommentariy) {
 
 		mKommentariy = kommentariy;
 	}
-	
+
 	public String getIDRRef() {
 
 		return mIDRRef;
@@ -180,20 +179,20 @@ public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcel
 
 		return mKommentariy;
 	}
-	
+
 	public Date getVremyaNachalaSkidkiPhiksCen() {
 
 		return mVremyaNachalaSkidkiPhiksCen;
 	}
-	
+
 	public Date getVremyaOkonchaniyaSkidkiPhiksCen() {
 
 		return mVremyaOkonchaniyaSkidkiPhiksCen;
 	}
 
 	@Override
-	public String getSerializedXML(SQLiteDatabase db) throws IllegalArgumentException, 
-	IllegalStateException, IOException {
+	public String getSerializedXML(SQLiteDatabase db) throws IllegalArgumentException,
+			IllegalStateException, IOException {
 
 		FixedPricesXMLSerializer serializer = new FixedPricesXMLSerializer(db, this);
 		return serializer.SerializeXML();
@@ -201,11 +200,11 @@ public class ZayavkaNaSkidki extends NomenclatureBasedDocument implements Parcel
 
 	@Override
 	public void writeUploaded(SQLiteDatabase db) {
-		
-		ContentValues values = new ContentValues();
-		
-		values.put("Vygruzhen", Hex.decodeHexWithPrefix("x'01'") );
 
-		DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id="+ String.valueOf(m_id), null);
+		ContentValues values = new ContentValues();
+
+		values.put("Vygruzhen", Hex.decodeHexWithPrefix("x'01'"));
+
+		DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id=" + String.valueOf(m_id), null);
 	}
 }

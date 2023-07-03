@@ -14,67 +14,66 @@ import sweetlife.android10.R;
 
 public class FilesListAdapter extends ZoomListArrayAdapter {
 
-			private ArrayList<String> mFilesList;
-			
-			public FilesListAdapter( ArrayList<String> filesList ) {
+	private ArrayList<String> mFilesList;
 
-				mFilesList = filesList;
-			}
+	public FilesListAdapter(ArrayList<String> filesList) {
 
-			@Override
-			public int getCount() {
+		mFilesList = filesList;
+	}
 
-				return mFilesList.size();
-			}
+	@Override
+	public int getCount() {
 
-			@Override
-			public Object getItem( int index ) {
+		return mFilesList.size();
+	}
 
-				return mFilesList.get(index);
-			}
+	@Override
+	public Object getItem(int index) {
 
-			@Override
-			public long getItemId(int index) {
+		return mFilesList.get(index);
+	}
 
-				return index;
-			}
+	@Override
+	public long getItemId(int index) {
 
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
+		return index;
+	}
 
-				FilesViewHolder holder = null;
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
 
-				if (convertView == null) {
+		FilesViewHolder holder = null;
 
-					convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_files, null );
-					
-					holder = new FilesViewHolder( convertView );
+		if (convertView == null) {
 
-					convertView.setTag(holder);
-				} 
-				else {
+			convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_files, null);
 
-					holder = (FilesViewHolder)convertView.getTag();
-				}
+			holder = new FilesViewHolder(convertView);
 
-				holder.SetValues( mFilesList.get(position) );
-				
-				return convertView;
-			}
+			convertView.setTag(holder);
+		} else {
 
-			public class FilesViewHolder {
+			holder = (FilesViewHolder) convertView.getTag();
+		}
 
-				private TextView mTextFileName = null;
+		holder.SetValues(mFilesList.get(position));
 
-				FilesViewHolder( View row ) {
+		return convertView;
+	}
 
-					mTextFileName = (TextView)row.findViewById(R.id.text_file_name);
-				}
+	public class FilesViewHolder {
 
-				void SetValues( String file ) {
+		private TextView mTextFileName = null;
 
-					mTextFileName.setText( file );
-					mTextFileName.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
-				}
-			}
+		FilesViewHolder(View row) {
+
+			mTextFileName = (TextView) row.findViewById(R.id.text_file_name);
+		}
+
+		void SetValues(String file) {
+
+			mTextFileName.setText(file);
+			mTextFileName.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
+		}
+	}
 }

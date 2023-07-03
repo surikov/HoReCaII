@@ -1,7 +1,7 @@
 package reactive.ui;
 
 import android.media.MediaScannerConnection;
-import 	android.app.admin.*;
+import android.app.admin.*;
 import android.view.*;
 import android.app.*;
 import android.content.*;
@@ -73,6 +73,7 @@ public class Auxiliary {
 	public static int colorLine = 0x66ff00ff;
 	public static Paint paintLine = null;
 	public static int colorSelection = 0x663399ff;
+	//public static int colorSelection = 0x99ff0000;
 	public static float density = 1;
 	public static int tapSize = 8;
 	public static SensorEventListener sensorEventListener = null;
@@ -435,7 +436,7 @@ public class Auxiliary {
 						.replace(',', '_')
 						.replace('&', '_')
 						.replace("_", "")
-		//)
+				//)
 				;
 	}
 
@@ -728,21 +729,45 @@ public class Auxiliary {
 			//System.out.println("loadTextFromPOST response: "+httpURLConnection.getResponseCode()+", "+httpURLConnection.getResponseMessage());
 			r.child("code").value.is("" + httpURLConnection.getResponseCode());
 			r.child("message").value.is(httpURLConnection.getResponseMessage());
-			InputStream inputStream = httpURLConnection.getInputStream();
-			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-			byte[] bytes = new byte[1024];
-			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-			int intgr = bufferedInputStream.read(bytes);
-			while (intgr > -1) {
-				byteArrayOutputStream.write(bytes, 0, intgr);
-				intgr = bufferedInputStream.read(bytes);
+			try {
+				InputStream inputStream = httpURLConnection.getInputStream();
+				BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+				byte[] bytes = new byte[1024];
+				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+				int intgr = bufferedInputStream.read(bytes);
+				while (intgr > -1) {
+					byteArrayOutputStream.write(bytes, 0, intgr);
+					intgr = bufferedInputStream.read(bytes);
+				}
+				bufferedInputStream.close();
+				byte[] raw = byteArrayOutputStream.toByteArray();
+				r.child("raw").value.is(new String(raw));
+				r.child("message").value.is(r.child("message").value.property.value() + " / " + new String(raw));
+			} catch (Throwable t2) {
+				t2.printStackTrace();
+				r.child("message").value.is(r.child("message").value.property.value() + " / " + t2.toString());
 			}
-			bufferedInputStream.close();
-			byte[] raw = byteArrayOutputStream.toByteArray();
-			r.child("raw").value.is(new String(raw));
+			try {
+				InputStream input = httpURLConnection.getErrorStream();
+				if (input != null) {
+					ByteArrayOutputStream output = new ByteArrayOutputStream();
+					int nn;
+					while ((nn = input.read(data)) != -1) {
+						output.write(data, 0, nn);
+					}
+					input.close();
+
+					String s2 = new String(output.toByteArray(), "UTF-8");// "windows-1251");
+					r.child("message").value.is(r.child("message").value.property.value() + " / " + s2);
+				}
+			} catch (Throwable t3) {
+				t3.printStackTrace();
+				r.child("message").value.is(r.child("message").value.property.value() + " / " + t3.toString());
+			}
 			httpURLConnection.disconnect();
 		} catch (Throwable t) {
 			r.child("message").value.is(r.child("message").value.property.value() + " / " + t.toString());
+			t.printStackTrace();
 		}
 		return r;
 	}
@@ -920,6 +945,58 @@ public class Auxiliary {
 		return output.toByteArray();
 	}
 
+
+	public static String checkPrivateURL(String pathurl, String login, String password) throws Exception {
+		String errorText = "";
+		String responseText = "";
+		int responseStatus = 0;
+		String result = "";
+		HttpURLConnection connection = null;
+		URL url = new URL(pathurl);
+		connection = (HttpURLConnection) url.openConnection();
+		String userCredentials = login + ":" + password;
+		String basicAuth = "Basic " + new String(android.util.Base64.encode(userCredentials.getBytes(), android.util.Base64.DEFAULT));
+		connection.setRequestProperty("Authorization", basicAuth);
+		connection.setUseCaches(false);
+		connection.connect();
+		responseStatus = connection.getResponseCode();
+		//System.out.println("checkPrivateURL responseStatus " + responseStatus);
+		try {
+			byte data[] = new byte[1024];
+			int nn;
+			InputStream input = connection.getInputStream();
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			while ((nn = input.read(data)) != -1) {
+				output.write(data, 0, nn);
+			}
+			input.close();
+			responseText = new String(output.toByteArray(), "UTF-8");
+			//System.out.println("checkPrivateURL responseText " + responseText);
+		} catch (Throwable t) {
+			//t.printStackTrace();
+		}
+		try {
+			byte data[] = new byte[1024];
+			int nn;
+			InputStream input = connection.getErrorStream();
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			if (input != null) {
+				while ((nn = input.read(data)) != -1) {
+					output.write(data, 0, nn);
+				}
+				input.close();
+				errorText = new String(output.toByteArray(), "UTF-8");
+				//System.out.println("checkPrivateURL errorText " + errorText);
+			}
+		} catch (Throwable t) {
+			//t.printStackTrace();
+		}
+		if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+			result = "" + responseStatus + "\n" + errorText + "\n" + responseText;
+		}
+		return result;
+	}
+
 	public static byte[] loadFileFromPublicURL(String pathurl) throws Exception {
 		InputStream input = null;
 		ByteArrayOutputStream output = null;
@@ -980,7 +1057,7 @@ public class Auxiliary {
 					  +"При возникновении проблем обращайтесь в тех.поддержку по тел. 0775",context);
 	}*/
 	public static void warn(String s, Context context) {
-		//System.out.println("warn: " + s);
+		System.out.println("warn: " + s);
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(s);
 		builder.create().show();

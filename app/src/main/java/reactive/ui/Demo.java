@@ -135,7 +135,7 @@ public class Demo extends Activity {
 */
 				final RawSOAP rawSOAP = new RawSOAP();
 				//rawSOAP.url.is("http://89.109.7.162/ReportAndroid.1cws");
-				rawSOAP.url.is(sweetlife.android10.Settings.getInstance().getBaseURL()+"ReportAndroid.1cws");
+				rawSOAP.url.is(sweetlife.android10.Settings.getInstance().getBaseURL() + "ReportAndroid.1cws");
 				rawSOAP.xml.is("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>" //
 						+ "	<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"//
 						+ "		<soap:Body>\n" //
@@ -163,9 +163,9 @@ public class Demo extends Activity {
 						//System.out.println(rawSOAP.responseCode.property.value());
 						//System.out.println(rawSOAP.rawResponse);
 						//System.out.println(rawSOAP.data.dumpXML());
-				}
+					}
 				});
-				rawSOAP.startLater(Demo.this, "sending", Cfg.whoCheckListOwner(),Cfg.hrcPersonalPassword());
+				rawSOAP.startLater(Demo.this, "sending", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 			}
 		}).left().is(200).top().is(100).width().is(100).height().is(100));
 		requery.start(Demo.this);

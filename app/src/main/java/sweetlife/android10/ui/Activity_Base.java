@@ -68,95 +68,100 @@ public abstract class Activity_Base extends Activity implements OnTouchListener,
 		SetDisplayMetrics();
 		mDB = ApplicationHoreca.getInstance().getDataBase();
 	}
+
 	@Override
 	public void update(Observable observable, Object data) {
 	}
+
 	@Override
 	protected void onResume() {
 		LogHelper.debug(this.getClass().getCanonicalName() + " onResume");
 		//ApplicationHoreca.getInstance()
-		
+
 		AsyncTaskManager.getInstance().attach(this, this);
 		super.onResume();
 	}
+
 	@Override
 	protected void onPause() {
 		LogHelper.debug(this.getClass().getCanonicalName() + " onPause");
 		AsyncTaskManager.getInstance().detach();
 		super.onPause();
 	}
+
 	public SQLiteDatabase getDataBase() {
 
 		return mDB;
 	}
+
 	protected void setTitleWithVersionOwner() {
 		try {
-			String chOwner=sweetlife.android10.supervisor.Cfg.whoCheckListOwner();
-			if(chOwner.length()>0){
-				tee.binding.Bough data=Auxiliary.fromCursor(
-				getDataBase().rawQuery(
-						"select l.naimenovanie as name from PhizLicaPolzovatelya f join Polzovateli p on p._idrref=f.polzovatel join PhizicheskieLica l on l._idrref=f.phizlico where trim(p.kod)='"
-								+chOwner+"' order by f.period desc;"
-						,null));
-				chOwner=chOwner+"/"+data.child("row").child("name").value.property.value();
+			String chOwner = sweetlife.android10.supervisor.Cfg.whoCheckListOwner();
+			if (chOwner.length() > 0) {
+				tee.binding.Bough data = Auxiliary.fromCursor(
+						getDataBase().rawQuery(
+								"select l.naimenovanie as name from PhizLicaPolzovatelya f join Polzovateli p on p._idrref=f.polzovatel join PhizicheskieLica l on l._idrref=f.phizlico where trim(p.kod)='"
+										+ chOwner + "' order by f.period desc;"
+								, null));
+				chOwner = chOwner + "/" + data.child("row").child("name").value.property.value();
 				//System.out.println(data.dumpXML());
 			}
 			setTitle(chOwner
-					+"/"+getString(R.string.app_name)//
+					+ "/" + getString(R.string.app_name)//
 					+ "  " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName
-			+", "+ Settings.getInstance().getBaseIP()//
-			+"/"+Settings.getInstance().selectedBase1C()//
-					+" "+Settings.getInstance().selectedWSDL()//
+					+ ", " + Settings.getInstance().getBaseIP()//
+					+ "/" + Settings.getInstance().selectedBase1C()//
+					+ " " + Settings.getInstance().selectedWSDL()//
 			);
-		}
-		catch (NameNotFoundException e) {
+		} catch (NameNotFoundException e) {
 			//Activity_UploadBids.logToFile("setTitleWithVersionOwner.txt",e.getMessage());
 		}
 	}
+
 	private void SetDisplayMetrics() {
 		mDisplayMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
 		mDensity = mDisplayMetrics.densityDpi;
 	}
+
 	@Override
 	public boolean onTouch(View view, MotionEvent event) {
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
-		case MotionEvent.ACTION_POINTER_DOWN:
-			mPrevFingersDist = getFingersSpacing(event);
-			mZoomMode = ZOOM;
-			break;
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_POINTER_UP:
-			Log.d("sw","----------------------------\n\n\n\nmActivity_Base.ZoomMode "+mZoomMode+"\n\n\n\n\n------------------------------------");
-			if (mZoomMode != NONE) {
-				if (mZoomDirection == ZOOM_IN) {
-					ZoomListView(view, ZOOM_INC_WIDTH_SIZE * -1, ZOOM_INC_HEIGHT_SIZE * -1, ZOOM_INC_FONT_SIZE * -1);
+			case MotionEvent.ACTION_POINTER_DOWN:
+				mPrevFingersDist = getFingersSpacing(event);
+				mZoomMode = ZOOM;
+				break;
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_POINTER_UP:
+				Log.d("sw", "----------------------------\n\n\n\nmActivity_Base.ZoomMode " + mZoomMode + "\n\n\n\n\n------------------------------------");
+				if (mZoomMode != NONE) {
+					if (mZoomDirection == ZOOM_IN) {
+						ZoomListView(view, ZOOM_INC_WIDTH_SIZE * -1, ZOOM_INC_HEIGHT_SIZE * -1, ZOOM_INC_FONT_SIZE * -1);
+					} else {
+						ZoomListView(view, ZOOM_INC_WIDTH_SIZE, ZOOM_INC_HEIGHT_SIZE, ZOOM_INC_FONT_SIZE);
+					}
+					mZoomDirection = NONE;
+					mZoomMode = NONE;
 				}
-				else {
-					ZoomListView(view, ZOOM_INC_WIDTH_SIZE, ZOOM_INC_HEIGHT_SIZE, ZOOM_INC_FONT_SIZE);
+				Log.d("sw", "----------------------------\n\n\n\nnow mActivity_Base.ZoomMode " + mZoomMode + "\n\n\n\n\n------------------------------------");
+				break;
+			case MotionEvent.ACTION_MOVE:
+				if (mZoomMode == ZOOM) {
+					float newDist = getFingersSpacing(event);
+					if (newDist > mPrevFingersDist) {
+						mZoomDirection = ZOOM_OUT;
+					} else {
+						mZoomDirection = ZOOM_IN;
+					}
 				}
-				mZoomDirection = NONE;
-				mZoomMode = NONE;
-			}
-			Log.d("sw","----------------------------\n\n\n\nnow mActivity_Base.ZoomMode "+mZoomMode+"\n\n\n\n\n------------------------------------");
-			break;
-		case MotionEvent.ACTION_MOVE:
-			if (mZoomMode == ZOOM) {
-				float newDist = getFingersSpacing(event);
-				if (newDist > mPrevFingersDist) {
-					mZoomDirection = ZOOM_OUT;
-				}
-				else {
-					mZoomDirection = ZOOM_IN;
-				}
-			}
-			break;
+				break;
 		}
 		return false;
 	}
+
 	protected void ZoomListView(View view, int widthDelta, int heightDelta, int fontDelta) {
 		//System.out.println("\n\n\n\n\nZOOM_DIFFENT_BETWEEN_ROW_AND_HEADER "+ZOOM_DIFFENT_BETWEEN_ROW_AND_HEADER);
-		Log.d("sw","----------------------------\n\n\n\nZoomListView\n\n\n\n\n------------------------------------");
+		Log.d("sw", "----------------------------\n\n\n\nZoomListView\n\n\n\n\n------------------------------------");
 		RelativeLayout parent = (RelativeLayout) view.getParent();
 		LinearLayout buttonsLayout = null;
 		for (int i = 0; i < parent.getChildCount(); i++) {
@@ -179,30 +184,32 @@ public abstract class Activity_Base extends Activity implements OnTouchListener,
 			view.getLayoutParams().width = view.getLayoutParams().width + buttonsLayout.getChildCount() * widthDelta;
 			ListView list = (ListView) view;
 			//System.out.println("button.getTextSize() "+button.getTextSize());
-			
+
 			((IZoomList) list.getAdapter()).setRowTextFontSize(button.getTextSize() + ZOOM_DIFFENT_BETWEEN_ROW_AND_HEADER);
 
 			list.invalidate();
 		}
 	}
+
 	protected void increaseFontSize(TextView view, int increaseValue) {
 		float size = view.getTextSize();
 		switch (mDensity) {
-		case DisplayMetrics.DENSITY_LOW:
-			size = (size + increaseValue) / 0.75f;
-			break;
-		case DisplayMetrics.DENSITY_MEDIUM:
-			size = size + increaseValue;
-			break;
-		case DisplayMetrics.DENSITY_HIGH:
-			size = (size + increaseValue) / 1.5f;
-			break;
-		default:
-			break;
+			case DisplayMetrics.DENSITY_LOW:
+				size = (size + increaseValue) / 0.75f;
+				break;
+			case DisplayMetrics.DENSITY_MEDIUM:
+				size = size + increaseValue;
+				break;
+			case DisplayMetrics.DENSITY_HIGH:
+				size = (size + increaseValue) / 1.5f;
+				break;
+			default:
+				break;
 		}
 		view.setTextSize(size);
 		view.invalidate();
 	}
+
 	protected TextView makeTabIndicator(String text) {
 		TextView tabView = new TextView(this);
 		tabView.setHeight(50);
@@ -216,20 +223,22 @@ public abstract class Activity_Base extends Activity implements OnTouchListener,
 		tabView.setPadding(13, 0, 13, 0);
 		return tabView;
 	}
+
 	public int convertDensityPixel(int dip) {
 		return (int) (dip * getResources().getDisplayMetrics().density);
 	}
+
 	protected float getFingersSpacing(MotionEvent event) {
 		try {
 			float x = event.getX(0) - event.getX(1);
 			float y = event.getY(0) - event.getY(1);
 			//return FloatMath.sqrt(x * x + y * y);
-			return (float)Math.sqrt(x * x + y * y);
-		}
-		catch (Exception e) {
+			return (float) Math.sqrt(x * x + y * y);
+		} catch (Exception e) {
 		}
 		return 0;
 	}
+
 	protected Dialog CreateErrorDialog(int message) {
 		LogHelper.debug(this.getClass().getCanonicalName() + ".CreateErrorDialog: " + this.getString(message));
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -243,6 +252,7 @@ public abstract class Activity_Base extends Activity implements OnTouchListener,
 		});
 		return builder.create();
 	}
+
 	protected Dialog CreateErrorDialog(String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.error);

@@ -57,6 +57,9 @@ public class ActivityWebServicesReports extends Activity {
 	MenuItem menuSendPDF;
 	static int reportGridScrollViewY = 0;
 
+	public static String goLastPageReportName = "startup";
+
+
 	MenuItem menuClear;
 
 	Expect refreshFog = new Expect()//
@@ -339,10 +342,10 @@ public class ActivityWebServicesReports extends Activity {
 			report = new ReportValovayaPribil(this);
 		}
 
-
+/*
 		if (key.equals(ReportLocalizasiaDlyaTP.folderKey())) {
 			report = new ReportLocalizasiaDlyaTP(this);
-		}
+		}*/
 		if (key.equals(ReportObjedineniaKlientov.folderKey())) {
 			report = new ReportObjedineniaKlientov(this);
 		}
@@ -358,9 +361,9 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportPredzakazyNaTrafiki.folderKey())) {
 			report = new ReportPredzakazyNaTrafiki(this);
 		}
-		if (key.equals(ReportProbegTPSV.folderKey())) {
+		/*if (key.equals(ReportProbegTPSV.folderKey())) {
 			report = new ReportProbegTPSV(this);
-		}
+		}*/
 		if (key.equals(ReportKontragentySPrilojeniem.folderKey())) {
 			report = new ReportKontragentySPrilojeniem(this);
 		}
@@ -418,7 +421,9 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportProdazhiSTM.folderKey())) {
 			report = new ReportProdazhiSTM(this);
 		}
-
+		if (key.equals(ReportFixirovanieKoordinat.folderKey())) {
+			report = new ReportFixirovanieKoordinat(this);
+		}
 		return report;
 	}
 
@@ -446,22 +451,30 @@ public class ActivityWebServicesReports extends Activity {
 
 
 	void goLastPage() {
-		System.out.println("goLastPage " + Auxiliary.activityExatras(this).child("startup").value.property.value());
-		if (Auxiliary.activityExatras(this).child("startup").value.property.value().trim().equals(ReportStatusyZakazov.folderKey())) {
+		String goReportName = Auxiliary.activityExatras(this).child(ActivityWebServicesReports.goLastPageReportName).value.property.value().trim();
+		System.out.println("goLastPage " + goReportName);
+
+		if (goReportName.equals(ReportStatusyZakazov.folderKey())) {
 			//tapReport2(ReportStatusyZakazov.folderKey());
 			propSplit.value(layoutless.width().property.value());
 			reportSplit.value(layoutless.width().property.value());
 			openLastOrCreate(ReportStatusyZakazov.folderKey());
 		} else {
-			if (Auxiliary.activityExatras(this).child("startup").value.property.value().trim().equals(ReportStatistikaZakazov2.folderKey())) {
+			if (goReportName.equals(ReportStatistikaZakazov2.folderKey())) {
 				propSplit.value(layoutless.width().property.value());
 				reportSplit.value(layoutless.width().property.value());
 				openLastOrCreate(ReportStatistikaZakazov2.folderKey());
 			} else {
-				System.out.println("goLastPage default");
-				String folder = Preferences.string("folder", "").value();
-				String file = Preferences.string("file", "").value();
-				tapInstance2(folder, file);
+				if (goReportName.equals(ReportVzaioraschetySpokupatelem.folderKey())) {
+					propSplit.value(layoutless.width().property.value());
+					reportSplit.value(layoutless.width().property.value());
+					openLastOrCreate(ReportVzaioraschetySpokupatelem.folderKey());
+				} else {
+					System.out.println("goLastPage default");
+					String folder = Preferences.string("folder", "").value();
+					String file = Preferences.string("file", "").value();
+					tapInstance2(folder, file);
+				}
 			}
 		}
 	}
@@ -627,12 +640,13 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportAssortimentFlagmanov.folderKey(), ReportAssortimentFlagmanov.menuLabel());
 		addReportMenu2(ReportValovayaPribil.folderKey(), ReportValovayaPribil.menuLabel());
 		addReportMenu2(ReportVestnik.folderKey(), ReportVestnik.menuLabel());
-		addReportMenu2(ReportVizity.folderKey(), ReportVizity.menuLabel());
+
 
 		addReportMenu2(ReportVzaioraschetySpokupatelem.folderKey(), ReportVzaioraschetySpokupatelem.menuLabel());
 		addReportMenu2(ReportVozmeschenie.folderKey(), ReportVozmeschenie.menuLabel());
 		addReportMenu2(ReportVipolnenieDopMotivaciy.folderKey(), ReportVipolnenieDopMotivaciy.menuLabel());
 		addReportMenu2(ReportVipolneniePlanovPoPrilojeniu.folderKey(), ReportVipolneniePlanovPoPrilojeniu.menuLabel());
+		addReportMenu2(ReportVizity.folderKey(), ReportVizity.menuLabel());
 		//addReportMenu2(ReportVipolneniePlanov.folderKey(), ReportVipolneniePlanov.menuLabel());
 		addReportMenu2(ReportDegustaciaDlyaTP.folderKey(), ReportDegustaciaDlyaTP.menuLabel());
 		addReportMenu2(ReportDZDlyaTP.folderKey(), ReportDZDlyaTP.menuLabel());
@@ -647,7 +661,7 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportKlassifikaciaKlientov.folderKey(), ReportKlassifikaciaKlientov.menuLabel());
 		addReportMenu2(ReportKontragentySPrilojeniem.folderKey(), ReportKontragentySPrilojeniem.menuLabel());
 		addReportMenu2(ReportLimity.folderKey(), ReportLimity.menuLabel());
-		addReportMenu2(ReportLocalizasiaDlyaTP.folderKey(), ReportLocalizasiaDlyaTP.menuLabel());
+		//addReportMenu2(ReportLocalizasiaDlyaTP.folderKey(), ReportLocalizasiaDlyaTP.menuLabel());
 		addReportMenu2(ReportDostavkaPoMarshrutam.folderKey(), ReportDostavkaPoMarshrutam.menuLabel());
 		addReportMenu2(ReportNakladnieNaKontrole.folderKey(), ReportNakladnieNaKontrole.menuLabel());
 		addReportMenu2(ReportNalichieSkanov.folderKey(), ReportNalichieSkanov.menuLabel());
@@ -664,7 +678,9 @@ public class ActivityWebServicesReports extends Activity {
 		}
 		addReportMenu2(ReportPokazateliKPI.folderKey(), ReportPokazateliKPI.menuLabel());
 		//addReportMenu2(ReportPredzakazyNaTrafiki.folderKey(), ReportPredzakazyNaTrafiki.menuLabel());
-		addReportMenu2(ReportProbegTPSV.folderKey(), ReportProbegTPSV.menuLabel());
+		//addReportMenu2(ReportProbegTPSV.folderKey(), ReportProbegTPSV.menuLabel());
+
+
 		addReportMenu2(ReportProdajiFlagmanov.folderKey(), ReportProdajiFlagmanov.menuLabel());
 		addReportMenu2(ReportProdajiFlagmanovPoKontragentam.folderKey(), ReportProdajiFlagmanovPoKontragentam.menuLabel());
 		addReportMenu2(ReportResultatyUtverjdenihSpecifikaciy.folderKey(), ReportResultatyUtverjdenihSpecifikaciy.menuLabel());
@@ -690,6 +706,7 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportBonusyDlyaTP.folderKey(), ReportBonusyDlyaTP.menuLabel());
 		addReportMenu2(ReportTrafiki.folderKey(), ReportTrafiki.menuLabel());
 		addReportMenu2(ReportUsloviaOtgruzki.folderKey(), ReportUsloviaOtgruzki.menuLabel());
+		addReportMenu2(ReportFixirovanieKoordinat.folderKey(), ReportFixirovanieKoordinat.menuLabel());
 		addReportMenu2(ReportFixirovannieCeny.folderKey(), ReportFixirovannieCeny.menuLabel());
 		reportGrid.refresh();
 		waitForReportGridLayout();
@@ -812,6 +829,33 @@ public class ActivityWebServicesReports extends Activity {
 				}, null, null);
 	}
 
+	void sendFixirovanieKoordinat(final String num) {
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/UtvKoordinat/" + num + "/" + Cfg.whoCheckListOwner();
+		final Note result = new Note().value("Утверждение координат");
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+			@Override
+			public void doTask() {
+				try {
+					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String msg = new String(bytes, "UTF-8");
+					//String txt = Auxiliary.parseChildOrRaw(msg, "Message");
+					result.value(result.value() + "\n" + msg);
+					preReport.writeCurrentPage();
+				} catch (Throwable t) {
+					t.printStackTrace();
+					result.value(result.value() + "\n" + t.getMessage());
+				}
+			}
+		}).afterDone.is(new Task() {
+			@Override
+			public void doTask() {
+				Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
+				tapInstance2(preReport.getFolderKey(), preKey);
+			}
+		});
+		expect.start(ActivityWebServicesReports.this);
+	}
+
 	void sendDegustaciaState(final String num, final int state) {
 		final Note result = new Note().value("Заявка на дегустацию");
 		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
@@ -845,6 +889,61 @@ public class ActivityWebServicesReports extends Activity {
 			}
 		});
 		expect.start(ActivityWebServicesReports.this);
+	}
+
+	void sendDeleteSpec(String url) {
+		System.out.println(url);
+		final Note result = new Note().value("Удаление");
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+			@Override
+			public void doTask() {
+				try {
+					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String msg = new String(bytes, "UTF-8");
+					//String txt = Auxiliary.parseChildOrRaw(msg, "Message");
+					result.value(result.value() + "\n" + msg);
+					preReport.writeCurrentPage();
+				} catch (Throwable t) {
+					t.printStackTrace();
+					result.value(result.value() + "\n" + t.getMessage());
+				}
+			}
+		}).afterDone.is(new Task() {
+			@Override
+			public void doTask() {
+				Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
+				tapInstance2(preReport.getFolderKey(), preKey);
+			}
+		});
+		expect.start(ActivityWebServicesReports.this);
+	}
+
+	void promptReportDeleteSpec(final String num, final String art) {
+		final Numeric sel = new Numeric();
+		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки"}, sel, "№" + num, new Task() {
+			@Override
+			public void doTask() {
+				if (sel.value() == 0) {
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkiNaFiksCeny/DeleteSpec/" + num;
+					sendDeleteSpec(url);
+				} else {
+					if (sel.value() == 1) {
+						String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkiNaFiksCeny/DeleteLineSpec/" + num + "/" + art;
+						sendDeleteSpec(url);
+					}
+				}
+			}
+		}, null, null, null, null);
+	}
+
+	void doHOOKFixirovanieKoordinat(final String num) {
+		final Numeric sel = new Numeric();
+		Auxiliary.pickConfirm(this, "Новые координаты локализации в заявке №" + num, "Утвердить", new Task() {
+			@Override
+			public void doTask() {
+				sendFixirovanieKoordinat(num);
+			}
+		});
 	}
 
 	void doHOOKDegustacia(final String num) {
@@ -1137,6 +1236,54 @@ public class ActivityWebServicesReports extends Activity {
 		}, null, null);*/
 	}
 
+	void promptPoKontragentu(final String num) {
+		//System.out.println(num);
+		/*Auxiliary.pick(this, "Утвердить всё с таким же контрагентом" , "Утвердить", new Task() {
+			public void doTask() {
+
+			}
+		});*/
+		Calendar cfrom = Calendar.getInstance();
+		//cfrom.add(Calendar.DATE, 1);
+		Calendar cto = Calendar.getInstance();
+		cto.add(Calendar.DATE, 1);
+		final Numeric from = new Numeric().value((float) cfrom.getTimeInMillis());
+		final Numeric to = new Numeric().value((float) cto.getTimeInMillis());
+		Auxiliary.pick(this, "Утвердить всё с таким же контрагентом", new SubLayoutless(this)//
+						.child(new RedactDate(this).format.is("dd.MM.yyyy").date.is(from)
+								.left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 0.3)
+								.width().is(Auxiliary.tapSize * 3)
+								.height().is(Auxiliary.tapSize * 0.7))//
+						.child(new RedactDate(this).format.is("dd.MM.yyyy").date.is(to)
+								.left().is(Auxiliary.tapSize * 4)
+								.top().is(Auxiliary.tapSize * 0.3)
+								.width().is(Auxiliary.tapSize * 3)
+								.height().is(Auxiliary.tapSize * 0.7))//
+						.width().is(Auxiliary.tapSize * 7.5)//
+						.height().is(Auxiliary.tapSize * 4)//
+				, "Утвердить", new Task() {
+					public void doTask() {
+						//SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd")short1cDate
+						String dfrom = Auxiliary.short1cDate.format(new Date(from.value().longValue()));
+						String dto = Auxiliary.short1cDate.format(new Date(to.value().longValue()));
+						//String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
+						String sql = "select pz.kod as kod from Polzovateli pp join Podrazdeleniya pz on pp.podrazdelenie=pz._idrref where pp.kod='" + Cfg.whoCheckListOwner() + "'";
+						Bough rawdata = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+						String podrkod = rawdata.child("row").child("kod").value.property.value();
+						String body = "{\"НачДата\":\"" + dfrom + "\"";
+						body = body + ",\"КонДата\":\"" + dto + "\"";
+						body = body + ",\"hrc\":\"" + Cfg.whoCheckListOwner() + "\"";
+						body = body + ",\"Подразделение\":\"" + podrkod + "\"";
+						body = body + ",\"Ndok\":\"" + num + "\"";
+						body = body + "}";
+						System.out.println(body);
+						String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/fixprice/UtvVse";
+						ReportFixirovannieCeny.sendApproveAll(ActivityWebServicesReports.this, url, body);
+					}
+				}, null, null, null, null);
+	}
+
 	void doHOOKApproveFixAction(int nn, String art, String num, final String row) {
 		if (nn == 0) {
 			promptDropWholeFix(num);
@@ -1155,6 +1302,10 @@ public class ActivityWebServicesReports extends Activity {
 						} else {
 							if (nn == 5) {
 								allFixApprove();
+							} else {
+								if (nn == 6) {
+									promptPoKontragentu(num);
+								}
 							}
 						}
 					}
@@ -1164,7 +1315,13 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 	void doHOOKApproveFix(final String art, final String num, final String row) {
-		String[] titles = new String[]{"Удалить всю заявку " + num, "Удалить строку из заявки", "Утвердить", "Отказать", "Комментировать", "Утвердить всё"};
+		String[] titles = new String[]{"Удалить всю заявку №" + num
+				, "Удалить арт." + art + " из заявки №" + num
+				, "Утвердить всю заявку №" + num
+				, "Отказать всей заявке №" + num
+				, "Комментировать заявку №" + num
+				, "Утвердить всё найденное"
+				, "Утвердить всё с таким же контрагентом"};
 		final Numeric nn = new Numeric();
 		Auxiliary.pickSingleChoice(this, titles, nn, null, new Task() {
 			public void doTask() {
@@ -1201,7 +1358,7 @@ public class ActivityWebServicesReports extends Activity {
 		String page = Cfg.pathToHTML(ActivityWebServicesReports.this.preReport.getFolderKey(), ActivityWebServicesReports.this.preKey);
 
 		final Vector<String> strings = Auxiliary.readTextFromFile(new File(page));
-		System.out.println(strings.size()+": "+page);
+		System.out.println(strings.size() + ": " + page);
 		final Bough b = new Bough();
 		final Note statustext = new Note().value("Подождите");
 		Expect expect = new Expect().status.is(statustext)//
@@ -1218,7 +1375,7 @@ public class ActivityWebServicesReports extends Activity {
 								//System.out.println(""+i+": "+strings.get(i));
 								Matcher matcher = pattern.matcher(strings.get(i));
 								if (matcher.find()) {
-									System.out.println("sendAllFixDocsApprove found "+strings.get(i));
+									System.out.println("sendAllFixDocsApprove found " + strings.get(i));
 									String fixDocNum = matcher.group(2);
 									String fixArtikul = matcher.group(3);
 									String msg = "№" + fixDocNum + ", артикул " + fixArtikul;
@@ -1235,7 +1392,7 @@ public class ActivityWebServicesReports extends Activity {
 								}
 							}
 							b.child("result").value.is(result);
-							System.out.println("sendAllFixDocsApprove result"+result);
+							System.out.println("sendAllFixDocsApprove result" + result);
 							preReport.writeCurrentPage();
 						} catch (Throwable t) {
 							t.printStackTrace();
@@ -1245,7 +1402,7 @@ public class ActivityWebServicesReports extends Activity {
 				}).afterDone.is(new Task() {
 					@Override
 					public void doTask() {
-						Auxiliary.warn("Результат: "+b.child("result").value.property.value(), ActivityWebServicesReports.this);
+						Auxiliary.warn("Результат: " + b.child("result").value.property.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
 				});
@@ -1264,6 +1421,7 @@ public class ActivityWebServicesReports extends Activity {
 											+ "&Art=" + URLEncoder.encode(art.trim(), "utf-8") //
 											+ "&hrc=" + URLEncoder.encode(Cfg.whoCheckListOwner().trim(), "utf-8")//
 											+ "&ukaz=" + URLEncoder.encode(approve.trim(), "utf-8");
+							//url="https://service.swlife.ru/hrc120107/hs/fixprice/?Ndok=0000545161&Art=114206&hrc=kazan&ukaz=1";
 							Report_Base.startPing();
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							b.child("result").value.is(new String(bytes));
@@ -1441,6 +1599,16 @@ public class ActivityWebServicesReports extends Activity {
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKDegustacia(num);
 				}
+				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportFixKoordinat)) {
+					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
+					doHOOKFixirovanieKoordinat(num);
+				}
+				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportDeleteSpec)) {
+					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
+					String art = brwsr.getQueryParameter(Report_Base.FIELDArtikul);
+					promptReportDeleteSpec(num, art);
+				}
+
 				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportLimity)) {
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKReportLimity(num);

@@ -47,14 +47,7 @@ public class ActivityMatricaEdit extends Activity {
 	ColumnText mPt;
 	ColumnText mSb;
 	
-	/*
-	ColumnDate mPn1;
-	ColumnDate mVt1;
-	ColumnDate mSr1;
-	ColumnDate mCt1;
-	ColumnDate mPt1;
-	ColumnDate mSb1;
-	*/
+
 
 
 	ColumnNumeric mPotencial;
@@ -63,6 +56,7 @@ public class ActivityMatricaEdit extends Activity {
 	ColumnNumeric mTOM3;
 	ColumnText mTipOplati;
 	ColumnNumeric mPlan;
+	ColumnNumeric mSTM;
 	//ColumnNumeric mNacenka;
 	RedactSingleChoice terrRedactSingleChoice;
 	RedactSingleChoice oddEven;
@@ -95,11 +89,15 @@ public class ActivityMatricaEdit extends Activity {
 	Numeric footTOM2 = new Numeric();
 	Numeric footTOM3 = new Numeric();
 	Numeric footPlan = new Numeric();
+	Numeric footSTM = new Numeric();
 	Numeric footNacenka = new Numeric();
 	Numeric footPlanUtro = new Numeric();
 	Numeric footPlanLetuchka = new Numeric();
 	Numeric footPlanItogo = new Numeric();
 	Numeric footPlanNar = new Numeric();
+	Numeric footPlanSTM = new Numeric();
+
+	//Numeric footPlan = new Numeric();
 	Note footOsnov = new Note();
 	Note terrName = new Note();
 	Note periodName = new Note();
@@ -110,6 +108,7 @@ public class ActivityMatricaEdit extends Activity {
 	ColumnNumeric sPlanLetuchka;
 	ColumnNumeric sPlanItogo;
 	ColumnNumeric sPlanNarItog;
+	ColumnNumeric sPlanSTM;
 	Bough currentMatrica;
 	Bough currentSvod;
 	Toggle filled = new Toggle();
@@ -191,11 +190,7 @@ public class ActivityMatricaEdit extends Activity {
 			Calendar c = Calendar.getInstance();
 			c.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 			c.setTimeInMillis(s);
-			//c.get(Calendar.HOUR_OF_DAY);
-			//Date d=new Date();
-			//d.setTime(s);
-			//System.out.println(tag+": "+s+": "+c);
-			//System.out.println(d+".");
+
 			if (c.get(Calendar.HOUR_OF_DAY) == 9 && c.get(Calendar.MINUTE) == 0) {
 				return true;
 			}
@@ -238,15 +233,7 @@ public class ActivityMatricaEdit extends Activity {
 		if (!valid9morningDay("В субботу", "sb")) {
 			return false;
 		}
-		/*
-		//HashMap<String, Integer> visitCount = new HashMap<String, Integer>();
-		boolean no9;
-		for (int i = 0; i < currentMatrica.children.size(); i++) {
-			//3240000
-			Bough row = currentMatrica.children.get(i);
-			String kontragent = row.child("kontragent").value.property.value() + ": " + getKontragentName(row.child("kontragent").value.property.value());
-			//System.out.println(kontragent+": "+row.child("pn").value.property.value());
-		}*/
+
 		return true;
 	}
 
@@ -361,57 +348,6 @@ public class ActivityMatricaEdit extends Activity {
 		return true;
 	}
 
-	/*boolean _validVisitCount() {
-		//HashMap<String, Integer> visitCount = new HashMap<String, Integer>();
-		for (int i = 0; i < currentMatrica.children.size(); i++) {
-			Bough row = currentMatrica.children.get(i);
-			String kod = row.child("kontragent").value.property.value();
-			String kontragent = kod + ": " + getKontragentName(kod);
-			int cnt = 0;
-			if (Numeric.string2double(row.child("pn").value.property.value()) > 0) {
-				cnt++;
-			}
-			if (Numeric.string2double(row.child("vt").value.property.value()) > 0) {
-				cnt++;
-			}
-			if (Numeric.string2double(row.child("sr").value.property.value()) > 0) {
-				cnt++;
-			}
-			if (Numeric.string2double(row.child("ct").value.property.value()) > 0) {
-				cnt++;
-			}
-			if (Numeric.string2double(row.child("pt").value.property.value()) > 0) {
-				cnt++;
-			}
-			if (Numeric.string2double(row.child("sb").value.property.value()) > 0) {
-				cnt++;
-			}
-			if (cnt > 2) {
-				if (kontragent.equals("84541")// 
-						|| kontragent.equals("82068")//
-						|| kontragent.equals("18919")//
-						|| kontragent.equals("13522")//
-						|| kontragent.equals("82388")//
-						|| kontragent.equals("84905")//
-						|| kontragent.equals("84605")//
-						|| kontragent.equals("85630")//
-						|| kontragent.equals("85631")//
-						|| kontragent.equals("85632")//
-						|| kontragent.equals("83553")//
-				) {
-					if (cnt > 3) {
-						Auxiliary.inform("У контрагента " + kontragent + " больше 3 визитов в неделю.", this);
-						return false;
-					}
-				}
-				else {
-					Auxiliary.inform("У контрагента " + kontragent + " больше 2 визитов в неделю.", this);
-					return false;
-				}
-			}
-		}
-		return true;
-	}*/
 	void composeGUI() {
 		//feelTerritories();
 		oddEven = new RedactSingleChoice(this);
@@ -522,15 +458,6 @@ public class ActivityMatricaEdit extends Activity {
 		mCt = new ColumnText();//.format.is("HH:mm");
 		mPt = new ColumnText();//.format.is("HH:mm");
 		mSb = new ColumnText();//.format.is("HH:mm");
-		
-		/*
-		mPn1 = new ColumnDate().format.is("HH:mm");
-		mVt1 = new ColumnDate().format.is("HH:mm");
-		mSr1 = new ColumnDate().format.is("HH:mm");
-		mCt1 = new ColumnDate().format.is("HH:mm");
-		mPt1 = new ColumnDate().format.is("HH:mm");
-		mSb1 = new ColumnDate().format.is("HH:mm");
-		*/
 
 
 		mPotencial = new ColumnNumeric().format.is("#########0.00");
@@ -539,6 +466,7 @@ public class ActivityMatricaEdit extends Activity {
 		mTOM3 = new ColumnNumeric().format.is("#########0.00");
 		mTipOplati = new ColumnText();
 		mPlan = new ColumnNumeric().format.is("#########0.00");
+		mSTM = new ColumnNumeric().format.is("#########0.00");
 		//mNacenka = new ColumnNumeric().format.is("#########0.00'%'");
 		gridMatrica//
 				.noFoot.is(false)//
@@ -563,12 +491,13 @@ public class ActivityMatricaEdit extends Activity {
 						//, mSb1.title.is("ч."+dayName(5)).footer.is(footSb1.asNote()).width.is(1.1 * Auxiliary.tapSize)//
 
 
-						, mPotencial.title.is("Потенциал ТТ").footer.is(footPotencial.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize)//
-						, mTOM1.title.is(monthName(periodMonth.value().intValue() - 3)).footer.is(footTOM1.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize)//
-						, mTOM2.title.is(monthName(periodMonth.value().intValue() - 2)).footer.is(footTOM2.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize)//
-						, mTOM3.title.is(monthName(periodMonth.value().intValue() - 1)).footer.is(footTOM3.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize)//
-						, mPlan.title.is("План, тыс.руб").footer.is(footPlan.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize) //
+						, mPotencial.title.is("Потенциал ТТ").footer.is(footPotencial.asNote("########0.00")).width.is(1.3 * Auxiliary.tapSize)//
+						, mTOM1.title.is(monthName(periodMonth.value().intValue() - 3)).footer.is(footTOM1.asNote("########0.00")).width.is(1.3 * Auxiliary.tapSize)//
+						, mTOM2.title.is(monthName(periodMonth.value().intValue() - 2)).footer.is(footTOM2.asNote("########0.00")).width.is(1.3 * Auxiliary.tapSize)//
+						, mTOM3.title.is(monthName(periodMonth.value().intValue() - 1)).footer.is(footTOM3.asNote("########0.00")).width.is(1.3 * Auxiliary.tapSize)//
+						, mPlan.title.is("План, тыс.руб").footer.is(footPlan.asNote("########0.00")).width.is(1.3 * Auxiliary.tapSize) //
 						//, mNacenka.title.is("Наценка").footer.is(footNacenka.asNote("########0.00")).width.is(1.2 * Auxiliary.tapSize) //
+						, mSTM.title.is("План СТМ").footer.is(footSTM.asNote("########0.00")).width.is(1.3 * Auxiliary.tapSize) //
 				});
 		layoutless.child(gridMatrica//
 				.pageSize.is(gridPageSize)//
@@ -592,6 +521,7 @@ public class ActivityMatricaEdit extends Activity {
 		sPlanLetuchka = new ColumnNumeric().format.is("#########0.00");
 		sPlanItogo = new ColumnNumeric().format.is("#########0.00");
 		sPlanNarItog = new ColumnNumeric().format.is("#########0.00");
+		sPlanSTM = new ColumnNumeric().format.is("#########0.00");
 		layoutless.child(new SplitLeftRight(this)//
 				.split.is(split)//
 				.rightSide(gridSvod.noFoot.is(false)//
@@ -603,6 +533,7 @@ public class ActivityMatricaEdit extends Activity {
 								, sPlanLetuchka.title.is("План летучка").footer.is(footPlanLetuchka.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize) //
 								, sPlanItogo.title.is("План итого").footer.is(footPlanItogo.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize) //
 								, sPlanNarItog.title.is("План нар. итог").footer.is(footPlanNar.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize) //
+								, sPlanSTM.title.is("План СТМ").footer.is(footPlanSTM.asNote("########0.00")).width.is(1.5 * Auxiliary.tapSize) //
 						}))//
 				//
 				.width().is(layoutless.width().property)//
@@ -703,9 +634,6 @@ public class ActivityMatricaEdit extends Activity {
 	void initialFillMatrica() {
 		String territoryKod = getKod();
 		String periodString = "" + (2013 + periodYear.value().intValue()) + pad2(1 + periodMonth.value().intValue()) + "01";
-		//final String url = "https://testservice.swlife.ru/tsybin_hrc/hs/MatricaTP/Zapolnit/" + territoryKod + "/" + periodString;
-
-		//final String url = "https://testservice.swlife.ru/tsybin_hrc/hs/MatricaTP/Zapolnit/" + territoryKod + "/" + periodString;
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/MatricaTP/Zapolnit/" + territoryKod + "/" + periodString;
 		System.out.println("url " + url);
 		final Bough b = new Bough();
@@ -736,57 +664,6 @@ public class ActivityMatricaEdit extends Activity {
 		expect.start(ActivityMatricaEdit.this);
 	}
 
-	/*
-		void initialFillMatricaOld() {
-			String periodString = "" + (2013 + periodYear.value().intValue()) + pad2(1 + periodMonth.value().intValue()) + "01";
-			save();
-			final String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
-					+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-					+ "<soap:Body>"//
-					+ "<Zapolnit xmlns=\"http://ws.swl/Matrica\">"//
-					+ "<Podr>" + getKod() + "</Podr>"//
-					+ "<Period>" + periodString + "</Period>"//
-					+ "<Kod></Kod>"//
-					+ "<Dvuhnedel>" + dvuhnedel.value().intValue() + "</Dvuhnedel>"//
-					+ "</Zapolnit>"//
-					+ "</soap:Body>"//
-					+ "</soap:Envelope>";
-			System.out.println(xml);
-			System.out.println(Settings.getInstance().getBaseURL() + "WebMatrica.1cws");
-			final RawSOAP r = new RawSOAP().timeout.is(10 * 60 * 1000);
-			new Expect().status.is("Выполнение...").task.is(new Task() {
-				@Override
-				public void doTask() {
-					r.url.is(Settings.getInstance().getBaseURL() + "WebMatrica.1cws")//
-							//r.url.is(Settings.getInstance().getBaseURL() + "WebMatricatest.1cws")//
-							.xml.is(xml);
-					Report_Base.startPing();
-					r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-				}
-			}).afterDone.is(new Task() {
-				@Override
-				public void doTask() {
-					if (r.exception.property.value() != null) {
-						Auxiliary.warn("Ошибка: " + r.exception.property.value().toString() + " / " + r.exception.property.value().getMessage(), ActivityMatricaEdit.this);
-					} else {
-						if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
-							//System.out.println(r.data.dumpXML());
-							insertInitialFill(r.data, true);
-							refillGrids();
-							checkFilled();
-						} else {
-							Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), ActivityMatricaEdit.this);
-						}
-					}
-				}
-			}).afterCancel.is(new Task() {
-				@Override
-				public void doTask() {
-					//
-				}
-			}).start(this);
-		}
-	*/
 	public static String dayName(int n) {
 		if (n > 6) {
 			n = n - 7;
@@ -896,25 +773,25 @@ public class ActivityMatricaEdit extends Activity {
 			}
 		} else {
 			rows = data.children("Plan");
-			//rows = data.child("soap:Body").child("m:PerechitatResponse").child("m:return").child("m:Plan");
-			//Bough svod = data.child("soap:Body").child("m:PerechitatResponse").child("m:return").child("m:Svod");
+
 			Vector<Bough> svod = data.children("Svod");
-			//System.out.println(svod.dumpXML());
+
 			SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T00:00:00'");
 			f.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-			//for (int i = 0; i < svod.children.size(); i++) {
+
 			for (int i = 0; i < svod.size(); i++) {
-				//Bough row = svod.children.get(i);
+
 				Bough row = svod.get(i);
 				try {
 					//f.parse("");
 					sql = "insert into MatricaSvodX ("//
-							+ "matrica_id,data,planUtro,planLetuchka"//
+							+ "matrica_id,data,planUtro,planLetuchka,PlanSTM"//
 							+ ")\n values\n ("//
 							+ _id //
 							+ "," + f.parse(row.child("Data").value.property.value()).getTime() //
 							+ "," + Numeric.string2double(row.child("PlanHoch").value.property.value())//
 							+ "," + Numeric.string2double(row.child("PlanLet").value.property.value())//
+							+ "," + Numeric.string2double(row.child("PlanSTM").value.property.value())//
 							+ ")";
 					//System.out.println(sql);
 					ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
@@ -941,8 +818,10 @@ public class ActivityMatricaEdit extends Activity {
 				if (!ZapolnitResponse) {
 					nacenka = (int) Numeric.string2double(row.child("PlanNac").value.property.value());
 				}
+
 				sql = "insert into MatricaRowsX ("//
-						+ "matrica_id,udalit,kontragent,tipTT,tipOplaty,pn,vt,sr,ct,pt,sb,pn1,vt1,sr1,ct1,pt1,sb1,potencialTT,tom1,tom2,tom3,vdm1,vdm2,vdm3,planTysRub"//
+						+ "matrica_id,udalit,kontragent,tipTT,tipOplaty,pn,vt,sr,ct,pt,sb,pn1,vt1,sr1,ct1,pt1,sb1,potencialTT,tom1,tom2,tom3,vdm1,vdm2,vdm3"
+						+",planTysRub,PlanSTM"//
 						+ ",nacenka,uploaded,vrrab,email"//
 						+ ")\n values\n ("//
 						+ _id//
@@ -974,13 +853,15 @@ public class ActivityMatricaEdit extends Activity {
 						+ "," + Numeric.string2double(row.child("VDM2").value.property.value())//
 						+ "," + Numeric.string2double(row.child("VDM3").value.property.value())//
 						+ "," + t4//
+						+ ",'" + row.child("PlanSTM").value.property.value() + "'"//
 						+ "," + nacenka//
 						+ ",1"//
 						+ ",'" + row.child("VRRab").value.property.value() + "'"//
 						+ ",'" + row.child("Email").value.property.value() + "'"//
+
 						//+ ",'" +dvuhnedel.value()+ "'"//
 						+ ")";
-				//System.out.println(sql);
+				System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			} catch (Throwable t) {
 				t.printStackTrace();
@@ -992,119 +873,6 @@ public class ActivityMatricaEdit extends Activity {
 		filled.value(true);
 	}
 
-	/*
-		void insertInitialFillOld(Bough data, boolean ZapolnitResponse) {
-			System.out.println(data.dumpXML());
-			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from MatricaRowsX where matrica_id=" + _id);
-			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from MatricaSvodX where matrica_id=" + _id);
-			Bough rows;
-			String sql;
-			if (ZapolnitResponse) {
-				rows = data.child("soap:Body").child("m:ZapolnitResponse").child("m:return").child("m:Plan");
-				Calendar probe = new GregorianCalendar(2013 + periodYear.value().intValue(), periodMonth.value().intValue(), 1);
-				probe.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-				int dayCount = probe.getActualMaximum(Calendar.DAY_OF_MONTH);
-				for (int i = 1; i <= dayCount; i++) {
-					probe = new GregorianCalendar(2013 + periodYear.value().intValue(), periodMonth.value().intValue(), i + 1);
-					sql = "insert into MatricaSvodX ("//
-							+ "matrica_id,data,planUtro,planLetuchka,planItogo,planNarItog"//
-							+ ")\n values\n ("//
-							+ _id//
-							+ "," + probe.getTime().getTime() + ",0,0,0,0"//
-							+ ")";
-					ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-				}
-			} else {
-				rows = data.child("soap:Body").child("m:PerechitatResponse").child("m:return").child("m:Plan");
-				Bough svod = data.child("soap:Body").child("m:PerechitatResponse").child("m:return").child("m:Svod");
-				//System.out.println(svod.dumpXML());
-				SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T00:00:00'");
-				f.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-				for (int i = 0; i < svod.children.size(); i++) {
-					Bough row = svod.children.get(i);
-					try {
-						//f.parse("");
-						sql = "insert into MatricaSvodX ("//
-								+ "matrica_id,data,planUtro,planLetuchka"//
-								+ ")\n values\n ("//
-								+ _id //
-								+ "," + f.parse(row.child("m:Data").value.property.value()).getTime() //
-								+ "," + Numeric.string2double(row.child("m:PlanHoch").value.property.value())//
-								+ "," + Numeric.string2double(row.child("m:PlanLet").value.property.value())//
-								+ ")";
-						//System.out.println(sql);
-						ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-					} catch (Throwable t) {
-						t.printStackTrace();
-					}
-				}
-			}
-			//System.out.println(rows.dumpXML());
-			DateFormat from = new SimpleDateFormat("'0001-01-01T'kk:mm:ss");
-			from.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-			for (int i = 0; i < rows.children.size(); i++) {
-				Bough row = rows.children.get(i);
-				String kontragentID = "";
-				try {
-					double t1 = Numeric.string2double(row.child("m:TOM1").value.property.value());
-					double t2 = Numeric.string2double(row.child("m:TOM2").value.property.value());
-					double t3 = Numeric.string2double(row.child("m:TOM3").value.property.value());
-					//int t4 = (int) ((t1 + t2 + t3) / 3);
-					double t4 = Numeric.string2double(row.child("m:Plan").value.property.value());
-					int nacenka = 7;
-					if (!ZapolnitResponse) {
-						nacenka = (int) Numeric.string2double(row.child("m:PlanNac").value.property.value());
-					}
-					sql = "insert into MatricaRowsX ("//
-							+ "matrica_id,udalit,kontragent,tipTT,tipOplaty,pn,vt,sr,ct,pt,sb,pn1,vt1,sr1,ct1,pt1,sb1,potencialTT,tom1,tom2,tom3,vdm1,vdm2,vdm3,planTysRub"//
-							+ ",nacenka,uploaded,vrrab,email"//
-							+ ")\n values\n ("//
-							+ _id//
-							+ ",0"//
-							+ "," + row.child("m:Kontragent").value.property.value()//
-							+ ",''"//
-							+ ",'" + row.child("m:TipOplati").value.property.value() + "'"//
-							+ "," + from.parse(row.child("m:Pn").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Vt").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Sr").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Ct").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Pt").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Sb").value.property.value()).getTime()//
-
-
-							+ "," + from.parse(row.child("m:Pn1").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Vt1").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Sr1").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Ct1").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Pt1").value.property.value()).getTime()//
-							+ "," + from.parse(row.child("m:Sb1").value.property.value()).getTime()//
-
-
-							+ "," + Numeric.string2double(row.child("m:Potencial").value.property.value())//
-							+ "," + Numeric.string2double(row.child("m:TOM1").value.property.value())//
-							+ "," + Numeric.string2double(row.child("m:TOM2").value.property.value())//
-							+ "," + Numeric.string2double(row.child("m:TOM3").value.property.value())//
-							+ "," + Numeric.string2double(row.child("m:VDM1").value.property.value())//
-							+ "," + Numeric.string2double(row.child("m:VDM2").value.property.value())//
-							+ "," + Numeric.string2double(row.child("m:VDM3").value.property.value())//
-							+ "," + t4//
-							+ "," + nacenka//
-							+ ",1"//
-							+ ",'" + row.child("m:VRRab").value.property.value() + "'"//
-							+ ",'" + row.child("m:Email").value.property.value() + "'"//
-							//+ ",'" +dvuhnedel.value()+ "'"//
-							+ ")";
-					//System.out.println(sql);
-					ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-			ApplicationHoreca.getInstance().getDataBase().execSQL("update matricaX set filled=1 where _id=" + _id);
-			save();
-			filled.value(true);
-		}
-	*/
 	void requeryData() {
 		//System.out.println("requeryData start");
 		String sql = "select"//
@@ -1115,21 +883,16 @@ public class ActivityMatricaEdit extends Activity {
 				+ ", m.tom1, m.tom2, m.tom3, m.vdm1, m.vdm2, m.vdm3, m.planTysRub"//
 				+ ", m.nacenka,m.uploaded"//
 				+ ", m.vrrab,m.email"//
-				//+ ", m.dvuhnedel"//
+				+ ", m.PlanSTM as planSTM"//
 				+ " from MatricaRowsX m"//
 				+ " join kontragenty k on m.kontragent=k.kod "//
 				+ " where m.matrica_id=" + _id//
 				+ " order by k.naimenovanie";
 		currentMatrica = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		//System.out.println(currentMatrica.dumpXML());
-		sql = "select _id,data,planUtro,planLetuchka,planItogo,planNarItog from MatricaSvodX where matrica_id=" + _id + " order by data";
+
+		sql = "select _id,data,planUtro,planLetuchka,planItogo,planNarItog,PlanSTM as planSTM from MatricaSvodX where matrica_id=" + _id + " order by data";
 		currentSvod = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		//sql = "select dataZagruzkiMarshruta from matricaX where _id=" + _id;
-		//06-07 17:57:30.261: I/System.out(537): update Matrica set dataZagruzkiMarshruta=518882838 where _id=4
-		//Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		//String s = b.child("dataZagruzkiMarshruta").value.property.value();
-		//dataZagruzkiMarshruta = (int) Numeric.string2double(s);
-		//System.out.println("requeryData done");
+
 	}
 
 	int extractTimeMills(String dateMills) {
@@ -1230,57 +993,13 @@ public class ActivityMatricaEdit extends Activity {
 				mNN.cell("" + (i + 1), bg, tapMatricaRow);
 				mKontragent.cell(row.child("kontragent").value.property.value() + ": " + getKontragentName(row.child("kontragent").value.property.value())//
 						, bg, tapMatricaRow);
-			/*
-				if(dvuhnedel.value()>0){
-					mPn.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("pn").value.property.value())))
-							+" "+timeFormat.format(new Date((long) Numeric.string2double(row.child("pn1").value.property.value())))
-							, bg, tapMatricaRow);
-					mVt.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("vt").value.property.value())))
-							+" "+timeFormat.format(new Date((long) Numeric.string2double(row.child("vt").value.property.value())))
-							, bg, tapMatricaRow);
-					mSr.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("sr").value.property.value())))
-							+" "+timeFormat.format(new Date((long) Numeric.string2double(row.child("sr").value.property.value())))
-							, bg, tapMatricaRow);
-					mCt.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("ct").value.property.value())))
-							+" "+timeFormat.format(new Date((long) Numeric.string2double(row.child("ct").value.property.value())))
-							, bg, tapMatricaRow);
-					mPt.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("pt").value.property.value())))
-							+" "+timeFormat.format(new Date((long) Numeric.string2double(row.child("pt").value.property.value())))
-							, bg, tapMatricaRow);
-					mSb.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("sb").value.property.value())))
-							+" "+timeFormat.format(new Date((long) Numeric.string2double(row.child("sb").value.property.value())))
-							, bg, tapMatricaRow);
-				}else{
-					mPn.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("pn").value.property.value()))), bg, tapMatricaRow);
-					mVt.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("vt").value.property.value()))), bg, tapMatricaRow);
-					mSr.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("sr").value.property.value()))), bg, tapMatricaRow);
-					mCt.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("ct").value.property.value()))), bg, tapMatricaRow);
-					mPt.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("pt").value.property.value()))), bg, tapMatricaRow);
-					mSb.cell(timeFormat.format(new Date((long) Numeric.string2double(row.child("sb").value.property.value()))), bg, tapMatricaRow);
-				}*/
+
 				mPn.cell(formatTime(row.child("pn").value.property.value(), row.child("pn1").value.property.value()), bg, tapMatricaRow);
 				mVt.cell(formatTime(row.child("vt").value.property.value(), row.child("vt1").value.property.value()), bg, tapMatricaRow);
 				mSr.cell(formatTime(row.child("sr").value.property.value(), row.child("sr1").value.property.value()), bg, tapMatricaRow);
 				mCt.cell(formatTime(row.child("ct").value.property.value(), row.child("ct1").value.property.value()), bg, tapMatricaRow);
 				mPt.cell(formatTime(row.child("pt").value.property.value(), row.child("pt1").value.property.value()), bg, tapMatricaRow);
 				mSb.cell(formatTime(row.child("sb").value.property.value(), row.child("sb1").value.property.value()), bg, tapMatricaRow);
-				/*
-				mPn.cell((long) Numeric.string2double(row.child("pn").value.property.value()), bg, tapMatricaRow);
-				mVt.cell((long) Numeric.string2double(row.child("vt").value.property.value()), bg, tapMatricaRow);
-				mSr.cell((long) Numeric.string2double(row.child("sr").value.property.value()), bg, tapMatricaRow);
-				mCt.cell((long) Numeric.string2double(row.child("ct").value.property.value()), bg, tapMatricaRow);
-				mPt.cell((long) Numeric.string2double(row.child("pt").value.property.value()), bg, tapMatricaRow);
-				mSb.cell((long) Numeric.string2double(row.child("sb").value.property.value()), bg, tapMatricaRow);
-				*/
-				
-				/*
-				mPn1.cell((long) Numeric.string2double(row.child("pn1").value.property.value()), bg, tapMatricaRow);
-				mVt1.cell((long) Numeric.string2double(row.child("vt1").value.property.value()), bg, tapMatricaRow);
-				mSr1.cell((long) Numeric.string2double(row.child("sr1").value.property.value()), bg, tapMatricaRow);
-				mCt1.cell((long) Numeric.string2double(row.child("ct1").value.property.value()), bg, tapMatricaRow);
-				mPt1.cell((long) Numeric.string2double(row.child("pt1").value.property.value()), bg, tapMatricaRow);
-				mSb1.cell((long) Numeric.string2double(row.child("sb1").value.property.value()), bg, tapMatricaRow);
-				*/
 
 				mPotencial.cell(Numeric.string2double(row.child("potencialTT").value.property.value()), bg, tapMatricaRow);
 				mTOM1.cell(Numeric.string2double(row.child("tom1").value.property.value()), bg, tapMatricaRow);
@@ -1288,12 +1007,11 @@ public class ActivityMatricaEdit extends Activity {
 				mTOM3.cell(Numeric.string2double(row.child("tom3").value.property.value()), bg, tapMatricaRow);
 				mTipOplati.cell(row.child("tipOplaty").value.property.value(), bg, tapMatricaRow);
 				mPlan.cell(Numeric.string2double(row.child("planTysRub").value.property.value()), bg, tapMatricaRow);
-				//mNacenka.cell(Numeric.string2double(row.child("nacenka").value.property.value()), bg, tapMatricaRow);
+				mSTM.cell(Numeric.string2double(row.child("planSTM").value.property.value()), bg, tapMatricaRow);
+
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
-			//System.out.println(extractTimeMills(row.child("pn").value.property.value()));
-			//if (Numeric.string2double(row.child("pn").value.property.value()) > 0) {
 			if (extractTimeMills(row.child("pn").value.property.value()) > 0) {
 				avgPn.value(avgPn.value() + 1);
 			}
@@ -1339,6 +1057,7 @@ public class ActivityMatricaEdit extends Activity {
 			footTOM2.value(footTOM2.value() + Numeric.string2double(row.child("tom2").value.property.value()));
 			footTOM3.value(footTOM3.value() + Numeric.string2double(row.child("tom3").value.property.value()));
 			footPlan.value(footPlan.value() + Numeric.string2double(row.child("planTysRub").value.property.value()));
+			footSTM.value(footSTM.value() + Numeric.string2double(row.child("planSTM").value.property.value()));
 		}
 		if (dvuhnedel.value() > 0) {
 			footPn.value(avgPn.value().intValue() + "`" + avgPn1.value().intValue());
@@ -1369,6 +1088,7 @@ public class ActivityMatricaEdit extends Activity {
 		double utro = 0;
 		double letuchka = 0;
 		double itog = 0;
+		double stm=0;
 		footPlanUtro.value(0);
 		footPlanLetuchka.value(0);
 		footPlanItogo.value(0);
@@ -1392,15 +1112,19 @@ public class ActivityMatricaEdit extends Activity {
 			sPlanItogo.cell(itog, tapSvodRow);
 			narItog = narItog + itog;
 			sPlanNarItog.cell(narItog, tapSvodRow);
+			stm=stm+Numeric.string2double(row.child("planSTM").value.property.value());
+			sPlanSTM.cell(Numeric.string2double(row.child("planSTM").value.property.value()), tapSvodRow);
+
 			footPlanUtro.value(footPlanUtro.value() + utro);
 			footPlanLetuchka.value(footPlanLetuchka.value() + letuchka);
 			footPlanItogo.value(footPlanItogo.value() + itog);
 			footPlanNar.value(narItog);
+			footPlanSTM.value(stm);
+
 		}
 	}
 
 	void refillGrids() {
-		//System.out.println("refillGrids");
 		requeryData();
 		gridMatrica.clearColumns();
 		fillMatricaGrid();
@@ -1410,74 +1134,6 @@ public class ActivityMatricaEdit extends Activity {
 		gridSvod.refresh();
 	}
 
-	/*void _initalFill(Bough data) {
-		gridMatrica.clearColumns();
-		Bough rows = data.child("soap:Body").child("m:ZapolnitResponse").child("m:return").child("m:Plan");
-		footPn.value(0);
-		footVt.value(0);
-		footSr.value(0);
-		footCt.value(0);
-		footPt.value(0);
-		footSb.value(0);
-		footPotencial.value(0);
-		footTOM1.value(0);
-		footTOM2.value(0);
-		footTOM3.value(0);
-		DateFormat to = new SimpleDateFormat("kk:mm");
-		DateFormat from = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss");
-		DecimalFormat decimalFormat = new DecimalFormat("#########0.00");
-		Vector<String> parents = new Vector<String>();
-		for (int i = 0; i < rows.children.size(); i++) {
-			Bough row = rows.children.get(i);
-			Task tapMatricaRow = new Task() {
-				@Override
-				public void doTask() {
-					tapMatricaRow("");
-				}
-			};
-			try {
-				String osnovnoyKlientTorgovoyTochki = getOsnovnoyKlientTorgovoyTochki(row.child("m:Kontragent").value.property.value());
-				boolean notFound = true;
-				for (int p = 0; p < parents.size(); p++) {
-					if (parents.get(p).equals(osnovnoyKlientTorgovoyTochki.trim())) {
-						notFound = false;
-						break;
-					}
-				}
-				if (notFound || osnovnoyKlientTorgovoyTochki.trim().length() == 0) {
-					parents.add(osnovnoyKlientTorgovoyTochki.trim());
-				}
-				mNN.cell("" + (i + 1), tapMatricaRow);
-				mKontragent.cell(row.child("m:Kontragent").value.property.value()//
-						+ ": " + getKontragentName(row.child("m:Kontragent").value.property.value())//
-				, tapMatricaRow);
-			}
-			catch (Throwable t) {
-				t.printStackTrace();
-			}
-		}
-		footOsnov.value("Количество основных клиентов торговой точки: " + parents.size());
-		gridMatrica.refresh();
-		gridSvod.clearColumns();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-		Calendar probe = new GregorianCalendar(2013 + periodYear.value().intValue(), periodMonth.value().intValue(), 1);
-		int dayCount = probe.getActualMaximum(Calendar.DAY_OF_MONTH);
-		int dn = 0;
-		for (int i = 0; i < dayCount; i++) {
-			Task tapSvodRow = new Task() {
-				@Override
-				public void doTask() {
-					tapSvodRow("");
-				}
-			};
-			probe = new GregorianCalendar(2013 + periodYear.value().intValue(), periodMonth.value().intValue(), i + 1);
-			dn++;
-			if (dn > 6) {
-				dn = 0;
-			}
-		}
-		gridSvod.refresh();
-	}*/
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		refillGrids();
@@ -1492,14 +1148,12 @@ public class ActivityMatricaEdit extends Activity {
 	}
 
 	void save() {
-		//checkFilled();
 		Date d = new Date(periodYear.value().intValue() + 113, periodMonth.value().intValue(), 1);
 		String sql = "update MatricaX set periodDeystvia=" + (d.getTime() - d.getTimezoneOffset() * 60 * 1000)//
 				+ ", kod='" + getKod() + "'"//
 				+ ", dvuhnedel='" + dvuhnedel.value() + "'"//
 				+ ", nacenka=" + nacenkaprocent.value() + ""//
 				+ " where _id=" + _id;
-		//System.out.println(d);
 		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
@@ -1532,10 +1186,7 @@ public class ActivityMatricaEdit extends Activity {
 			return;
 		}
 
-
-		//testMatrica();
 		Auxiliary.pickString(this, "Комментарий", kommentariy, "Выгрузить", new Task() {
-			//Auxiliary.pickConfirm(this, "Выгрузить маршрут. Вы уверены?", "Да, выгрузить", new Task() {
 			@Override
 			public void doTask() {
 				uploadMatricaNew();
@@ -1551,18 +1202,14 @@ public class ActivityMatricaEdit extends Activity {
 				+ " group by kontragenty.kod"//
 				+ " order by kontragenty.naimenovanie";
 		final Bough bough = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		//System.out.println(sql);
-		//System.out.println(bough.dumpXML());
 		Vector<String> names = new Vector<String>();
 		final Vector<String> kods = new Vector<String>();
 		for (int i = 0; i < bough.children.size(); i++) {
 			boolean exists = false;
 			Bough row = bough.children.get(i);
 			String curKod = row.child("kod").value.property.value();
-			//System.out.println("curKod "+curKod);
 			for (int k = 0; k < currentMatrica.children.size(); k++) {
 				String matricaKod = currentMatrica.children.get(k).child("kontragent").value.property.value();
-				//System.out.println("matricaKod "+matricaKod);
 				if (curKod.equals(matricaKod)) {
 					exists = true;
 					break;
@@ -1573,7 +1220,6 @@ public class ActivityMatricaEdit extends Activity {
 				kods.add(bough.children.get(i).child("kod").value.property.value());
 			}
 		}
-		//System.out.println(this.getKod());
 		final Numeric sel = new Numeric();
 		Auxiliary.pickFilteredChoice(ActivityMatricaEdit.this, names.toArray(new String[0]), sel//
 				, new Task() {
@@ -1613,12 +1259,12 @@ public class ActivityMatricaEdit extends Activity {
 		String territoryKod = getKod();
 		String periodString = "" + (2013 + periodYear.value().intValue()) + pad2(1 + periodMonth.value().intValue()) + "01";
 		SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
-		//SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
 		Date dataUploadDate=new Date(dataUpload);
 		System.out.println(dataUploadDate);
 		String d = f.format(dataUploadDate);
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/MatricaTP/Perechitat/" + territoryKod + "/" + periodString + "/" + d;
-		//http://testservice.swlife.ru/tsybin_hrc/hs/MatricaTP/Perechitat/х0639/20220901/2021-10-18T12:05:01
+
 		System.out.println("testMatrica url " + url);
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Проверка").task.is(new Task() {
@@ -1640,8 +1286,6 @@ public class ActivityMatricaEdit extends Activity {
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				//System.out.println("error: "+b.child("error").dumpXML());
-				//System.out.println("json: "+b.child("json").child("data").dumpXML());
 
 				String kommentarii = b.child("json").child("data").child("Kommentarii").value.property.value();
 				System.out.println("Kommentarii: " + kommentarii);
@@ -1655,67 +1299,6 @@ public class ActivityMatricaEdit extends Activity {
 		expect.start(ActivityMatricaEdit.this);
 	}
 
-	/*
-		void testMatricaOld() {
-			String Podrazdelenie = Cfg.territory().children.get(territorySelection.value().intValue()).child("kod").value.property.value();
-			String Period = yearsRedactSingleChoice.items.get(periodYear.value().intValue()) + pad2(1 + periodMonth.value().intValue()) + "01";
-			Calendar c = Calendar.getInstance();
-			SimpleDateFormat f = new SimpleDateFormat("yyyyMMddHHmmss");
-			String d = f.format(dataUpload);
-			//System.out.println("testMatrica " + d);
-			final String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
-					+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-					+ "<soap:Body>"//
-					+ "<Perechitat xmlns=\"http://ws.swl/Matrica\">"//
-					+ "\n<Podr>" + Podrazdelenie + "</Podr>"//
-					+ "\n<Period>" + Period + "</Period>"//
-					+ "\n<Data>" + d + "</Data>"//
-					+ "\n</Perechitat>"//
-					+ "</soap:Body>"//
-					+ "</soap:Envelope>";
-			//System.out.println(xml);
-			final RawSOAP r = new RawSOAP();
-			new Expect().status.is("Проверка...").task.is(new Task() {
-				@Override
-				public void doTask() {
-					r.url.is(Settings.getInstance().getBaseURL() + "WebMatrica.1cws")//
-							//r.url.is(Settings.getInstance().getBaseURL() + "WebMatricatest.1cws")//
-							.xml.is(xml);
-					Report_Base.startPing();
-					r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-				}
-			}).afterDone.is(new Task() {
-				@Override
-				public void doTask() {
-					if (r.exception.property.value() != null) {
-						Auxiliary.warn("Ошибка: " + r.exception.property.value().toString() + " / " + r.exception.property.value().getMessage(), ActivityMatricaEdit.this);
-					} else {
-						if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
-							//System.out.println("r.data.dumpXML(): " + r.data.dumpXML());
-							String kommentarii = r.data.child("soap:Body").child("m:PerechitatResponse").child("m:return").child("m:Kommentarii").value.property.value();
-							if (kommentarii.trim().equals("ок")) {
-								//Auxiliary.inform(kommentarii, ActivityMatricaEdit.this);
-							} else {
-								promptReRead(r.data);
-								//Auxiliary.inform("Статус: " + kommentarii, ActivityMatricaEdit.this);
-								//System.out.println("r.data.dumpXML(): " + r.data.dumpXML());
-								//insertInitialFill(r.data, false);
-								//refillGrids();
-								//checkFilled();
-							}
-						} else {
-							Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), ActivityMatricaEdit.this);
-						}
-					}
-				}
-			}).afterCancel.is(new Task() {
-				@Override
-				public void doTask() {
-					//
-				}
-			}).start(this);
-		}
-	*/
 	void setLock(){
 		final Note result = new Note();
 		matricaLock(result, new Task() {
@@ -1739,7 +1322,6 @@ public class ActivityMatricaEdit extends Activity {
 		matricaLock(result, new Task() {
 			@Override
 			public void doTask() {
-				//System.out.println("sending");
 				matricaSend(result, new Task() {
 					@Override
 					public void doTask() {
@@ -1756,12 +1338,7 @@ public class ActivityMatricaEdit extends Activity {
 	}
 
 	void matricaLock(final Note note, Task nextStep) {
-		//int i = territorySelection.value().intValue();
-		//String kod = Cfg.territory().children.get(i).child("kod").value.property.value().trim();
-		//String podrazdelenie = Cfg.territory().children.get(territorySelection.value().intValue()).child("kod").value.property.value();
 		String sql = "select terr.kod as kod,terr.naimenovanie as name from Podrazdeleniya terr join Polzovateli usr on usr.podrazdelenie=terr._idrref where usr.kod='" + Cfg.whoCheckListOwner() + "';";
-		//String podrazdelenie = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null)).child("row").child("kod").value.property.value();
-		//String podrazdelenie = Cfg.territory().children.get(territorySelection.value().intValue()).child("kod").value.property.value();
 		String Period = yearsRedactSingleChoice.items.get(periodYear.value().intValue()) + pad2(1 + periodMonth.value().intValue()) + "01";
 		String podrazdelenie=getKod();
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/MatricaTP/ChangeStart/" + podrazdelenie + "/" + Period + "";
@@ -1789,12 +1366,7 @@ public class ActivityMatricaEdit extends Activity {
 	}
 
 	void matricaUnlock(final Note note, Task nextStep) {
-
-		//note.value(note.value() + "unlocked");
-		//nextStep.doTask();
 		String sql = "select terr.kod as kod,terr.naimenovanie as name from Podrazdeleniya terr join Polzovateli usr on usr.podrazdelenie=terr._idrref where usr.kod='" + Cfg.whoCheckListOwner() + "';";
-		//String podrazdelenie = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null)).child("row").child("kod").value.property.value();
-		//String podrazdelenie = Cfg.territory().children.get(territorySelection.value().intValue()).child("kod").value.property.value();
 		String podrazdelenie=getKod();
 		String Period = yearsRedactSingleChoice.items.get(periodYear.value().intValue()) + pad2(1 + periodMonth.value().intValue()) + "01";
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/MatricaTP/ChangeEnd/" + podrazdelenie + "/" + Period + "";
@@ -1822,15 +1394,11 @@ public class ActivityMatricaEdit extends Activity {
 	}
 
 	void matricaSend(final Note note, Task nextStep) {
-		//note.value(note.value() + "отправка"+ "\n");
 		final Note response = new Note();
-		//final String url = "http://testservice.swlife.ru/tsybin_hrc/hs/MatricaTP/Vigruzit"  ;
-
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/MatricaTP/Vigruzit";
 
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
 		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-		//String Podrazdelenie = Cfg.territory().children.get(territorySelection.value().intValue()).child("kod").value.property.value();
 		String Podrazdelenie =getKod();
 		SimpleDateFormat visitFormat = new SimpleDateFormat("HHmm");
 		visitFormat.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
@@ -1874,6 +1442,7 @@ public class ActivityMatricaEdit extends Activity {
 					+ "\n						,\"SbStrog\":\"false\""
 					+ "\n						,\"Prichina\":\"None\""
 					+ "\n						,\"Plan\":\"" + row.child("planTysRub").value.property.value() + "\""
+					+ "\n						,\"PlanSTM\":\"" + row.child("planSTM").value.property.value() + "\""
 					+ "\n						,\"VDM1\":\"" + Numeric.string2double(row.child("vdm1").value.property.value()) + "\""
 					+ "\n						,\"VDM2\":\"" + Numeric.string2double(row.child("vdm2").value.property.value()) + "\""
 					+ "\n						,\"VDM3\":\"" + Numeric.string2double(row.child("vdm3").value.property.value()) + "\""
@@ -1908,6 +1477,7 @@ public class ActivityMatricaEdit extends Activity {
 					+ "\n						\"Data\":\"" + data + "\""
 					+ "\n						,\"PlanHoch\":\"" + row.child("planUtro").value.property.value() + "\""
 					+ "\n						,\"PlanLet\":\"" + row.child("planLetuchka").value.property.value() + "\""
+					+ "\n						,\"PlanSTM\":\"" + row.child("planSTM").value.property.value() + "\""
 					+ "\n					}");
 		}
 		xml.append("\n		]");
@@ -1943,163 +1513,10 @@ public class ActivityMatricaEdit extends Activity {
 				}
 			}
 
-		/*}).afterDone.is(new Task() {
-			@Override
-			public void doTask() {
-				Auxiliary.warn(response.value(), ActivityMatricaEdit.this);
-			}
-		});*/
 		}).afterDone.is(nextStep);
 		expect.start(this);
 	}
-/*
-	void uploadMatricaOld() {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-		String Podrazdelenie = Cfg.territory().children.get(territorySelection.value().intValue()).child("kod").value.property.value();
-		StringBuilder xml = new StringBuilder();
-		xml.append("<?xml version=\"1.0\" ?>" //
-				+ "\n<S:Envelope xmlns:S=\"http://www.w3.org/2003/05/soap-envelope\">" //
-				+ "\n	<S:Body>"// 
-				+ "\n		<Vigruzit xmlns=\"http://ws.swl/Matrica\">"// 
-				+ "\n			<Matrica>"// 
-				+ "\n				<Podrazdelenie>" + Podrazdelenie + "</Podrazdelenie>");
-		xml.append("\n				<Plan>");
-		SimpleDateFormat visitFormat = new SimpleDateFormat("HHmm");
-		//"dd.MM.yyyy HH:mm:ss");
-		visitFormat.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-		for (int i = 0; i < currentMatrica.children.size(); i++) {
-			Bough row = currentMatrica.children.get(i);
-			if (!validVRRab(row.child("vrrab").value.property.value())) {
-				Auxiliary.warn("Для контрагента " + row.child("kontragent").value.property.value() + " время работы должно быть в формате 09:30-20:30", this);
-				return;
-			}
-			xml.append("\n					<StrPlan>"//
-					+ "\n						<Kontragent>" + row.child("kontragent").value.property.value() + "</Kontragent>"//
-					+ "\n						<Pn>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("pn").value.property.value()))) + "</Pn>"//
-					+ "\n						<Vt>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("vt").value.property.value()))) + "</Vt>"//
-					+ "\n						<Sr>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("sr").value.property.value()))) + "</Sr>"//
-					+ "\n						<Ct>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("ct").value.property.value()))) + "</Ct>"//
-					+ "\n						<Pt>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("pt").value.property.value()))) + "</Pt>"//
-					+ "\n						<Sb>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("sb").value.property.value()))) + "</Sb>"//
-					+ "\n						<Potencial>" + row.child("potencialTT").value.property.value() + "</Potencial>"//
-					+ "\n						<TOM1>" + row.child("tom1").value.property.value() + "</TOM1>"//
-					+ "\n						<TOM2>" + row.child("tom2").value.property.value() + "</TOM2>"//
-					+ "\n						<TOM3>" + row.child("tom3").value.property.value() + "</TOM3>"//
-					+ "\n						<TipOplati>" + row.child("tipOplaty").value.property.value() + "</TipOplati>"//
-					+ "\n						<PnStrog>false</PnStrog>"//
-					+ "\n						<VtStrog>false</VtStrog>"//
-					+ "\n						<SrStrog>false</SrStrog>"//
-					+ "\n						<CtStrog>false</CtStrog>"//
-					+ "\n						<PtStrog>false</PtStrog>"//
-					+ "\n						<SbStrog>false</SbStrog>"//
-					+ "\n						<Plan>" + row.child("planTysRub").value.property.value() + "</Plan>"//
-					+ "\n						<VDM1>" + Numeric.string2double(row.child("vdm1").value.property.value()) + "</VDM1>"//
-					+ "\n						<VDM2>" + Numeric.string2double(row.child("vdm2").value.property.value()) + "</VDM2>"//
-					+ "\n						<VDM3>" + Numeric.string2double(row.child("vdm3").value.property.value()) + "</VDM3>"//
-					+ "\n						<NacM1>0</NacM1>"//
-					+ "\n						<NacM2>0</NacM2>"//
-					+ "\n						<NacM3>0</NacM3>"//
-					+ "\n						<PlanNac>" + Numeric.string2double(row.child("nacenka").value.property.value()) + "</PlanNac>"//
-					+ "\n						<VRRab>" + row.child("vrrab").value.property.value() + "</VRRab>"//
-					+ "\n						<Email>" + row.child("email").value.property.value() + "</Email>"//
 
-
-					+ "\n						<Pn1>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("pn1").value.property.value()))) + "</Pn1>"//00010101
-					+ "\n						<Vt1>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("vt1").value.property.value()))) + "</Vt1>"//
-					+ "\n						<Sr1>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("sr1").value.property.value()))) + "</Sr1>"//
-					+ "\n						<Ct1>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("ct1").value.property.value()))) + "</Ct1>"//
-					+ "\n						<Pt1>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("pt1").value.property.value()))) + "</Pt1>"//
-					+ "\n						<Sb1>" + visitFormat.format(new Date((long) Numeric.string2double(row.child("sb1").value.property.value()))) + "</Sb1>"//
-
-					+ "\n						<PnStrog1>false</PnStrog1>"//
-					+ "\n						<VtStrog1>false</VtStrog1>"//
-					+ "\n						<SrStrog1>false</SrStrog1>"//
-					+ "\n						<CtStrog1>false</CtStrog1>"//
-					+ "\n						<PtStrog1>false</PtStrog1>"//
-					+ "\n						<SbStrog1>false</SbStrog1>"//
-
-
-					+ "\n					</StrPlan>");
-		}
-		xml.append("\n				</Plan>");
-		xml.append("\n				<Svod>");
-		for (int i = 0; i < currentSvod.children.size(); i++) {
-			Bough row = currentSvod.children.get(i);
-			Date date = new Date();
-			date.setTime((long) Numeric.string2double(row.child("data").value.property.value()));
-			String data = simpleDateFormat.format(date);
-			xml.append("\n					<StrSvod>"//
-					+ "\n						<Data>" + data + "</Data>"//
-					+ "\n						<PlanHoch>" + row.child("planUtro").value.property.value() + "</PlanHoch>"//
-					+ "\n						<PlanLet>" + row.child("planLetuchka").value.property.value() + "</PlanLet>"//
-					+ "\n					</StrSvod>");
-		}
-		xml.append("\n				</Svod>");
-		String Period = yearsRedactSingleChoice.items.get(periodYear.value().intValue()) + pad2(1 + periodMonth.value().intValue()) + "01";
-		xml.append("\n				<Kommentarii>" + kommentariy.value() + "</Kommentarii>"//
-				+ "\n				<Period>" + Period + "</Period>"//
-				+ "\n				<Dvuhnedel>" + dvuhnedel.value().intValue() + "</Dvuhnedel>"//
-				+ "\n			</Matrica>"//
-				+ "\n		</Vigruzit>"//
-				+ "\n	</S:Body>"//
-				+ "\n</S:Envelope>");
-		//System.out.println(xml.toString());
-		final String request = xml.toString();
-		System.out.println(request);
-		final RawSOAP r = new RawSOAP();
-		new Expect().status.is("Выполнение...").task.is(new Task() {
-			@Override
-			public void doTask() {
-				r.url.is(Settings.getInstance().getBaseURL() + "WebMatrica.1cws")//
-						//r.url.is(Settings.getInstance().getBaseURL() + "WebMatricatest.1cws")//
-						.xml.is(request);
-				Report_Base.startPing();
-
-				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-			}
-		}).afterDone.is(new Task() {
-			@Override
-			public void doTask() {
-				if (r.exception.property.value() != null) {
-					Auxiliary.warn("Ошибка: " + r.exception.property.value().toString() + " / " + r.exception.property.value().getMessage(), ActivityMatricaEdit.this);
-				} else {
-					if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
-						String rez = r.data.child("soap:Body").child("m:VigruzitResponse").child("m:return").value.property.value();
-						//System.out.println(rez);
-						//System.out.println(r.data.dumpXML());
-						if (rez.trim().equals("ок")) {
-							Auxiliary.warn(rez, ActivityMatricaEdit.this);
-							//int cur = 0;
-							Calendar c = Calendar.getInstance();
-							c.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-							dataUpload = c.getTimeInMillis();
-							//System.out.println("set dataUpload = " + c.getTime());
-							//System.out.println("dataUpload = " + dataUpload + " / " + c.getTimeInMillis());
-							String sql = "update MatricaX set dataUpload=" + dataUpload//
-									+ " where _id=" + _id;
-							ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-							//System.out.println("Matrica "+Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select * from MatricaX where _id=" + _id, null)).dumpXML());
-							sql = "update MatricaRowsX set uploaded=1"//
-									+ " where matrica_id=" + _id;
-							System.out.println(sql);
-							ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-						} else {
-							Auxiliary.warn("Ошибка: " + rez, ActivityMatricaEdit.this);
-						}
-					} else {
-						Auxiliary.inform("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), ActivityMatricaEdit.this);
-					}
-				}
-			}
-		}).afterCancel.is(new Task() {
-			@Override
-			public void doTask() {
-				//
-			}
-		}).start(this);
-	}
-*/
 	void dropMatrica() {
 		ApplicationHoreca.getInstance().getDataBase().execSQL("delete from MatricaX where _id=" + _id);
 		ApplicationHoreca.getInstance().getDataBase().execSQL("delete from MatricaRowsX where matrica_id=" + _id);

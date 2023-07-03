@@ -19,20 +19,20 @@ import sweetlife.android10.consts.ITableColumnsNames;
 
 
 public class ContractsXMLParser extends DefaultHandler implements ITableColumnsNames {
-	
+
 	public static final String TAG_STRING_STATUS = "StringTStatus";
-	public static final String TAG_COD_CLIENT    = "rCodClient";
+	public static final String TAG_COD_CLIENT = "rCodClient";
 	public static final String TAG_CLIENT_STATUS = "rClientStatus";
-	public static final String TAG_COD_CONTRACT  = "rCodContract";
+	public static final String TAG_COD_CONTRACT = "rCodContract";
 
 	public static final String OPEN = "Открыт";
 	public static final String DELETION_MARK = "Пом. Уд.";
 	public static final String CLOSE = "Закрыт";
 
 	private ArrayList<ContractStatus> mContractsList;
-	private String                    mContentValue;
-	private ContractStatus            mCurrentContract;
-	
+	private String mContentValue;
+	private ContractStatus mCurrentContract;
+
 	public ArrayList<ContractStatus> Parse(String xmlString)
 			throws ParserConfigurationException, SAXException, IOException,
 			NumberFormatException, ParseException, Exception {
@@ -42,7 +42,7 @@ public class ContractsXMLParser extends DefaultHandler implements ITableColumnsN
 		XMLReader reader = saxParser.getXMLReader();
 
 		reader.setContentHandler(this);
-		
+
 		InputSource inputSource = new InputSource(new StringReader(xmlString));
 
 		reader.parse(inputSource);
@@ -60,59 +60,55 @@ public class ContractsXMLParser extends DefaultHandler implements ITableColumnsN
 	@Override
 	public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
 
-		if( TAG_STRING_STATUS.compareToIgnoreCase(localName) == 0 ) {
+		if (TAG_STRING_STATUS.compareToIgnoreCase(localName) == 0) {
 
 			mCurrentContract = new ContractStatus();
 		}
-		
+
 		mContentValue = "";
 	}
 
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
 
-		if( TAG_CLIENT_STATUS.compareToIgnoreCase(localName) == 0 ) {
+		if (TAG_CLIENT_STATUS.compareToIgnoreCase(localName) == 0) {
 
 			mCurrentContract.setClose(getClose(mContentValue));
 			mCurrentContract.setDeletionMark(getDeletionMark(mContentValue));
-		}
-		else if( TAG_COD_CONTRACT.compareToIgnoreCase(localName) == 0 ) {
+		} else if (TAG_COD_CONTRACT.compareToIgnoreCase(localName) == 0) {
 
 			mCurrentContract.setCode(mContentValue);
-		}
-		else if( TAG_STRING_STATUS.compareToIgnoreCase(localName) == 0 ) {
+		} else if (TAG_STRING_STATUS.compareToIgnoreCase(localName) == 0) {
 
 			mContractsList.add(mCurrentContract);
 		}
 	}
 
-	private String getClose( String status ) {
-		
-		if( OPEN.compareToIgnoreCase(status) == 0 ) {
+	private String getClose(String status) {
+
+		if (OPEN.compareToIgnoreCase(status) == 0) {
 
 			return "x'00'";
-		}
-		else {
+		} else {
 
 			return "x'01'";
 		}
 	}
-	
-	private String getDeletionMark( String status ) {
-		
-		if( OPEN.compareToIgnoreCase(status) == 0 ||  CLOSE.compareToIgnoreCase(status) == 0  ) {
+
+	private String getDeletionMark(String status) {
+
+		if (OPEN.compareToIgnoreCase(status) == 0 || CLOSE.compareToIgnoreCase(status) == 0) {
 
 			return "x'00'";
-		}
-		else {
+		} else {
 
 			return "x'01'";
-		}		
+		}
 	}
-	
+
 	@Override
 	public void characters(char ch[], int start, int length) {
 
-		mContentValue = mContentValue + new String( ch, start, length );
+		mContentValue = mContentValue + new String(ch, start, length);
 	}
 }

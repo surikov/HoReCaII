@@ -30,7 +30,7 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 	private TextView mTextCount;
 	private Button mBtnPlus;
 	private Button mBtnMinus;
-	private NomenclatureCountHelper mCountHelper =  new NomenclatureCountHelper(0,0);
+	private NomenclatureCountHelper mCountHelper = new NomenclatureCountHelper(0, 0);
 	private Cursor mSearchCursor = null;
 	private FoodstuffsData mFoodStuffs = null;
 	private SQLiteDatabase mDB = null;
@@ -53,6 +53,7 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 		mDB = db;
 		mIsCRAvailable = isCRAvailable;
 	}
+
 	@Override
 	protected void finalize() throws Throwable {
 		if (mSearchCursor != null && !mSearchCursor.isClosed()) {
@@ -61,6 +62,7 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 		}
 		super.finalize();
 	}
+
 	@Override
 	protected void onCreate() {
 		LayoutInflater inflater = (LayoutInflater) anchor.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -74,6 +76,7 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 		setButtons(root);
 		setContentView(root);
 	}
+
 	private void setButtons(View root) {
 		mBtnMinus = (Button) root.findViewById(R.id.btn_minus);
 		mBtnMinus.setOnClickListener(new OnClickListener() {
@@ -216,8 +219,8 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 				if (mEditForInput.equals(mEditArticle)) {
 					String searchString = mEditArticle.getText().toString();
 					if (searchString.length() != 0 && searchString.compareToIgnoreCase(mNomenclatureExists) != 0 && searchString.compareToIgnoreCase(mNomenclatureNotFound) != 0) {
-						Request_Search requestSearch = new Request_Search(Request_Search.SEARCH_ARTICLE, searchString,false);
-						mSearchCursor = requestSearch.Request(mDB, null,false);
+						Request_Search requestSearch = new Request_Search(Request_Search.SEARCH_ARTICLE, searchString, false);
+						mSearchCursor = requestSearch.Request(mDB, null, false);
 						if (mSearchCursor.moveToFirst()) {
 							if (mFoodStuffs.IsFoodstuffAlreadyInList(Request_NomenclatureBase.getIDRRef(mSearchCursor))) {
 								mEditArticle.setText(mNomenclatureExists);
@@ -236,24 +239,22 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 							mEditArticle.setEnabled(false);
 							mIsSlashInputEnable = false;
 							Resources res = anchor.getResources();
-							mTextCount.setText(res.getString(R.string.count) 
+							mTextCount.setText(res.getString(R.string.count)
 									+ "    " + res.getString(R.string.min_quantity) + " "
-									+ Request_NomenclatureBase.getMinNorma(mSearchCursor) 
+									+ Request_NomenclatureBase.getMinNorma(mSearchCursor)
 									+ "  " + res.getString(R.string.koef_mest) + " "
 									+ Request_NomenclatureBase.getKoephphicient(mSearchCursor));
 							mBtnPlus.setEnabled(true);
 							mBtnMinus.setEnabled(true);
-							countByHandChanged=false;
-						}
-						else {
+							countByHandChanged = false;
+						} else {
 							mEditArticle.setText(mNomenclatureNotFound);
 							mEditArticle.setTextColor(Color.RED);
 							mSearchCursor.close();
 							mSearchCursor = null;
 						}
 					}
-				}
-				else {
+				} else {
 					if (mSearchCursor != null && !mSearchCursor.isClosed() && mSearchCursor.getCount() != 0) {
 						CheckInputCount();
 						SetNewFoodStaff();
@@ -263,6 +264,7 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 			}
 		});
 	}
+
 	private void CheckEditForClear() {
 		String editText = mEditForInput.getText().toString();
 		if (mNomenclatureNotFound.compareToIgnoreCase(editText) == 0 || mNomenclatureExists.compareToIgnoreCase(editText) == 0) {
@@ -270,12 +272,13 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 			mEditForInput.setText("");
 		}
 		if (mEditForInput == mEditCount) {
-			if(!countByHandChanged){
+			if (!countByHandChanged) {
 				mEditForInput.setText("");
 			}
 			countByHandChanged = true;
 		}
 	}
+
 	private void SetNewFoodStaff() {
 		NomenclaturePriceAndSale priceHelper = new NomenclaturePriceAndSale(mSearchCursor, mIsCRAvailable);
 		mFoodStuffs.newFoodstuff(//
@@ -297,8 +300,9 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 				, Request_NomenclatureBase.getLastPrice(mSearchCursor)//
 				//,Request_NomenclatureBase.getSkidka(mSearchCursor)//
 				//,Request_NomenclatureBase.getVidSkidki(mSearchCursor)//
-				);
+		);
 	}
+
 	private void CheckInputCount() {
 		double count = 0.00D;
 		if (mEditCount.getText().toString().length() != 0) {
@@ -306,22 +310,21 @@ public class Popup_AddNomenclature extends BetterPopupWindow {
 		}
 		mEditCount.setText(DecimalFormatHelper.format(mCountHelper.ReCalculateCount(count)));
 	}
+
 	private void rollCount(boolean increase) {
 		double count = 0.00D;
 		if (mEditCount.getText().toString().length() != 0) {
 			count = Double.parseDouble(mEditCount.getText().toString().replace(',', '.'));
 		}
-		
+
 		if (increase) {
 			if (count < mCountHelper.getPlaceCount()) {
 				count = mCountHelper.getPlaceCount();
+			} else {
+				count = count + mCountHelper.getPlaceCount();
 			}
-			else {
-				count =count+ mCountHelper.getPlaceCount();
-			}
-		}
-		else {
-			count =count- mCountHelper.getPlaceCount();
+		} else {
+			count = count - mCountHelper.getPlaceCount();
 			count = count < 0 ? 0 : count;
 		}
 		mEditCount.setText(DecimalFormatHelper.format(mCountHelper.ReCalculateCount(count)));

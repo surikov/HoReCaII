@@ -6,13 +6,17 @@ import reactive.ui.*;
 
 import android.content.*;
 import android.graphics.*;
+
 import tee.binding.properties.*;
+
 import android.util.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.TextView.BufferType;
+
 import tee.binding.task.*;
 import tee.binding.it.*;
+
 import android.text.*;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
@@ -69,17 +73,16 @@ public class HTMLText extends TextView implements Rake {
 			ViewGroup.MarginLayoutParams params;
 			if (inTableRow) {
 				params = new
-				//RelativeLayout.LayoutParams
-				TableRow.LayoutParams(//
+						//RelativeLayout.LayoutParams
+						TableRow.LayoutParams(//
 						width.property.value().intValue()//
 						, height.property.value().intValue());
-			}
-			else {
+			} else {
 				params = new RelativeLayout.LayoutParams
-				//		TableRow.LayoutParams
-				(//
-						width.property.value().intValue()//
-						, height.property.value().intValue());
+						//		TableRow.LayoutParams
+						(//
+								width.property.value().intValue()//
+								, height.property.value().intValue());
 			}
 			params.leftMargin = left.property.value().intValue();
 			params.topMargin = top.property.value().intValue();
@@ -104,18 +107,19 @@ public class HTMLText extends TextView implements Rake {
 				public void doTask() {
 					if (hidden.property.value()) {
 						setVisibility(View.INVISIBLE);
-					}
-					else {
+					} else {
 						setVisibility(View.VISIBLE);
 					}
 				}
 			});
 		}
 	};
+
 	@Override
 	public ToggleProperty<Rake> hidden() {
 		return hidden;
 	}
+
 	Task postInvalidate = new Task() {
 		@Override
 		public void doTask() {
@@ -128,18 +132,22 @@ public class HTMLText extends TextView implements Rake {
 		this.inTableRow = tableRowMode;
 		init();
 	}
+
 	public HTMLText(Context context) {
 		super(context);
 		init();
 	}
+
 	public HTMLText(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
+
 	public HTMLText(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init();
 	}
+
 	void init() {
 		if (initialized) {
 			return;
@@ -161,34 +169,42 @@ public class HTMLText extends TextView implements Rake {
 		left.property.afterChange(reFit);
 		top.property.afterChange(reFit);
 	}
+
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 	}
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 	}
+
 	@Override
 	public NumericProperty<Rake> left() {
 		return left;
 	}
+
 	@Override
 	public NumericProperty<Rake> top() {
 		return top;
 	}
+
 	@Override
 	public NumericProperty<Rake> width() {
 		return width;
 	}
+
 	@Override
 	public NumericProperty<Rake> height() {
 		return height;
 	}
+
 	@Override
 	public View view() {
 		return this;
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
@@ -198,30 +214,37 @@ public class HTMLText extends TextView implements Rake {
 		top.property.unbind();
 		background.property.unbind();
 	}
+
 	public HTMLText labelStyleSmallNormal() {
 		setTextAppearance(this.getContext(), android.R.style.TextAppearance_Small);
 		return this;
 	}
+
 	public HTMLText labelStyleMediumNormal() {
 		setTextAppearance(this.getContext(), android.R.style.TextAppearance_Medium);
 		return this;
 	}
+
 	public HTMLText labelStyleLargeNormal() {
 		setTextAppearance(this.getContext(), android.R.style.TextAppearance_Large);
 		return this;
 	}
+
 	public HTMLText labelStyleSmallInverse() {
 		setTextAppearance(this.getContext(), android.R.style.TextAppearance_Small_Inverse);
 		return this;
 	}
+
 	public HTMLText labelStyleMediumInverse() {
 		setTextAppearance(this.getContext(), android.R.style.TextAppearance_Medium_Inverse);
 		return this;
 	}
+
 	public HTMLText labelStyleLargeInverse() {
 		setTextAppearance(this.getContext(), android.R.style.TextAppearance_Large_Inverse);
 		return this;
 	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		//System.out.println(event);

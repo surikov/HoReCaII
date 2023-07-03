@@ -171,6 +171,13 @@ public class DatabaseHelper {
 				+ ");"//
 		);
 
+		mDB.execSQL("create table if not exists stars ("//
+				+ "_id integer primary key asc"//
+				+ ",artikul text null"//
+				+ ");"//
+		);
+		mDB.execSQL("create index if not exists IX_stars_artikul on stars(artikul);");
+
 		//
 		try {
 			mDB.execSQL("alter table Nomenklatura add column Mark blob;");
@@ -1011,7 +1018,13 @@ public class DatabaseHelper {
 		mDB.execSQL("create index if not exists IX_AssortimentNaSklade_Zapret on AssortimentNaSklade(Zapret);");
 		mDB.execSQL("create index if not exists IX_AssortimentNaSklade_Trafic on AssortimentNaSklade(Trafic);");
 
-
+		try {
+			mDB.execSQL("alter table MatricaRowsX add column PlanSTM number;");
+			mDB.execSQL("alter table MatricaSvodX add column PlanSTM number;");
+		}
+		catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
 		//delete from Assortiment where NomenklaturaPostavshhik=X'BFE050505450303011DA6D9397ECB611' and KontragentPodrazdelenie=X'B2E63F309CD622334A63258B97558954';
 		//insert into Assortiment(NomenklaturaPostavshhik,KontragentPodrazdelenie,Zapret,Trafic) values (X'BFE050505450303011DA6D9397ECB611',X'B2E63F309CD622334A63258B97558954',X'00',X'00');
 

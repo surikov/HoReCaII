@@ -13,24 +13,25 @@ import android.util.Xml;
 
 public class ContractsXMLSerializer implements IXMLSerializer {
 
-	private static final String GET_CLIENTS_STATUS  = "ПолучитьСтатусКлиентов";
+	private static final String GET_CLIENTS_STATUS = "ПолучитьСтатусКлиентов";
 	private static final String CONTRACT_CODES_LIST = "СписокКодовДоговоров";
 	private static final String COD_CONTRACT = "CodContract";
-	
+
 	private ArrayList<String> mCodConstractList;
-	
+
 	ContractsXMLSerializer(ArrayList<String> codConstractList) {
-		
+
 		mCodConstractList = codConstractList;
 	}
+
 	@Override
 	public String SerializeXML() throws IllegalArgumentException, IllegalStateException, IOException {
-		
+
 		XmlSerializer serializer = Xml.newSerializer();
-		
+
 		StringWriter writer = new StringWriter(4096);
 		serializer.setOutput(writer);
-		
+
 		serializer.startDocument(UTF_8, true);
 
 		serializer.startTag(null, TAG_ENVELOPE);
@@ -45,7 +46,7 @@ public class ContractsXMLSerializer implements IXMLSerializer {
 
 		serializer.startTag(null, CONTRACT_CODES_LIST);
 
-		for(String code : mCodConstractList) {
+		for (String code : mCodConstractList) {
 
 			serializer.startTag(null, COD_CONTRACT);
 			serializer.text(code);

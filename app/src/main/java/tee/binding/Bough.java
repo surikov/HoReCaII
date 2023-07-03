@@ -2,13 +2,18 @@ package tee.binding;
 
 import tee.binding.properties.*;
 import tee.binding.it.*;
+
 import java.util.*;
+
 import javax.xml.parsers.*;
+
 import org.json.*;
 import org.xml.sax.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
+
 import java.io.*;
+
 import android.util.*;
 
 /**
@@ -22,11 +27,13 @@ public class Bough {
 	public NoteProperty<Bough> value = new NoteProperty<Bough>(this);
 	public Vector<Bough> children = new Vector<Bough>();
 	public ToggleProperty<Bough> attribute = new ToggleProperty<Bough>(this);
+
 	public Bough child(Bough b) {
 		children.add(b);
 		//b.parent = this;
 		return this;
 	}
+
 	/*
 	 public Vector<Bough> children() {
 	 return children;
@@ -41,6 +48,7 @@ public class Bough {
 		child(b);
 		return b;
 	}
+
 	public Vector<Bough> children(String n) {
 		Vector<Bough> c = new Vector<Bough>();
 		for (int i = 0; i < children.size(); i++) {
@@ -50,6 +58,7 @@ public class Bough {
 		}
 		return c;
 	}
+
 	public static String safeEncodedString(String s) {
 		if (s == null) {
 			return "";
@@ -57,20 +66,23 @@ public class Bough {
 		s = s.replaceAll("\"", "&quot;");
 		return s;
 	}
-	public Bough createClone(){
-		Bough rr=new Bough();
+
+	public Bough createClone() {
+		Bough rr = new Bough();
 		rr.name.is(this.name.property.value());
 		rr.value.is(this.value.property.value());
-		for(int ii=0;ii<this.children.size();ii++){
+		for (int ii = 0; ii < this.children.size(); ii++) {
 			rr.children.add(this.children.get(ii).createClone());
 		}
 		return rr;
 	}
+
 	public String dumpXML() {
 		StringBuilder sb = new StringBuilder();
 		Bough.dumpXML(sb, this, "");
 		return sb.toString();
 	}
+
 	public static void dumpXML(StringBuilder sb, Bough b, String pad) {
 		sb.append("\n" + pad + "<" + b.name.property.value());
 		for (int i = 0; i < b.children.size(); i++) {
@@ -89,11 +101,11 @@ public class Bough {
 		}
 		if (hasChildren) {
 			sb.append("\n" + pad + "</" + b.name.property.value() + ">");
-		}
-		else {
+		} else {
 			sb.append("</" + b.name.property.value() + ">");
 		}
 	}
+
 	public static String readTillChar(java.io.StringReader reader, char stop) throws Exception {
 		String s = "";
 		char c = 0;
@@ -102,14 +114,14 @@ public class Bough {
 			c = (char) i;
 			if (c == stop) {
 				break;
-			}
-			else {
+			} else {
 				s = s + c;
 				i = reader.read();
 			}
 		}
 		return s;
 	}
+
 	public static String pad(int n) {
 		String s = "";
 		for (int i = 0; i < n; i++) {
@@ -117,25 +129,27 @@ public class Bough {
 		}
 		return s;
 	}
+
 	public static Bough parseJSON(String data) {
 		Bough b = new Bough();
 		try {
 			JSONObject jsonObject = new JSONObject(data);
 			attachValues(jsonObject, b);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 		return b;
 	}
+
 	public static Bough parseJSONorThrow(String data) throws Exception {
 		Bough b = new Bough();
 
-			JSONObject jsonObject = new JSONObject(data);
-			attachValues(jsonObject, b);
+		JSONObject jsonObject = new JSONObject(data);
+		attachValues(jsonObject, b);
 
 		return b;
 	}
+
 	public static void attachValues(JSONObject jsonObject, Bough b) {
 		Iterator<String> keys = jsonObject.keys();
 		while (keys.hasNext()) {
@@ -150,72 +164,67 @@ public class Bough {
 			//jsonObject.getString(name)
 		}
 	}
+
 	public static boolean attachText(String name, JSONObject jsonObject, Bough b) {
 		String stringValue = null;
 		try {
 			stringValue = jsonObject.getString(name);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
 		if (stringValue != null) {
-			b.children.add(new Bough().name.is(name).value.is( stringValue));
+			b.children.add(new Bough().name.is(name).value.is(stringValue));
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
+
 	public static boolean attachArray(String name, JSONObject jsonObject, Bough b) {
 		JSONArray arrayValue = null;
 		try {
 			arrayValue = jsonObject.getJSONArray(name);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
 		if (arrayValue != null) {
 			for (int i = 0; i < arrayValue.length(); i++) {
 				Bough n = new Bough().name.is(name);
 				b.children.add(n);
-			
-					JSONObject vObject = null;
+
+				JSONObject vObject = null;
+				try {
+					vObject = arrayValue.getJSONObject(i);
+				} catch (Throwable t) {
+					//
+				}
+				if (vObject != null) {
+					attachValues(vObject, n);
+				} else {
+					String vString = null;
 					try {
-						vObject = arrayValue.getJSONObject(i);
-					}
-					catch (Throwable t) {
+						vString = arrayValue.getString(i);
+					} catch (Throwable t) {
 						//
 					}
-					if (vObject != null) {
-						attachValues(vObject, n);
-					}
-					else {
-						String vString = null;
-						try {
-							vString = arrayValue.getString(i);
-						}
-						catch (Throwable t) {
-							//
-						}
-						if (vString != null) {
-							n.value.is(vString);
-						}
+					if (vString != null) {
+						n.value.is(vString);
 					}
 				}
-			
+			}
+
 			//b.children.add(new Bough().name.is(name).value.is(arrayValue.toString()));
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
+
 	public static boolean attachObject(String name, JSONObject jsonObject, Bough b) {
 		JSONObject objectValue = null;
 		try {
 			objectValue = jsonObject.getJSONObject(name);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			//
 		}
 		if (objectValue != null) {
@@ -223,11 +232,11 @@ public class Bough {
 			b.children.add(n);
 			attachValues(objectValue, n);
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
+
 	/*
 	public static Bough ___parseJSON(String data) {
 		JsonReader jsonReader = new JsonReader(new StringReader(data));
@@ -377,13 +386,14 @@ public class Bough {
 					current.value(b);
 					for (int i = 0; i < attributes.getLength(); i++) {
 						Bough bb = new Bough()//
-						.name.is(attributes.getQName(i))//
-						.value.is(attributes.getValue(i))//
-						.attribute.is(true);
+								.name.is(attributes.getQName(i))//
+								.value.is(attributes.getValue(i))//
+								.attribute.is(true);
 						bb.parsedParent = current.value();
 						current.value().child(bb);
 					}
 				}
+
 				@Override
 				public void endElement(String uri, String localName, String qName) throws SAXException {
 					//String c = current.value().value.property.value();
@@ -393,6 +403,7 @@ public class Bough {
 					stringBuilder.delete(0, stringBuilder.length());
 					stringBuilder.append(current.value().value.property.value());
 				}
+
 				@Override
 				public void characters(char ch[], int start, int length) throws SAXException {
 					//String c = current.value().value.property.value();
@@ -403,17 +414,16 @@ public class Bough {
 			};
 			InputStream is = new ByteArrayInputStream(data.getBytes("UTF-8"));
 			saxParser.parse(is, handler);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 		if (current.value().children.size() > 0) {
 			return current.value().children.get(0);
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
+
 	public static void main(String[] a) {
 		Bough b = new Bough().name.is("Test").value.is("Ops");
 		b.child("test").child("test2").child("test3").attribute.is(true).value.is("Ya!");

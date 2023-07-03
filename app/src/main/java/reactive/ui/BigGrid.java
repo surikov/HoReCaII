@@ -1,6 +1,7 @@
 package reactive.ui;
 
 import tee.binding.properties.*;
+
 import android.graphics.*;
 
 import android.view.*;
@@ -12,9 +13,11 @@ import android.view.*;
 import android.widget.*;
 
 import java.util.*;
+
 import reactive.ui.*;
 
 import android.view.animation.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
@@ -35,14 +38,17 @@ public class BigGrid extends SubLayoutless {
 		super(context);
 		this.setWillNotDraw(false);
 	}
+
 	public BigGrid(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.setWillNotDraw(false);
 	}
+
 	public BigGrid(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		this.setWillNotDraw(false);
 	}
+
 	@Override
 	protected void init() {
 		super.init();
@@ -78,6 +84,7 @@ public class BigGrid extends SubLayoutless {
 			});
 		}
 	}
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		System.out.println("onDraw" + ": " + shiftX.property.value() + "x" + shiftY.property.value() + " / " + currentShiftX + "x" + currentShiftY);
@@ -95,10 +102,10 @@ public class BigGrid extends SubLayoutless {
 		for (int x = 0; x < wCount; x++) {
 			for (int y = 0; y < hCount; y++) {
 				int xx = //x * cellWidth+ deltaX;
-				deltaX + x * cellWidth + shiftX.property.value().intValue();
+						deltaX + x * cellWidth + shiftX.property.value().intValue();
 				int yy = //y * cellHeight+ deltaY;
-				deltaY + y * cellHeight + shiftY.property.value().intValue();
-				String lbl = currentShiftX/cellWidth + "x" + currentShiftY/cellHeight;
+						deltaY + y * cellHeight + shiftY.property.value().intValue();
+				String lbl = currentShiftX / cellWidth + "x" + currentShiftY / cellHeight;
 				canvas.drawRect(//
 						xx + 1//
 						, yy + 1//
@@ -127,6 +134,7 @@ public class BigGrid extends SubLayoutless {
 			}
 		}*/
 	}
+
 	public BigGrid _data() {
 		int w = 90;
 		int h = 70;
@@ -141,7 +149,7 @@ public class BigGrid extends SubLayoutless {
 		for (int x = 0; x < wc; x++) {
 			for (int y = 0; y < hc; y++) {
 				s.child(new Decor(this.getContext())//
-				.labelText.is(x + "x" + y)//
+						.labelText.is(x + "x" + y)//
 						.left().is(x * w)//
 						.top().is(y * h)//
 						.width().is(w)//

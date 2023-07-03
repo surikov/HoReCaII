@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
 import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+
 //https://github.com/shaobin0604/Android-HomeKey-Locker/blob/master/HomeLockerLib/src/main/java/io/github/homelocker/lib/HomeKeyLocker.java
 public class OverlayScreen extends AlertDialog {
 	OverlayScreen me = null;
@@ -21,12 +22,14 @@ public class OverlayScreen extends AlertDialog {
 			me.show();
 		}
 	}
+
 	public void unlock() {
 		if (me != null) {
 			me.dismiss();
 			me = null;
 		}
 	}
+
 	private OverlayScreen(Activity activity) {
 		super(activity);
 		//super(activity, R.style.OverlayDialog);
@@ -41,14 +44,15 @@ public class OverlayScreen extends AlertDialog {
 		setOwnerActivity(activity);
 		setCancelable(false);
 	}
-	public final boolean dispatchTouchEvent(MotionEvent motionevent) {
-        return true;
-    }
 
-    protected final void onCreate(Bundle bundle) {
-        super.onCreate(bundle);
-        FrameLayout framelayout = new FrameLayout(getContext());
-        framelayout.setBackgroundColor(0);
-        setContentView(framelayout);
-    }
+	public final boolean dispatchTouchEvent(MotionEvent motionevent) {
+		return true;
+	}
+
+	protected final void onCreate(Bundle bundle) {
+		super.onCreate(bundle);
+		FrameLayout framelayout = new FrameLayout(getContext());
+		framelayout.setBackgroundColor(0);
+		setContentView(framelayout);
+	}
 }

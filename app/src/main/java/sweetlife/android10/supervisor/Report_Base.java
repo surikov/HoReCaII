@@ -18,6 +18,8 @@ public abstract class Report_Base {
 
 	public final static String HOOKReportPoVoditelam = "HookReportPoVoditelam";
 	public final static String HOOKReportOrderState = "HookReportOrderState";
+	public final static String HOOKReportFixKoordinat = "HOOKReportFixKoordinat";
+	public final static String HOOKReportDeleteSpec = "HOOKReportDeleteSpec";
 	public final static String HOOKReportDegustacia = "HookReportDegustacia";
 	public final static String HOOKReportLimity = "HookReportLimity";
 	public final static String HOOKReportVzaimoraschety = "ReportVzaimoraschety";
@@ -302,7 +304,7 @@ public abstract class Report_Base {
 				//byte[] byte64 = Auxiliary.loadFileFromURL(getQueryLink);
 				String postBody = composePostBody(xlsQuery);
 				if (postBody == null) {
-					byte[] raw = Base64.decode(Auxiliary.loadFileFromPrivateURL(getQueryLink + "&IMEI=" + Cfg.device_id()
+					byte[] raw = Base64.decode(Auxiliary.loadFileFromPrivateURL(getQueryLink // + "&IMEI=" + Cfg.device_id()
 							, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()), Base64.DEFAULT);
 					FileOutputStream fileOutputStream = null;
 					fileOutputStream = new FileOutputStream(to);
@@ -405,7 +407,8 @@ public abstract class Report_Base {
 				System.out.println("export " + getQueryLink);
 				String postBody = composePostBody(pdfQuery);
 				if (postBody == null) {
-					byte[] raw = Base64.decode(Auxiliary.loadFileFromPrivateURL(getQueryLink + "&IMEI=" + Cfg.device_id(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()), Base64.DEFAULT);
+					byte[] raw = Base64.decode(Auxiliary.loadFileFromPrivateURL(getQueryLink //+ "&IMEI=" + Cfg.device_id()
+							, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()), Base64.DEFAULT);
 					FileOutputStream fileOutputStream = null;
 					fileOutputStream = new FileOutputStream(to);
 					fileOutputStream.write(raw, 0, raw.length);
@@ -496,7 +499,8 @@ public abstract class Report_Base {
 					txt = getQueryLink;
 					String postBody = composePostBody(ordinaryQuery);
 					if (postBody == null) {
-						byte[] bytes = Auxiliary.loadFileFromPrivateURL(getQueryLink + "&IMEI=" + Cfg.device_id(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+						byte[] bytes = Auxiliary.loadFileFromPrivateURL(getQueryLink //+ "&IMEI=" + Cfg.device_id()
+								, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 						txt = new String(bytes);
 					} else {
 						System.out.println("getQueryLink " + getQueryLink);

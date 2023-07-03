@@ -77,7 +77,7 @@ public class GridScroll2 extends ScrollView {
 	}*/
 
 	public void refreshScroll(int top) {
-		//System.out.println("refreshScroll "+top);
+		System.out.println("refreshScroll "+top);
 		grid.progressBar.setVisibility(View.VISIBLE);
 		grid.lockScroll = true;
 		grid.progressBar.postInvalidate();
@@ -91,7 +91,7 @@ public class GridScroll2 extends ScrollView {
 		double contentHeight = grid.rowHeight.property.value() * grid.pageSize.property.value();
 		double limit = contentHeight - scrollViewHeight;
 		if (top > 0 && limit > 0 && top >= limit) {
-			System.err.println("next");
+			System.out.println("refreshScroll next");
 			if (grid.beforeFlip.property.value() != null) {
 				grid.flipNext();
 			} else {

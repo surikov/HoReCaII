@@ -22,11 +22,13 @@ public class RouteListAdapter extends ZoomListCursorAdapter {
 	public RouteListAdapter(Context context, Cursor c) {
 		super(context, c);
 	}
+
 	@Override
 	public void bindView(View row, Context context, Cursor cursor) {
 		RouteHolder holder = (RouteHolder) row.getTag();
 		holder.populateFrom(cursor, getRowTextFontSize());
 	}
+
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup view) {
 		View row = LayoutInflater.from(context).inflate(R.layout.row_constractorslist, view, false);
@@ -55,6 +57,7 @@ public class RouteListAdapter extends ZoomListCursorAdapter {
 			Fr = (ImageView) row.findViewById(R.id.fr);
 			St = (ImageView) row.findViewById(R.id.st);
 		}
+
 		void populateFrom(Cursor cursor, float rowTextFontSize) {
 			//System.out.println("rowTextFontSize "+rowTextFontSize);
 			//System.out.println("TypedValue.COMPLEX_UNIT_PX "+TypedValue.COMPLEX_UNIT_PX);
@@ -66,44 +69,37 @@ public class RouteListAdapter extends ZoomListCursorAdapter {
 				if (Request_ClientsList.getContactsCount(cursor) - Request_ClientsList.getOpenContactsCount(cursor) == 0) {
 					name.setTextColor(Color.BLACK);
 					code.setTextColor(Color.BLACK);
-				}
-				else {
+				} else {
 					name.setTextColor(Color.BLUE);
 					code.setTextColor(Color.BLUE);
 				}
-			}
-			else {
+			} else {
 				name.setTextColor(Color.RED);
 				code.setTextColor(Color.RED);
 			}
 			if (Request_ClientsList.getMo(cursor) == 1) {
 				Mo.setImageResource(android.R.drawable.checkbox_on_background);
-			}
-			else {
+			} else {
 				Mo.setImageResource(android.R.drawable.checkbox_off_background);
 			}
 			if (Request_ClientsList.getTh(cursor) == 1) {
 				Th.setImageResource(android.R.drawable.checkbox_on_background);
-			}
-			else {
+			} else {
 				Th.setImageResource(android.R.drawable.checkbox_off_background);
 			}
 			if (Request_ClientsList.getWd(cursor) == 1) {
 				Wd.setImageResource(android.R.drawable.checkbox_on_background);
-			}
-			else {
+			} else {
 				Wd.setImageResource(android.R.drawable.checkbox_off_background);
 			}
 			if (Request_ClientsList.getCh(cursor) == 1) {
 				Ch.setImageResource(android.R.drawable.checkbox_on_background);
-			}
-			else {
+			} else {
 				Ch.setImageResource(android.R.drawable.checkbox_off_background);
 			}
 			if (Request_ClientsList.getFr(cursor) == 1) {
 				Fr.setImageResource(android.R.drawable.checkbox_on_background);
-			}
-			else
+			} else
 				Fr.setImageResource(android.R.drawable.checkbox_off_background);
 			if (Request_ClientsList.getSt(cursor) == 1)
 				St.setImageResource(android.R.drawable.checkbox_on_background);
@@ -112,16 +108,14 @@ public class RouteListAdapter extends ZoomListCursorAdapter {
 			}
 			if (Request_ClientsList.getClientVisitDone(cursor)) {
 				name.setBackgroundColor(0x3300ff00);
-			}
-			else {
+			} else {
 				if (Request_ClientsList.getClientVisitStartedNotFinished(cursor)) {
 					name.setBackgroundColor(0x330000ff);
-				}
-				else {
+				} else {
 					name.setBackgroundColor(0x00000000);
 				}
 			}
-			
+
 			if (Request_ClientsList.getClientName(cursor).startsWith("(не в маршруте)")) {
 				name.setBackgroundColor(0x00000000);
 				name.setTextColor(0xff999999);
@@ -132,8 +126,7 @@ public class RouteListAdapter extends ZoomListCursorAdapter {
 				Ch.setVisibility(View.INVISIBLE);
 				Fr.setVisibility(View.INVISIBLE);
 				St.setVisibility(View.INVISIBLE);
-			}
-			else {
+			} else {
 				Mo.setVisibility(View.VISIBLE);
 				Th.setVisibility(View.VISIBLE);
 				Wd.setVisibility(View.VISIBLE);

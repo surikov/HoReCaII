@@ -18,7 +18,7 @@ public class TrafiksListAdapter extends ZoomListArrayAdapter {
 
 	private TraficsData mTraficsData;
 
-	public TrafiksListAdapter( TraficsData trafiksData) {
+	public TrafiksListAdapter(TraficsData trafiksData) {
 
 		mTraficsData = trafiksData;
 	}
@@ -30,7 +30,7 @@ public class TrafiksListAdapter extends ZoomListArrayAdapter {
 	}
 
 	@Override
-	public Object getItem( int index ) {
+	public Object getItem(int index) {
 
 		return mTraficsData.getTrafik(index);
 	}
@@ -48,20 +48,19 @@ public class TrafiksListAdapter extends ZoomListArrayAdapter {
 
 		if (convertView == null) {
 
-			convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_trafiks, null );
+			convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_trafiks, null);
 
-			holder = new FoodStuffViewHolder( convertView );
+			holder = new FoodStuffViewHolder(convertView);
 
 			convertView.setTag(holder);
-		} 
-		else {
+		} else {
 
-			holder = (FoodStuffViewHolder)convertView.getTag();
+			holder = (FoodStuffViewHolder) convertView.getTag();
 		}
 
 		ZayavkaPokupatelya_Trafik trafik = mTraficsData.getTrafik(position);
 
-		holder.SetValues( trafik );
+		holder.SetValues(trafik);
 
 		return convertView;
 	}
@@ -77,52 +76,52 @@ public class TrafiksListAdapter extends ZoomListArrayAdapter {
 		private TextView mTextMinCount = null;
 		private TextView mTextDate = null;
 
-		FoodStuffViewHolder( View row ) {
+		FoodStuffViewHolder(View row) {
 
-			mTextNumber = (TextView)row.findViewById(R.id.text_number);
-			mTextArticle = (TextView)row.findViewById(R.id.text_article);
-			mTextNomenclature = (TextView)row.findViewById(R.id.text_nomenclature);
-			mTextPlaceCount = (TextView)row.findViewById(R.id.text_place_count);
-			mTextUnit = (TextView)row.findViewById(R.id.text_unit);
-			mTextCount = (TextView)row.findViewById(R.id.text_count);
-			mTextMinCount     = (TextView)row.findViewById(R.id.text_min_count);
-			mTextDate     = (TextView)row.findViewById(R.id.text_date);
+			mTextNumber = (TextView) row.findViewById(R.id.text_number);
+			mTextArticle = (TextView) row.findViewById(R.id.text_article);
+			mTextNomenclature = (TextView) row.findViewById(R.id.text_nomenclature);
+			mTextPlaceCount = (TextView) row.findViewById(R.id.text_place_count);
+			mTextUnit = (TextView) row.findViewById(R.id.text_unit);
+			mTextCount = (TextView) row.findViewById(R.id.text_count);
+			mTextMinCount = (TextView) row.findViewById(R.id.text_min_count);
+			mTextDate = (TextView) row.findViewById(R.id.text_date);
 		}
 
-		void SetValues( ZayavkaPokupatelya_Trafik trafik ) {
+		void SetValues(ZayavkaPokupatelya_Trafik trafik) {
 
-			mTextNumber.setText( String.valueOf(trafik.getNomerStroki()) );
+			mTextNumber.setText(String.valueOf(trafik.getNomerStroki()));
 			mTextNumber.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
-			mTextArticle.setText( trafik.getArtikul() );
+			mTextArticle.setText(trafik.getArtikul());
 			mTextArticle.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
-			if(trafik.vetSpravka){
-				mTextNomenclature.setText( trafik.getNomenklaturaNaimenovanie() +" +вет.справка");
-			}else{
-				mTextNomenclature.setText( trafik.getNomenklaturaNaimenovanie() );
+			if (trafik.vetSpravka) {
+				mTextNomenclature.setText(trafik.getNomenklaturaNaimenovanie() + " +вет.справка");
+			} else {
+				mTextNomenclature.setText(trafik.getNomenklaturaNaimenovanie());
 			}
-			
+
 			mTextNomenclature.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
-			mTextPlaceCount.setText( DecimalFormatHelper.format(trafik.getKoefMest()) );
+			mTextPlaceCount.setText(DecimalFormatHelper.format(trafik.getKoefMest()));
 			mTextPlaceCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
-			mTextUnit.setText( trafik.getEdinicaIzmereniyaName() );
+			mTextUnit.setText(trafik.getEdinicaIzmereniyaName());
 			mTextUnit.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
-			mTextCount.setText( DecimalFormatHelper.format(trafik.getKolichestvo()) );
+			mTextCount.setText(DecimalFormatHelper.format(trafik.getKolichestvo()));
 			mTextCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
 
-			mTextMinCount.setText( DecimalFormatHelper.format(trafik.getMinNorma()) );
+			mTextMinCount.setText(DecimalFormatHelper.format(trafik.getMinNorma()));
 			mTextMinCount.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
 			Date date = trafik.getData();
 
-			if(date != null) { 
+			if (date != null) {
 
-				mTextDate.setText( DateTimeHelper.UIDateString(trafik.getData()) );
+				mTextDate.setText(DateTimeHelper.UIDateString(trafik.getData()));
 				mTextDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 			}
 		}

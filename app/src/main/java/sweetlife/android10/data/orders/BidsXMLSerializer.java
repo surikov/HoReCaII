@@ -61,6 +61,7 @@ public class BidsXMLSerializer implements IXMLSerializer {
 		mServicesData = new ServicesData(db, mZayavka);
 		mTraficsData = new TraficsData(db, mZayavka);
 	}
+
 	@Override
 	public String SerializeXML() throws IllegalArgumentException, IllegalStateException, IOException {
 		XmlSerializer serializer = Xml.newSerializer();
@@ -95,6 +96,7 @@ public class BidsXMLSerializer implements IXMLSerializer {
 		}*/
 		return xml;
 	}
+
 	private void SerializeZayavka(XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startTag(null, TAG_HEADER_DOC);
 		serializer.attribute(null, ATR_COD_CLIENT, mZayavka.getClientKod());
@@ -105,16 +107,12 @@ public class BidsXMLSerializer implements IXMLSerializer {
 		serializer.attribute(null, ATR_TYPE_PAY, mZayavka.getTipOplatyForUpload());
 
 		//if(ApplicationHoreca.getInstance().currentHRCmarshrut.length()>1){
-		if(Cfg.isChangedHRC()){
+		if (Cfg.isChangedHRC()) {
 			//serializer.attribute(null, ATR_COD_USER, ApplicationHoreca.getInstance().currentHRCmarshrut);
 			serializer.attribute(null, ATR_COD_USER, Cfg.selectedOrDbHRC());
-		}else{
+		} else {
 			serializer.attribute(null, ATR_COD_USER, mZayavka.getOtvetstvennyyKod());
 		}
-
-
-
-
 
 
 		serializer.attribute(null, ATR_COD_SUBUNIT, ApplicationHoreca.getInstance().getCurrentAgent().getPodrazdelenieKod());
@@ -132,20 +130,17 @@ public class BidsXMLSerializer implements IXMLSerializer {
 		serializer.startTag(null, "m:Samovivoz");
 		if (mZayavka.dostavkaKind == mZayavka.DOSTAVKA_OBICHNAYA) {
 			serializer.text(FALSE);
-		}
-		else {
+		} else {
 			serializer.text(TRUE);
 		}
 		serializer.endTag(null, "m:Samovivoz");
 		if (mZayavka.dostavkaKind == mZayavka.DOSTAVKA_OBICHNAYA) {
 			//
-		}
-		else {
+		} else {
 			serializer.startTag(null, "m:SposobPrinyatia");
 			if (mZayavka.dostavkaKind == mZayavka.DOSTAVKA_DOVERENNOST) {
 				serializer.text("Доверенность");
-			}
-			else {
+			} else {
 				serializer.text("Печать");
 			}
 			serializer.endTag(null, "m:SposobPrinyatia");
@@ -153,18 +148,19 @@ public class BidsXMLSerializer implements IXMLSerializer {
 			serializer.text(mZayavka.dostvkaKoment);
 			serializer.endTag(null, "m:KommentSamovivoz");
 		}
-		String DataNackl="20141128";
-		Date d=new Date();
-		d.setTime((long)mZayavka.dostvkaVozvrNakl);
+		String DataNackl = "20141128";
+		Date d = new Date();
+		d.setTime((long) mZayavka.dostvkaVozvrNakl);
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		format.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-		DataNackl=format.format(d);
+		DataNackl = format.format(d);
 		//mZayavka.dostvkaVozvrNakl
 		serializer.startTag(null, "m:DataNackl");
 		serializer.text(DataNackl);
 		serializer.endTag(null, "m:DataNackl");
 		serializer.endTag(null, TAG_HEADER_DOC);
 	}
+
 	private void SerializeZayavka_Tovary(XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		int count = mFoodstuffData.getCount();
 		ZayavkaPokupatelya_Foodstaff foodstaff = null;
@@ -196,6 +192,7 @@ public class BidsXMLSerializer implements IXMLSerializer {
 			serializer.endTag(null, TAG_STRING_TP);
 		}
 	}
+
 	private void SerializeZayavka_Uslugi(XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		int count = mServicesData.getCount();
 		ZayavkaPokupatelya_Service service = null;
@@ -223,6 +220,7 @@ public class BidsXMLSerializer implements IXMLSerializer {
 			serializer.endTag(null, TAG_STRING_TP);
 		}
 	}
+
 	private void SerializeZayavka_Trafiks(XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startTag(null, TAG_TP_DOC_TRAF);
 		int count = mTraficsData.getCount();
@@ -242,11 +240,11 @@ public class BidsXMLSerializer implements IXMLSerializer {
 			serializer.startTag(null, TAG_COMMENT);
 			serializer.text(String.valueOf(trafik.getKommentariy()));
 			serializer.endTag(null, TAG_COMMENT);
-			
+
 			serializer.startTag(null, "m:vs");
-			serializer.text(trafik.vetSpravka?"да":"нет");
+			serializer.text(trafik.vetSpravka ? "да" : "нет");
 			serializer.endTag(null, "m:vs");
-			
+
 			serializer.endTag(null, TAG_STRING_TP);
 		}
 		serializer.endTag(null, TAG_TP_DOC_TRAF);

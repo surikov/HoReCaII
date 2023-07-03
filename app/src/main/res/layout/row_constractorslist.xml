@@ -1,71 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="1" >
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:weightSum="1">
 
-    <TextView
-        android:id="@+id/code"
+	<TextView
+		android:id="@+id/code"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center"
+		android:layout_marginLeft="7dip"
+		android:layout_weight="0.1" />
+	<!--
+
+	<TextView
+		android:id="@+id/code"
 		android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center"
-        android:layout_marginLeft="7dip"
-        android:layout_weight="0.1" />
-    <!-- 
-
-    <TextView
-        android:id="@+id/code"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center"
-        android:layout_marginLeft="7dip"
-        android:layout_weight="0.1"
-        android:typeface="normal" />
+		android:layout_gravity="left|center"
+		android:layout_marginLeft="7dip"
+		android:layout_weight="0.1"
+		android:typeface="normal" />
 -->
-    <TextView
-        android:id="@+id/constractor_name"
-		android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center"
-        android:layout_weight="0.6" />
+	<TextView
+		android:id="@+id/constractor_name"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center"
+		android:layout_weight="0.6" />
 
-    <ImageView
-        android:id="@+id/mo"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.05" />
+	<ImageView
+		android:id="@+id/mo"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.05" />
 
-    <ImageView
-        android:id="@+id/th"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.05" />
+	<ImageView
+		android:id="@+id/th"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.05" />
 
-    <ImageView
-        android:id="@+id/wd"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.05" />
+	<ImageView
+		android:id="@+id/wd"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.05" />
 
-    <ImageView
-        android:id="@+id/ch"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.05" />
+	<ImageView
+		android:id="@+id/ch"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.05" />
 
-    <ImageView
-        android:id="@+id/fr"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.05" />
+	<ImageView
+		android:id="@+id/fr"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.05" />
 
-    <ImageView
-        android:id="@+id/st"
-        android:layout_width="0dip"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="0.05" />
+	<ImageView
+		android:id="@+id/st"
+		android:layout_width="0dip"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:layout_weight="0.05" />
 
 </LinearLayout>

@@ -30,7 +30,7 @@ public class ActivityVseAnketi extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuAdd = menu.add("Добавить");
 		menuClear = menu.add("Удалить всё");
-		menuList = menu.add("Обработанные заявки");
+		menuList = menu.add("Выгруженные заявки");
 		return true;
 	}
 

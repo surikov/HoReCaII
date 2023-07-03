@@ -1,4 +1,5 @@
 package tee.binding.it;
+
 import tee.binding.it.Toggle;
 import tee.binding.it.Note;
 import tee.binding.it.It;
@@ -8,6 +9,7 @@ import java.util.*;
 
 import tee.binding.Calculation;
 import tee.binding.task.Task;
+
 /**
  * @author User
  */
@@ -16,10 +18,12 @@ public class Numeric extends It<Double> {
 	private It<String> _string = null;
 	//private Numeric me = this;
 	private Numeric _otherwise = null;
+
 	public Numeric() {
 		super();
 		this.value(0);
 	}
+
 	/**
 	 * @param s
 	 * @return
@@ -39,6 +43,7 @@ public class Numeric extends It<Double> {
 		}
 		return dd;
 	}
+
 	/**
 	 * @param a
 	 */
@@ -86,6 +91,7 @@ public class Numeric extends It<Double> {
 		temperature.value(20);
 		System.out.println(description.value());
 	}
+
 	@Override
 	protected void adjust() {
 		if (null == this._value) {
@@ -98,15 +104,18 @@ public class Numeric extends It<Double> {
 			this._value = Double.MAX_VALUE;
 		}
 	}
+
 	@Override
 	public Numeric value(Double newValue) {
 		super.value(newValue);
 		return this;
 	}
+
 	public Numeric value(Float newValue) {
 		super.value(newValue.doubleValue());
 		return this;
 	}
+
 	/**
 	 * @param newValue
 	 * @return
@@ -115,6 +124,7 @@ public class Numeric extends It<Double> {
 		super.value(newValue.doubleValue());
 		return this;
 	}
+
 	public Numeric read() {
 		final Numeric r = new Numeric().value(value());
 		final Numeric watcher = new Numeric().bind(this);
@@ -132,6 +142,7 @@ public class Numeric extends It<Double> {
 		});
 		return r;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -140,11 +151,13 @@ public class Numeric extends It<Double> {
 		super.bind(it);
 		return this;
 	}
+
 	@Override
 	public Numeric bind(It<Double> it) {
 		super.bind(it);
 		return this;
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -153,6 +166,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return plus(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -161,16 +175,19 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return plus(n);
 	}
+
 	@Override
 	public Numeric afterChange(Task newValue) {
 		super.afterChange(newValue);
 		return this;
 	}
+
 	@Override
 	public Numeric afterChange(Task newValue, boolean dontFire) {
 		super.afterChange(newValue, dontFire);
 		return this;
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -179,6 +196,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().bind(value);
 		return plus(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -196,6 +214,7 @@ public class Numeric extends It<Double> {
 				}
 				return second().value() - fvalue.value();
 			}
+
 			@Override
 			public Double calculateSecond() {
 				if (first() == null) {
@@ -215,6 +234,7 @@ public class Numeric extends It<Double> {
 		});
 		return new Numeric().bind(clc.second());
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -223,6 +243,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return multiply(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -231,6 +252,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return multiply(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -239,6 +261,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().bind(value);
 		return multiply(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -259,6 +282,7 @@ public class Numeric extends It<Double> {
 				}
 				return second().value() / fvalue.value();
 			}
+
 			@Override
 			public Double calculateSecond() {
 				if (first() == null) {
@@ -278,6 +302,7 @@ public class Numeric extends It<Double> {
 		});
 		return new Numeric().bind(clc.second());
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -286,6 +311,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return divide(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -294,6 +320,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return divide(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -302,6 +329,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().bind(value);
 		return divide(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -319,6 +347,7 @@ public class Numeric extends It<Double> {
 				}
 				return second().value() * fvalue.value();
 			}
+
 			@Override
 			public Double calculateSecond() {
 				if (first() == null) {
@@ -341,6 +370,7 @@ public class Numeric extends It<Double> {
 		}).bind(fvalue);
 		return new Numeric().bind(clc.second());
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -349,6 +379,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return minus(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -357,6 +388,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().value(value);
 		return minus(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -365,6 +397,7 @@ public class Numeric extends It<Double> {
 		Numeric n = new Numeric().bind(value);
 		return minus(n);
 	}
+
 	/**
 	 * @param value
 	 * @return
@@ -382,6 +415,7 @@ public class Numeric extends It<Double> {
 				}
 				return second().value() + fvalue.value();
 			}
+
 			@Override
 			public Double calculateSecond() {
 				if (first() == null) {
@@ -401,6 +435,7 @@ public class Numeric extends It<Double> {
 		});
 		return new Numeric().bind(clc.second());
 	}
+
 	/**
 	 * @param bb
 	 * @return
@@ -422,6 +457,7 @@ public class Numeric extends It<Double> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param bb
 	 * @return
@@ -445,6 +481,7 @@ public class Numeric extends It<Double> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param bb
 	 * @return
@@ -468,6 +505,7 @@ public class Numeric extends It<Double> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param bb
 	 * @return
@@ -491,6 +529,7 @@ public class Numeric extends It<Double> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param bb
 	 * @return
@@ -514,6 +553,7 @@ public class Numeric extends It<Double> {
 		});
 		return retvalue;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -521,6 +561,7 @@ public class Numeric extends It<Double> {
 	public Toggle equals(double it) {
 		return same(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -529,6 +570,7 @@ public class Numeric extends It<Double> {
 		//return new Toggle().less(this, it);
 		return less(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -536,6 +578,7 @@ public class Numeric extends It<Double> {
 	public Toggle more(double it) {
 		return more(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -543,6 +586,7 @@ public class Numeric extends It<Double> {
 	public Toggle moreOrEquals(double it) {
 		return moreOrEquals(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -550,6 +594,7 @@ public class Numeric extends It<Double> {
 	public Toggle lessOrEquals(double it) {
 		return lessOrEquals(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -558,6 +603,7 @@ public class Numeric extends It<Double> {
 		//return new Toggle().equals(this, it);
 		return same(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -566,6 +612,7 @@ public class Numeric extends It<Double> {
 		//return new Toggle().less(this, it);
 		return less(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -574,6 +621,7 @@ public class Numeric extends It<Double> {
 		//return new Toggle().more(this, it);
 		return more(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -582,6 +630,7 @@ public class Numeric extends It<Double> {
 		//return new Toggle().moreOrEquals(this, it);
 		return moreOrEquals(new Numeric().value(it));
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -590,15 +639,18 @@ public class Numeric extends It<Double> {
 		//return new Toggle().lessOrEquals(this, it);
 		return lessOrEquals(new Numeric().value(it));
 	}
+
 	/**
 	 * @return
 	 */
 	public Note asNote() {
 		return asNote("");
 	}
+
 	public Note asNote(String format) {
 		return new Note().bind(asString(format));
 	}
+
 	public It<String> asString() {
 		return asString("");
 	}
@@ -606,6 +658,7 @@ public class Numeric extends It<Double> {
 	 public static Fork<Double> iF(Toggle it) {
      return new Fork<Double>().condition(it);
      }*/
+
 	/**
 	 * @return
 	 */
@@ -619,8 +672,7 @@ public class Numeric extends It<Double> {
 					if (_string != null) {
 						if (_string.value() == null || _string.value().length() < 1) {
 							me.value(0);
-						}
-						else {
+						} else {
 							//try {
 							me.value(string2double(_string.value()));
 							//} catch (Throwable t) {
@@ -642,6 +694,7 @@ public class Numeric extends It<Double> {
 		}
 		return _string;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -656,8 +709,7 @@ public class Numeric extends It<Double> {
 				if (it.value()) {
 					when.unbind(when._otherwise);
 					when.bind(me);
-				}
-				else {
+				} else {
 					if (when._otherwise == null) {
 						when._otherwise = new Numeric();
 					}
@@ -668,6 +720,7 @@ public class Numeric extends It<Double> {
 		});
 		return when;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -679,6 +732,7 @@ public class Numeric extends It<Double> {
 		_otherwise.bind(it);
 		return this;
 	}
+
 	/**
 	 * @param it
 	 * @return
@@ -690,6 +744,7 @@ public class Numeric extends It<Double> {
 		_otherwise.value(it);
 		return this;
 	}
+
 	/**
 	 * @param it
 	 * @return

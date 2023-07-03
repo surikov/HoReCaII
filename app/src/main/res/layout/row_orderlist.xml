@@ -1,51 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/row"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:weightSum="1" >
+	android:id="@+id/row"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:weightSum="1">
 
-    <TextView
-        android:id="@+id/row_order_date"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_marginLeft="7dip"
-        android:layout_weight=".1" />
+	<TextView
+		android:id="@+id/row_order_date"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_marginLeft="7dip"
+		android:layout_weight=".1" />
 
-    <TextView
-        android:id="@+id/row_order_number"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight=".1" />
+	<TextView
+		android:id="@+id/row_order_number"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight=".1" />
 
-    <TextView
-        android:id="@+id/row_order_kontragent"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight=".25" />
+	<TextView
+		android:id="@+id/row_order_kontragent"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight=".25" />
 
-    <TextView
-        android:id="@+id/row_order_type_payment"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight=".12" />
+	<TextView
+		android:id="@+id/row_order_type_payment"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight=".12" />
 
-    <TextView
-        android:id="@+id/row_order_document_summ"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight=".08" />
+	<TextView
+		android:id="@+id/row_order_document_summ"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight=".08" />
 
-    <TextView
-        android:id="@+id/row_order_date_shipment"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight=".1" />
+	<TextView
+		android:id="@+id/row_order_date_shipment"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight=".1" />
 
-    <TextView
-        android:id="@+id/row_order_comments"
-        android:layout_width="0px" android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_weight=".25" />
+	<TextView
+		android:id="@+id/row_order_comments"
+		android:layout_width="0px"
+		android:layout_height="wrap_content"
+		android:layout_gravity="left|center_vertical"
+		android:layout_weight=".25" />
 
 </LinearLayout>

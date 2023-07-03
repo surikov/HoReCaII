@@ -155,6 +155,48 @@ public class EditOrderViaWeb {
 		});
 	}
 
+	void promptForceApprove() {
+		Auxiliary.pickConfirm(context, "Провести без ограничений на наценку", "Провести", new Task() {
+			@Override
+			public void doTask() {
+				sendForceApprove();
+			}
+		});
+	}
+
+	void sendForceApprove() {
+		final Note result = new Note().value("Проведение заказа:");
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ZakaziPokupatelya/ProvestiPoNacenke/" + documentNumber
+				+ "/" + Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyMMdd")
+				+ "/" + Cfg.whoCheckListOwner();
+		System.out.println("sendForceApprove " + url);
+		Task sendTask = new Task() {
+			@Override
+			public void doTask() {
+				try {
+					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String msg = new String(bytes, "UTF-8");
+					//String txt = Auxiliary.parseChildOrRaw(msg, "Message");
+					result.value(result.value() + "\n" + msg);
+					me.preReport.writeCurrentPage();
+				} catch (Throwable t) {
+					t.printStackTrace();
+					result.value(result.value() + "\n" + t.getMessage());
+				}
+			}
+		};
+		Task afterSend = new Task() {
+			@Override
+			public void doTask() {
+				Auxiliary.warn(result.value(), context);
+				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
+			}
+		};
+		Expect expect = new Expect().status.is("Подождите").task.is(sendTask).afterDone.is(afterSend);
+		expect.start(context);
+	}
+
 	void openSchetNaOplatu() {
 		System.out.println("openSchetNaOplatu " + documentNumber);
 		ReportPechatSchetaNaOplatu.tempInitKind = 0;
@@ -177,6 +219,7 @@ public class EditOrderViaWeb {
 						, "Повторить заказ"//
 						, "Сменить контрагента в заказе"//
 						, "Удаление мелких заказов"//
+						, "Провести (для РД)"//
 				}, nn//
 				, hrc + ": №" + documentNumber //+ "/" + documentDate
 						+ ", отгрузка " + shipDate//
@@ -219,6 +262,11 @@ public class EditOrderViaWeb {
 						if (nn.value().intValue() == 10) {
 							promptUdalenieMelkihZakazov();
 						}
+						if (nn.value().intValue() == 11) {
+							promptForceApprove();
+						}
+
+
 					}
 				}, null, null, null, null);
 	}
@@ -248,7 +296,7 @@ public class EditOrderViaWeb {
 						txt = mm;
 					}
 					*/
-					String txt=Auxiliary.parseChildOrRaw(msg,"Message");
+					String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 					result.value(result.value() + "\n" + txt);
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
@@ -347,7 +395,7 @@ public class EditOrderViaWeb {
 				+ "	where dgvr.PometkaUdaleniya=x'00' "
 				+ "	and dgvr.vladelec=" + clientID
 				+ "	limit 100;";
-		System.out.println("promptDogovorTipOplaty "+sql);
+		System.out.println("promptDogovorTipOplaty " + sql);
 		bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		System.out.println(bb.dumpXML());
 		Vector<String> labels = new Vector<String>();
@@ -390,7 +438,7 @@ public class EditOrderViaWeb {
 				}
 			}
 		}
-		if(labels.size()>0) {
+		if (labels.size() > 0) {
 			final String[] list = new String[labels.size()];
 			labels.copyInto(list);
 			final Numeric idx = new Numeric().value(-1);
@@ -406,8 +454,8 @@ public class EditOrderViaWeb {
 					);
 				}
 			}, true);
-		}else{
-			Auxiliary.warn("Нет доступных договоров.",context);
+		} else {
+			Auxiliary.warn("Нет доступных договоров.", context);
 		}
 
 	}
@@ -728,7 +776,7 @@ public class EditOrderViaWeb {
 		}
 		RedactNumber cena = new RedactNumber(context);
 		cena.setEnabled(inf.min > 0 && inf.max > 0);
-		String kolichestvoLabel="Количество ("+inf.edizm+", мин. "+inf.minNorma+", в упаковке "+inf.koephphicient+")";
+		String kolichestvoLabel = "Количество (" + inf.edizm + ", мин. " + inf.minNorma + ", в упаковке " + inf.koephphicient + ")";
 		Auxiliary.pick(context, "", new SubLayoutless(context)//
 						.child(new Decor(context).labelText.is(description).labelStyleMediumNormal().left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 0.5)

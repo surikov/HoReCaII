@@ -50,6 +50,7 @@ public class ActivityMatricaKontragent extends Activity {
 	double dvuhnedel=0;
 	
 	Numeric planTysRub = new Numeric();
+	Numeric planSTM = new Numeric();
 	//Note tom1Name = new Note();
 	//Note tom2Name = new Note();
 	//Note tom3Name = new Note();
@@ -102,6 +103,7 @@ public class ActivityMatricaKontragent extends Activity {
 				+ ",m.tom3 as tom3"//
 				+ ",m.nacenka as nacenka"//
 				+ ",m.planTysRub as planTysRub"//
+				+ ",m.planSTM as planSTM"//
 				+ ",m.vrrab as vrrab"//
 				+ ",m.email as email"//
 				//+ ",m.upload as upload"//
@@ -143,6 +145,7 @@ public class ActivityMatricaKontragent extends Activity {
 		//tom3.value(Numeric.string2double(r.child("row").child("tom3").value.property.value()));
 		tomValue.value(r.child("row").child("tom1").value.property.value() + " / " + r.child("row").child("tom2").value.property.value() + " / " + r.child("row").child("tom3").value.property.value());
 		planTysRub.value(Numeric.string2double(r.child("row").child("planTysRub").value.property.value()));
+		planSTM.value(Numeric.string2double(r.child("row").child("planSTM").value.property.value()));
 		Date d = new Date();
 		d.setTime((long) Numeric.string2double(r.child("row").child("periodDeystvia").value.property.value()));
 		int p = d.getMonth();
@@ -312,13 +315,14 @@ public class ActivityMatricaKontragent extends Activity {
 		//layoutless.field(this, 11, tom2Name, new RedactNumber(this).number.is(tom2));
 		//layoutless.field(this, 12, tom3Name, new RedactNumber(this).number.is(tom3));
 		layoutless.field(this, 11, "план, тыс. руб", new RedactNumber(this).number.is(planTysRub));
+		layoutless.field(this, 12, "план СТМ, тыс. руб", new RedactNumber(this).number.is(planSTM));
 		//RedactNumber r= new RedactNumber(this).number.is(nacenka);
 		//r.setSelectAllOnFocus(true);
 		//layoutless.field(this, 12, "наценка, %", new RedactNumber(this).number.is(nacenka).selectAllOnFocus.is(true));
 		
 		
-		layoutless.field(this, 12, "время работы", new RedactText(this).text.is(vrrab).selectAllOnFocus.is(true));
-		layoutless.field(this, 13, "e-mail", new RedactText(this).text.is(email).selectAllOnFocus.is(true));
+		layoutless.field(this, 13, "время работы", new RedactText(this).text.is(vrrab).selectAllOnFocus.is(true));
+		layoutless.field(this, 14, "e-mail", new RedactText(this).text.is(email).selectAllOnFocus.is(true));
 		
 		
 		/*layoutless.field(this, 14, "", new Knob(this).labelText.is("Сохранить")).afterTap.is(new Task() {
@@ -333,7 +337,7 @@ public class ActivityMatricaKontragent extends Activity {
 				delete();
 			}
 		});*/
-		layoutless.innerHeight.is(0.8 * 15.2 * Auxiliary.tapSize);
+		layoutless.innerHeight.is(0.8 * 17 * Auxiliary.tapSize);
 	}
 	void save() {
 		DecimalFormat format = new DecimalFormat("##########");
@@ -369,7 +373,8 @@ public class ActivityMatricaKontragent extends Activity {
 				//+ "\n	,tom1=" + tom1.value()//	
 				//+ "\n	,tom2=" + tom2.value()//	
 				//+ "\n	,tom3=" + tom3.value()//	
-				+ "\n	,planTysRub=" + planTysRub.value()//	
+				+ "\n	,planTysRub=" + planTysRub.value()//
+				+ "\n	,planSTM=" + planSTM.value()//
 				+ "\n	where _id=" + _id//
 		;
 		//System.out.println("="+planTysRub.value());

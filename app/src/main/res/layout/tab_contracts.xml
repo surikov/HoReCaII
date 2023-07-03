@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="#E3E3E3" >
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="#E3E3E3">
 
-    <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
+		<LinearLayout
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
 
-            <include
-                android:id="@+id/list_header"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/header_contracts_0" />
+			<include
+				android:id="@+id/list_header"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				layout="@layout/header_contracts_0" />
 
-            <TableLayout
-                android:id="@+id/table_contracts_0"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+			<TableLayout
+				android:id="@+id/table_contracts_0"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" />
 
-            <include
-                android:id="@+id/list_header"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/header_contracts_1" />
+			<include
+				android:id="@+id/list_header"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				layout="@layout/header_contracts_1" />
 
-            <TableLayout
-                android:id="@+id/table_contracts_1"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
+			<TableLayout
+				android:id="@+id/table_contracts_1"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" />
 
-            <include
-                android:id="@+id/list_header"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                layout="@layout/header_contracts_2" />
+			<include
+				android:id="@+id/list_header"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				layout="@layout/header_contracts_2" />
 
-            <TableLayout
-                android:id="@+id/table_contracts_2"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
+			<TableLayout
+				android:id="@+id/table_contracts_2"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" />
+		</LinearLayout>
+	</ScrollView>
 
 </RelativeLayout>

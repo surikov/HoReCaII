@@ -40,8 +40,10 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 	int hourFifference = +3;//+4;
 	final static String uploaded = "да";
 	final static String notuploaded = "нет";
-	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");;
-	SimpleDateFormat to = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");;
+	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	;
+	SimpleDateFormat to = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+	;
 	public static boolean autoRefreshDone = false;
 
 	void startAutoRefresh() {
@@ -55,13 +57,13 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 					try {
 						publishProgress();
 						Thread.sleep(20 * 1000);
-					}
-					catch (Throwable t) {
+					} catch (Throwable t) {
 						t.printStackTrace();
 					}
 				}
 				return null;
 			}
+
 			@Override
 			protected void onProgressUpdate(Void... progress) {
 				OnDateChanged(mFromPeriod.getTime(), mToPeriod.getTime());
@@ -84,27 +86,32 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 				}				
 			}}).start(); */
 	}
+
 	void stopAutoRefresh() {
 		System.out.println("startAutoRefresh");
 		autoRefreshDone = true;
 	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		//startAutoRefresh();
 	}
+
 	@Override
 	protected void onPause() {
 		super.onPause();
 		//stopAutoRefresh();
 	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menuRefresh = menu.add("Обновить");
 		menuOtchety = menu.add("Отчёты");
-		menuResetUpload= menu.add("Повторить выгрузку");
+		menuResetUpload = menu.add("Повторить выгрузку");
 		return true;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item == menuOtchety) {
@@ -126,20 +133,22 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 		}
 		return true;
 	}
-	void promptResetUpload(){
-		Auxiliary.pickConfirm(this, "Пометить все точки как невыгруженные", "Да", new Task(){
+
+	void promptResetUpload() {
+		Auxiliary.pickConfirm(this, "Пометить все точки как невыгруженные", "Да", new Task() {
 
 			@Override
 			public void doTask() {
 				//String sql="update Vizits set upload=0;";
 				//mDB.execSQL(sql);
-				String sql="update GPSPoints set upload=0;";
+				String sql = "update GPSPoints set upload=0;";
 				mDB.execSQL(sql);
 				OnDateChanged(mFromPeriod.getTime(), mToPeriod.getTime());
 			}
-			
+
 		});
 	}
+
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.act_doc_gps_points);
 		super.onCreate(savedInstanceState);
@@ -150,6 +159,7 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 		mPointsList.setAdapter(mGPSPointstListAdapter);
 		mPointsList.setOnTouchListener(this);
 	}
+
 	private Cursor RequestGPSPoints(String dateFrom, String dateTo) {
 		System.out.println("RequestGPSPoints from " + dateFrom + " to " + dateTo);
 		String sql = "select _id,BeginDate,BeginTime,longitude,latitude,Upload from GPSPoints where date(BeginDate) >= '" //
@@ -158,6 +168,7 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 				+ "ORDER BY _id desc";
 		return mDB.rawQuery(sql, null);
 	}
+
 	@Override
 	protected void OnDateChanged(Date fromDate, Date toDate) {
 		//System.out.println("OnDateChanged from " + fromDate + " to " + toDate);
@@ -170,11 +181,13 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 		public GPSPointsListAdapter(Context context, Cursor cursor) {
 			super(context, cursor);
 		}
+
 		@Override
 		public void bindView(View row, Context context, Cursor cursor) {
 			GPSPointsHolder holder = (GPSPointsHolder) row.getTag();
 			holder.populateFrom(cursor);
 		}
+
 		@Override
 		public View newView(Context context, Cursor cursor, ViewGroup parent) {
 			LayoutInflater inflater = LayoutInflater.from(context);
@@ -196,6 +209,7 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 				shirota = (TextView) row.findViewById(R.id.row_shirota);
 				dolgota = (TextView) row.findViewById(R.id.row_dolgota);
 			}
+
 			void populateFrom(Cursor cursor) {
 				int upload = cursor.getInt(cursor.getColumnIndex(UPLOAD));
 				float rowTextFontSize = 17;//11;//getRowTextFontSize();
@@ -214,26 +228,22 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 					//System.out.println(now+" / "+pointDate);
 					if (now - pointDate < newMinutes * 60 * 1000L) {
 						transparency = TIME_NEW;
-					}
-					else {
+					} else {
 						if (now - pointDate < middleMinutes * 60 * 1000L) {
 							transparency = TIME_MIDDLE;
-						}
-						else {
+						} else {
 							transparency = TIME_OLD;
 						}
 					}
-				}
-				catch (Throwable t) {
+				} catch (Throwable t) {
 					t.printStackTrace();
 				}
 				int color = //uploadColor + 
-				transparency;
+						transparency;
 				//System.out.println("rowTextFontSize "+rowTextFontSize);
 				if (upload > 0) {
 					date.setText(uploaded);
-				}
-				else {
+				} else {
 					date.setText(notuploaded);
 				}
 				//date.setText(DateTimeHelper.UIDateString(DateTimeHelper.SQLDateToDate(cursor.getString(cursor.getColumnIndex(BEGIN_DATE)))));

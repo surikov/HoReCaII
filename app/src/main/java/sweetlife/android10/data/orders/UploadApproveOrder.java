@@ -8,6 +8,7 @@ import org.acra.ErrorReporter;
 import org.apache.http.HttpStatus;
 
 import tee.binding.*;
+
 import android.content.*;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -21,15 +22,15 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 	public final static int ThatDone_APPROVE = 1;
 	public final static int ThatDone_DROP = 2;
 	public final static int ThatDone_CHANGE = 3;
-	
+
 	public final static int ThatDone_MOVE_DATE = 5;//DateOtgruz
-	
-	
+
+
 	public final static int ThatDone_GET = -12345;
 	private SQLiteDatabase mDB;
 	//public static int SUCCESS = 0;
 	//public static int ERROR = 1;
-	private int TIMEOUT = 300*1000;
+	private int TIMEOUT = 300 * 1000;
 	int thatDone;
 	String docNumber;
 	String createDate;
@@ -44,9 +45,9 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 			, int thatDone//
 			, String mdocNumber//
 			, String mcreateDate//
-			
+
 			, String mshipDate//
-			,Bough mbody
+			, Bough mbody
 			, String mComment//
 	) {
 		super(progressDialogMessage, appContext);
@@ -55,24 +56,25 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		this.docNumber = mdocNumber;
 		this.createDate = reformat(mcreateDate);
 		this.shipDate = reformat(mshipDate);
-		cmnt=mComment;
-		this.body=mbody;
+		cmnt = mComment;
+		this.body = mbody;
 		//createDate = reformat(createDate);
 		//shipDate = reformat(shipDate);
 	}
+
 	String reformat(String d) {
 		//System.out.println("d was "+d);
 		try {
 			DateFormat from = new SimpleDateFormat("dd.MM.yyyy");
 			DateFormat to = new SimpleDateFormat("yyyy-MM-dd");
 			d = to.format(from.parse(d));
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			LogHelper.debug(this.getClass().getCanonicalName() + " reformat " + d + " " + t.getMessage());
 		}
 		//System.out.println("d now is "+d);
 		return d;
 	}
+
 	public String SerializeXMLThatDone_APPROVE() throws IllegalArgumentException, IllegalStateException, IOException {
 		Bough bough = new Bough().name.is("S:Envelope");
 		bough.child("xmlns:S").attribute.is(true).value.is("http://schemas.xmlsoap.org/soap/envelope/");
@@ -91,6 +93,7 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		String xml = sb.toString();
 		return xml;
 	}
+
 	public String SerializeXMLThatDone_DROP() throws IllegalArgumentException, IllegalStateException, IOException {
 		Bough bough = new Bough().name.is("S:Envelope");
 		bough.child("xmlns:S").attribute.is(true).value.is("http://schemas.xmlsoap.org/soap/envelope/");
@@ -109,8 +112,9 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		String xml = sb.toString();
 		return xml;
 	}
+
 	public String SerializeXMLThatDone_CHANGE() throws IllegalArgumentException, IllegalStateException, IOException {
-		
+
 		Bough bough = new Bough().name.is("S:Envelope");
 		bough.child("xmlns:S").attribute.is(true).value.is("http://schemas.xmlsoap.org/soap/envelope/");
 		bough.child("S:Body").child("Change").child("xmlns").attribute.is(true).value.is("http://ws.swl/ChangeOrders");
@@ -128,6 +132,7 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		String xml = sb.toString();
 		return xml;
 	}
+
 	public String SerializeXMLThatDone_GET() throws IllegalArgumentException, IllegalStateException, IOException {
 		Bough bough = new Bough().name.is("S:Envelope");
 		bough.child("xmlns:S").attribute.is(true).value.is("http://schemas.xmlsoap.org/soap/envelope/");
@@ -140,6 +145,7 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		String xml = sb.toString();
 		return xml;
 	}
+
 	public String SerializeXML() throws IllegalArgumentException, IllegalStateException, IOException {
 		if (thatDone == UploadApproveOrder.ThatDone_APPROVE) {
 			return SerializeXMLThatDone_APPROVE();
@@ -155,6 +161,7 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		}
 		return "";
 	}
+
 	@Override
 	protected String doInBackground(Object... params) {
 		String ret = "";
@@ -164,8 +171,7 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		try {
 			requestString = SerializeXML();
 			//LogHelper.debug(this.getClass().getCanonicalName() + " requestString is " + requestString);
-		}
-		catch (IOException e1) {
+		} catch (IOException e1) {
 			ErrorReporter.getInstance().putCustomData("handled", "serialize except");
 			ErrorReporter.getInstance().handleSilentException(e1);
 			return e1.getMessage();
@@ -184,8 +190,7 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 					ErrorReporter.getInstance().handleSilentException(null);
 					return "Contracts != SC_OK ";
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				ErrorReporter.getInstance().putCustomData("handled", "execute except");
 				ErrorReporter.getInstance().handleSilentException(e);
 				return e.getMessage();
@@ -198,14 +203,12 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 				Bough bough = Bough.parseXML(responseString);
 				if (thatDone == UploadApproveOrder.ThatDone_GET) {
 
-					ret=responseString;
+					ret = responseString;
 					//UIHelper.MsgBox("Interactive", xml , context);
-				}
-				else {
+				} else {
 					ret = bough.child("soap:Body").child("m:ChangeResponse").child("m:return").value.property.value();
 				}
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				ErrorReporter.getInstance().putCustomData("handled", "parse except");
 				ErrorReporter.getInstance().handleSilentException(e);
 				return e.getMessage();
@@ -213,14 +216,16 @@ public class UploadApproveOrder extends ManagedAsyncTask<String> {
 		}
 		return ret;
 	}
+
 	@Override
 	protected void onPostExecute(String result) {
-		
+
 		//LogHelper.debug(this.getClass().getCanonicalName() + " result is " + result);
 		Bundle resultData = new Bundle();
 		resultData.putString(RESULT_STRING, result);
 		mTaskListener.onComplete(resultData);
 	}
+
 	@Override
 	public String getProgressMessage() {
 		return mProgressDialogMessage;

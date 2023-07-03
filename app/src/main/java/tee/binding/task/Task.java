@@ -6,21 +6,21 @@ package tee.binding.task;
  */
 public abstract class Task {
 
-    /**
-     *
-     */
-    private boolean lock = false;
+	/**
+	 *
+	 */
+	private boolean lock = false;
 
-    public void start() {
-        if (!lock) {
-            lock = true;
-            doTask();
-            lock = false;
-        }
-    }
+	public void start() {
+		if (!lock) {
+			lock = true;
+			doTask();
+			lock = false;
+		}
+	}
 
-    /**
-     *
-     */
-    public abstract void doTask();
+	/**
+	 *
+	 */
+	public abstract void doTask();
 }

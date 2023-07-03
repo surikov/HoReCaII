@@ -1,6 +1,7 @@
 package reactive.ui;
 
 import tee.binding.properties.*;
+
 import android.view.*;
 import android.app.Activity;
 import android.content.*;
@@ -12,6 +13,7 @@ import android.widget.*;
 
 import java.io.File;
 import java.util.*;
+
 import tee.binding.task.*;
 import tee.binding.it.*;
 
@@ -33,12 +35,15 @@ public class SQLiteGrid extends SubLayoutless {
 	public SQLiteGrid(Context context) {
 		super(context);
 	}
+
 	public SQLiteGrid(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
+
 	public SQLiteGrid(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
+
 	@Override
 	protected void init() {
 		super.init();
@@ -66,16 +71,17 @@ public class SQLiteGrid extends SubLayoutless {
 			rowHeight = new NumericProperty<SQLiteGrid>(this);
 			rowHeight.is(Auxiliary.tapSize);
 			tableLayout = new TableLayout(this.getContext());
-			
+
 			scrollView = new ScrollView(this.getContext()) {
 				@Override
 				public boolean onTouchEvent(MotionEvent event) {
 					System.out.println("onTouchEvent " + event);
 					return super.onTouchEvent(event);
 				}
+
 				@Override
 				protected void onScrollChanged(int left, int top, int oldLeft, int oldTop) {
-					System.out.println("onScrollChanged " + left+", "+top+" / "+oldLeft+", "+oldTop);
+					System.out.println("onScrollChanged " + left + ", " + top + " / " + oldLeft + ", " + oldTop);
 					super.onScrollChanged(left, top, oldLeft, oldTop);
 				}
 			};
@@ -102,6 +108,7 @@ public class SQLiteGrid extends SubLayoutless {
 			header.shiftX.property.bind(footer.shiftX.property);
 		}
 	}
+
 	public SQLiteGrid columns(SQLiteGridColumn[] indata) {
 		columns = indata;
 		if (columns.length < 1) {
@@ -129,6 +136,7 @@ public class SQLiteGrid extends SubLayoutless {
 		footer.innerWidth.is(left);
 		return this;
 	}
+
 	private void reFitGrid() {
 		int left = 0;
 		//if (alignCenter.property.value()) {

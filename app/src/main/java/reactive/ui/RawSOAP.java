@@ -38,7 +38,7 @@ public class RawSOAP {
 	public ItProperty<RawSOAP, Task> afterSuccess = new ItProperty<RawSOAP, Task>(this);
 	public ItProperty<RawSOAP, Task> afterError = new ItProperty<RawSOAP, Task>(this);
 	public ItProperty<RawSOAP, Throwable> exception = new ItProperty<RawSOAP, Throwable>(this);
-	public Bough data=null;
+	public Bough data = null;
 	public String rawResponse = null;
 
 	public RawSOAP() {
@@ -120,8 +120,8 @@ public class RawSOAP {
 		return buffer.toString();
 	}
 */
-	public void startNow(String login,String password) {
-		System.out.println("startNow "+url.property.value()+": "+login+"/"+password);
+	public void startNow(String login, String password) {
+		System.out.println("startNow " + url.property.value() + ": " + login + "/" + password);
 		HttpURLConnection httpURLConnection = null;
 		try {
 			statusCode.is(-2);
@@ -136,7 +136,7 @@ public class RawSOAP {
 			httpURLConnection.setChunkedStreamingMode(0);
 			httpURLConnection.setRequestProperty("charset", requestEncoding.property.value());
 
-			if(login!=null && password!=null) {
+			if (login != null && password != null) {
 				String userCredentials = login + ":" + password;
 				String basicAuth = "Basic " + new String(Base64.encode(userCredentials.getBytes(), Base64.DEFAULT));
 				httpURLConnection.setRequestProperty("Authorization", basicAuth);
@@ -161,7 +161,7 @@ public class RawSOAP {
 			//request.setEntity(stringEntity);
 			statusCode.is(-3);
 			//HttpResponse httpResponse = client.execute(request);
-			OutputStream outputStream=httpURLConnection.getOutputStream();
+			OutputStream outputStream = httpURLConnection.getOutputStream();
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
 			//httpURLConnection.connect();
 			bufferedOutputStream.write(xml.property.value().getBytes(requestEncoding.property.value()));
@@ -174,7 +174,7 @@ public class RawSOAP {
 			//statusDescription.is(httpResponse.getStatusLine().getReasonPhrase());
 			//HttpEntity entity = httpResponse.getEntity();
 			//rawResponse = entity2String(entity, responseEncoding.property.value());
-			InputStream inputStream=httpURLConnection.getInputStream();
+			InputStream inputStream = httpURLConnection.getInputStream();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 
 			byte[] bytes = new byte[1024];
@@ -194,11 +194,11 @@ public class RawSOAP {
 		} catch (Throwable t) {
 			exception.is(t);
 			t.printStackTrace();
-			if(httpURLConnection!=null) {
+			if (httpURLConnection != null) {
 				try {
 					responseCode.is(httpURLConnection.getResponseCode());
 					statusCode.is(httpURLConnection.getResponseCode());
-				}catch (Throwable tt){
+				} catch (Throwable tt) {
 					//
 				}
 			}
@@ -208,14 +208,14 @@ public class RawSOAP {
 		//System.out.println("startNow done");
 	}
 
-	public void startLater(Context context, String alert,final String login,final String password) {
+	public void startLater(Context context, String alert, final String login, final String password) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(alert);
 		final AlertDialog dialog = builder.show();
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... r) {
-				startNow( login, password);
+				startNow(login, password);
 				return null;
 			}
 

@@ -17,25 +17,28 @@ public class LogHandler extends Handler {
 	public LogHandler(SQLiteDatabase db) {
 		mDB = db;
 	}
+
 	@Override
 	public void close() {
 	}
+
 	@Override
 	public void flush() {
 	}
+
 	public static void cleanUpDebugLog() {
 		//System.out.println("cleanUpDebugLog");
 		try {
 			Calendar now = Calendar.getInstance();
 			now.add(Calendar.DAY_OF_MONTH, -1);
-			mDB.delete(LoggingOpenHelper.LOG_DEBUG_TABLE_NAME, "dateadded<?", new String[] { DateTimeHelper.SQLDateTimeString(now.getTime()) });
+			mDB.delete(LoggingOpenHelper.LOG_DEBUG_TABLE_NAME, "dateadded<?", new String[]{DateTimeHelper.SQLDateTimeString(now.getTime())});
 			//WriteDebugRecord(mDB, "cleanUpDebugLog before " + now);
-			LogHelper.debug( "cleanUpDebugLog before " + now.getTime());
-		}
-		catch (Throwable t) {
+			LogHelper.debug("cleanUpDebugLog before " + now.getTime());
+		} catch (Throwable t) {
 			System.out.println("cleanUpDebugLog " + t.getMessage());
 		}
 	}
+
 	//функция записи логов
 	@Override
 	public void publish(LogRecord record) {
@@ -49,6 +52,7 @@ public class LogHandler extends Handler {
 			}
 		}
 	}
+
 	//функция записи логов
 	public static void WriteLogRecord(SQLiteDatabase logDB, LogMessage message) {
 		if (logDB == null) {
@@ -87,6 +91,7 @@ public class LogHandler extends Handler {
 			return;
 		}
 	}
+
 	public static void WriteDebugRecord(SQLiteDatabase logDB, String message) {
 		//формируем дату в формате базы данных
 		String date = DateTimeHelper.DateToSQLTimestamp(Calendar.getInstance().getTime()).toString();

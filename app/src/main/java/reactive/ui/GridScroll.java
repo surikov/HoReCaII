@@ -105,10 +105,11 @@ public class GridScroll extends ScrollView {
 			refreshScroll(top);
 		}
 	}
+
 	@Override
 	public void scrollTo(int x, int y) {
 		//System.err.println("scrollTo "+x+"/"+y+"/"+getChildCount());
-		super.scrollTo(x,y);
+		super.scrollTo(x, y);
 
 	}
 

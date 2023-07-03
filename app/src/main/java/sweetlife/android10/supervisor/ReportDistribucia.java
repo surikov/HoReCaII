@@ -194,12 +194,13 @@ public class ReportDistribucia extends Report_Base {
 			propertiesForm = new SubLayoutless(context);
 
 			RedactMultiChoice terr = new RedactMultiChoice(context);
-			RedactSingleChoice kontragent = new RedactSingleChoice(context);
+			RedactFilteredSingleChoice kontragent = new RedactFilteredSingleChoice(context);
 
 			kontragent.selection.is(whoPlus1);
 			kontragent.item("[Все контрагенты]");
 			for (int i = 0; i < Cfg.kontragenty().children.size(); i++) {
-				kontragent.item(Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
+				kontragent.item(Cfg.kontragenty().children.get(i).child("kod").value.property.value()
+				+": "+Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
 			}
 			terr.selection.bind(territories);
 			//terr.selection.is(territory);
@@ -213,7 +214,7 @@ public class ReportDistribucia extends Report_Base {
 					.input(context, 1, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(dateFrom).format.is("dd.MM.yyyy"))//
 					.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateTo).format.is("dd.MM.yyyy"))//
 					.input(context, 3, Auxiliary.tapSize * 0.3, "Контрагент", kontragent)//
-					.tallInput(context, 4, Auxiliary.tapSize * 0.3, new Note().value("Территория"), terr, new Numeric().value(5 * Auxiliary.tapSize))//
+					.input(context, 4, Auxiliary.tapSize * 0.3, new Note().value("Территория"), terr, new Numeric().value(5 * Auxiliary.tapSize))//
 			;
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("На сегодня")//

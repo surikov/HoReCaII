@@ -8,6 +8,7 @@ import sweetlife.android10.consts.ITableColumnsNames;
 import sweetlife.android10.data.common.Sales;
 import sweetlife.android10.database.ISklady;
 import sweetlife.android10.supervisor.Cfg;
+import sweetlife.android10.ui.Activity_NomenclatureNew;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.utils.Hex;
@@ -886,7 +887,12 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			, String ingredientKluch
 			, String flagmanTovarSegmentKod
 	) {
+
 		refreshTovariGeroiDay(dataOtgruzki);
+
+
+
+
 		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
 		if (Cfg.selectedOrDbHRC().equals("hrc00")) {
 			polzovatelID = "x'00'";
@@ -1161,6 +1167,8 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n  	,n5.minCena as n5minCena ";
 		sql = sql + "\n  	,atricle_count.artikul as artCount ";
 		sql = sql + "\n 	,'' || Prodazhi.kolichestvo || n.skladEdIzm as lastSellCount ";
+		sql = sql + "\n  	,stars.artikul as stars_artikul ";
+
 		sql = sql + "\n	from Nomenklatura_sorted n ";
 		sql = sql + "\n 	cross join Consts const ";
 		sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
@@ -1324,6 +1332,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			sql = sql + "\n  		left join ReceptiiProducty reprod on n.product=reprod.product and reprod.Kluch='" + ingredientKluch + "' and reprod._idrref=X'" + ingredientIdrref + "'";
 		}
 		sql = sql + "\n  		left join atricle_count on atricle_count.artikul=n.artikul";
+		sql = sql + "\n  		left join stars on stars.artikul=n.artikul";
 		String poisk = "";
 		if (poiskovoeSlovo == null) poiskovoeSlovo = "";
 		if (poiskovoeSlovo.trim().length() > 0) {
@@ -1415,6 +1424,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		}
 		if (ingredientIdrref != null) {
 			sql = sql + "\n and reprod.product is not null";
+		}
+		if(Activity_NomenclatureNew.filterByStar.value()){
+			sql = sql + "\n and stars.artikul=n.artikul";
 		}
 		sql = sql + "\n limit " + limit + " offset " + offset;
 		//System.out.println("poisk "+tipPoiska +"/"+ ISearchBy.SEARCH_HERO+"/"+poisk);

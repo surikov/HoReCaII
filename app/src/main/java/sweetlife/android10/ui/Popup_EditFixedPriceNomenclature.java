@@ -3,6 +3,7 @@ package sweetlife.android10.ui;
 import sweetlife.android10.data.fixedprices.ZayavkaNaSkidki_TovaryPhiksCen;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.widgets.BetterPopupWindow;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -19,16 +20,16 @@ import sweetlife.android10.R;
 
 public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 
-	private EditText                      mEditForInput;
+	private EditText mEditForInput;
 
-	private EditText                      mEditPrice;
-	private EditText                      mEditTovarooborot;
+	private EditText mEditPrice;
+	private EditText mEditTovarooborot;
 
 	private ZayavkaNaSkidki_TovaryPhiksCen mTovar;
 
-	public Popup_EditFixedPriceNomenclature( View anchor, 
-			OnCloseListener closeListener, 
-			ZayavkaNaSkidki_TovaryPhiksCen tovar) {
+	public Popup_EditFixedPriceNomenclature(View anchor,
+											OnCloseListener closeListener,
+											ZayavkaNaSkidki_TovaryPhiksCen tovar) {
 
 		super(anchor, closeListener);
 
@@ -67,7 +68,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 	private void InitializeTovarooborot(View root) {
 
 		mEditTovarooborot = (EditText) root.findViewById(R.id.edit_tovarooborot);
-		mEditTovarooborot.setText( mTovar.getObyazatelstva() == 0 ? "" : DecimalFormatHelper.format(mTovar.getObyazatelstva()) );
+		mEditTovarooborot.setText(mTovar.getObyazatelstva() == 0 ? "" : DecimalFormatHelper.format(mTovar.getObyazatelstva()));
 		mEditTovarooborot.setTextColor(Color.LTGRAY);
 		//mEditTovarooborot.setBackgroundDrawable(anchor.getResources().getDrawable( R.drawable.editbox_normal));
 		mEditTovarooborot.setOnTouchListener(new OnTouchListener() {
@@ -101,7 +102,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 
 	private void setButtons(View root) {
 
-		Button btn1 = (Button)root.findViewById(R.id.btn_1);
+		Button btn1 = (Button) root.findViewById(R.id.btn_1);
 		btn1.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -110,7 +111,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn2 = (Button)root.findViewById(R.id.btn_2);
+		Button btn2 = (Button) root.findViewById(R.id.btn_2);
 		btn2.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -119,7 +120,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn3 = (Button)root.findViewById(R.id.btn_3);
+		Button btn3 = (Button) root.findViewById(R.id.btn_3);
 		btn3.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -128,7 +129,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn4 = (Button)root.findViewById(R.id.btn_4);
+		Button btn4 = (Button) root.findViewById(R.id.btn_4);
 		btn4.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -137,7 +138,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn5 = (Button)root.findViewById(R.id.btn_5);
+		Button btn5 = (Button) root.findViewById(R.id.btn_5);
 		btn5.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -146,7 +147,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn6 = (Button)root.findViewById(R.id.btn_6);
+		Button btn6 = (Button) root.findViewById(R.id.btn_6);
 		btn6.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -155,7 +156,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn7 = (Button)root.findViewById(R.id.btn_7);
+		Button btn7 = (Button) root.findViewById(R.id.btn_7);
 		btn7.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -164,7 +165,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn8 = (Button)root.findViewById(R.id.btn_8);
+		Button btn8 = (Button) root.findViewById(R.id.btn_8);
 		btn8.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -173,7 +174,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn9 = (Button)root.findViewById(R.id.btn_9);
+		Button btn9 = (Button) root.findViewById(R.id.btn_9);
 		btn9.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -182,7 +183,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btn0 = (Button)root.findViewById(R.id.btn_0);
+		Button btn0 = (Button) root.findViewById(R.id.btn_0);
 		btn0.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -191,37 +192,37 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		((Button)root.findViewById(R.id.btn_slash)).setEnabled(false);
+		((Button) root.findViewById(R.id.btn_slash)).setEnabled(false);
 
-		Button btnPoint = (Button)root.findViewById(R.id.btn_point);
+		Button btnPoint = (Button) root.findViewById(R.id.btn_point);
 		btnPoint.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 
-					String inputString = mEditForInput.getText().toString();
+				String inputString = mEditForInput.getText().toString();
 
-					if( !inputString.contains(".") ) {
+				if (!inputString.contains(".")) {
 
-						mEditForInput.setText(mEditForInput.getText().toString() + ".");
-					}
-			}
-		});
-
-		Button btnDel = (Button)root.findViewById(R.id.btn_del);
-		btnDel.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-
-				String searchString = mEditForInput.getText().toString();			
-
-				if( searchString.length() != 0 ) {
-
-					mEditForInput.setText(searchString.substring(0, searchString.length() -1 ));
+					mEditForInput.setText(mEditForInput.getText().toString() + ".");
 				}
 			}
 		});
 
-		Button btnClear = (Button)root.findViewById(R.id.btn_clear);
+		Button btnDel = (Button) root.findViewById(R.id.btn_del);
+		btnDel.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				String searchString = mEditForInput.getText().toString();
+
+				if (searchString.length() != 0) {
+
+					mEditForInput.setText(searchString.substring(0, searchString.length() - 1));
+				}
+			}
+		});
+
+		Button btnClear = (Button) root.findViewById(R.id.btn_clear);
 		btnClear.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -230,7 +231,7 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 			}
 		});
 
-		Button btnEnter = (Button)root.findViewById(R.id.btn_enter);
+		Button btnEnter = (Button) root.findViewById(R.id.btn_enter);
 		btnEnter.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -238,24 +239,24 @@ public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 				String text = mEditPrice.getText().toString();
 
 				double cena = 0;
-				if( text.length() != 0 ) {
+				if (text.length() != 0) {
 
 					cena = Double.parseDouble(text);
-					if( cena > 1000000 ) cena = 1000000;
+					if (cena > 1000000) cena = 1000000;
 				}
 				mTovar.setCena(cena);
 
 				text = mEditTovarooborot.getText().toString();
 
 				double tovarooborot = 0;
-				if( text.length() != 0 ) {
+				if (text.length() != 0) {
 
 					tovarooborot = Double.parseDouble(text);
-					if( tovarooborot > 1000000 ) tovarooborot = 1000000;
+					if (tovarooborot > 1000000) tovarooborot = 1000000;
 				}
 				mTovar.setObyazatelstva(tovarooborot);
-				
-				dismiss( 0 );
+
+				dismiss(0);
 			}
 		});
 	}

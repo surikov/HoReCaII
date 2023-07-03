@@ -3,6 +3,7 @@ package reactive.ui;
 import tee.binding.it.Numeric;
 import tee.binding.properties.*;
 import tee.binding.task.*;
+
 import android.graphics.*;
 import android.text.StaticLayout;
 import android.text.Layout.Alignment;
@@ -20,6 +21,7 @@ public class SketchLine extends Sketch {
 	private Path path = new Path();
 	private Vector<Numeric> xs = new Vector<Numeric>();
 	private Vector<Numeric> ys = new Vector<Numeric>();
+
 	//private boolean first = true;
 	//private Vector<Integer>xx=new Vector<Integer>();
 	//private Vector<Integer>yy=new Vector<Integer>();
@@ -49,6 +51,7 @@ public class SketchLine extends Sketch {
 			bm = null;
 		}*/
 	}
+
 	void resetPath() {
 		path = new Path();
 		if (xs.size() > 0) {
@@ -59,9 +62,11 @@ public class SketchLine extends Sketch {
 		}
 		//valid = false;
 	}
+
 	public SketchLine point(double x, double y) {
 		return point(new Numeric().value(x), new Numeric().value(y));
 	}
+
 	public SketchLine point(Numeric x, Numeric y) {
 		xs.add(new Numeric().bind(x).afterChange(new Task() {
 			@Override
@@ -78,7 +83,7 @@ public class SketchLine extends Sketch {
 			}
 		}, true));
 		resetPath();
-		
+
 		postInvalidate.start();
 		/*
 		if (first) {
@@ -93,9 +98,10 @@ public class SketchLine extends Sketch {
 		}*/
 		//xx.add(x);
 		//yy.add(y);
-		
+
 		return this;
 	}
+
 	public SketchLine() {
 		// paint.setAntiAlias(true);
 		paint.setAntiAlias(true);
@@ -124,6 +130,7 @@ public class SketchLine extends Sketch {
 		endX.property.afterChange(postInvalidate);
 		endY.property.afterChange(postInvalidate);*/
 	}
+
 	@Override
 	public void draw(Canvas canvas) {
 		/*canvas.drawLine(//
@@ -139,7 +146,7 @@ public class SketchLine extends Sketch {
 			canvas.drawBitmap(bm, src, dest, bmPaint);
 		}*/
 		canvas.drawPath(path, paint);
-		
+
 	}
 	/*void resetBM() {
 		if (valid) {

@@ -29,9 +29,10 @@ public class Activity_Pechati extends Activity {
 		setContentView(layoutless);
 		resetGUI();
 	}
+
 	void resetGUI() {
 		final RawSOAP rawSOAP = new RawSOAP();
-		rawSOAP.url.is(Settings.getInstance().getBaseURL()+"WebPechati.1cws");
+		rawSOAP.url.is(Settings.getInstance().getBaseURL() + "WebPechati.1cws");
 		rawSOAP.xml.is("<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
 				+ "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
 				+ "	<soap:Body>"//
@@ -41,25 +42,24 @@ public class Activity_Pechati extends Activity {
 				+ "		</Get>"//
 				+ "	</soap:Body>"//
 				+ "</soap:Envelope>");
-		System.out.println("url "+rawSOAP.url.property.value());
-		System.out.println("xml "+rawSOAP.xml.property.value());
+		System.out.println("url " + rawSOAP.url.property.value());
+		System.out.println("xml " + rawSOAP.xml.property.value());
 		new Expect().status.is("Поиск...").task.is(new Task() {
 			@Override
 			public void doTask() {
 				Report_Base.startPing();
-				
-				rawSOAP.startNow(Cfg.whoCheckListOwner(),Cfg.hrcPersonalPassword());
+
+				rawSOAP.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 			}
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				System.out.println("rawSOAP.exception.property.value() "+rawSOAP.exception.property.value());
-				System.out.println("rawSOAP.data.dumpXML() "+rawSOAP.data.dumpXML());
+				System.out.println("rawSOAP.exception.property.value() " + rawSOAP.exception.property.value());
+				System.out.println("rawSOAP.data.dumpXML() " + rawSOAP.data.dumpXML());
 				if (rawSOAP.exception.property.value() != null) {
 					Auxiliary.warn("Ошибка: " + rawSOAP.exception.property.value().getMessage(), Activity_Pechati.this);
 					rawSOAP.exception.property.value().printStackTrace();
-				}
-				else {
+				} else {
 					if (rawSOAP.statusCode.property.value() >= 100 && rawSOAP.statusCode.property.value() <= 300) {
 						//System.out.println(rawSOAP.data.dumpXML());
 						Vector<Bough> rez = rawSOAP.data.child("soap:Body")//
@@ -88,6 +88,7 @@ public class Activity_Pechati extends Activity {
 		})//
 				.start(this);
 	}
+
 	void addBitmap(Bitmap bm) {
 		int w = Auxiliary.screenWidth(this);
 		Decor decor = new Decor(this);

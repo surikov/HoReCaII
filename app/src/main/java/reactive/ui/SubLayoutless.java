@@ -9,9 +9,11 @@ import android.view.*;
 import android.widget.*;
 
 import java.util.*;
+
 import reactive.ui.*;
 
 import android.view.animation.*;
+
 import tee.binding.properties.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
@@ -40,12 +42,15 @@ public class SubLayoutless extends Layoutless {
 	public SubLayoutless(Context context) {
 		super(context);
 	}
+
 	public SubLayoutless(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
+
 	public SubLayoutless(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
+
 	/*@Override
 	protected void onMeasureX() {
 		//
@@ -56,6 +61,7 @@ public class SubLayoutless extends Layoutless {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		//System.out.println(this.getClass().getCanonicalName() + ".onMeasure done");
 	}
+
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		//System.out.println(this.getClass().getCanonicalName() + ".onSizeChanged "+w+"/"+ h+"/"+oldw+"/"+ oldh);
@@ -66,6 +72,7 @@ public class SubLayoutless extends Layoutless {
 				+ " at " + this.getLeft() + ":" + this.getTop()//
 		);*/
 	}
+
 	@Override
 	protected void init() {
 		super.init();
@@ -112,6 +119,7 @@ public class SubLayoutless extends Layoutless {
 			//System.out.println(this.getClass().getCanonicalName()+".now "+left.property.value());
 		}
 	}
+
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();

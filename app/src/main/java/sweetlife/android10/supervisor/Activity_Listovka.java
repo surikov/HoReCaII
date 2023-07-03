@@ -141,9 +141,9 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				try {
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String s = new String(b, "utf-8");
-					System.out.println(s);
+					System.out.println("GetBannerForTablet "+s);
 					Bough d = Bough.parseJSON("{row:" + s + "}");
-					System.out.println(d.dumpXML());
+					//System.out.println(d.dumpXML());
 					catData.children = d.children;
 				} catch (Throwable t) {
 					t.printStackTrace();
@@ -219,7 +219,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 			);
 			//System.out.println(sql);
 			final Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-			System.out.println(b.dumpXML());
+			//System.out.println(b.dumpXML());
 			for (int i = 0; i < b.children.size(); i++) {
 				Bough row = b.children.get(i);
 				cellRows.add(new ListCellInfo(
