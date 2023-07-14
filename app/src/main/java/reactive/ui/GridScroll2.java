@@ -62,12 +62,14 @@ public class GridScroll2 extends ScrollView {
 	@Override
 	protected void onScrollChanged(int left, int top, int oldLeft, int oldTop) {
 		super.onScrollChanged(left, top, oldLeft, oldTop);
+		//System.out.println(left+"/"+ top+"/"+ oldLeft+"/"+ oldTop);
 		if (grid.lockScroll) {
 			return;
 		} else {
 			refreshScroll(top);
 		}
 	}
+
 
 	/*@Override
 	public void scrollTo(int x, int y) {
@@ -77,7 +79,7 @@ public class GridScroll2 extends ScrollView {
 	}*/
 
 	public void refreshScroll(int top) {
-		System.out.println("refreshScroll "+top);
+		//System.out.println("refreshScroll "+top);
 		grid.progressBar.setVisibility(View.VISIBLE);
 		grid.lockScroll = true;
 		grid.progressBar.postInvalidate();

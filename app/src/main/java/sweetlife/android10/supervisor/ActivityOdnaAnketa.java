@@ -457,7 +457,7 @@ public class ActivityOdnaAnketa extends Activity {
 			//System.out.println("check '"+kon.child("kod").value.property.value()+"'");
 			if (kon.children.get(i).child("kod").value.property.value().equals(o)) {
 				GolovnoyKontragent.value(i + 1);
-				System.out.println("found GolovnoyKontragent " + i);
+				//System.out.println("found GolovnoyKontragent " + i);
 				break;
 			}
 		}

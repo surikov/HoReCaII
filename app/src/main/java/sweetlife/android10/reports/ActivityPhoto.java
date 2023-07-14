@@ -72,7 +72,7 @@ public class ActivityPhoto extends Activity {
 				if (bm == null) {
 					//System.out.println("no bitmap");
 				}else{
-					System.out.println("found " + bm.getWidth()+'x'+bm.getHeight());
+					//System.out.println("found " + bm.getWidth()+'x'+bm.getHeight());
 					double ww=layoutless.width().property.value()/2-Auxiliary.tapSize;
 					double hh=layoutless.height().property.value()-Auxiliary.tapSize;
 					double rw=ww/bm.getWidth();
@@ -83,9 +83,9 @@ public class ActivityPhoto extends Activity {
 						newW=bm.getWidth()*rw;
 						newH=bm.getHeight()*rw;
 					}
-					System.out.println("to " + ww+'x'+hh+" : "+rw+" / " + newW+'x'+newH);
+					//System.out.println("to " + ww+'x'+hh+" : "+rw+" / " + newW+'x'+newH);
 					bm=Bitmap.createScaledBitmap(bm, (int)newW, (int)newH, true);
-					System.out.println("now " + bm.getWidth()+'x'+bm.getHeight());
+					//System.out.println("now " + bm.getWidth()+'x'+bm.getHeight());
 					/*if(bm.getHeight()>layoutless.height().property.value()){
 						double r=0.7*layoutless.height().property.value()/bm.getHeight();
 						bm=Bitmap.createScaledBitmap(bm, (int)(bm.getWidth()*r), (int)(bm.getHeight()*r), true);

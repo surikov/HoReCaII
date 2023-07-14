@@ -239,6 +239,12 @@ public class DataGrid2 extends SubLayoutless {
 		}.execute();
 	}
 
+	public void scrollUp(){
+		lockScroll = true;
+		scrollView.scrollTo(0, 0);
+		lockScroll = false;
+	}
+
 	private void reFitGrid() {
 		int left = 0;
 		if (center.property.value()) {

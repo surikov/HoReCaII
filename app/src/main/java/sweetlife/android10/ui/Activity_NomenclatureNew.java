@@ -30,7 +30,7 @@ import tee.binding.it.*;
 
 public class Activity_NomenclatureNew extends Activity {
 	Layoutless layoutless;
-	int itemsMaxCount = 99;
+	int itemsMaxCount = 20;
 	static Numeric gridOffset = new Numeric();
 	static Numeric searchMode = new Numeric().value(1);
 	static Numeric searchKuhnya = new Numeric();
@@ -61,7 +61,7 @@ public class Activity_NomenclatureNew extends Activity {
 	Note summaZakaza = new Note().value("summaZakaza");
 	Task doRefreshData = new Task() {
 		public void doTask() {
-			System.out.println("doRefreshData mode "+mode.value());
+			System.out.println("doRefreshData mode " + mode.value());
 			if (mode.value() == ShowViewNomenklatura) {
 				refreshCategotyGrid();
 			} else {
@@ -75,6 +75,7 @@ public class Activity_NomenclatureNew extends Activity {
 			if (me == null) {
 				//
 			} else {
+				//System.out.println("now mode is " + mode.value());
 				gridOffset.value(0);
 				me.doRefreshData.start();
 			}
@@ -92,6 +93,7 @@ public class Activity_NomenclatureNew extends Activity {
 	static int color3 = 0x30000000;
 	static int color4 = 0x40000000;
 	static int color5 = 0x50000000;
+
 	Task createCategoryTapTask(final String p1, final String p2, final String p3, final String p4, final String p5) {
 		return new Task() {
 			public void doTask() {
@@ -105,11 +107,14 @@ public class Activity_NomenclatureNew extends Activity {
 			}
 		};
 	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		buildUI();
+		doRefreshData.start();
 	}
+
 	void buildUI() {
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
@@ -126,7 +131,7 @@ public class Activity_NomenclatureNew extends Activity {
 		layoutless.child(new Knob(this).labelText.is("Поиск").locked().is(mode.equals(ShowViewPoisk)).afterTap.is(new Task() {
 			@Override
 			public void doTask() {
-				System.out.println("knobViewPoisk");
+				//System.out.println("knobViewPoisk");
 				mode.value(ShowViewPoisk);
 			}
 		}).left().is(layoutless.width().property.multiply(0.0 / 3))//
@@ -134,7 +139,7 @@ public class Activity_NomenclatureNew extends Activity {
 		layoutless.child(new Knob(this).labelText.is("Номенклатура").locked().is(mode.equals(ShowViewNomenklatura)).afterTap.is(new Task() {
 			@Override
 			public void doTask() {
-				System.out.println("knobViewNomenklatura");
+				//System.out.println("knobViewNomenklatura");
 				mode.value(ShowViewNomenklatura);
 			}
 		}).left().is(layoutless.width().property.multiply(1.0 / 3))//
@@ -142,7 +147,7 @@ public class Activity_NomenclatureNew extends Activity {
 		layoutless.child(new Knob(this).labelText.is("История").locked().is(mode.equals(ShowViewIstoria)).afterTap.is(new Task() {
 			@Override
 			public void doTask() {
-				System.out.println("knobViewIstoria");
+				//System.out.println("knobViewIstoria");
 				mode.value(ShowViewIstoria);
 			}
 		}).left().is(layoutless.width().property.multiply(2.0 / 3))//
@@ -262,7 +267,9 @@ public class Activity_NomenclatureNew extends Activity {
 						.otherwise(new Numeric().bind(layoutless.height().property.minus(3 * Auxiliary.tapSize))))
 		);
 	}
+
 	void requeryGridData() {
+		System.out.println("requeryGridData mode " + mode.value());
 		if (mode.value() == ShowViewIstoria) {
 			String sql = Request_NomenclatureBase.composeSQLall(//
 					DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
@@ -352,7 +359,7 @@ public class Activity_NomenclatureNew extends Activity {
 	}
 
 	Intent SetActivityResult() {
-		System.out.println(this.getClass().getCanonicalName() + ": SetActivityResult");
+		//System.out.println(this.getClass().getCanonicalName() + ": SetActivityResult");
 		Intent resultIntent = new Intent();
 		String vidSkidki = Request_NomenclatureBase.calculateVidSkidki(
 				Numeric.string2double(selectedRow.child("Nacenka").value.property.value())
@@ -404,6 +411,7 @@ public class Activity_NomenclatureNew extends Activity {
 		resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.LAST_PRICE, Numeric.string2double(selectedRow.child("LastPrice").value.property.value()));
 		return resultIntent;
 	}
+
 	void openFoto() {
 		if (selectedRow == null) {
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
@@ -417,6 +425,7 @@ public class Activity_NomenclatureNew extends Activity {
 			Activity_NomenclatureNew.this.startActivity(intent);
 		}
 	}
+
 	void requestPriceNew() {
 		if (selectedRow != null) {
 			Vector<String> artikuls = new Vector<String>();
@@ -432,9 +441,11 @@ public class Activity_NomenclatureNew extends Activity {
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
 		}
 	}
+
 	void toggleStarFilter() {
 		filterByStar.value(!filterByStar.value());
 	}
+
 	void openCertificate() {
 		if (selectedRow == null) {
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
@@ -469,6 +480,7 @@ public class Activity_NomenclatureNew extends Activity {
 			expectRequery.start(Activity_NomenclatureNew.this);
 		}
 	}
+
 	void returnSelectedRow() {
 		if (selectedRow == null) {
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
@@ -480,6 +492,7 @@ public class Activity_NomenclatureNew extends Activity {
 			}
 		}
 	}
+
 	void toggleStart(String art, int rowNum) {
 		String nartart = art;
 		String sql = "select artikul as artikul from stars where artikul='" + art + "';";
@@ -492,6 +505,7 @@ public class Activity_NomenclatureNew extends Activity {
 		}
 		columnArtikul.cells.get(rowNum).labelText.is(nartart);
 	}
+
 	void flipGrid() {
 		selectedRow = null;
 		gridItems.clearColumns();
@@ -512,6 +526,14 @@ public class Activity_NomenclatureNew extends Activity {
 				, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 		};
 		if (itemsData != null) {
+			/*try{
+				System.out.println("start flipGrid");
+				int kk=0;
+				int mm=1/kk;
+				System.out.println("mm "+mm);
+			}catch(Throwable t){
+				t.printStackTrace();
+			}*/
 			for (int ii = 0; ii < itemsData.children.size(); ii++) {
 				final Bough row = itemsData.children.get(ii).createClone();
 				Task tap = new Task() {
@@ -601,25 +623,47 @@ public class Activity_NomenclatureNew extends Activity {
 									+ "/" + itemsData.children.get(ii).child("lastSellCount").value.property.value()
 					);
 				} else {
-					columnPosledniaya.cell(" ", tap);
+					columnPosledniaya.cell(" ", tap,"");
 				}
 			}
+			if (itemsData.children.size() < 10) {
+				for (int ii = 0; ii < 10 - itemsData.children.size(); ii++) {
+					columnArtikul.cell("");
+					columnNomenklatura.cell("");
+					columnProizvoditel.cell("");
+					columnMinKolichestvo.cell("","");
+					columnCena.cell("","");
+					columnSkidka.cell("","");
+					columnPosledniaya.cell("","");
+				}
+			}
+
+			//System.out.println("done flipGrid");
+			//highlightLastSelectedRow();
 		}
 	}
-	void highlightLastSelectedRow(){
+
+	void highlightLastSelectedRow() {
+		//System.out.println("highlightLastSelectedRow lastSelectedArtikul " + lastSelectedArtikul);
+		//gridItems.scrollUp();
 		for (int ii = 0; ii < itemsData.children.size(); ii++) {
 			Bough row = itemsData.children.get(ii).createClone();
 			String art = itemsData.children.get(ii).child("Artikul").value.property.value();
 			if (art.equals(lastSelectedArtikul)) {
+				//System.out.println("found " + ii);
 				gridItems.tapColumnRow(ii, 1);
-				break;
+
+				return;
 			}
 		}
+		//System.out.println("not found");
 	}
 
 	void resetItemsGrid() {
+		System.out.println("resetItemsGrid");
 		new Expect().status.is("Поиск...").task.is(new Task() {
 			public void doTask() {
+				//System.out.println("resetItemsGrid start");
 				requeryGridData();
 			}
 		}).afterDone.is(new Task() {
@@ -627,10 +671,14 @@ public class Activity_NomenclatureNew extends Activity {
 				flipGrid();
 				gridItems.refresh();
 				highlightLastSelectedRow();
+				//System.out.println("resetItemsGrid done offset " + gridOffset.value() + "/scroll " + gridItems.scrollView.getScrollY());
+
 			}
 		}).start(this);
 	}
+
 	void refreshCategotyGrid() {
+		System.out.println("refreshCategotyGrid");
 		gridCategoriesY = gridCategories.scrollView.getScrollY();
 		gridCategories.clearColumns();
 		String sql = "select cat1 as cat1,key1 as key1, cat2 as cat2,key2 as key2, cat3 as cat3,key3 as key3, cat4 as cat4,key4 as key4, cat5 as cat5,key5 as key5";
@@ -641,6 +689,8 @@ public class Activity_NomenclatureNew extends Activity {
 		if (level4.trim().length() > 0) sql = sql + "\n		or (rod5=x'" + level4 + "')";
 		sql = sql + "\n	order by cat1,cat2,cat3,cat4,cat5;";
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		System.out.println("sql: "+sql);
+		System.out.println("data: "+data.dumpXML());
 		String lastKey1 = "";
 		String lastKey2 = "";
 		String lastKey3 = "";
@@ -663,13 +713,17 @@ public class Activity_NomenclatureNew extends Activity {
 				columnCategories.cell(curCat1, color1, createCategoryTapTask(curKey1, "", "", "", ""));
 			} else {
 				if (curKey2.length() == 0) {
-					if (curKey1.toUpperCase().equals(level1.toUpperCase())) gridCategoriesY = Auxiliary.tapSize * rowCounter;
+					if (curKey1.toUpperCase().equals(level1.toUpperCase())) {
+						gridCategoriesY = Auxiliary.tapSize * rowCounter;
+					}
 					rowCounter++;
 					columnCategories.cell(curCat1, color1, createCategoryTapTask(curKey1, "", "", "", ""));
 				} else {
 					if (curKey3.length() == 0) {
 						if (!curKey1.equals(lastKey1)) {
-							if (curKey1.toUpperCase().equals(level1.toUpperCase())) gridCategoriesY = Auxiliary.tapSize * rowCounter;
+							if (curKey1.toUpperCase().equals(level1.toUpperCase())) {
+								gridCategoriesY = Auxiliary.tapSize * rowCounter;
+							}
 							rowCounter++;
 							columnCategories.cell(curCat1, color1);
 						}
@@ -682,7 +736,9 @@ public class Activity_NomenclatureNew extends Activity {
 								columnCategories.cell(curCat1, color1);
 							}
 							if (!curKey2.equals(lastKey2)) {
-								if (curKey2.toUpperCase().equals(level2.toUpperCase())) gridCategoriesY = Auxiliary.tapSize * rowCounter;
+								if (curKey2.toUpperCase().equals(level2.toUpperCase())) {
+									gridCategoriesY = Auxiliary.tapSize * rowCounter;
+								}
 								rowCounter++;
 								columnCategories.cell(curCat2, color2);
 							}
@@ -699,7 +755,9 @@ public class Activity_NomenclatureNew extends Activity {
 									columnCategories.cell(curCat2, color2);
 								}
 								if (!curKey3.equals(lastKey3)) {
-									if (curKey3.toUpperCase().equals(level3.toUpperCase())) gridCategoriesY = Auxiliary.tapSize * rowCounter;
+									if (curKey3.toUpperCase().equals(level3.toUpperCase())) {
+										gridCategoriesY = Auxiliary.tapSize * rowCounter;
+									}
 									rowCounter++;
 									columnCategories.cell(curCat3, color3);
 								}
@@ -719,7 +777,9 @@ public class Activity_NomenclatureNew extends Activity {
 									columnCategories.cell(curCat3, color3);
 								}
 								if (!curKey4.equals(lastKey4)) {
-									if (curKey4.toUpperCase().equals(level4.toUpperCase())) gridCategoriesY = Auxiliary.tapSize * rowCounter;
+									if (curKey4.toUpperCase().equals(level4.toUpperCase())) {
+										gridCategoriesY = Auxiliary.tapSize * rowCounter;
+									}
 									rowCounter++;
 									columnCategories.cell(curCat4, color4);
 								}
@@ -751,12 +811,14 @@ public class Activity_NomenclatureNew extends Activity {
 		}
 		gridOffset.value(newOffset);
 		filterByStar.value(false);
+		//System.out.println("onPause " + newOffset + "/" + gridOffset.value() + "/" + this.gridItems.scrollView.getScrollY());
+
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		me = this;
-		doRefreshData.start();
+		//doRefreshData.start();
 	}
 }

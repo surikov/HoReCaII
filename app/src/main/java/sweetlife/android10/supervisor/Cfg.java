@@ -645,7 +645,7 @@ public class Cfg {
 			;
 		}
 		territoriesCache = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		//System.out.println(sql);
+		System.out.println("fillTerritoriesCache "+sql);
 		//System.out.println(territoriesCache.dumpXML());
 		//System.out.println("done territoriesCache");
 	}
@@ -1222,7 +1222,7 @@ public class Cfg {
 		System.out.println("findCRGroup " + idrf + "/" + artikul);
 		for (int i = 0; i < crGroupCache.size(); i++) {
 			if (crGroupCache.get(i).equals(idrf) && crArtikulCache.get(i).equals(artikul)) {
-				System.out.println("found " + crCenaCache.get(i));
+				//System.out.println("found " + crCenaCache.get(i));
 				return crCenaCache.get(i).doubleValue();
 			}
 		}

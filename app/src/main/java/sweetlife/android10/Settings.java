@@ -39,9 +39,9 @@ public class Settings {
 	private static String _primaryURL = "https://service.swlife.ru";
 	//private static String _primaryURL = "https://testservice.swlife.ru";
 
-	private static String _secondaryURL = "http://95.79.111.216";//"http://89.109.7.162";
+	private static String _secondaryURL = "https://95.79.111.216";//"http://89.109.7.162";
 	private static String _primaryFileStoreURL = "https://androbmen.swlife.ru/";//android/Update2.xml";
-	private static String _secondaryFileStoreURL = "http://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
+	private static String _secondaryFileStoreURL = "https://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
 	public static boolean isPrimaryGate = true;
 	//http://89.109.7.162/androbmen/android/Update2.xml
 	//https://androbmen.swlife.ru/android/Update2.xml

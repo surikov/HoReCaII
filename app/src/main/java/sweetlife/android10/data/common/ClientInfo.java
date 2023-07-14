@@ -83,7 +83,11 @@ public class ClientInfo {
 
 		return mKod;
 	}
+/*
+	public String getSafeFileName() {
 
+		return mName.replace('"',' ').replace('\'',' ').replace('/',' ').replace('\\',' ');
+	}*/
 	public String getName() {
 
 		return mName;

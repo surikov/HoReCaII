@@ -30,12 +30,14 @@ import java.io.*;
 import reactive.ui.Layoutless;
 
 class ListCellInfo {
-	public ListCellInfo(String artikul, String name, String edizm, double price, double skidka) {
+	public ListCellInfo(String artikul, String name, String edizm, double price, double skidka,String datastart,String dataend) {
 		this.artikul = artikul;
 		this.name = name;
 		this.price = price;
 		this.edizm = edizm;
 		this.skidka = skidka;
+		this.datastart=datastart;
+		this.dataend=dataend;
 	}
 
 	String name = "";
@@ -43,6 +45,8 @@ class ListCellInfo {
 	String edizm = "";
 	double price = 0.0;
 	double skidka = 0.0;
+	String datastart="st";
+	String dataend="nd";
 }
 
 public class Activity_Listovka extends Activity implements ITableColumnsNames {
@@ -123,7 +127,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		this.setTitle("Газета (листовка)");
 		Preferences.init(this);
 		Bough b = Auxiliary.activityExatras(this);
-		System.out.println(b.dumpXML());
+		//System.out.println(b.dumpXML());
 		dataOtgruzki = b.child("dataOtgruzki").value.property.value();
 		clientID = b.child("clientID").value.property.value();
 		polzovatelID = b.child("polzovatelID").value.property.value();
@@ -141,7 +145,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				try {
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String s = new String(b, "utf-8");
-					System.out.println("GetBannerForTablet "+s);
+					//System.out.println("GetBannerForTablet "+s);
 					Bough d = Bough.parseJSON("{row:" + s + "}");
 					//System.out.println(d.dumpXML());
 					catData.children = d.children;
@@ -228,6 +232,8 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 						, row.child("EdinicyIzmereniyaNaimenovanie").value.property.value()
 						, Numeric.string2double(row.child("Cena").value.property.value())
 						, Numeric.string2double(row.child("CenaSoSkidkoy").value.property.value())
+						,row.child("datastart").value.property.value()
+						,row.child("dataend").value.property.value()
 
 				));
 			/*
@@ -263,14 +269,27 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 			double skidka=Math.round(cellRows.get(i).skidka);
 			double cena=Math.round(cellRows.get(i).price);
 			double ratio=Math.round(100*skidka/cena);
-			//System.out.println(cellRows.get(i).artikul+" - "+skidka+" / "+cena+" : "+ratio);
-			html = html + this.htmlCell(
-					cellRows.get(i).artikul
-					, "" + cellRows.get(i).price + "р. / " + cellRows.get(i).edizm
-					, "" + cellRows.get(i).skidka + "р. / " + cellRows.get(i).edizm
+			//System.out.println("cell: "+cellRows.get(i).artikul+": "+skidka+" / "+cena+": "+ratio);
+			if(skidka<0) {
+				html = html + this.htmlBannerCell(
+						cellRows.get(i).artikul
+						, "" + cellRows.get(i).price + "р. / " + cellRows.get(i).edizm
+						//, "" + cellRows.get(i).skidka + "р. / " + cellRows.get(i).edizm
 
-					//ratio+ " = " + skidka + " :  " + cena + " /" + sortMode
-					, cellRows.get(i).name);
+						//ratio+ " = " + skidka + " :  " + cena + " /" + sortMode
+						, cellRows.get(i).name
+				);
+			}else{
+				html = html + this.htmlCell(
+						cellRows.get(i).artikul
+						, "" + cellRows.get(i).price + "р. / " + cellRows.get(i).edizm
+						, "" + cellRows.get(i).skidka + "р. / " + cellRows.get(i).edizm
+
+						//ratio+ " = " + skidka + " :  " + cena + " /" + sortMode
+						, cellRows.get(i).name
+						, cellRows.get(i).dataend
+				);
+			}
 		}
 		return html;
 	}
@@ -321,7 +340,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 					, null
 			);
 			final Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-			System.out.println(b.dumpXML());
+			//System.out.println(b.dumpXML());
 			for (int i = 0; i < this.catData.children.size(); i++) {
 				if (this.catData.children.get(i).child("НомерДокумента").value.property.value().trim().equals(selectedCat.trim())) {
 					Vector<Bough> arts = this.catData.children.get(i).children("Товары");
@@ -346,7 +365,9 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 								, name
 								, edizm
 								, price
-								, skidka
+								, -1
+								,""
+								,""
 						));
 					}
 				}
@@ -544,6 +565,9 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				"		.priceNew{\n" +
 				"			color: #c36;\n" +
 				"		}\n" +
+				"		.priceBanner{\n" +
+				"			color: #66f;\n" +
+				"		}\n" +
 				"		a {\n" +
 				"		    color: #000;\n" +
 				"		}\n" +
@@ -599,7 +623,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		return html;
 	}
 
-	String htmlCell(String artikul, String old, String cena, String info) {
+	String htmlCell(String artikul, String old, String cena, String info,String dataend) {
 		String html = "\n		<a href='selectArtikul?art=" + artikul + "'>\n" +
 				"			<div class=\"oneCell\">\n" +
 				"				<div class='imgColumn'>\n" +
@@ -610,7 +634,27 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				"					<div class='artikulInfo'>" + info + "</div>\n" +
 				"					<div class='countCell'>\n" +
 				"						<div class='priceOld'>" + old + "</div>\n" +
-				"						<div class='priceNew'>" + cena + "</div>\n" +
+				//"						<div class='priceNew'>" + cena + "</div>\n" +
+				"						<div class='priceNew'>" + cena + "<br/>до "+Auxiliary.tryReFormatDate(dataend,"yyyy-MM-dd","dd.MM.yy")+"</div>\n" +
+				//"						<div class='buyCell'>- 8 +</div>\n" +
+				"					</div>\n" +
+				"				</div>\n" +
+				"			</div>\n" +
+				"		</a>";
+		return html;
+	}
+	String htmlBannerCell(String artikul, String old, String info) {
+		String html = "\n		<a href='selectArtikul?art=" + artikul + "'>\n" +
+				"			<div class=\"oneCell\">\n" +
+				"				<div class='imgColumn'>\n" +
+				//"					<img class='cellImg' src='http://89.109.7.162/GolovaNew/hs/Prilozhenie/ПревьюФотоНоменклатуры?Артикул=" + artikul + "' />\n" +
+				"					<img class='cellImg' src='https://files.swlife.ru/photo/" + artikul + ".jpg' />\n" +
+				"				</div>\n" +
+				"				<div class='infoColumn'>\n" +
+				"					<div class='artikulInfo'>" + info + "</div>\n" +
+				"					<div class='countCell'>\n" +
+				"						<div class='priceBanner'>" + old + "</div>\n" +
+				//"						<div class='priceNew'>" + cena + "</div>\n" +
 				//"						<div class='buyCell'>- 8 +</div>\n" +
 				"					</div>\n" +
 				"				</div>\n" +

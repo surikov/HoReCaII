@@ -219,6 +219,7 @@ public class ActivityWebServicesReports extends Activity {
 				//int width  = view.getMeasuredWidth();
 				//int height = view.getMeasuredHeight();
 				//System.out.println("addOnGlobalLayoutListener reportGridScrollViewY: "+reportGridScrollViewY);
+				//System.out.println("addOnGlobalLayoutListener reportGridScrollViewY: "+reportGridScrollViewY);
 				scrollBack();
 			}
 		});
@@ -258,9 +259,9 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportVzaioraschetySpokupatelem.folderKey())) {
 			report = new ReportVzaioraschetySpokupatelem(this);
 		}
-		if (key.equals(ReportRekomendaciiKlientam.folderKey())) {
-			report = new ReportRekomendaciiKlientam(this);
-		}
+		//if (key.equals(ReportRekomendaciiKlientam.folderKey())) {
+		//	report = new ReportRekomendaciiKlientam(this);
+		//}
 		if (key.equals(ReportZakazyVneMarshruta.folderKey())) {
 			report = new ReportZakazyVneMarshruta(this);
 		}
@@ -566,8 +567,10 @@ public class ActivityWebServicesReports extends Activity {
 		Auxiliary.pickConfirm(ActivityWebServicesReports.this, "Удалить отчёт?", "Удалить", new Task() {
 			@Override
 			public void doTask() {
+				reportGridScrollViewY = reportGrid.scrollView.getScrollY();
 				deleteReport(report, instanceKey);
 				goBlankPage();
+				scrollBack();
 			}
 		});
 	}
@@ -686,7 +689,7 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportResultatyUtverjdenihSpecifikaciy.folderKey(), ReportResultatyUtverjdenihSpecifikaciy.menuLabel());
 		addReportMenu2(ReportProdazhiSTM.folderKey(), ReportProdazhiSTM.menuLabel());
 
-		addReportMenu2(ReportRekomendaciiKlientam.folderKey(), ReportRekomendaciiKlientam.menuLabel());
+		//addReportMenu2(ReportRekomendaciiKlientam.folderKey(), ReportRekomendaciiKlientam.menuLabel());
 		addReportMenu2(ReportSvodDlyaTP.folderKey(), ReportSvodDlyaTP.menuLabel());
 		addReportMenu2(ReportSkidkiDlyaKlientov.folderKey(), ReportSkidkiDlyaKlientov.menuLabel());
 		addReportMenu2(ReportSKUsOtgruzkami.folderKey(), ReportSKUsOtgruzkami.menuLabel());

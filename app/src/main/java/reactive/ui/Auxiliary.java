@@ -903,7 +903,7 @@ public class Auxiliary {
 		HttpURLConnection connection = null;
 
 		URL url = new URL(pathurl);
-		System.out.println("login " + login + ", password " + password + ": " + url);
+		System.out.println("loadFileFromPrivateURL login " + login + ", password " + password + ": " + url);
 		connection = (HttpURLConnection) url.openConnection();
 		String userCredentials = login + ":" + password;
 		String basicAuth = "Basic " + new String(android.util.Base64.encode(userCredentials.getBytes(), android.util.Base64.DEFAULT));
@@ -925,7 +925,7 @@ public class Auxiliary {
 		input.close();
 		String s = new String(output.toByteArray(), "windows-1251");
 
-		System.out.println("loadFileFromPrivateURL " + connection.getResponseCode() + ": " + s);
+		//System.out.println("loadFileFromPrivateURL " + connection.getResponseCode() + ": " + s);
 
 		input = connection.getErrorStream();
 		if (input != null) {
@@ -1608,7 +1608,7 @@ public class Auxiliary {
 
 
 	public static Vector<String> readTextFromFile(File file, String encoding) {
-		System.out.println("readTextFromFile " + file.getAbsolutePath());
+		//System.out.println("readTextFromFile " + file.getAbsolutePath());
 		Vector<String> result = new Vector<String>();
 		try {
 			//BufferedReader input = new BufferedReader(new FileReader(aFile));

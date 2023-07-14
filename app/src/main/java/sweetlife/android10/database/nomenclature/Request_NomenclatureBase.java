@@ -1168,7 +1168,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n  	,atricle_count.artikul as artCount ";
 		sql = sql + "\n 	,'' || Prodazhi.kolichestvo || n.skladEdIzm as lastSellCount ";
 		sql = sql + "\n  	,stars.artikul as stars_artikul ";
-
+		sql = sql + "\n  	,newSkidki.datastart as datastart, newSkidki.dataend as dataend";
 		sql = sql + "\n	from Nomenklatura_sorted n ";
 		sql = sql + "\n 	cross join Consts const ";
 		sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";

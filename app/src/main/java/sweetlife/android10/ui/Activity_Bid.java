@@ -2196,7 +2196,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			for (int n = 0; n < b.children.size(); n++) {
 				if (tovari.get(i).child("Артикул").value.property.value().trim()
 						.equals(b.children.get(n).child("Artikul").value.property.value().trim())) {
-					System.out.println("found " + b.children.get(n).dumpXML());
+					//System.out.println("found " + b.children.get(n).dumpXML());
 					double CENA = Numeric.string2double(b.children.get(n).child("Cena").value.property.value());
 					double SKIDKA = Numeric.string2double(b.children.get(n).child("Skidka").value.property.value());
 					String VID_SKIDKI = b.children.get(n).child("VidSkidki").value.property.value();
@@ -2753,7 +2753,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		try {
 			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
 					+ "/Заказ "
-					+ApplicationHoreca.getInstance().getClientInfo().getName()
+					//+ApplicationHoreca.getInstance().getClientInfo().getName()
+					+Auxiliary.safeFileName(ApplicationHoreca.getInstance().getClientInfo().getName())
 					+Math.floor(Math.random()*10000)
 					+".xls";
 			File xfile = new File(xname);

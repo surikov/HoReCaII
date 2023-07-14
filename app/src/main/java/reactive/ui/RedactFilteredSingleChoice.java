@@ -1,5 +1,6 @@
 package reactive.ui;
 
+import android.app.AlertDialog;
 import android.text.*;
 
 import tee.binding.properties.*;
@@ -29,6 +30,7 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 	ColumnText lines;
 	boolean initialized = false;
 	String[] stringsRows = null;
+	AlertDialog lastAlertDialog=null;
 	/*Task rowtap=new Task(){
 		public void doTask(){
 			System.out.println("selection "+selection.property.value());
@@ -80,18 +82,19 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 		init();
 	}
 
-	void pick(String[] strings) {
+	AlertDialog pick(String[] strings) {
 		stringsRows = strings;
 		grid = new DataGrid(RedactFilteredSingleChoice.this.getContext());
 		lines = new ColumnText();
-		Auxiliary.pick(RedactFilteredSingleChoice.this.getContext(), "", new SubLayoutless(RedactFilteredSingleChoice.this.getContext())//
+		AlertDialog d = Auxiliary.pick(RedactFilteredSingleChoice.this.getContext(), "", new SubLayoutless(RedactFilteredSingleChoice.this.getContext())//
 						.child(new RedactText(RedactFilteredSingleChoice.this.getContext()).text.is(filter.property)
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 0.3)
 								.width().is(Auxiliary.tapSize * 10)
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(grid.noHead.is(true).columns(new Column[]{
-								lines.title.is("data").width.is(Auxiliary.tapSize * 15 - Auxiliary.tapSize)
+								lines.title.is("data")
+										.width.is(Auxiliary.tapSize * 15 - Auxiliary.tapSize)
 						})
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 1.0)
@@ -100,7 +103,9 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 						.width().is(Auxiliary.tapSize * 11)//
 						.height().is(Auxiliary.tapSize * 9)//
 				, null, null, null, null, null, null);
+		this.lastAlertDialog=d;
 		refreshList();
+		return d;
 	}
 
 	void refreshList() {
@@ -114,6 +119,12 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 						public void doTask() {
 							selection.property.value(nn);
 							//System.out.println("selection " + nn + "/" + selection.property.value());
+							if(RedactFilteredSingleChoice.this.lastAlertDialog==null){
+								//
+							}else {
+								RedactFilteredSingleChoice.this.lastAlertDialog.dismiss();
+								RedactFilteredSingleChoice.this.lastAlertDialog=null;
+							}
 						}
 					};
 					//rowtap
@@ -153,6 +164,8 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 							strings[i] = items.get(i);
 						}
 						//Auxiliary.pickSingleChoice(RedactFilteredSingleChoice.this.getContext(), strings, selection.property);
+						//AlertDialog d = pick(strings);
+						//System.out.println(d);
 						pick(strings);
 					}
 				}
