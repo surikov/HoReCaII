@@ -1,3 +1,4 @@
+
 package sweetlife.android10.supervisor;
 
 import android.content.*;
@@ -13,36 +14,36 @@ import tee.binding.*;
 
 import java.io.*;
 
-public class ReportPokazateliKPI extends Report_Base {
+public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 	//Numeric dateFrom = new Numeric();
 	//Numeric dateTo = new Numeric();
-	Numeric dateShip = new Numeric();
+	//Numeric dateShip = new Numeric();
 	Numeric territory = new Numeric();
 
-	public ReportPokazateliKPI(ActivityWebServicesReports p) {
+	public ReportZayavkiNaDobavlenieVmatricu(ActivityWebServicesReports p) {
 		super(p);
 	}
 
 	public static String menuLabel() {
-		return "Показатели KPI";
+		return "Заявки на добавление в матрицу";
 	}
 
 	public static String folderKey() {
-		return "pokazateliKPI";
+		return "zayavkiNaDobavlenieVmatricu";
 	}
 
 
 	public String getMenuLabel() {
-		return "Показатели KPI";
+		return "Заявки на добавление в матрицу";
 	}
 
 	public String getFolderKey() {
-		return "pokazateliKPI";
+		return "zayavkiNaDobavlenieVmatricu";
 	}
 
 	@Override
 	public String getShortDescription(String key) {
-		Bough b = null;
+		/*Bough b = null;
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
 		try {
 			b = Bough.parseXML(xml);
@@ -50,8 +51,8 @@ public class ReportPokazateliKPI extends Report_Base {
 			return d;
 		} catch (Throwable t) {
 			//
-		}
-		return "?";
+		}*/
+		return "";
 	}
 
 	@Override
@@ -84,7 +85,7 @@ public class ReportPokazateliKPI extends Report_Base {
 		}
 		//dateFrom.value(Numeric.string2double(b.child("from").value.property.value()));
 		//dateTo.value(Numeric.string2double(b.child("to").value.property.value()));
-		dateShip.value(Numeric.string2double(b.child("ship").value.property.value()));
+		//dateShip.value(Numeric.string2double(b.child("ship").value.property.value()));
 		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
 	}
 
@@ -93,7 +94,7 @@ public class ReportPokazateliKPI extends Report_Base {
 		Bough b = new Bough().name.is(getFolderKey());
 		//b.child("from").value.is("" + dateFrom.value());
 		//b.child("to").value.is("" + dateTo.value());
-		b.child("ship").value.is("" + dateShip.value());
+		//b.child("ship").value.is("" + dateShip.value());
 		b.child("territory").value.is("" + territory.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
@@ -105,54 +106,18 @@ public class ReportPokazateliKPI extends Report_Base {
 		long d = new Date().getTime();
 		//b.child("from").value.is("" + (d - 30 * 24 * 60 * 60 * 1000.0));
 		//b.child("to").value.is("" + (d));
-		b.child("ship").value.is("" + (d + 1 * 24 * 60 * 60 * 1000.0));
+		//b.child("ship").value.is("" + (d + 1 * 24 * 60 * 60 * 1000.0));
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		//System.out.println(xml);
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
 	}
 
-	/*
-		@Override
-		public String composeRequest() {
-			long cu = new Date().getTime();
-			int i = territory.value().intValue();
-			String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-			String xml = ""//
-					+ "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>"//
-					+ "\n		<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-					+ "\n			<soap:Body>"//
-					+ "\n				<m:getReport xmlns:m=\"http://ws.swl/fileHRC\">"//
-					+ "\n					<m:Имя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">Показатели</m:Имя>"//
-					//+ "\n					<m:НачалоПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">2013-03-25T00:00:00</m:НачалоПериода>"//
-					+ "\n					<m:НачалоПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(cu, "yyyy-MM-dd") + "T00:00:00</m:НачалоПериода>"//
-					+ "\n					<m:КонецПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(cu, "yyyy-MM-dd") + "T23:59:59</m:КонецПериода>"//
-					//+ "\n					<m:КодПользователя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">supercheb_hrc</m:КодПользователя>"//
-					//+ "\n					<m:КодПользователя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">HRC29</m:КодПользователя>"//
-					+ "\n					<m:КодПользователя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + hrc//Cfg.currentHRC()
-					+ "</m:КодПользователя>"//
-					+ "\n					<m:Параметры xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"//
-					+ "\n						<Param xmlns=\"http://ws.swl/Param\">"//
-					+ "\n							<Name>ДатаОтгрузкиСегодня</Name>"//
-					//+ "\n							<Value>20130327235959</Value>"//
-					+ "\n							<Value>" + Cfg.formatMills(dateShip.value(), "yyyyMMdd") + "235959</Value>"//
-					+ "\n							<Tipe>Значение</Tipe>"//
-					+ "\n							<TipeElem>Дата</TipeElem>"//
-					+ "\n						</Param>"//
-					+ "\n					</m:Параметры>"//
-					+ "\n					<m:IMEI xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.hrc_imei() + "</m:IMEI>"//
-					+ "\n				</m:getReport>" //
-					+ "\n			</soap:Body>"//
-					+ "\n		</soap:Envelope>";
-			//System.out.println(xml);
-			return xml;
-		}*/
 	@Override
 	public String composeGetQuery(int queryKind) {
-		String kod = Cfg.territory().children.get(territory.value().intValue()).child("kod").value.property.value().trim();
-		String now=Cfg.formatMills(new Date().getTime(), "yyyyMMdd");
-		String otgruzka=Cfg.formatMills(dateShip.value(), "yyyyMMdd");
-		String param="{\"Подразделение\":\""+kod+"\", \"Дата\":\""+now+"\", \"ДатаОтгрузки\":\""+otgruzka+"\"}";
-		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Report/ПоказателиПродаж/" + Cfg.whoCheckListOwner()+ "?param="+param;
+		String hrc = Cfg.whoCheckListOwner();
+		//hrc = "region1";
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/Report/УтверждениеЗаявокНаДобавлениеКлиентовВМатрицу/" + hrc;
 		return url;
 	}
 
@@ -168,7 +133,7 @@ public class ReportPokazateliKPI extends Report_Base {
 			}
 			propertiesForm//
 					.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
-					.input(context, 1, Auxiliary.tapSize * 0.3, "Дата отгрузки", new RedactDate(context).date.is(dateShip).format.is("dd.MM.yyyy"))//
+					//.input(context, 1, Auxiliary.tapSize * 0.3, "Дата отгрузки", new RedactDate(context).date.is(dateShip).format.is("dd.MM.yyyy"))//
 					.input(context, 2, Auxiliary.tapSize * 0.3, "Территория", terr)//
 					/*.input(context, 2, Auxiliary.tapSize * 0.3, "", new Knob(context).labelText.is("Обновить").afterTap.is(new Task() {
 						@Override
@@ -177,7 +142,7 @@ public class ReportPokazateliKPI extends Report_Base {
 						}
 					}), Auxiliary.tapSize * 3)*/
 			;
-			propertiesForm.child(new Knob(context)//
+			/*propertiesForm.child(new Knob(context)//
 					.labelText.is("На завтра")//
 					.afterTap.is(new Task() {
 						@Override
@@ -194,7 +159,7 @@ public class ReportPokazateliKPI extends Report_Base {
 					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
-			);
+			);*/
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("Обновить")//
 					.afterTap.is(new Task() {
@@ -205,7 +170,7 @@ public class ReportPokazateliKPI extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 1 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 2 + 1 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -215,15 +180,43 @@ public class ReportPokazateliKPI extends Report_Base {
 						@Override
 						public void doTask() {
 							//expectRequery.start(activityReports);
-							activityReports.promptDeleteRepoort(ReportPokazateliKPI.this, currentKey);
+							activityReports.promptDeleteRepoort(ReportZayavkiNaDobavlenieVmatricu.this, currentKey);
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 2 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 2 + 2 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
 		}
 		return propertiesForm;
+	}
+
+	@Override
+	public String interceptActions(String s) {
+		String[] strings = s.split("\n");
+		for (int i = 0; i < strings.length; i++) {
+			String line = strings[i];
+			if (i - 2 > -1 && i + 1 < strings.length - 1) {
+				String num = extract(line, '№', '<');
+				if (num.length() > 2 ){
+					int start = line.indexOf('№');
+					int end = line.indexOf("<", start + 1);
+						line = line.substring(0, start)//
+								+ "№<a href=\"hook"//
+								+ "?kind=" + HookZayavkiNaDobavlenieVmatricu//
+								+ "&" + FIELDDocumentNumber + "=" + num //
+								+ "\">" + num + "</a>"//
+								+ line.substring(end);
+						System.out.println("url line: "+line);
+						strings[i] = line;
+				}
+			}
+		}
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < strings.length; i++) {
+			sb.append(strings[i]);
+		}
+		return sb.toString();
 	}
 }

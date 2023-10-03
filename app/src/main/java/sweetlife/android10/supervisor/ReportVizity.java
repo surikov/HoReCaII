@@ -19,7 +19,7 @@ package sweetlife.android10.supervisor;
         import android.content.Context;
 
 public class ReportVizity extends Report_Base {
-    Toggle pereschitatDannieRegistra = new Toggle();
+    //Toggle pereschitatDannieRegistra = new Toggle();
     Numeric territory = new Numeric();
     Numeric dateCreateFrom = new Numeric();
     Numeric dateCreateTo = new Numeric();
@@ -90,7 +90,7 @@ public class ReportVizity extends Report_Base {
             b = new Bough();
         }
         territory.value(Numeric.string2double(b.child("territory").value.property.value()));
-        pereschitatDannieRegistra.value(b.child("pereschitatDannieRegistra").value.property.value().equals("true"));
+        //pereschitatDannieRegistra.value(b.child("pereschitatDannieRegistra").value.property.value().equals("true"));
         dateCreateFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
         dateCreateTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
     }
@@ -99,7 +99,7 @@ public class ReportVizity extends Report_Base {
     public void writeForm(String instanceKey) {
         Bough b = new Bough().name.is(getFolderKey());
         b.child("territory").value.is("" + territory.value());
-        b.child("pereschitatDannieRegistra").value.is("" + pereschitatDannieRegistra.value());
+        //b.child("pereschitatDannieRegistra").value.is("" + pereschitatDannieRegistra.value());
         b.child("docFrom").value.is("" + dateCreateFrom.value());
         b.child("docTo").value.is("" + dateCreateTo.value());
         String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
@@ -114,7 +114,7 @@ public class ReportVizity extends Report_Base {
 
         b.child("docFrom").value.is("" + (d - 0 * 24 * 60 * 60 * 1000.0));
         b.child("docTo").value.is("" + (d + 0 * 24 * 60 * 60 * 1000.0));
-        b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
+        //b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
         String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
         Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
     }
@@ -124,7 +124,8 @@ public class ReportVizity extends Report_Base {
     public String composeGetQuery(int queryKind) {
         int i = territory.value().intValue();
         String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-        String p = "{\"ПересчитатьДанныеРегистра\":"+(pereschitatDannieRegistra.value()?"true":"false")
+        String p = //"{\"ПересчитатьДанныеРегистра\":"+(pereschitatDannieRegistra.value()?"true":"false")
+				"{\"ПересчитатьДанныеРегистра\":false"
                 +",\"ДатаНачала\":\"" + Cfg.formatMills(dateCreateFrom.value(), "yyyyMMdd")
                 + "\",\"ДатаОкончания\":\"" + Cfg.formatMills(dateCreateTo.value(), "yyyyMMdd")
                 + "\"}";
@@ -197,7 +198,7 @@ public class ReportVizity extends Report_Base {
             }
             propertiesForm//
                     .input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
-                    .input(context, 1, Auxiliary.tapSize * 0.3, "", new RedactToggle(context).labelText.is("Пересчитать данные регистра").yes.is(pereschitatDannieRegistra))//
+                    //.input(context, 1, Auxiliary.tapSize * 0.3, "", new RedactToggle(context).labelText.is("Пересчитать данные регистра").yes.is(pereschitatDannieRegistra))//
                     .input(context, 2, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(dateCreateFrom).format.is("dd.MM.yyyy"))//
                     .input(context, 3, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
 

@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import reactive.ui.Auxiliary;
 import reactive.ui.Expect;
+import sweetlife.android10.ApplicationHoreca;
 import sweetlife.android10.Settings;
 import sweetlife.android10.data.common.IStateChanged;
 import sweetlife.android10.data.common.NomenclatureBasedDocument;
@@ -28,6 +29,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +51,8 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	private static ImageView mCheckAll;
 	MenuItem menuOtchety;
 
-	public String composeUploadOrderString(String key) {
+	public static String composeUploadOrderString(String key) {
+		SQLiteDatabase mDB= ApplicationHoreca.getInstance().getDataBase();
 		String request = "";
 		String sql = "select doc.Nomer as Nomer,doc.DataOtgruzki as DataOtgruzki,dgvr.Kod as Kod,kntr.kod as kntr,doc.tipOplaty as tipOplaty,doc.Kommentariy as kommentariy from"//
 				+ "\n ZayavkaPokupatelyaIskhodyaschaya doc"//

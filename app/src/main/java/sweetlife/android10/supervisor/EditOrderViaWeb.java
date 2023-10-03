@@ -209,12 +209,12 @@ public class EditOrderViaWeb {
 		Auxiliary.pickSingleChoice(context, new String[]{//
 						"Провести"//
 						, "Пометить заказ на удаление"//
-						, "Изменить номенклатуру"//
+						,"Изменить заказ"//, "Изменить номенклатуру"//
 						, "Перенести дату"//
 						, "Счёт на оплату"//
 						//, "Заявка на фикс.цену"//
 						, "Изменить договор или оплату"//
-						, "Добавить номенклатуру"//
+						//, "Добавить номенклатуру"//
 						, "Пересчитать цены"//
 						, "Повторить заказ"//
 						, "Сменить контрагента в заказе"//
@@ -233,7 +233,7 @@ public class EditOrderViaWeb {
 							promptSendDelete();
 						}
 						if (nn.value().intValue() == 2) {
-							requestItemsChange();
+							requestItemsChangeNew();
 						}
 						if (nn.value().intValue() == 3) {
 							promptChangeDate();
@@ -247,22 +247,23 @@ public class EditOrderViaWeb {
 						if (nn.value().intValue() == 5) {
 							promptDogovorTipOplaty();
 						}
+						/*
 						if (nn.value().intValue() == 6) {
 							promptNewItem();
-						}
-						if (nn.value().intValue() == 7) {
+						}*/
+						if (nn.value().intValue() == 6) {
 							promptRecalculate();
 						}
-						if (nn.value().intValue() == 8) {
+						if (nn.value().intValue() == 7) {
 							promptCloneOrder();
 						}
-						if (nn.value().intValue() == 9) {
+						if (nn.value().intValue() == 8) {
 							promptReplaceOrderClient();
 						}
-						if (nn.value().intValue() == 10) {
+						if (nn.value().intValue() == 9) {
 							promptUdalenieMelkihZakazov();
 						}
-						if (nn.value().intValue() == 11) {
+						if (nn.value().intValue() == 10) {
 							promptForceApprove();
 						}
 
@@ -556,14 +557,90 @@ public class EditOrderViaWeb {
 		expect.start(context);
 	}
 
+	void requestItemsChangeNew() {
+		final Bough b = new Bough();
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+			@Override
+			public void doTask() {
+				try {
+					String url =
+							//"https://testservice.swlife.ru/dbutenko_hrc"
+							Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+									+ "/hs/ZakaziPokupatelya/PoluchitSostavZakazov/" + Cfg.whoCheckListOwner();
+					String text = "[{\"НомерДокумента\":\"" + documentNumber + "\", \"ДатаДокумента\":\"" + ActivityWebServicesReports.reformatDate3(documentDate) + "\"}]";
+					Bough result;
+					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					b.child("result").value.is(result.child("message").value.property.value());
+					String rawText = result.child("raw").value.property.value();
+					Bough raw = Bough.parseJSON(rawText);
+					//System.out.println("requestItemsChange\n"+url+"\n"+text+"\n"+raw.dumpXML());
+					b.child("raw").children = raw.children;
+					//me.preReport.writeCurrentPage();
+
+				} catch (Throwable t) {
+					t.printStackTrace();
+					b.child("result").value.is(t.toString());
+				}
+			}
+		}).afterDone.is(new Task() {
+			@Override
+			public void doTask() {
+				//createUpdatableOrder(b.child("raw"));
+				String client_id = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(
+						"select \"x'\" || hex(_idrref) || \"'\" as id from Kontragenty where trim(kod)='"
+								+ b.child("raw").child("Данные").child("КодКонтрагента").value.property.value().trim() + "';"
+						, null)).child("row").child("id").value.property.value();
+				String oplatanum = Cfg.tip_nalichnie;//"Наличная";
+				if (b.child("raw").child("Данные").child("ТипОплаты").value.property.value().equals("Безналичная")) {
+					oplatanum = Cfg.tip_beznal;
+				}
+				if (b.child("raw").child("Данные").child("ТипОплаты").value.property.value().equals("Товарный чек")) {
+					oplatanum = Cfg.tip_tovcheck;
+				}
+				String dogovor_idrref = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(
+						"select \"x'\" || hex(_idrref) || \"'\" as id from DogovoryKontragentov where trim(kod)='"
+								+ b.child("raw").child("Данные").child("КодДоговора").value.property.value().trim() + "';"
+						, null)).child("row").child("id").value.property.value();
+				try {
+					Date tt = Auxiliary.mssqlTime.parse(b.child("raw").child("Данные").child("ДатаОтгрузки").value.property.value());
+					Numeric dateShip = new Numeric().value((double) tt.getTime());
+					//Auxiliary.tryReFormatDate(b.child("raw").child("Данные").child("ДатаОтгрузки").value.property.value(),"yyyy-MM-ddThh:mm:ss",""));
+					//System.out.println("client_id " + client_id);
+					//System.out.println("oplatanum " + oplatanum);
+					//System.out.println("dogovor_idrref " + dogovor_idrref);
+					//System.out.println("dateShip " + dateShip);
+					//System.out.println("requestItemsChangeNew " + b.child("raw").dumpXML());
+
+					Intent intent = new Intent();
+					intent.setClass(context, Activity_Bid.class);
+					intent.putExtra("client_id", client_id);
+					intent.putExtra("dogovor_idrref", dogovor_idrref);
+					intent.putExtra("oplatanum", oplatanum);
+					intent.putExtra("dateShip", "" + dateShip.value());
+					intent.putExtra("nomerDokumenta1C", b.child("raw").child("Данные").child("НомерДокумента").value.property.value().trim());
+					String raw = b.child("raw").dumpXML();
+					intent.putExtra("raw_data", "" + raw);
+					Activity_Bid.unLockCreateNewOrder();
+					me.needRefresh=true;
+					context.startActivity(intent);
+				}catch (Throwable ttt){
+					ttt.printStackTrace();
+				}
+			}
+		});
+		expect.start(context);
+	}
+
 	void promptCloneOrder() {
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
-					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
-							+ "/hs/ZakaziPokupatelya/PoluchitSostavZakazov/" + Cfg.whoCheckListOwner();
+					String url =
+							//"https://testservice.swlife.ru/dbutenko_hrc"
+							Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+									+ "/hs/ZakaziPokupatelya/PoluchitSostavZakazov/" + Cfg.whoCheckListOwner();
 					String text = "[{\"НомерДокумента\":\"" + documentNumber + "\", \"ДатаДокумента\":\"" + ActivityWebServicesReports.reformatDate3(documentDate) + "\"}]";
 					//System.out.println(url + ": " + text);
 					Bough result;
@@ -572,7 +649,7 @@ public class EditOrderViaWeb {
 					String rawText = result.child("raw").value.property.value();
 					//System.out.println(rawText);
 					Bough raw = Bough.parseJSON(rawText);
-					//System.out.println(raw.dumpXML());
+					//System.out.println("promptCloneOrder\n"+url+"\n"+text+"\n"+raw.dumpXML());
 					b.child("raw").children = raw.children;
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
@@ -590,6 +667,45 @@ public class EditOrderViaWeb {
 			}
 		});
 		expect.start(context);
+	}
+
+	void createUpdatableOrder(final Bough data) {
+		System.out.println("createUpdatableOrder " + data.dumpXML());
+
+		currentKlientKod = data.child("Данные").child("КодКонтрагента").value.property.value();
+		System.out.println("currentKlientKod " + currentKlientKod);
+		SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
+		String sql = "select hex(_idrref) as id from kontragenty where kod=" + currentKlientKod.trim() + ";";
+		Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+		if (bb.child("row").child("id").value.property.value().trim().length() < 7) {
+			Auxiliary.warn("Не найден контрагент " + currentKlientKod, context);
+			return;
+		}
+		String client_id = "x'" + bb.child("row").child("id").value.property.value() + "'";
+		System.out.println("client_id " + client_id);
+
+
+
+/*
+		int dogovor_idrref=dogovor_idrrefs.get(idx.value().intValue());
+		int oplatanum=tips.get(idx.value().intValue());
+		String dateShip= "" + dateShip.value();
+		String raw_data = data.child("raw").dumpXML();
+
+		Intent intent = new Intent();
+		intent.setClass(context, Activity_Bid.class);
+
+		String client_id = "x'" + bb.child("row").child("id").value.property.value() + "'";
+		intent.putExtra("client_id", client_id);
+
+		intent.putExtra("dogovor_idrref",dogovor_idrref );
+		intent.putExtra("oplatanum",oplatanum);
+		intent.putExtra("dateShip",dateShip);
+		intent.putExtra("raw_data", raw_data);
+
+		Activity_Bid.unLockCreateNewOrder();
+		context.startActivity(intent);
+		*/
 	}
 
 	void createCloneOrder(final Bough data) {
@@ -654,8 +770,8 @@ public class EditOrderViaWeb {
 		Calendar today = Calendar.getInstance();
 		today.setTime(NomenclatureBasedDocument.nextWorkingDate(today));
 		final Numeric dateShip = new Numeric().value((double) today.getTime().getTime());
-		System.out.println("today " + today);
-		System.out.println("data " + data.dumpXML());
+		//System.out.println("today " + today);
+		//System.out.println("data " + data.dumpXML());
 		SubLayoutless subLayoutless = new SubLayoutless(context);
 		subLayoutless.child(new Decor(context).labelText.is("Доставка").labelAlignRightCenter().labelStyleMediumNormal()//
 				.left().is(margin).top().is(margin)//
@@ -699,7 +815,7 @@ public class EditOrderViaWeb {
 			}
 		}, null, null, null, null);
 	}
-
+/*
 	void promptNewItem() {
 		System.out.println("promptNewItem");
 		SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
@@ -721,7 +837,7 @@ public class EditOrderViaWeb {
 		ApplicationHoreca.getInstance().setClientInfo(orderOwner);
 
 		me.startActivityForResult(intent, me.NOMENKLATURA_NEW);
-	}
+	}*/
 
 	void requestItemsChange() {
 		final Numeric it = new Numeric().value(-1);
@@ -743,6 +859,27 @@ public class EditOrderViaWeb {
 		if (c.trim().length() > 0) {
 			c = " (" + c + ")";
 		}
+		Auxiliary.pickFilteredChoice(context, labels, it//
+				, "Заказ " + documentNumber + " от " + documentDate + " на " + shipDate + c//
+				, new Task() {
+					@Override
+					public void doTask() {
+						promptItem(it.value().intValue());
+					}
+				}, "Сохранить", new Task() {
+					@Override
+					public void doTask() {
+						requestSaveOrder();
+					}
+				}, "Комментарий", new Task() {
+					@Override
+					public void doTask() {
+						promptComment();
+					}
+				}
+				, null, null
+		);
+		/*
 		Auxiliary.pickSingleChoice(context, labels, it//
 				, "Заказ " + documentNumber + " от " + documentDate + " на " + shipDate + c//
 				, new Task() {
@@ -761,6 +898,7 @@ public class EditOrderViaWeb {
 						promptComment();
 					}
 				});
+		*/
 	}
 
 	void promptItem(final int n) {

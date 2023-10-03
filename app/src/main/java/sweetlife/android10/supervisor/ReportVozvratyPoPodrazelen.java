@@ -1,5 +1,24 @@
 package sweetlife.android10.supervisor;
 
+import android.content.Context;
+
+import java.io.File;
+import java.net.URLEncoder;
+import java.util.Calendar;
+import java.util.Date;
+
+import reactive.ui.Auxiliary;
+import reactive.ui.Decor;
+import reactive.ui.Knob;
+import reactive.ui.RedactDate;
+import reactive.ui.RedactFilteredSingleChoice;
+import reactive.ui.RedactSingleChoice;
+import reactive.ui.SubLayoutless;
+import sweetlife.android10.Settings;
+import tee.binding.Bough;
+import tee.binding.it.Numeric;
+import tee.binding.task.Task;
+
 import android.content.*;
 
 import java.util.*;
@@ -15,29 +34,29 @@ import tee.binding.*;
 
 import java.io.*;
 
-public class ReportProdazhiSTM extends Report_Base {
+public class ReportVozvratyPoPodrazelen extends Report_Base {
 	Numeric docFrom = new Numeric();
 	Numeric docTo = new Numeric();
 	Numeric territory = new Numeric();
 	Numeric whoPlus1 = new Numeric();
 
 	public static String menuLabel() {
-		return "Продажи СТМ";
+		return "Возвраты по подразделениям";
 	}
 
 	public static String folderKey() {
-		return "prodazhistm";
+		return "vozvratyPoPodrazelen";
 	}
 
 	public String getMenuLabel() {
-		return "Продажи СТМ";
+		return "Возвраты по подразделениям";
 	}
 
 	public String getFolderKey() {
-		return "prodazhistm";
+		return "vozvratyPoPodrazelen";
 	}
 
-	public ReportProdazhiSTM(ActivityWebServicesReports p) {
+	public ReportVozvratyPoPodrazelen(ActivityWebServicesReports p) {
 		super(p);
 	}
 
@@ -98,10 +117,7 @@ public class ReportProdazhiSTM extends Report_Base {
 		b.child("docTo").value.is("" + docTo.value());
 		b.child("territory").value.is("" + territory.value());
 		b.child("who").value.is("" + whoPlus1.value());
-		//b.child("modeNew").value.is("" + modeNew.value());
-		//b.child("docTo").value.is("" + dateCreateTo.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
-		//System.out.println("writeForm " + xml);
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
 		System.out.println("writeForm: " + instanceKey + ": " + xml);
 	}
@@ -111,67 +127,24 @@ public class ReportProdazhiSTM extends Report_Base {
 		Bough b = new Bough().name.is(getFolderKey());
 		long d = new Date().getTime();
 		Calendar from = Calendar.getInstance();
-		//from.setTimeInMillis(docFrom.value().longValue());
 		from.set(Calendar.DAY_OF_MONTH, 1);
 		b.child("docFrom").value.is("" + from.getTimeInMillis());
 		b.child("docTo").value.is("" + (d + 0 * 24 * 60 * 60 * 1000.0));
-		//b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
 		System.out.println("writeDefaultForm: " + instanceKey + ": " + xml);
 	}
 
-	/*@Override
-	public String composeRequest() {
-		int i = territory.value().intValue();
-		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-
-		String xml = ""//
-				+ "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>"//
-				+ "\n		<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-				+ "\n			<soap:Body>"//
-				+ "\n				<m:getReport xmlns:m=\"http://ws.swl/fileHRC\">"//
-				+ "\n					<m:Имя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"//
-				+ "СводДляТП"//
-				+ "</m:Имя>"//
-				+ "\n					<m:НачалоПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(dateMonth.value(), "yyyy-MM-dd") + "T00:00:00</m:НачалоПериода>"//
-				+ "\n					<m:КонецПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(dateMonth.value(), "yyyy-MM-dd") + "T23:59:59</m:КонецПериода>"//
-				+ "\n					<m:КодПользователя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + hrc//Cfg.currentHRC()
-				+ "</m:КодПользователя>"//
-				+ "\n					<m:Параметры xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"//
-				+ "\n					</m:Параметры>"//
-				+ "\n					<m:IMEI xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.hrc_imei() + "</m:IMEI>"//
-				+ "\n				</m:getReport>" //
-				+ "\n			</soap:Body>"//
-				+ "\n		</soap:Envelope>";
-		//System.out.println(xml);
-		return xml;
-	}*/
 	@Override
 	public String composeGetQuery(int queryKind) {
 		int i = territory.value().intValue();
 		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-		//http://89.109.7.162/hrc120107/hs/Report/ВыполнениеПлановПродаж/zentr?param={"ВариантОтчета":"Свод","ДатаНачала":"20190501","ДатаОкончания":"20190531"}
-		/*Calendar from = Calendar.getInstance();
-		from.setTimeInMillis(dateMonth.value().longValue());
-		from.set(Calendar.DAY_OF_MONTH, 1);
-*/
 		Calendar from = Calendar.getInstance();
 		from.setTimeInMillis(docFrom.value().longValue());
 		Calendar to = Calendar.getInstance();
 		to.setTimeInMillis(docTo.value().longValue());
-		//to.set(Calendar.DAY_OF_MONTH, 1);
-		//to.add(Calendar.MONTH, 1);
-		//to.add(Calendar.DAY_OF_MONTH, -1);
-
-
 		String p = "{\"";
-		p = p + "ВариантОтчета\":\"ВаловаяПрибыльСТМ\"";
-		/*if (modeNew.value() > 0) {
-			p = p + "ВариантОтчета\":\"СводСТМ\"";
-		} else {
-			p = p + "ВариантОтчета\":\"Свод\"";
-		}*/
+		p = p + "ВариантОтчета\":\"ДляПланшета\"";
 		p = p + ",\"ДатаНачала\":\""
 				+ Cfg.formatMills(from.getTimeInMillis(), "yyyyMMdd")
 				+ "\",\"ДатаОкончания\":\""
@@ -179,7 +152,7 @@ public class ReportProdazhiSTM extends Report_Base {
 				+ "\"";
 		if (whoPlus1.value().intValue() > 0) {
 			Bough kontragenty = Cfg.kontragentyForSelectedMarshrut();
-			int nn = whoPlus1.value().intValue()-1;
+			int nn = whoPlus1.value().intValue() - 1;
 			nn = (nn < 0 || nn >= kontragenty.children.size()) ? 0 : nn;
 			String kod = kontragenty.children.get(nn).child("kod").value.property.value();
 			p = p + ",\"Контрагент\":\"" + kod + "\"";
@@ -196,7 +169,7 @@ public class ReportProdazhiSTM extends Report_Base {
 			t.printStackTrace();
 			e = t.getMessage();
 		}
-		String serviceName = "ВаловаяПрибыль";
+		String serviceName = "ВозвратыПоПодразделениямNew";
 		try {
 			serviceName = URLEncoder.encode(serviceName, "UTF-8");
 		} catch (Throwable t) {
@@ -288,7 +261,7 @@ public class ReportProdazhiSTM extends Report_Base {
 						@Override
 						public void doTask() {
 							//expectRequery.start(activityReports);
-							activityReports.promptDeleteRepoort(ReportProdazhiSTM.this, currentKey);
+							activityReports.promptDeleteRepoort(ReportVozvratyPoPodrazelen.this, currentKey);
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//

@@ -1,6 +1,7 @@
 package sweetlife.android10.supervisor;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Vector;
 import java.util.regex.*;
@@ -198,7 +199,45 @@ public class ReportFixirovannieCeny extends Report_Base {
 	}
 
 	@Override
-	public String composeRequest() {
+	public String composeGetQuery(int queryKind) {
+		//https://service.swlife.ru/hrc120107/hs/Report/ЗаявкиНаФиксированныеЦены/supernn_hrc?param={"ДатаНачала":"20230920","ДатаОкончания":"20230920","Контрагенты":["87687"],"Номенклатура":["112480"]}
+		int i = territory.value().intValue();
+		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
+		String p = "{\"ДатаНачала\":\"" + Cfg.formatMills(dateCreateFrom.value(), "yyyyMMdd") + "\""//
+				+ ",\"ДатаОкончания\":\"" + Cfg.formatMills(dateCreateTo.value(), "yyyyMMdd") + "\""//
+				;
+		String list = "";
+		String delimiter = "";
+		for (int a = 0; a < kontragents.size(); a++) {
+			if (kontragents.get(a).checked) {
+				list = list + delimiter + "\"" + kontragents.get(a).id + "\"";
+				delimiter = ",";
+			}
+		}
+		if (list.length() > 0) {
+			p = p + ",\"Контрагенты\":[" + list + "]";
+		}
+		list = "";
+		delimiter = "";
+		for (int a = 0; a < artikuls.size(); a++) {
+			if (artikuls.get(a).checked) {
+				list = list + delimiter + "\"" + artikuls.get(a).id + "\"";
+				delimiter = ",";
+			}
+		}
+		if (list.length() > 0) {
+			p = p + ",\"Номенклатура\":[" + list + "]";
+		}
+		p = p + "}";
+		String serviceName = "ЗаявкиНаФиксированныеЦены";
+		String q = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Report/"
+				+ serviceName + "/" + hrc + "?param=" + p
+				+ tagForFormat(queryKind);
+		return q;
+	}
+
+	//@Override
+	public String __composeRequest() {
 		int i = territory.value().intValue();
 		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
 		String xml = ""//
@@ -427,14 +466,14 @@ public class ReportFixirovannieCeny extends Report_Base {
 		new Expect().task.is(new Task() {
 			public void doTask() {
 				System.out.println("sendApproveAll");
-				System.out.println("url: " +url);
-				System.out.println("body: "+data);
-				System.out.println("login: "+Cfg.whoCheckListOwner());
-				System.out.println("password: "+Cfg.hrcPersonalPassword());
+				System.out.println("url: " + url);
+				System.out.println("body: " + data);
+				System.out.println("login: " + Cfg.whoCheckListOwner());
+				System.out.println("password: " + Cfg.hrcPersonalPassword());
 				Bough bb = Auxiliary.loadTextFromPrivatePOST(url, data.getBytes(), 1000 * 60 * 5
 						, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
 						//,"bot28","Molgav1024"
-						,true
+						, true
 				);
 				System.out.println("sendApproveAll " + bb.dumpXML());
 				res.value(bb.child("message").value.property.value());

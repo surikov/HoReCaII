@@ -112,7 +112,7 @@ public class Layoutless extends RelativeLayout implements Rake {
 	}
 
 	public Layoutless child(Rake v) {
-		this.addView(v.view());
+		this.addView(v.view());//,children.size());
 		//this.bringChildToFront(v.view());
 		//System.out.println("child "+v);
 		children.add(v);

@@ -220,6 +220,10 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 					, null
 					, null
 					, null
+					,false
+					,false
+					,false
+					,false
 			);
 			//System.out.println(sql);
 			final Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -302,7 +306,17 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		html = html + this.htmlPageBottom();
 		return html;
 	}
+	@Override
+	public void onBackPressed(){
+		System.out.println("onBackPressed "+selectedCat);
+		if(selectedCat==null){
+			super.onBackPressed();
+		}else{
+			selectedCat=null;
+			this.fillGUI(false);
+		}
 
+	}
 	void readCatData(boolean fromCache) {
 		if (!fromCache) {
 			cellRows.clear();
@@ -338,6 +352,10 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 					, null
 					, null
 					, null
+					,false
+					,false
+					,false
+					,false
 			);
 			final Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			//System.out.println(b.dumpXML());

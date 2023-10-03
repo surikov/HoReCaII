@@ -20,6 +20,7 @@ public abstract class Report_Base {
 	public final static String HOOKReportOrderState = "HookReportOrderState";
 	public final static String HOOKReportFixKoordinat = "HOOKReportFixKoordinat";
 	public final static String HOOKReportDeleteSpec = "HOOKReportDeleteSpec";
+	public final static String HookZayavkiNaDobavlenieVmatricu = "HookZayavkiNaDobavlenieVmatricu";
 	public final static String HOOKReportDegustacia = "HookReportDegustacia";
 	public final static String HOOKReportLimity = "HookReportLimity";
 	public final static String HOOKReportVzaimoraschety = "ReportVzaimoraschety";
@@ -499,9 +500,17 @@ public abstract class Report_Base {
 					txt = getQueryLink;
 					String postBody = composePostBody(ordinaryQuery);
 					if (postBody == null) {
+						System.out.println("no post");
 						byte[] bytes = Auxiliary.loadFileFromPrivateURL(getQueryLink //+ "&IMEI=" + Cfg.device_id()
-								, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+								, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
+								//,"bot28","Molgav1024"
+						,"UTF-8"
+						);
+						//txt = new String(bytes,"windows-1251");
 						txt = new String(bytes);
+						if(txt.indexOf("HTML")<0){
+							txt = txt+"\n"+new String(bytes,"windows-1251");
+						}
 					} else {
 						System.out.println("getQueryLink " + getQueryLink);
 						//Bough result=Auxiliary.loadTextFromPrivatePOST(getQueryLink, postBody.getBytes(), 30000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
@@ -532,7 +541,8 @@ public abstract class Report_Base {
 					System.out.println("rawSOAP.startNow " + rawSOAP.url.property.value() + " " + xml);
 					Report_Base.startPing();
 					rawSOAP.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					System.out.println("rawSOAP.startNow() done");
+					System.out.println("Report_Base.writeCurrentPage statusCode "+rawSOAP.statusCode.property.value());
+					System.out.println("Report_Base.writeCurrentPage exception "+rawSOAP.exception.property.value());
 					if (rawSOAP.statusCode.property.value() >= 100 //
 							&& rawSOAP.statusCode.property.value() <= 300//
 							&& rawSOAP.exception.property.value() == null//

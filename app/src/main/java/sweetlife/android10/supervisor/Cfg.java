@@ -100,8 +100,8 @@ public class Cfg {
     */
 
 
-	//public static String hrcPersonalLoginCached = "";//hrc252";//"hrc252";//hrc252/hrc22
-	public static String hrcPersonalPasswordCached = "";//""hrc25202";//"hrc25202";//hrc25202/hrc2202
+	//public static String hrcPersonalPasswordCached = "Hm7LPRvg";//hrc252";//"hrc252";//hrc252/hrc22
+	public static String hrcPersonalPasswordCached = "";
 
 	/*public static String hrcPersonalLogin(){
 		if(hrcPersonalLoginCached.equals("")){
@@ -116,6 +116,29 @@ public class Cfg {
 			hrcPersonalPasswordCached = settings.getString(Activity_Login.hrcpasswordName, "");
 		}
 		return hrcPersonalPasswordCached;
+	}
+
+	public static String whoCheckListOwner() {
+		//System.out.println("whoCheckListOwner "+checkListOwner+" / "+checkListOwnerCfg);
+		if (checkListOwnerCfg == null) {
+
+			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/HorecaL.xml")));
+			try {
+				checkListOwnerCfg = Bough.parseXML(xml);
+				checkListOwner = checkListOwnerCfg.child("hrc").value.property.value();
+			} catch (Throwable t) {
+				t.printStackTrace();
+				checkListOwnerCfg = new Bough();
+				checkListOwner = Cfg.DBHRC();
+			}
+			if (checkListOwnerCfg == null) {
+				checkListOwnerCfg = new Bough();
+			}
+			//System.out.println("checkListOwner "+checkListOwner+" / "+checkListOwnerCfg);
+		}
+		//System.out.println("whoCheckListOwner " + checkListOwner + " / " + checkListOwnerCfg.dumpXML());
+		return checkListOwner;
+		//return "hrc297";
 	}
 
 
@@ -226,27 +249,7 @@ public class Cfg {
 		return tpCode;
 	}
 
-	public static String whoCheckListOwner() {
-		//System.out.println("whoCheckListOwner "+checkListOwner+" / "+checkListOwnerCfg);
-		if (checkListOwnerCfg == null) {
 
-			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/HorecaL.xml")));
-			try {
-				checkListOwnerCfg = Bough.parseXML(xml);
-				checkListOwner = checkListOwnerCfg.child("hrc").value.property.value();
-			} catch (Throwable t) {
-				t.printStackTrace();
-				checkListOwnerCfg = new Bough();
-				checkListOwner = Cfg.DBHRC();
-			}
-			if (checkListOwnerCfg == null) {
-				checkListOwnerCfg = new Bough();
-			}
-			//System.out.println("checkListOwner "+checkListOwner+" / "+checkListOwnerCfg);
-		}
-		System.out.println("whoCheckListOwner " + checkListOwner + " / " + checkListOwnerCfg.dumpXML());
-		return checkListOwner;
-	}
 
 	public static void currentIMEI(Activity a, String hrc) {
 	/*try {
@@ -853,6 +856,7 @@ public class Cfg {
 	public static String skidkiLastHRC = "";
 
 	public static void refreshNomenklatureGroups(SQLiteDatabase mDB) {
+		//System.out.println("refreshNomenklatureGroups");
 		mDB.execSQL("drop table if exists nomenklatura_counts;");
 		mDB.execSQL("create table nomenklatura_counts (cnt integer,rdtl blob primary key,name text);");
 		mDB.execSQL("insert into nomenklatura_counts (cnt,rdtl,name) select count(da._idrref) as cnt,da.roditel as rdtl,da.naimenovanie as name from Nomenklatura_sorted da where da.EtoGruppa=x'00' and da.PometkaUdaleniya=x'00' group by da.roditel;");
@@ -882,7 +886,7 @@ public class Cfg {
 				+ "\n		left join nomenklatura_counts cnt5 on n5._IDRRef=cnt5.rdtl"
 				+ "\n 	where n1.EtoGruppa=x'01' and n1.PometkaUdaleniya=x'00' and n1.Roditel=x'00' and (count1>0 or count2>0 or count3>0 or count4>0 or count5>0)"
 				+ "\n	order by cat1,cat2,cat3,cat4,cat5;");*/
-		mDB.execSQL("insert into nomenklatura_groups (cat1,count1,rod1,key1 ,cat2,count2,rod2,key2 ,cat3,count3,rod3,key3 ,cat4,count4,rod4,key4 ,cat5,count5,rod5,key5)"
+		String sql="insert into nomenklatura_groups (cat1,count1,rod1,key1 ,cat2,count2,rod2,key2 ,cat3,count3,rod3,key3 ,cat4,count4,rod4,key4 ,cat5,count5,rod5,key5)"
 				+ "\n	select cat1,count1,rod1,key1 ,cat2,count2,rod2,key2 ,cat3,count3,rod3,key3 ,cat4,count4,rod4,key4 ,cat5,count5,rod5,key5 from ("
 				+ "\n			select n1.naimenovanie as cat1,cnt1.cnt as count1,n1.roditel as rod1,n1._IDRRef as key1"
 				+ "\n				,null as cat2,null as count2,null as rod2,null as key2"
@@ -979,7 +983,10 @@ public class Cfg {
 				+ "\n				and n4.EtoGruppa=x'01' and n4.PometkaUdaleniya=x'00'"
 				+ "\n				and n5.EtoGruppa=x'01' and n5.PometkaUdaleniya=x'00'"
 				+ "\n				and cnt5.cnt>0"
-				+ "\n	) uu");
+				+ "\n	) uu";
+
+		System.out.println("refreshNomenklatureGroups "+sql);
+		mDB.execSQL(sql);
 	}
 
 	public static void refreshSkidkiKontragent(String kod) {
@@ -1119,6 +1126,17 @@ public class Cfg {
 				" group by NomenklaturaPostavshhik;";
 		//System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
+		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic  , klient_idrref             , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)"
+				+"\n  select   AssortimentNaSklade._id,NomenklaturaPostavshhik,zapret,trafic,KontragentPodrazdelenie   ,null                  ,null           ,null           ,null           ,null           ,null"
+				+"\n  from  AssortimentNaSklade "
+				+"\n  join Kontragenty on Kontragenty.kod=" + skidkiLastKontragentKod + "  and AssortimentNaSklade.KontragentPodrazdelenie=Kontragenty.VidDostavki"
+				+"\n group by NomenklaturaPostavshhik;";
+		System.out.println(sql);
+		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
+
+
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
 				"  select aa._id,NomenklaturaPostavshhik,aa.zapret,aa.trafic,null                                   ,podr._IDRRef           ,null           ,null           ,null           ,null           ,null\n" +
 				"  from Polzovateli\n" +

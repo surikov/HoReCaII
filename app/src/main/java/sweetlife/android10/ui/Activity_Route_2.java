@@ -33,6 +33,8 @@ import sweetlife.android10.*;
 
 public class Activity_Route_2 extends Activity {
 
+	Note popUpURL = new Note();
+
 	public static Toggle tolkoZaDatu = new Toggle().value(false);
 	Layoutless layoutless;
 	DataGrid2 dataGrid;
@@ -45,6 +47,10 @@ public class Activity_Route_2 extends Activity {
 	ColumnText columnPt;
 	ColumnText columnSb;
 	ColumnText columnMenu;
+
+	WebRender popup;
+
+	Toggle hidePopUp=new Toggle().value(true);
 	//public static int lastGridY=0;
 	//public static int lastGridOffset=0;
 	//ColumnText columnToDen;
@@ -139,6 +145,91 @@ public class Activity_Route_2 extends Activity {
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		GPS.StopAndUnbindServiceIfRequired(this);
+
+		addUpperFields();
+		addRouteGrid();
+		addBottomButtons();
+		popup=new WebRender(this);
+		addPopUp();
+
+		GPS.StopAndUnbindServiceIfRequired(this);
+		//canRequery=true;
+		initPopUp();
+	}
+	void addPopUp(){
+		layoutless.child(new Decor(this)
+
+				.background.is(0x99000000)
+				.hidden().is(hidePopUp)
+				.left().is(0)//
+				.top().is(0)//
+				.width().is(layoutless.width().property)//
+				.height().is(layoutless.height().property)//
+		);
+		layoutless.child(new Decor(this)
+
+				.background.is(0xffeeeeee)
+				.hidden().is(hidePopUp)
+				.left().is(0.5 * Auxiliary.tapSize - 1)//
+				.top().is(0.5 * Auxiliary.tapSize - 1)//
+				.width().is(layoutless.width().property.minus(1 * Auxiliary.tapSize).plus(2))//
+				.height().is(layoutless.height().property.minus(2 * Auxiliary.tapSize).plus(2))//
+		);
+
+		layoutless.child(popup
+				.hidden().is(hidePopUp)
+				//.url.is(popUpURL)
+				//.url.is("https://service.swlife.ru/hrc120107/hs/ObnovlenieInfo/КартинкаПриНачалеРаботы/000278668/20230926")
+				.left().is(0.5 * Auxiliary.tapSize)//
+				.top().is(0.5 * Auxiliary.tapSize)//
+				.width().is(layoutless.width().property.minus(1 * Auxiliary.tapSize))//
+				.height().is(layoutless.height().property.minus(3 * Auxiliary.tapSize))//
+		);
+		layoutless.child(new Knob(this)
+
+				.afterTap.is(new Task() {
+					public void doTask() {
+						showPrePopUpPage();
+					}
+				})
+
+				.labelText.is("←")
+				.hidden().is(hidePopUp)
+				.left().is(0.5 * Auxiliary.tapSize)//
+				.top().is(layoutless.height().property.minus(2.5 * Auxiliary.tapSize))//
+				.width().is(1 * Auxiliary.tapSize)//
+				.height().is(1 * Auxiliary.tapSize)//
+		);
+		layoutless.child(new Knob(this)
+
+				.afterTap.is(new Task() {
+					public void doTask() {
+						showNextPopUpPage();
+					}
+				})
+
+				.labelText.is("→")
+				.hidden().is(hidePopUp)
+				.left().is(layoutless.width().property.minus(1.5 * Auxiliary.tapSize))//
+				.top().is(layoutless.height().property.minus(2.5 * Auxiliary.tapSize))//
+				.width().is(1 * Auxiliary.tapSize)//
+				.height().is(1 * Auxiliary.tapSize)//
+		);
+		popup.afterLink.is(new Task() {
+			@Override
+			public void doTask() {
+				try {
+					final android.net.Uri uri = android.net.Uri.parse(popup.url.property.value());
+					Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri);
+					startActivity(browserIntent);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		});
+	}
+
+	void addUpperFields() {
 		Calendar today = Calendar.getInstance();
 		zaDatu.value(((double) today.getTimeInMillis()));
 		setupOtguzka();
@@ -217,32 +308,22 @@ public class Activity_Route_2 extends Activity {
 				.width().is(layoutless.width().property)//
 				.height().is(0.5 * Auxiliary.tapSize)//
 		);
-		/*layoutless.child(new Decor(this)//
-				.background.is(0x11000000)//
-				.left().is(0)//
-				.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
-				.width().is(layoutless.width().property)//
-				.height().is(1)//
-		);*/
+	}
+
+	void addRouteGrid() {
 		dataGrid = new DataGrid2(this).center.is(true)//
 				.headerHeight.is(1 * Auxiliary.tapSize)
 				.pageSize.is(gridPageSize)//
 				.dataOffset.is(gridOffset)//
-				//.lastManualScrollY.is(lastGridY)
 				.beforeFlip.is(new Task() {
 					@Override
 					public void doTask() {
-						//System.out.println("beforeFlip gridOffset "+gridOffset.value());
 						requeryGridData();
 						flipGrid();
-						//System.out.println("after beforeFlip gridOffset "+gridOffset.value());
 					}
 				});
 		columnKod = new ColumnText();
 		columnClient = new ColumnDescription();
-		//columnToDen = new ColumnText();
-		//columnToNar = new ColumnText();
-		//columnNacnk = new ColumnText();
 		columnPn = new ColumnText();
 		columnVt = new ColumnText();
 		columnSr = new ColumnText();
@@ -250,32 +331,17 @@ public class Activity_Route_2 extends Activity {
 		columnPt = new ColumnText();
 		columnSb = new ColumnText();
 		columnMenu = new ColumnText();
-		//System.out.println("columnClient "+columnClient);
 		layoutless.child(dataGrid//
 				.headerHeight.is(0.5 * Auxiliary.tapSize)//
 				.columns(new Column[]{//
 						columnKod.title.is("Код").width.is(1.5 * Auxiliary.tapSize)
-						//
 						, columnClient.title.is("Контрагент").width.is(Auxiliary.screenWidth(this) - 5.5 * Auxiliary.tapSize)
-						//
-						,
-						//columnToDen.title.is("план/факт").width.is(1.5 * Auxiliary.tapSize),
-						//columnToNar.title.is("план/факт").width.is(1.5 * Auxiliary.tapSize),
-						//columnNacnk.title.is("план/факт").width.is(1.5 * Auxiliary.tapSize)
-						//
-						//,
-						columnPn.title.is("Пн").width.is(0.5 * Auxiliary.tapSize)
-						//
+						, columnPn.title.is("Пн").width.is(0.5 * Auxiliary.tapSize)
 						, columnVt.title.is("Вт").width.is(0.5 * Auxiliary.tapSize)
-						//
 						, columnSr.title.is("Ср").width.is(0.5 * Auxiliary.tapSize)
-						//
 						, columnCh.title.is("Чт").width.is(0.5 * Auxiliary.tapSize)
-						//
 						, columnPt.title.is("Пт").width.is(0.5 * Auxiliary.tapSize)
-						//
 						, columnSb.title.is("Сб").width.is(0.5 * Auxiliary.tapSize)
-						//
 						, columnMenu.title.is(" ").width.is(1 * Auxiliary.tapSize)
 				})//
 				.left().is(0)//
@@ -283,33 +349,9 @@ public class Activity_Route_2 extends Activity {
 				.width().is(layoutless.width().property)//
 				.height().is(layoutless.height().property.minus(2 * Auxiliary.tapSize))//
 		);
-		/*layoutless.child(new Decor(this)//
-				.labelText.is("ТО день")//
-				//.background.is(0x110000ff)//
-				.labelAlignCenterCenter()//
-				.left().is(Auxiliary.screenWidth(this) - 7.5 * Auxiliary.tapSize)//
-				.top().is(1 * Auxiliary.tapSize)//
-				.width().is(1.5 * Auxiliary.tapSize)//
-				.height().is(1 * Auxiliary.tapSize)//
-		);
-		layoutless.child(new Decor(this)//
-				.labelText.is("ТО нар.")//
-				//.background.is(0x1100ff00)//
-				.labelAlignCenterCenter()//
-				.left().is(Auxiliary.screenWidth(this) - 6.0 * Auxiliary.tapSize)//
-				.top().is(1 * Auxiliary.tapSize)//
-				.width().is(1.5 * Auxiliary.tapSize)//
-				.height().is(1 * Auxiliary.tapSize)//
-		);
-		layoutless.child(new Decor(this)//
-				.labelText.is("Нац.")//
-				//.background.is(0x11ff0000)//
-				.labelAlignCenterCenter()//
-				.left().is(Auxiliary.screenWidth(this) - 4.5 * Auxiliary.tapSize)//
-				.top().is(1 * Auxiliary.tapSize)//
-				.width().is(1.5 * Auxiliary.tapSize)//
-				.height().is(1 * Auxiliary.tapSize)//
-		);*/
+	}
+
+	void addBottomButtons() {
 		layoutless.child(new Decor(this)//
 				.background.is(0x11000000)//
 				.left().is(0)//
@@ -321,44 +363,14 @@ public class Activity_Route_2 extends Activity {
 		layoutless.child(new Knob(this)//
 				.afterTap.is(new Task() {
 					public void doTask() {
-						//String forhrc=Requests.getTPCode(ApplicationHoreca.getInstance().getDataBase());
-						//System.out.println("forhrc "+forhrc);
-						/*String tpCode = Requests.getTPCode(ApplicationHoreca.getInstance().getDataBase());
-						String tpFIO = Requests.getTPfio(ApplicationHoreca.getInstance().getDataBase());
-						String chOwner = sweetlife.horeca.supervisor.Cfg.whoCheckListOwner();
-						if (chOwner.length() > 0) {
-							String sql = "select l.naimenovanie as name,l.kod as kod from PhizLicaPolzovatelya f \n" +
-									"join Polzovateli p on p._idrref=f.polzovatel join PhizicheskieLica l on l._idrref=f.phizlico \n" +
-									"where trim(p.kod)='" + chOwner.trim() + "' order by f.period desc;"//
-									;
-							Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-							tpCode = data.child("row").child("kod").value.property.value();
-							tpFIO = data.child("row").child("name").value.property.value();
-						}*/
-						/*
-						String chOwner=sweetlife.horeca.supervisor.Cfg.whoCheckListOwner();
-						if(chOwner.length()>0){
-							tee.binding.Bough data=Auxiliary.fromCursor(
-									getDataBase().rawQuery(
-											"select l.naimenovanie as name from PhizLicaPolzovatelya f join Polzovateli p on p._idrref=f.polzovatel join PhizicheskieLica l on l._idrref=f.phizlico where trim(p.kod)='"
-													+chOwner+"' order by f.period desc;"
-											,null));
-							chOwner=chOwner+"/"+data.child("row").child("name").value.property.value();
-							//System.out.println(data.dumpXML());
-						}*/
-						//final String code = tpCode;
 						final String code = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
 						String tpFIO = Cfg.polzovatelFIO(Cfg.whoCheckListOwner());
-						//System.out.println("gps "+Cfg.whoCheckListOwner()+"/"+code+"/"+tpFIO);
 						Auxiliary.pickSingleChoice(Activity_Route_2.this, new String[]{//
 								"GPS (" + tpFIO + ")", "Заявки", "Фиксированные цены", "Возвраты от покупателей"
 						}, vigruzitN, "Выгрузить", new Task() {
 							public void doTask() {
-								//System.out.println(vigruzitN.value());
 								if (vigruzitN.value() == 0) {
-									final UploadTask task = new UploadTask(ApplicationHoreca.getInstance().getDataBase(), SystemHelper.getDiviceID(Activity_Route_2.this)
-											, getApplicationContext());
-									//AsyncTaskManager.getInstance().executeTask(Activity_Route_2.this, task);
+									final UploadTask task = new UploadTask(ApplicationHoreca.getInstance().getDataBase(), SystemHelper.getDiviceID(Activity_Route_2.this), getApplicationContext());
 									new Expect().status.is("Выгрузка визитов...")//
 											.task.is(new Task() {
 										public void doTask() {
@@ -371,7 +383,7 @@ public class Activity_Route_2 extends Activity {
 												t.printStackTrace();
 											}
 										}
-									})//
+									})
 											.afterDone.is(new Task() {
 										public void doTask() {
 											Auxiliary.warn(task.mResultString, Activity_Route_2.this);
@@ -491,8 +503,72 @@ public class Activity_Route_2 extends Activity {
 				.width().is(layoutless.width().property.minus(15 * Auxiliary.tapSize))//
 				.height().is(Auxiliary.tapSize)//
 		);
-		GPS.StopAndUnbindServiceIfRequired(this);
-		//canRequery=true;
+	}
+
+	void showNextPopUpPage() {
+		System.out.println("showNextPopUpPage");
+		//hidePopUp.value(true);
+		if(currentPopupIdx<popupList.children.size()-1){
+			currentPopupIdx++;
+			showPopUpPage();
+		}else{
+			hidePopUp.value(true);
+		}
+	}
+	void showPrePopUpPage() {
+		System.out.println("showPrePopUpPage");
+		//hidePopUp.value(true);
+		if(currentPopupIdx>0){
+			currentPopupIdx--;
+			showPopUpPage();
+		}
+	}
+
+	void showPopUpPage() {
+		//popUpURL.value()
+		hidePopUp.value(false);
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ObnovlenieInfo/КартинкаПриНачалеРаботы/"
+				+ popupList.children.get(currentPopupIdx).child("Номер").value.property.value()
+				+"/"+ popupList.children.get(currentPopupIdx).child("Дата").value.property.value()
+				;
+		popup.login.is(Cfg.whoCheckListOwner());
+		popup.password.is(Cfg.hrcPersonalPassword());
+		popup.go(url);
+	}
+	Bough popupList=new Bough();
+	int currentPopupIdx=0;
+	//static boolean popUpShow=true;
+	void initPopUp() {
+		//final Bough result = new Bough();
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ObnovlenieInfo/ПриНачалеРаботы/"
+				+ ApplicationHoreca.getInstance().getCurrentAgent().getAgentName().trim()
+				;
+		new Expect().task.is(new Task() {
+			@Override
+			public void doTask() {
+				try {
+					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String txt = new String(b, "UTF-8");
+					Bough rr = Bough.parseJSON(txt);
+					System.out.println("result is " + rr.dumpXML());
+					popupList.children = rr.children("Результат");
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task() {
+			@Override
+			public void doTask() {
+				if(popupList.children.size()>0) {
+					showPopUpPage();
+				}
+			}
+		}).status.is("Подождите...").start(this);
+		//popup.login.is(Cfg.whoCheckListOwner());
+		//popup.password.is(Cfg.hrcPersonalPassword());
+		//popup.go("https://service.swlife.ru/hrc120107/hs/ObnovlenieInfo/КартинкаПриНачалеРаботы/000278668/20230926");
 	}
 
 	@Override

@@ -573,7 +573,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n		,[OsnovnoeIzobrazhenie] blob null,[StranaProiskhozhdeniya] blob null,[NomerGTD] blob null,[EdinicaDlyaOtchetov] blob null,[Vesovoy] blob null	"//
 				+ "\n		,[PoryadokPriPechatiPraysLista] numeric null,[OsnovnoyProizvoditel] blob null,[Prioritet] numeric null,[MinimalnyyOstatok] numeric null,[VetKategoriya] blob null	"//
 				+ "\n		,[ProcentEstestvennoyUbyli] numeric null,[SrokGodnosti] numeric null,[TovarPodZakaz] blob null,[Brend] blob null,[TovarPodZakazKazan] blob null, UpperName text null	"//
-				+ "\n		, skladEdIzm text, skladEdVes real, skladEdKoef real, otchEdIzm text, otchdEdVes real, otchEdKoef real, kvant real, product blob null, tegi text, mark blob null	"//
+				+ "\n		, skladEdIzm text, skladEdVes real, skladEdKoef real, otchEdIzm text, otchdEdVes real, otchEdKoef real, kvant real, product blob null, tegi text, mark blob null, brand blob null"//
 				+ "\n	);	");
 		//System.out.println("101715 "+Auxiliary.fromCursor(mDB.rawQuery("select n._id,n.[_IDRRef],n.[Artikul] from Nomenklatura_sorted n where n.artikul=101715;",null)).dumpXML());
 		sql = "	insert into Nomenklatura_sorted (	"//
@@ -582,7 +582,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n			,VesovoyKoephphicientVkhozhdeniya,VestiUchetPoKharakteristikam,OtvetstvennyyMenedzherZaPokupki,OsnovnoyPostavschik,StatyaZatrat	"//
 				+ "\n			,OsnovnoeIzobrazhenie,StranaProiskhozhdeniya,NomerGTD,EdinicaDlyaOtchetov,Vesovoy,PoryadokPriPechatiPraysLista,OsnovnoyProizvoditel	"//
 				+ "\n			,Prioritet,MinimalnyyOstatok,VetKategoriya,ProcentEstestvennoyUbyli,SrokGodnosti,TovarPodZakaz,Brend,TovarPodZakazKazan,UpperName	"//
-				+ "\n			, skladEdIzm, skladEdVes, skladEdKoef, otchEdIzm, otchdEdVes, otchEdKoef, kvant, product, tegi, mark	"//
+				+ "\n			, skladEdIzm, skladEdVes, skladEdKoef, otchEdIzm, otchdEdVes, otchEdKoef, kvant, product, tegi, mark, brand	"//
 				+ "\n			)	"//
 				+ "\n		select 	"//
 				+ "\n			n._IDRRef, n._Version, n.PometkaUdaleniya, n.Predopredelennyy, n.Roditel, n.EtoGruppa, n.Kod, n.Naimenovanie, n.NaimenovaniePolnoe, n.Artikul, n.EdinicaKhraneniyaOstatkov	"//
@@ -590,7 +590,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n			, n.VesovoyKoephphicientVkhozhdeniya, n.VestiUchetPoKharakteristikam, n.OtvetstvennyyMenedzherZaPokupki, n.OsnovnoyPostavschik, n.StatyaZatrat	"//
 				+ "\n			, n.OsnovnoeIzobrazhenie, n.StranaProiskhozhdeniya, n.NomerGTD, n.EdinicaDlyaOtchetov, n.Vesovoy, n.PoryadokPriPechatiPraysLista, n.OsnovnoyProizvoditel	"//
 				+ "\n			, n.Prioritet, n.MinimalnyyOstatok, n.VetKategoriya, n.ProcentEstestvennoyUbyli, n.SrokGodnosti, n.TovarPodZakaz, n.Brend, n.TovarPodZakazKazan, n.UpperName	"//
-				+ "\n			, n.skladEdIzm, n.skladEdVes, n.skladEdKoef, n.otchEdIzm, n.otchdEdVes, n.otchEdKoef, n.kvant, n.product, tegi, mark	"//
+				+ "\n			, n.skladEdIzm, n.skladEdVes, n.skladEdKoef, n.otchEdIzm, n.otchdEdVes, n.otchEdKoef, n.kvant, n.product, tegi, mark, brand	"//
 				+ "\n		from nomenklatura n	"//
 				//+ "\n		join Price on Price.nomenklatura=n._idrref	or n.roditel=X'00000000000000000000000000000000'"//
 				//+ "\n		join Price_artikul on Price_artikul.nomenklatura=n._idrref"//
@@ -612,7 +612,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n			,VesovoyKoephphicientVkhozhdeniya,VestiUchetPoKharakteristikam,OtvetstvennyyMenedzherZaPokupki,OsnovnoyPostavschik,StatyaZatrat	"//
 				+ "\n			,OsnovnoeIzobrazhenie,StranaProiskhozhdeniya,NomerGTD,EdinicaDlyaOtchetov,Vesovoy,PoryadokPriPechatiPraysLista,OsnovnoyProizvoditel	"//
 				+ "\n			,Prioritet,MinimalnyyOstatok,VetKategoriya,ProcentEstestvennoyUbyli,SrokGodnosti,TovarPodZakaz,Brend,TovarPodZakazKazan,UpperName	"//
-				+ "\n			, skladEdIzm, skladEdVes, skladEdKoef, otchEdIzm, otchdEdVes, otchEdKoef, kvant, tegi, mark	"//
+				+ "\n			, skladEdIzm, skladEdVes, skladEdKoef, otchEdIzm, otchdEdVes, otchEdKoef, kvant, tegi, mark, brand	"//
 				+ "\n			)	"//
 				+ "\n		select 	"//
 				+ "\n			n._IDRRef, n._Version, n.PometkaUdaleniya, n.Predopredelennyy, n.Roditel, n.EtoGruppa, n.Kod, n.Naimenovanie, n.NaimenovaniePolnoe, n.Artikul, n.EdinicaKhraneniyaOstatkov	"//
@@ -620,7 +620,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n			, n.VesovoyKoephphicientVkhozhdeniya, n.VestiUchetPoKharakteristikam, n.OtvetstvennyyMenedzherZaPokupki, n.OsnovnoyPostavschik, n.StatyaZatrat	"//
 				+ "\n			, n.OsnovnoeIzobrazhenie, n.StranaProiskhozhdeniya, n.NomerGTD, n.EdinicaDlyaOtchetov, n.Vesovoy, n.PoryadokPriPechatiPraysLista, n.OsnovnoyProizvoditel	"//
 				+ "\n			, n.Prioritet, n.MinimalnyyOstatok, n.VetKategoriya, n.ProcentEstestvennoyUbyli, n.SrokGodnosti, n.TovarPodZakaz, n.Brend, n.TovarPodZakazKazan, n.UpperName	"//
-				+ "\n			, n.skladEdIzm, n.skladEdVes, n.skladEdKoef, n.otchEdIzm, n.otchdEdVes, n.otchEdKoef, n.kvant, tegi, mark	"//
+				+ "\n			, n.skladEdIzm, n.skladEdVes, n.skladEdKoef, n.otchEdIzm, n.otchdEdVes, n.otchEdKoef, n.kvant, tegi, mark, brand	"//
 				+ "\n		from nomenklatura n	"//
 				+ "\n		where n.EtoGruppa=x'01'"//
 				+ "\n		order by n.naimenovanie	"//

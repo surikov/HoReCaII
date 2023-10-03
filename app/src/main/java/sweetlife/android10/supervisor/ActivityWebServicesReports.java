@@ -35,7 +35,7 @@ import java.text.*;
 public class ActivityWebServicesReports extends Activity {
 	public static final int FILE_SELECT_SKD_RESULT = 112234;
 	public static final int FILE_PEREBIT_SKD_RESULT = 223322;
-	public static final int NOMENKLATURA_NEW = 555333;
+	//public static final int NOMENKLATURA_NEW = 555333;
 	public static String selectedDocNum = "";
 	public static Bitmap icon_doc_add;
 	public static Bitmap icon_ok;
@@ -58,7 +58,7 @@ public class ActivityWebServicesReports extends Activity {
 	static int reportGridScrollViewY = 0;
 
 	public static String goLastPageReportName = "startup";
-
+	public static boolean needRefresh = false;
 
 	MenuItem menuClear;
 
@@ -171,6 +171,7 @@ public class ActivityWebServicesReports extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		System.out.println("ActivityWebServicesReports.onCreate");
 		super.onCreate(savedInstanceState);
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
@@ -239,7 +240,25 @@ public class ActivityWebServicesReports extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		//System.out.println("onResume: reportGridScrollViewY");
+		System.out.println("ActivityWebServicesReports.onResume needRefresh " + needRefresh);
+		if (needRefresh) {
+			needRefresh = false;
+			//expectRequery.start(this);
+			if (preReport != null) {
+				System.out.println("ActivityWebServicesReports preReport.writeCurrentPage");
+				new Expect().task.is(new Task() {
+					@Override
+					public void doTask() {
+						preReport.writeCurrentPage();
+					}
+				}).afterDone.is(new Task() {
+					@Override
+					public void doTask() {
+						tapInstance2(preReport.getFolderKey(), preKey);
+					}
+				}).status.is("Обновление....").start(this);
+			}
+		}
 	}
 
 	Report_Base createReport(String key) {
@@ -321,6 +340,9 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportDZDlyaTP.folderKey())) {
 			report = new ReportDZDlyaTP(this);
 		}
+		if (key.equals(ReportDZBlizhaishiePlateji.folderKey())) {
+			report = new ReportDZBlizhaishiePlateji(this);
+		}
 		if (key.equals(ReportDistribuciaPoKluchevimPosiciam.folderKey())) {
 			report = new ReportDistribuciaPoKluchevimPosiciam(this);
 		}
@@ -350,9 +372,9 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportObjedineniaKlientov.folderKey())) {
 			report = new ReportObjedineniaKlientov(this);
 		}
-		if (key.equals(ReportOtchetPoKassamDlyaTP.folderKey())) {
-			report = new ReportOtchetPoKassamDlyaTP(this);
-		}
+		//if (key.equals(ReportOtchetPoKassamDlyaTP.folderKey())) {
+		//	report = new ReportOtchetPoKassamDlyaTP(this);
+		//}
 		if (key.equals(ReportPlanPolevihRabot.folderKey())) {
 			report = new ReportPlanPolevihRabot(this);
 		}
@@ -361,6 +383,11 @@ public class ActivityWebServicesReports extends Activity {
 		}
 		if (key.equals(ReportPredzakazyNaTrafiki.folderKey())) {
 			report = new ReportPredzakazyNaTrafiki(this);
+		}
+
+
+		if (key.equals(ReportZayavkiNaDobavlenieVmatricu.folderKey())) {
+			report = new ReportZayavkiNaDobavlenieVmatricu(this);
 		}
 		/*if (key.equals(ReportProbegTPSV.folderKey())) {
 			report = new ReportProbegTPSV(this);
@@ -374,6 +401,15 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportStatistikaZakazov2.folderKey())) {
 			report = new ReportStatistikaZakazov2(this);
 		}
+
+
+
+		if (key.equals(ReportKontragentyPortalaSmart.folderKey())) {
+			report = new ReportKontragentyPortalaSmart(this);
+		}
+
+
+
 		if (key.equals(ReportProcentZapolneniyaChekListov.folderKey())) {
 			report = new ReportProcentZapolneniyaChekListov(this);
 		}
@@ -392,9 +428,9 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportSvodDlyaTP.folderKey())) {
 			report = new ReportSvodDlyaTP(this);
 		}
-		if (key.equals(ReportTrafiki.folderKey())) {
-			report = new ReportTrafiki(this);
-		}
+		//if (key.equals(ReportTrafiki.folderKey())) {
+		//	report = new ReportTrafiki(this);
+		//}
 		if (key.equals(ReportVipolnenieDopMotivaciy.folderKey())) {
 			report = new ReportVipolnenieDopMotivaciy(this);
 		}
@@ -421,6 +457,9 @@ public class ActivityWebServicesReports extends Activity {
 		}
 		if (key.equals(ReportProdazhiSTM.folderKey())) {
 			report = new ReportProdazhiSTM(this);
+		}
+		if (key.equals(ReportVozvratyPoPodrazelen.folderKey())) {
+			report = new ReportVozvratyPoPodrazelen(this);
 		}
 		if (key.equals(ReportFixirovanieKoordinat.folderKey())) {
 			report = new ReportFixirovanieKoordinat(this);
@@ -646,12 +685,15 @@ public class ActivityWebServicesReports extends Activity {
 
 
 		addReportMenu2(ReportVzaioraschetySpokupatelem.folderKey(), ReportVzaioraschetySpokupatelem.menuLabel());
+		addReportMenu2(ReportVozvratyPoPodrazelen.folderKey(), ReportVozvratyPoPodrazelen.menuLabel());
+
 		addReportMenu2(ReportVozmeschenie.folderKey(), ReportVozmeschenie.menuLabel());
 		addReportMenu2(ReportVipolnenieDopMotivaciy.folderKey(), ReportVipolnenieDopMotivaciy.menuLabel());
 		addReportMenu2(ReportVipolneniePlanovPoPrilojeniu.folderKey(), ReportVipolneniePlanovPoPrilojeniu.menuLabel());
 		addReportMenu2(ReportVizity.folderKey(), ReportVizity.menuLabel());
 		//addReportMenu2(ReportVipolneniePlanov.folderKey(), ReportVipolneniePlanov.menuLabel());
 		addReportMenu2(ReportDegustaciaDlyaTP.folderKey(), ReportDegustaciaDlyaTP.menuLabel());
+		addReportMenu2(ReportDZBlizhaishiePlateji.folderKey(), ReportDZBlizhaishiePlateji.menuLabel());
 		addReportMenu2(ReportDZDlyaTP.folderKey(), ReportDZDlyaTP.menuLabel());
 		addReportMenu2(ReportDistribucia.folderKey(), ReportDistribucia.menuLabel());
 		addReportMenu2(ReportDistribuciaPoKluchevimPosiciam.folderKey(), ReportDistribuciaPoKluchevimPosiciam.menuLabel());
@@ -659,9 +701,12 @@ public class ActivityWebServicesReports extends Activity {
 
 
 		addReportMenu2(ReportZakazyVneMarshruta.folderKey(), ReportZakazyVneMarshruta.menuLabel());
+
+		addReportMenu2(ReportZayavkiNaDobavlenieVmatricu.folderKey(), ReportZayavkiNaDobavlenieVmatricu.menuLabel());
 		addReportMenu2(ReportZayavkiNaPerebitieNakladnih.folderKey(), ReportZayavkiNaPerebitieNakladnih.menuLabel());
 		addReportMenu2(ReportZayavkiNaUvelichenieLimita.folderKey(), ReportZayavkiNaUvelichenieLimita.menuLabel());
 		addReportMenu2(ReportKlassifikaciaKlientov.folderKey(), ReportKlassifikaciaKlientov.menuLabel());
+		addReportMenu2(ReportKontragentyPortalaSmart.folderKey(), ReportKontragentyPortalaSmart.menuLabel());
 		addReportMenu2(ReportKontragentySPrilojeniem.folderKey(), ReportKontragentySPrilojeniem.menuLabel());
 		addReportMenu2(ReportLimity.folderKey(), ReportLimity.menuLabel());
 		//addReportMenu2(ReportLocalizasiaDlyaTP.folderKey(), ReportLocalizasiaDlyaTP.menuLabel());
@@ -670,7 +715,7 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportNalichieSkanov.folderKey(), ReportNalichieSkanov.menuLabel());
 		addReportMenu2(ReportNSK.folderKey(), ReportNSK.menuLabel());
 		addReportMenu2(ReportObjedineniaKlientov.folderKey(), ReportObjedineniaKlientov.menuLabel());
-		addReportMenu2(ReportOtchetPoKassamDlyaTP.folderKey(), ReportOtchetPoKassamDlyaTP.menuLabel());
+		//addReportMenu2(ReportOtchetPoKassamDlyaTP.folderKey(), ReportOtchetPoKassamDlyaTP.menuLabel());
 		addReportMenu2(ReportPechatSchetaNaOplatu.folderKey(), ReportPechatSchetaNaOplatu.menuLabel());
 		addReportMenu2(ReportProcentZapolneniyaChekListov.folderKey(), ReportProcentZapolneniyaChekListov.menuLabel());
 
@@ -680,7 +725,7 @@ public class ActivityWebServicesReports extends Activity {
 			addReportMenu2(ReportPlanPolevihRabot.folderKey(), ReportPlanPolevihRabot.menuLabel());
 		}
 		addReportMenu2(ReportPokazateliKPI.folderKey(), ReportPokazateliKPI.menuLabel());
-		//addReportMenu2(ReportPredzakazyNaTrafiki.folderKey(), ReportPredzakazyNaTrafiki.menuLabel());
+		addReportMenu2(ReportPredzakazyNaTrafiki.folderKey(), ReportPredzakazyNaTrafiki.menuLabel());
 		//addReportMenu2(ReportProbegTPSV.folderKey(), ReportProbegTPSV.menuLabel());
 
 
@@ -707,7 +752,7 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportStatusyRasporjazheniySKD.folderKey(), ReportStatusyRasporjazheniySKD.menuLabel());
 
 		addReportMenu2(ReportBonusyDlyaTP.folderKey(), ReportBonusyDlyaTP.menuLabel());
-		addReportMenu2(ReportTrafiki.folderKey(), ReportTrafiki.menuLabel());
+		//addReportMenu2(ReportTrafiki.folderKey(), ReportTrafiki.menuLabel());
 		addReportMenu2(ReportUsloviaOtgruzki.folderKey(), ReportUsloviaOtgruzki.menuLabel());
 		addReportMenu2(ReportFixirovanieKoordinat.folderKey(), ReportFixirovanieKoordinat.menuLabel());
 		addReportMenu2(ReportFixirovannieCeny.folderKey(), ReportFixirovannieCeny.menuLabel());
@@ -995,6 +1040,90 @@ public class ActivityWebServicesReports extends Activity {
 			}
 		});
 		expect.start(ActivityWebServicesReports.this);
+	}
+
+	void promptUtverditZayavkuNaDobavlenieKlienta(final String num) {
+		Auxiliary.pickConfirm(this, "Утвердить заявку №" + num, "Утвердить", new Task() {
+			public void doTask() {
+				final Note result = new Note().value("Утвердить заявку №" + num);
+				Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+					@Override
+					public void doTask() {
+						try {
+							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+									+ "/hs/KlientVMatricu/?Ndok=" + num + "&Utverdit=1&user=" + Cfg.whoCheckListOwner();
+							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+							String msg = new String(bytes, "UTF-8");
+							String txt = Auxiliary.parseChildOrRaw(msg, "Message");
+							result.value(result.value() + "\n" + txt);
+						} catch (Throwable t) {
+							t.printStackTrace();
+							result.value(result.value() + "\n" + t.getMessage());
+						}
+					}
+				}).afterDone.is(new Task() {
+					@Override
+					public void doTask() {
+						Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
+						tapInstance2(preReport.getFolderKey(), preKey);
+					}
+				});
+				expect.start(ActivityWebServicesReports.this);
+			}
+		});
+	}
+
+	void promptOtkazatZayavkuNaDobavlenieKlienta(final String num) {
+		Auxiliary.pickConfirm(this, "Отказать заявке №" + num, "Отказать", new Task() {
+			public void doTask() {
+				final Note result = new Note().value("Отказать заявке №" + num);
+				Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+					@Override
+					public void doTask() {
+						try {
+							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+									+ "/hs/KlientVMatricu/?Ndok=" + num + "&Utverdit=0&user=" + Cfg.whoCheckListOwner();
+							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+							String msg = new String(bytes, "UTF-8");
+							String txt = Auxiliary.parseChildOrRaw(msg, "Message");
+							result.value(result.value() + "\n" + txt);
+						} catch (Throwable t) {
+							t.printStackTrace();
+							result.value(result.value() + "\n" + t.getMessage());
+						}
+					}
+				}).afterDone.is(new Task() {
+					@Override
+					public void doTask() {
+						Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
+						tapInstance2(preReport.getFolderKey(), preKey);
+					}
+				});
+				expect.start(ActivityWebServicesReports.this);
+			}
+		});
+	}
+
+	void doHOOKHookZayavkiNaDobavlenieVmatricu(final String num) {
+		//Auxiliary.warn(num,this);
+		Auxiliary.pick3Choice(this, "Заявка на добавление клиента", "№" + num
+				, "Удаление визита", new Task() {
+					@Override
+					public void doTask() {
+						//
+					}
+				}, "Утвердить", new Task() {
+					@Override
+					public void doTask() {
+						promptUtverditZayavkuNaDobavlenieKlienta(num);
+					}
+				}, "Отказать", new Task() {
+					@Override
+					public void doTask() {
+						promptOtkazatZayavkuNaDobavlenieKlienta(num);
+					}
+				}
+		);
 	}
 
 	void doHOOKReportLimity(final String num) {
@@ -1616,6 +1745,10 @@ public class ActivityWebServicesReports extends Activity {
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKReportLimity(num);
 				}
+				if (brwsr.getQueryParameter("kind").equals(Report_Base.HookZayavkiNaDobavlenieVmatricu)) {
+					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
+					doHOOKHookZayavkiNaDobavlenieVmatricu(num);
+				}
 				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportOrderState)) {
 					String urlDocumentDate = brwsr.getQueryParameter(Report_Base.FIELDDocumentDate);
 					String urlShipDate = brwsr.getQueryParameter(Report_Base.FIELDShipDate);
@@ -2082,7 +2215,7 @@ public class ActivityWebServicesReports extends Activity {
 				}
 				break;
 			}
-			case NOMENKLATURA_NEW: {
+			/*case NOMENKLATURA_NEW: {
 				if (resultCode == RESULT_OK) {
 					//String art = intent.getStringExtra(ITableColumnsNames.ARTIKUL);
 					//System.out.println("new item "+art);
@@ -2136,11 +2269,11 @@ public class ActivityWebServicesReports extends Activity {
 					popup.showLikeQuickAction();
 				}
 				break;
-			}
+			}*/
 		}
 		super.onActivityResult(requestCode, resultCode, intent);
 	}
-
+/*
 	void sendNewOrderItem(String orderNum, String artikul, String count, String price, String cr) {
 		//String url="https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/DobavitTovarVZakaz/12-1609303/97974/2/123/0/hrc297"
 
@@ -2179,7 +2312,7 @@ public class ActivityWebServicesReports extends Activity {
 			}
 		}).status.is("Отправка файла").start(this);
 	}
-
+*/
 	void sendPerebitFile(final String filePath) {
 		System.out.println("sendPerebitFile " + filePath);
 		String[] spl = filePath.split("\\.");

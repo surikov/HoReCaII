@@ -36,6 +36,7 @@ public class Settings {
 	//private static String _primaryFileStoreURL="https://androbmen.swlife.ru/";//android/Update2.xml";
 	//private static String _secondaryFileStoreURL="http://89.109.7.162/";//androbmen/android/Update2.xml";
 	public static String photoURL = "https://files.swlife.ru/photo/";
+
 	private static String _primaryURL = "https://service.swlife.ru";
 	//private static String _primaryURL = "https://testservice.swlife.ru";
 
@@ -52,8 +53,11 @@ public class Settings {
 */
 
 	private static String _base1c = "hrc120107";
+	//private static String _base1c = "dbutenko_hrc";
 	//private static String _base1c="shatov";
 	//private static String _base1c="GolovaNew";
+
+
 	private static String _wsdlDiff = "";
 	private static String _baseURL = _primaryURL;
 	private static String _baseFileStoreURL = _primaryFileStoreURL;

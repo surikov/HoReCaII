@@ -9,11 +9,14 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
+import android.webkit.HttpAuthHandler;
 
 public class WebRender extends WebView implements Rake {
 	boolean initialized = false;
 	private ToggleProperty<Rake> hidden = new ToggleProperty<Rake>(this);
 	public NoteProperty<WebRender> url = new NoteProperty<WebRender>(this);
+	public NoteProperty<WebRender> login = new NoteProperty<WebRender>(this);
+	public NoteProperty<WebRender> password = new NoteProperty<WebRender>(this);
 	public ItProperty<WebRender, Task> afterLink = new ItProperty<WebRender, Task>(this);
 	//public ItProperty<WebRender, Task> afterLoad = new ItProperty<WebRender, Task>(this);
 	//public NoteProperty<WebView> active = new NoteProperty<WebView>(this);
@@ -63,19 +66,12 @@ public class WebRender extends WebView implements Rake {
 		setWebViewClient(new WebViewClient() {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String urlString) {
-				//System.out.println("WebRender.shouldOverrideUrlFlag " + shouldOverrideUrlFlag + " for " + urlString);
-
-				//if (shouldOverrideUrlFlag) {
 				url.is(urlString);
 				if (afterLink.property.value() != null) {
-					System.out.println("WebRender.afterLink start");
+					//System.out.println("WebRender.afterLink start");
 					afterLink.property.value().start();
 				}
 				return true;
-				//} else {
-				//	return false;
-				//}
-
 			}
 
 			@Override
@@ -89,15 +85,20 @@ public class WebRender extends WebView implements Rake {
 			}
 
 			void scrollBack() {
-				//shouldOverrideUrlFlag = true;
 				setEnabled(true);
-
-				System.out.println("now scrollY " + browserScrollY);
+				//System.out.println("now scrollY " + browserScrollY);
 				if (browserScrollY > 0) {
-
 					scrollTo(0, browserScrollY);
 				}
 				browserScrollY = 0;
+			}
+
+			@Override
+			public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+				//super.onReceivedHttpAuthRequest();
+				//handler.proceed("Username", "password");
+				System.out.println("onReceivedHttpAuthRequest " + host+" : "+realm);
+				handler.proceed(login.property.value(),password.property.value());
 			}
 
 		});

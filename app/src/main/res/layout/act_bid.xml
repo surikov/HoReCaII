@@ -179,7 +179,7 @@
 			android:layout_height="wrap_content"
 			android:layout_toRightOf="@+id/btn_article"
 			android:focusable="false"
-			android:text="Рецепт" />
+			android:text="СТМ" />
 
 		<Button
 			android:id="@+id/btn_flagman"

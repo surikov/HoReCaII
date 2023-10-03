@@ -35,6 +35,7 @@ import sweetlife.android10.data.orders.TraficsData;
 import sweetlife.android10.data.orders.TrafiksListAdapter;
 import sweetlife.android10.data.orders.ZayavkaPokupatelya;
 import sweetlife.android10.data.orders.ZayavkaPokupatelya_Foodstaff;
+import sweetlife.android10.database.Request_Bids;
 import sweetlife.android10.database.Requests;
 import sweetlife.android10.database.nomenclature.ISearchBy;
 import sweetlife.android10.database.nomenclature.Request_NomenclatureBase;
@@ -90,12 +91,15 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	private static final int IDD_ALREADY_IN_LIST = 106;
 	public static boolean hideNacenkaStatus = true;
 
+	String nomerDokumenta1C = "";
+
 	int sortMode = FoodStuffListAdapter.sortByName;
 	MenuItem menuExport;
 	MenuItem menuImport;
 	MenuItem menuFromSpecificacia;
 	MenuItem menuDelete;
 	MenuItem menuOtchety;
+	MenuItem menuRecepty;
 	MenuItem menuDostavka;
 	MenuItem menuShowHideStatus;
 	MenuItem kommercheskoePredlojenie;
@@ -384,7 +388,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 	};
 
-	void promptReceipt() {
+	void old_promptReceipt() {
 		final Numeric sefIdx = new Numeric().value(-1);
 		String sql = "select receptii.naimenovanie as recname,receptii._id as recid from receptii order by receptii.naimenovanie;";
 		final Bough b = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
@@ -403,6 +407,29 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			}, true);
 			Auxiliary.pickSingleChoice(Activity_Bid.this, rows, sefIdx);
 		}
+	}
+
+	void promptReceipt() {
+		Intent intent = new Intent();
+		intent.setClass(Activity_Bid.this, Activity_STM_chooser.class);
+		String clientID = "0";
+		String polzovatelID = "0";
+		String dataOtgruzki = "0";
+		String sklad = "0";
+		try {
+			clientID = ApplicationHoreca.getInstance().getClientInfo().getID();
+			polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
+			dataOtgruzki = DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime());
+			sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
+		} catch (Throwable ttt) {
+			ttt.printStackTrace();
+		}
+
+		intent.putExtra("clientID", clientID);
+		intent.putExtra("dataOtgruzki", dataOtgruzki);
+		intent.putExtra("polzovatelID", polzovatelID);
+		intent.putExtra("sklad", sklad);
+		startActivityForResult(intent, ADD_NOMENCATURE);
 	}
 
 	void openReceipt(String id) {
@@ -802,6 +829,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		Calendar choosedDay = (Calendar) mAppInstance.getShippingDate().clone();
 		mBidData.setChoosedDay(choosedDay);
 		ZayavkaPokupatelya bid = extras.getParcelable(BID);
+
+		nomerDokumenta1C = Auxiliary.activityExatras(this).child("nomerDokumenta1C").value.property.value();
 		if (bid == null) {
 			if (!canCreateNewOrder()) {
 				finish();
@@ -945,7 +974,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		mEditShippingDate.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mIsOrderEditable) {
+				if (mIsOrderPropertiesEditable) {//mIsOrderEditable) {
 					DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
 						@Override
 						public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -962,6 +991,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 					};
 					Calendar shippingDate = mAppInstance.getShippingDate();
 					new DatePickerDialog(Activity_Bid.this, dateSetListener, shippingDate.get(Calendar.YEAR), shippingDate.get(Calendar.MONTH), shippingDate.get(Calendar.DAY_OF_MONTH)).show();
+				} else {
+					promptChangeDateRecalculate();
 				}
 			}
 		});
@@ -1054,14 +1085,27 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			btnSave.setOnClickListener(new View.OnClickListener() {
 				@SuppressWarnings("deprecation")
 				public void onClick(View v) {
-					if (mBidData.getFoodStuffs().getCount() == 0 && mBidData.getServices().getCount() == 0 && mBidData.getTrafiks().getCount() == 0) {
-						showDialog(IDD_IS_EMPTY);
-						return;
+					if (mHasChanges) {
+						/*if (
+								mBidData.getFoodStuffs().getCount() == 0
+										&& mBidData.getServices().getCount() == 0
+										&& mBidData.getTrafiks().getCount() == 0
+						) {
+							showDialog(IDD_IS_EMPTY);
+							return;
+						}*/
+						//SaveChangesBeforeExit();
+						//promptMoreItems();
+						promptRecomendatciiSelection();
+					} else {
+						Activity_Bid.this.finish();
 					}
-					SaveChangesBeforeExit();
-					//promptMoreItems();
 				}
 			});
+			//System.out.println("temporary "+temporary);
+			if (nomerDokumenta1C.length() > 1) {
+				btnSave.setText("Отправить");
+			}
 		} else {
 			btnSave.setEnabled(false);
 		}
@@ -1479,8 +1523,10 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		//System.out.println("SetOrderPropertiesEditable " + isOrderPropertiesEditable);
 		try {
 			mIsOrderPropertiesEditable = isOrderPropertiesEditable;
-			mEditShippingDate.setEnabled(//mIsOrderEditable);
-					mIsOrderPropertiesEditable);
+
+			//mEditShippingDate.setEnabled(//mIsOrderEditable);
+			//		mIsOrderPropertiesEditable);
+
 			//		mBtnShippingDate.setEnabled(mIsOrderPropertiesEditable);
 			mSpnPaymentType.setEnabled(mIsOrderEditable);
 			mSpnContracts.setEnabled(mIsOrderEditable);
@@ -1669,16 +1715,46 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			}
 		}
 	}
+/*
+	void promptRecomendationItems() {
+		//promptImport(artikuls, names);
+		Auxiliary.pick3Choice(this, "Дополнительно", "Показать рекомендации?", "Показать", new Task() {
+			@Override
+			public void doTask() {
+				promptRecomendatciiSelection();
+			}
+		}, "Завершить", new Task() {
+			@Override
+			public void doTask() {
+				Activity_Bid.this.finish();
+				if (mHasChanges) saveChanges();
+			}
+		}, null, null);
+	}*/
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		/*
 		if (keyCode == KeyEvent.KEYCODE_BACK & mHasChanges & mBidData.getFoodStuffs().getCount() != 0) {
 			showDialog(IDD_SAVE_CHANGES);
 			//promptMoreItems();
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+		*/
+		if (keyCode == KeyEvent.KEYCODE_BACK & mIsOrderEditable & mBidData.getFoodStuffs().getCount() != 0) {
+			//promptRecomendationItems();
+			if (mHasChanges && (!(nomerDokumenta1C.length() > 1))) {
+				promptRecomendatciiSelection();
+				return true;
+			} else {
+				return super.onKeyDown(keyCode, event);
+			}
+		} else {
+			if (mHasChanges) saveChanges();
+			return super.onKeyDown(keyCode, event);
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -1936,6 +2012,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		//menuListovkaOtdelaProdazh = menu.add("Листовка отдела продаж");
 		menuKartochkaKlienta = menu.add("Карточка клиента");
 		menuChangeDateRecalculate = menu.add("Сменить дату отгрузки и пересчитать цены");
+		menuRecepty = menu.add("Рецепты");
 		return true;
 	}
 
@@ -2031,24 +2108,17 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			doKartochkaKlienta();
 			return true;
 		}
-		if (item == menuChangeDateRecalculate) {
+		if (item == menuRecepty) {
 			if (!mIsOrderEditable) {
 				Auxiliary.warn("Заказ больше нельзя редактировать", this);
 			} else {
-				if (mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
-					showDialog(IDD_PAYMENT_NOT_SELECT);
-				} else {
-					//System.out.println("start menuChangeDateRecalculate");
-					//Number tt=new Numeric().value(mShippingDate.getTime());
-					final Numeric result = new Numeric();
-					Auxiliary.pickDate(this, mShippingDate, result, new Task() {
-						public void doTask() {
-							changeDateRecalculate(result.value().longValue());
-
-						}
-					});
-				}
+				old_promptReceipt();
 			}
+			return true;
+		}
+
+		if (item == menuChangeDateRecalculate) {
+			promptChangeDateRecalculate();
 		}
         /*if (item == menuListovkaOtdelaProdazh) {
             promptListovkaOtdelaProdazh();
@@ -2056,6 +2126,26 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
         }*/
 
 		return true;
+	}
+
+	void promptChangeDateRecalculate() {
+		if (!mIsOrderEditable) {
+			Auxiliary.warn("Заказ больше нельзя редактировать", this);
+		} else {
+			if (mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
+				showDialog(IDD_PAYMENT_NOT_SELECT);
+			} else {
+				//System.out.println("start menuChangeDateRecalculate");
+				//Number tt=new Numeric().value(mShippingDate.getTime());
+				final Numeric result = new Numeric();
+				Auxiliary.pickDate(this, mShippingDate, result, new Task() {
+					public void doTask() {
+						changeDateRecalculate(result.value().longValue());
+
+					}
+				});
+			}
+		}
 	}
 
 	void doKartochkaKlienta() {
@@ -2130,29 +2220,29 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	void doMenuDelete() {
-		//if (mIsOrderEditable) {
-		Auxiliary.pick3Choice(this, "Удаление заказа", "Вы уверены?", "Удалить", new Task() {
-			@Override
-			public void doTask() {
-				try {
-					//mNomenclatureBasedDocumentItems
-					//ZayavkaPokupatelyaIskhodyaschaya
-					String s = "delete from ZayavkaPokupatelyaIskhodyaschaya where _idrref=" + mBidData.getBid().getIDRRef();
-					//System.out.println(s);
-					mDB.execSQL(s);
-					String sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Smvz where parent=" + mBidData.getBid().getIDRRef();
-					mDB.execSQL(sql);
-					setResult(RESULT_OK);
-					finish();
-				} catch (Throwable t) {
-					t.printStackTrace();
+		if (nomerDokumenta1C.length() > 1) {
+			Auxiliary.warn("Заказ уже выгружен", this);
+		} else {
+			Auxiliary.pick3Choice(this, "Удаление заказа из планшета", "Вы уверены?", "Удалить", new Task() {
+				@Override
+				public void doTask() {
+					try {
+						//mNomenclatureBasedDocumentItems
+						//ZayavkaPokupatelyaIskhodyaschaya
+						String s = "delete from ZayavkaPokupatelyaIskhodyaschaya where _idrref=" + mBidData.getBid().getIDRRef();
+						//System.out.println(s);
+						mDB.execSQL(s);
+						String sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Smvz where parent=" + mBidData.getBid().getIDRRef();
+						mDB.execSQL(sql);
+						setResult(RESULT_OK);
+						finish();
+					} catch (Throwable t) {
+						t.printStackTrace();
+					}
 				}
-			}
-		}, "Отмена", null, "", null);
-		/*}
-		else {
-			Auxiliary.warn("Невозможно редактировать заказ", this);
-		}*/
+			}, "Отмена", null, "", null);
+		}
+
 	}
 
 	/*public static void createNewOrder(Bough data, Context context) {
@@ -2579,7 +2669,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	void doHistoryPaneExport() {
 		//gridHistory.exportCurrentDataCSV(Activity_Bid.this, "history.csv", "windows-1251");
 		try {
-			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export"+Math.floor(Math.random()*10000)+".xls";
+			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export" + Math.floor(Math.random() * 10000) + ".xls";
 			File xfile = new File(xname);
 			jxl.WorkbookSettings wbSettings = new jxl.WorkbookSettings();
 			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
@@ -2754,9 +2844,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
 					+ "/Заказ "
 					//+ApplicationHoreca.getInstance().getClientInfo().getName()
-					+Auxiliary.safeFileName(ApplicationHoreca.getInstance().getClientInfo().getName())
-					+Math.floor(Math.random()*10000)
-					+".xls";
+					+ Auxiliary.safeFileName(ApplicationHoreca.getInstance().getClientInfo().getName())
+					+ Math.floor(Math.random() * 10000)
+					+ ".xls";
 			File xfile = new File(xname);
 			jxl.WorkbookSettings wbSettings = new jxl.WorkbookSettings();
 			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
@@ -3337,7 +3427,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			return;
 		}
 		lockResetHistoryData = true;
-		//System.out.println("resetHistoryData start");
+		System.out.println("resetHistoryData start");
 		//LogHelper.debug(this.getClass().getCanonicalName() + ".resetHistoryData start");
 		String clientID = "0";
 		String polzovatelID = "0";
@@ -3427,7 +3517,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				, gridOffsetHistory.value().intValue()//
 				, isMustList//
 				, isTop, null, null, isSkidka, false, null, null, null);
-		System.out.println("requeryHistoryData " + sql);
+		//System.out.println("requeryHistoryData " + sql);
 		historyCursor = mDB.rawQuery(sql, null);
 		//System.out.println("fetched");
 		//System.out.println("load history ");
@@ -3904,14 +3994,69 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 		LogHelper.debug(this.getClass().getCanonicalName() + ".mustFillColumns done");
 	}*/
+	void addByArtikul(String art) {
+		String clientID = "0";
+		String polzovatelID = "0";
+		String dataOtgruzki = "0";
+		String sklad = "0";
+		try {
+			clientID = ApplicationHoreca.getInstance().getClientInfo().getID();
+			polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
+			dataOtgruzki = DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime());
+			sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
+		} catch (Throwable ttt) {
+			ttt.printStackTrace();
+		}
+		String sql = Request_NomenclatureBase.composeSQL(//
+				dataOtgruzki//
+				, clientID//
+				, polzovatelID//
+				, ""//
+				, ""//
+				, art
+				, ISearchBy.SEARCH_ARTICLE
+				, false//
+				, false//
+				, sklad//
+				, 200//
+				, 0, false, false, false, null, null);
+		Bough itemInfo = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+		//System.out.println(sql+" - "+itemInfo.dumpXML());
+		if (itemInfo.children.size() > 0) {
+			int n = 0;
+			double CENA = Numeric.string2double(itemInfo.children.get(n).child("Cena").value.property.value());
+			double SKIDKA = Numeric.string2double(itemInfo.children.get(n).child("Skidka").value.property.value());
+			String VID_SKIDKI = itemInfo.children.get(n).child("VidSkidki").value.property.value();
+			double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
+			FoodstuffsData foodstuffData = mBidData.getFoodStuffs();
+			foodstuffData.newFoodstuff(//
+					"x'" + itemInfo.children.get(n).child("_IDRRef").value.property.value() + "'"//
+					, art
+					, itemInfo.children.get(n).child("Naimenovanie").value.property.value()//
+					, "x'" + itemInfo.children.get(n).child("EdinicyIzmereniyaID").value.property.value() + "'"//
+					, itemInfo.children.get(n).child("EdinicyIzmereniyaNaimenovanie").value.property.value()//
+					, Numeric.string2double(itemInfo.children.get(n).child("MinNorma").value.property.value())//
+					, CENA//
+					, CENA_SO_SKIDKOY//
+					, Numeric.string2double(itemInfo.children.get(n).child("MinCena").value.property.value())//
+					, Numeric.string2double(itemInfo.children.get(n).child("MaxCena").value.property.value())//
+					, SKIDKA//
+					, VID_SKIDKI//
+					, Numeric.string2double(itemInfo.children.get(n).child("MinNorma").value.property.value())//
+					, Numeric.string2double(itemInfo.children.get(n).child("Koephphicient").value.property.value())//
+					, Numeric.string2double(itemInfo.children.get(n).child("BasePrice").value.property.value())//
+					, Numeric.string2double(itemInfo.children.get(n).child("LastPrice").value.property.value())//
+			);
+		}
+	}
 
-	void promptImport(final String[] artikuls, final String[] names) {
+	void promptImport(final String[] artikuls, final String[] names, boolean flagImport) {
 		if (mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
 			showDialog(IDD_PAYMENT_NOT_SELECT);
 			return;
 		}
 		try {
-			CharSequence[] items = new String[artikuls.length];
+/*
 			final They<Integer> defaultSelection = new They<Integer>();
 			String clientID = "0";
 			String polzovatelID = "0";
@@ -3925,16 +4070,15 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			} catch (Throwable ttt) {
 				ttt.printStackTrace();
 			}
-			for (int i = 0; i < artikuls.length; i++) {
-				items[i] = names[i];
-			}
+
 			String custom = "1=0";
 			for (int i = 0; i < artikuls.length; i++) {
 				if (artikuls[i].trim().length() > 3) {
 					custom = custom + " or n.[Artikul] = '" + artikuls[i] + "'";
 				}
 			}
-			System.out.println("compose 2:");
+			//if (flagSelectAll)
+			//System.out.println("compose 2:");
 			String sql = Request_NomenclatureBase.composeSQL(//
 					dataOtgruzki//
 					, clientID//
@@ -3948,84 +4092,124 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 					, sklad//
 					, 200//
 					, 0, false, false, false, null, null);
-			final Bough b = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-			for (int i = 0; i < artikuls.length; i++) {
-				String a = artikuls[i].trim();
-				for (int n = 0; n < b.children.size(); n++) {
-					String f = b.children.get(n).child("Artikul").value.property.value().trim();
-					if (f.equals(a)) {
-						defaultSelection.insert(defaultSelection.size(), i);
-						break;
+			final Bough itemInfo = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+			String negativeButtonTitle = null;
+			Task callbackNegativeBtn = null;
+			if (flagImport) {
+				for (int i = 0; i < artikuls.length; i++) {
+					String a = artikuls[i].trim();
+					for (int n = 0; n < itemInfo.children.size(); n++) {
+						String f = itemInfo.children.get(n).child("Artikul").value.property.value().trim();
+						if (f.equals(a)) {
+							defaultSelection.insert(defaultSelection.size(), i);
+							break;
+						}
 					}
 				}
+			} else {
+				negativeButtonTitle = "Закрыть";
+				callbackNegativeBtn = new Task() {
+					@Override
+					public void doTask() {
+						if (mHasChanges) saveChanges();
+						Activity_Bid.this.finish();
+					}
+				};
 			}
-			Auxiliary.pickMultiChoice(this, items, defaultSelection, "ok", new Task() {
-				@Override
-				public void doTask() {
-					FoodstuffsData foodstuffData = mBidData.getFoodStuffs();
-					for (int i = 0; i < artikuls.length; i++) {
-						boolean checked = false;
-						for (int ds = 0; ds < defaultSelection.size(); ds++) {
-							if (defaultSelection.at(ds) == i) {
-								checked = true;
-								break;
+			CharSequence[] items = new String[artikuls.length];
+			for (int i = 0; i < artikuls.length; i++) {
+				items[i] = names[i];
+				for (int n = 0; n < itemInfo.children.size(); n++) {
+					String f = itemInfo.children.get(n).child("Artikul").value.property.value().trim();
+					if (f.equals(artikuls[i])) {
+						double CENA = Numeric.string2double(itemInfo.children.get(n).child("Cena").value.property.value());
+						double SKIDKA = Numeric.string2double(itemInfo.children.get(n).child("Skidka").value.property.value());
+						String VID_SKIDKI = itemInfo.children.get(n).child("VidSkidki").value.property.value();
+						double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
+						items[i] = names[i] + ", " + CENA_SO_SKIDKOY + "р.";
+					}
+				}
+			}*/
+			Vector<CheckRow> rows = new Vector<CheckRow>();
+			for (int ii = 0; ii < artikuls.length; ii++) {
+				rows.add(new CheckRow(flagImport, artikuls[ii], names[ii]));
+			}
+			Auxiliary.pickFilteredMultiChoice(this, rows
+					, "Закрыть", new Task() {
+						@Override
+						public void doTask() {
+							if (mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
+								showDialog(IDD_PAYMENT_NOT_SELECT);
+								return;
 							}
+							if (mHasChanges) saveChanges();
+							Activity_Bid.this.finish();
 						}
-						if (checked) {
-							//String a = artikuls[i].trim();
-							for (int n = 0; n < b.children.size(); n++) {
-								String f = b.children.get(n).child("Artikul").value.property.value().trim();
-								if (f.equals(artikuls[i])) {
-									double CENA = Numeric.string2double(b.children.get(n).child("Cena").value.property.value());
-									double SKIDKA = Numeric.string2double(b.children.get(n).child("Skidka").value.property.value());
-									String VID_SKIDKI = b.children.get(n).child("VidSkidki").value.property.value();
-									double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
-                                    /*
-                                    double CENA_SO_SKIDKOY = getCenaSoSkidkoy(//
-                                            CENA//
-                                            , Numeric.string2double(b.children.get(n).child("Nacenka").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("FiksirovannyeCeny").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("SkidkaPartneraKarta").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("NakopitelnyeSkidki").value.property.value())//
-                                    );
-                                    double SKIDKA = getRazmerSkidki(//
-                                            Numeric.string2double(b.children.get(n).child("FiksirovannyeCeny").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("SkidkaPartneraKarta").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("NakopitelnyeSkidki").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("Nacenka").value.property.value())//
-                                    );
-                                    String VID_SKIDKI = getVidSkidki(//
-                                            Numeric.string2double(b.children.get(n).child("FiksirovannyeCeny").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("SkidkaPartneraKarta").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("NakopitelnyeSkidki").value.property.value())//
-                                            , Numeric.string2double(b.children.get(n).child("Nacenka").value.property.value())//
-                                    );*/
-									foodstuffData.newFoodstuff(//
-											"x'" + b.children.get(n).child("_IDRRef").value.property.value() + "'"//
-											, artikuls[i]//
-											, b.children.get(n).child("Naimenovanie").value.property.value()//
-											, "x'" + b.children.get(n).child("EdinicyIzmereniyaID").value.property.value() + "'"//
-											, b.children.get(n).child("EdinicyIzmereniyaNaimenovanie").value.property.value()//
-											, Numeric.string2double(b.children.get(n).child("MinNorma").value.property.value())//
-											, CENA//
-											, CENA_SO_SKIDKOY//
-											, Numeric.string2double(b.children.get(n).child("MinCena").value.property.value())//
-											, Numeric.string2double(b.children.get(n).child("MaxCena").value.property.value())//
-											, SKIDKA//
-											, VID_SKIDKI//
-											, Numeric.string2double(b.children.get(n).child("MinNorma").value.property.value())//
-											, Numeric.string2double(b.children.get(n).child("Koephphicient").value.property.value())//
-											, Numeric.string2double(b.children.get(n).child("BasePrice").value.property.value())//
-											, Numeric.string2double(b.children.get(n).child("LastPrice").value.property.value())//
-									);
-									break;
+					}
+					, "Добавить", new Task() {
+						@Override
+						public void doTask() {
+							for (int kk = 0; kk < rows.size(); kk++) {
+								if (rows.get(kk).checked) {
+									System.out.println("ok " + rows.get(kk).id);
+									addByArtikul(rows.get(kk).id.trim());
 								}
 							}
+							UpdateAfterAddingNomenclature();
 						}
 					}
-					UpdateAfterAddingNomenclature();
-				}
-			});
+					, flagImport ? "Импорт" : "Рекомендации");
+			/*
+			Auxiliary.pickMultiChoice(this, items, defaultSelection
+					, "Добавить", new Task() {
+						@Override
+						public void doTask() {
+							FoodstuffsData foodstuffData = mBidData.getFoodStuffs();
+							for (int i = 0; i < artikuls.length; i++) {
+								boolean checked = false;
+								for (int ds = 0; ds < defaultSelection.size(); ds++) {
+									if (defaultSelection.at(ds) == i) {
+										checked = true;
+										break;
+									}
+								}
+								if (checked) {
+									for (int n = 0; n < itemInfo.children.size(); n++) {
+										String f = itemInfo.children.get(n).child("Artikul").value.property.value().trim();
+										if (f.equals(artikuls[i])) {
+											double CENA = Numeric.string2double(itemInfo.children.get(n).child("Cena").value.property.value());
+											double SKIDKA = Numeric.string2double(itemInfo.children.get(n).child("Skidka").value.property.value());
+											String VID_SKIDKI = itemInfo.children.get(n).child("VidSkidki").value.property.value();
+											double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
+											foodstuffData.newFoodstuff(//
+													"x'" + itemInfo.children.get(n).child("_IDRRef").value.property.value() + "'"//
+													, artikuls[i]//
+													, itemInfo.children.get(n).child("Naimenovanie").value.property.value()//
+													, "x'" + itemInfo.children.get(n).child("EdinicyIzmereniyaID").value.property.value() + "'"//
+													, itemInfo.children.get(n).child("EdinicyIzmereniyaNaimenovanie").value.property.value()//
+													, Numeric.string2double(itemInfo.children.get(n).child("MinNorma").value.property.value())//
+													, CENA//
+													, CENA_SO_SKIDKOY//
+													, Numeric.string2double(itemInfo.children.get(n).child("MinCena").value.property.value())//
+													, Numeric.string2double(itemInfo.children.get(n).child("MaxCena").value.property.value())//
+													, SKIDKA//
+													, VID_SKIDKI//
+													, Numeric.string2double(itemInfo.children.get(n).child("MinNorma").value.property.value())//
+													, Numeric.string2double(itemInfo.children.get(n).child("Koephphicient").value.property.value())//
+													, Numeric.string2double(itemInfo.children.get(n).child("BasePrice").value.property.value())//
+													, Numeric.string2double(itemInfo.children.get(n).child("LastPrice").value.property.value())//
+											);
+											break;
+										}
+									}
+								}
+							}
+							UpdateAfterAddingNomenclature();
+						}
+					}
+					, negativeButtonTitle, callbackNegativeBtn
+					, "Рекомендации для клиента"
+			);*/
 		} catch (Throwable t) {
 			t.printStackTrace();
 			Auxiliary.warn("Не скопированы данные для импорта", this);
@@ -4035,44 +4219,45 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	void doKommercheskoePredlojenie() {
 		final Numeric dateDay = new Numeric();
 		final Numeric artCount = new Numeric().value(50);
-		final Numeric tipSelect = new Numeric();
-		RedactSingleChoice r = new RedactSingleChoice(this);
+		final Numeric tipSelect = new Numeric().value(1);
+		RedactSingleChoice choice = new RedactSingleChoice(this);
 		String sql = "select _idrref as _idrref,naimenovanie as naimenovanie,kod as kod from TipyTorgovihTochek where deletionmark=x'00' order by naimenovanie";
 		final Bough b = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		//String[] rows = new String[b.children.size() + 1];
 		//rows[0] = "Любой тип";
-		r.item("Любой тип");
+		choice.item("По утвержденным фикс. ценам");
+		choice.item("По истории продаж");
 		for (int i = 0; i < b.children.size(); i++) {
 			//rows[i + 1] = b.children.get(i).child("naimenovanie").value.property.value();
 			//System.out.println(b.children.get(i).dumpXML());
-			r.item(b.children.get(i).child("naimenovanie").value.property.value());
+			choice.item(b.children.get(i).child("naimenovanie").value.property.value());
 		}
 		Auxiliary.pick(this, "Коммерческое предложение"//
 				, new SubLayoutless(this)//
-						.child(r.selection.is(tipSelect)//
-								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 0.1).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
+						.child(choice.selection.is(tipSelect)//
+								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
 						.child(new Decor(this).labelText.is("количество строк, не более").labelAlignLeftTop().labelStyleSmallNormal()//
 								//.hidden().is(selection.equals(0))//
-								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 1.1).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
+								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 1.7).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
 						.child(new RedactNumber(this).number.is(artCount)//
 								//.hidden().is(selection.equals(0))//
-								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 1.5).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
+								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 2.1).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
 						.child(new Decor(this).labelText.is("дата заказов").labelAlignLeftTop().labelStyleSmallNormal()//
 								//.hidden().is(selection.equals(0))//
-								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 2.6).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
+								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 3.4).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
 						.child(new RedactDate(this).format.is("dd.MM.yyyy").date.is(dateDay)//
 								//.hidden().is(selection.equals(0))//
-								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 3).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
+								.left().is(Auxiliary.tapSize * 0.1).top().is(Auxiliary.tapSize * 3.7).width().is(Auxiliary.tapSize * 8.8).height().is(Auxiliary.tapSize * 0.8))//
 						.width().is(Auxiliary.tapSize * 9)//
 						.height().is(Auxiliary.tapSize * 7)//
 				, "Получить", new Task() {
 					@Override
 					public void doTask() {
 						String kodTip = "";
-						if (tipSelect.value() > 0) {
+						if (tipSelect.value() > 1) {
 							kodTip = b.children.get(tipSelect.value().intValue() - 1).child("kod").value.property.value();
 						}
-						sendKommercheskoePredlojenie(artCount.value().intValue(), dateDay.value().longValue(), kodTip);
+						sendKommercheskoePredlojenie(tipSelect.value().intValue() == 0 ? true : false, artCount.value().intValue(), dateDay.value().longValue(), kodTip);
 					}
 				}, null, null, null, null);
 	}
@@ -4086,36 +4271,51 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 	}
 
-	void sendKommercheskoePredlojenie(int artCount, long timestamp, String kodTip) {
+	void sendKommercheskoePredlojenie(boolean fixNotSale, int artCount, long timestamp, String kodTip) {
 		//http://89.109.7.162/shatov/hs/KomPredlozenie/88668?КолТоваров=500&ДеньПродаж=20191001&ТипТТ=17
 		//System.out.println(artCount + "/" + timestamp + "/" + kodTip);
-		String counter = "";
-		if (artCount > 0) {
-			counter = "?" + enc("КолТоваров") + "=" + artCount;
-		} else {
-			counter = "?" + enc("КолТоваров") + "=50";
-		}
-		String day = "";
-		if (timestamp > 0) {
-			day = "&" + enc("ДеньПродаж") + "=" + Auxiliary.short1cDate.format(new Date(timestamp));
-		}
-		String tip = "";
-		if (kodTip.length() > 0) {
-			tip = "&" + enc("ТипТТ") + "=" + kodTip;
-		}
+
 		final Note result = new Note();
-		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
-				+ "/hs/KomPredlozenie/" + ApplicationHoreca.getInstance().getClientInfo().getKod() //
-				//+ "/50"
-				+ counter + day + tip//
-				;
+		final Note url = new Note();
+		if (!fixNotSale) {
+			String counter = "";
+			if (artCount > 0) {
+				counter = "?" + enc("КолТоваров") + "=" + artCount;
+			} else {
+				counter = "?" + enc("КолТоваров") + "=50";
+			}
+			String day = "";
+			if (timestamp > 0) {
+				day = "&" + enc("ДеньПродаж") + "=" + Auxiliary.short1cDate.format(new Date(timestamp));
+			}
+			String tip = "";
+			if (kodTip.length() > 0) {
+				tip = "&" + enc("ТипТТ") + "=" + kodTip;
+			}
+			url.value(Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
+					+ "/hs/KomPredlozenie/" + ApplicationHoreca.getInstance().getClientInfo().getKod() //
+					//+ "/50"
+					+ counter + day + tip)
+			;
+		} else {
+			Calendar tomorrow = Calendar.getInstance();
+			tomorrow.add(Calendar.HOUR, 24);
+			String datestring = "" + Auxiliary.short1cDate.format(tomorrow.getTime());
+			if (timestamp > 0) {
+				datestring = "" + Auxiliary.short1cDate.format(new Date(timestamp));
+			}
+			url.value(Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/KomPredlozenie/FiksCena/"
+					//+ "261032"
+					+ ApplicationHoreca.getInstance().getClientInfo().getKod().trim()
+					+ "/" + datestring + "?КолТоваров=" + artCount);
+		}
 		System.out.println(url);
 		new Expect().task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
 					//byte[] b = Auxiliary.loadFileFromPublicURL(url);
-					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					byte[] b = Auxiliary.loadFileFromPrivateURL(url.value(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 
 					String txt = new String(b, "UTF-8");
 					result.value(txt);
@@ -4132,8 +4332,11 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 
 				//Vector<String> artikuls = new Vector<String>();
 				Vector<Bough> all = b.children("КомПредложение");
+
 				//System.out.println(all.size());
 				if (b.child("Статус").value.property.value().equals("0") && all.size() > 0) {
+					parsePromptImport(all);
+					/*
 					String[] artikuls = new String[all.size()];
 					String[] names = new String[all.size()];
 					for (int i = 0; i < all.size(); i++) {
@@ -4141,11 +4344,142 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 						names[i] = all.get(i).child("Артикул").value.property.value() + ": " + all.get(i).child("НаименованиеТовара").value.property.value();
 					}
 					promptImport(artikuls, names);
-
+*/
 				} else {
 					Auxiliary.warn(b.child("Сообщение").value.property.value(), Activity_Bid.this);
 				}
 			}
 		}).status.is("Отправка...").start(this);
+	}
+
+	void parsePromptImport(Vector<Bough> all) {
+
+		String[] artikuls = new String[all.size()];
+		String[] names = new String[all.size()];
+		for (int i = 0; i < all.size(); i++) {
+			artikuls[i] = all.get(i).child("Артикул").value.property.value();
+			names[i] = all.get(i).child("Артикул").value.property.value() + ": " + all.get(i).child("НаименованиеТовара").value.property.value();
+		}
+		promptImport(artikuls, names, true);
+
+	}
+
+	void sendUpdateOrder() {
+		mBidData.getFoodStuffs().WriteToDataBase(mDB);
+		//mBidData.getServices().WriteToDataBase(mDB);
+		//mBidData.getTrafiks().WriteToDataBase(mDB);
+		ZayavkaPokupatelya bid = mBidData.getBid();
+		bid.setSumma(mBidData.getFoodStuffs().getAmount() + mBidData.getServices().getCount());
+		bid.setContract(mContractsAdapter.getSelectedItem().getID());
+		bid.setTipOplaty(mPaymentTypeAdapter.GetSelectedItem().getID());
+		bid.setComment(mEditComment.getText().toString() + "|" + mEditCustNum.getText().toString());
+		bid.setSebestoimost(mBidData.getFoodStuffs().getAmount());
+		bid.setShippingDate(mShippingDate.getTimeInMillis());
+		bid.writeToDataBase(mDB);
+
+		final String post = "[{\"Номер\":\"" + nomerDokumenta1C + "\"," + Activity_UploadBids.composeUploadOrderString(mBidData.getBid().getNomer()) + "}]";
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZakaziPokupatelya/" + Cfg.whoCheckListOwner();
+		final Note result = new Note();
+
+		new Expect().task.is(new Task() {
+			@Override
+			public void doTask() {
+				System.out.println("post: " + post);
+				try {
+					Bough txt = Auxiliary.loadTextFromPrivatePOST(url, post, 300 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					Bough data = Bough.parseJSON(txt.child("raw").value.property.value());
+					System.out.println("post result is " + data.dumpXML());
+					result.value(
+							data.child("Сообщение").value.property.value()
+							+" "+data.child("ДанныеПоЗаказам").child("Сообщение").value.property.value()
+							+" "+data.child("ДанныеПоЗаказам").child("Заказы").child("Сообщение").value.property.value()
+					);
+				} catch (Throwable t) {
+					t.printStackTrace();
+					result.value(t.getMessage());
+				}
+			}
+		}).afterDone.is(new Task() {
+							@Override
+							public void doTask() {
+								System.out.println("sendUpdateOrder result " + result.value());
+								Auxiliary.inform("Отправка заказа: " + result.value(), Activity_Bid.this);
+								mBidData.getBid().deleteOrder(ApplicationHoreca.getInstance().getDataBase());
+								Activity_Bid.this.finish();
+							}
+						}
+		).status.is("Подождите...").start(this);
+	}
+
+	void promptRecomendatciiSelection() {
+		if (nomerDokumenta1C.length() > 1) {
+			if (mHasChanges) {
+				sendUpdateOrder();
+			} else {
+				Activity_Bid.this.finish();
+			}
+		} else {
+			String sql = Request_NomenclatureBase.composeSQLall_Old(//.composeSQLall(//
+					DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
+					, ApplicationHoreca.getInstance().getClientInfo().getID()//
+					, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()//
+					, null//DateTimeHelper.SQLDateString(fr)//
+					, null//DateTimeHelper.SQLDateString(to)//
+					, ""//
+					, ISearchBy.SEARCH_NAME
+					, false//
+					, false//
+					, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()//
+					, 50//gridPageSize * 3//
+					//, gridHistory.dataOffset.property.value().intValue()//
+					, 0//
+					, false//
+					, false, null, null, false, false, null, null, null
+					, false//,filterBySTM.value()
+					, false
+					, true
+					, false
+			);
+			//System.out.println(sql);
+			Bough itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+			//System.out.println(itemsData.dumpXML());
+			Vector<Bough> all = itemsData.children("row");
+			Vector<String> artikuls = new Vector<String>();
+			Vector<String> names = new Vector<String>();
+			FoodstuffsData foodstuffsData = this.mBidData.getFoodStuffs();
+			for (int i = 0; i < all.size(); i++) {
+				boolean existedArt = false;
+				for (int kk = 0; kk < foodstuffsData.getCount(); kk++) {
+					ZayavkaPokupatelya_Foodstaff zayavkaPokupatelya_Foodstaff = foodstuffsData.getFoodstuff(kk);
+					if (zayavkaPokupatelya_Foodstaff.getArtikul().trim().equals(all.get(i).child("Artikul").value.property.value().trim())) {
+						existedArt = true;
+						break;
+					}
+				}
+				if (!existedArt) {
+					artikuls.add(all.get(i).child("Artikul").value.property.value());
+					double CENA = Numeric.string2double(all.get(i).child("Cena").value.property.value());
+					double SKIDKA = Numeric.string2double(all.get(i).child("Skidka").value.property.value());
+					String VID_SKIDKI = all.get(i).child("VidSkidki").value.property.value();
+					double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
+					names.add(all.get(i).child("Artikul").value.property.value()
+							+ ": " + all.get(i).child("Naimenovanie").value.property.value()
+							+ ", " + CENA_SO_SKIDKOY + "р."
+					);
+				}
+			}
+			String[] arrArt = new String[artikuls.size()];
+			String[] namArt = new String[artikuls.size()];
+			if (artikuls.size() > 0) {
+				promptImport(artikuls.toArray(arrArt), names.toArray(namArt), false);
+			} else {
+				if (mPaymentTypeAdapter.GetSelectedItem().isEmpty()) {
+					showDialog(IDD_PAYMENT_NOT_SELECT);
+					return;
+				}
+				if (mHasChanges) saveChanges();
+				Activity_Bid.this.finish();
+			}
+		}
 	}
 }

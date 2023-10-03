@@ -108,7 +108,7 @@ public class ReportVipolnenieDopMotivaciy extends Report_Base {
 		mb.setDate(1);
 		b.child("from").value.is("" + mb.getTime());
 		b.child("to").value.is("" + (d));
-		b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
+		//b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
 	}

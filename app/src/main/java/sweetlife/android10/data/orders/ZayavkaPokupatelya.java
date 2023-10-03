@@ -287,6 +287,13 @@ public class ZayavkaPokupatelya extends NomenclatureBasedDocument implements Par
 		}
 	}
 
+	public void deleteOrder(SQLiteDatabase db) {
+		System.out.println("deleteOrder " + mIDRRef);
+		db.execSQL("delete from ZayavkaPokupatelyaIskhodyaschaya_tovary where _ZayavkaPokupatelyaIskhodyaschaya_idrref==" + mIDRRef + ";");
+		db.execSQL("delete from ZayavkaPokupatelyaIskhodyaschaya where _idrref=" + mIDRRef + ";");
+
+	}
+
 	@Override
 	public void writeToDataBase(SQLiteDatabase db) {
 		//System.out.println(this.getClass().getName() + " writeToDataBase start "+mNew);

@@ -30,6 +30,8 @@ public class ActivityLimitEdit extends Activity {
 	String kod1C = "";
 	Numeric valueLimit = new Numeric();
 	Numeric valueOtsrochka = new Numeric();
+	Numeric valuePlan = new Numeric();
+	Numeric valuePotencial = new Numeric();
 	Note valueKommentariy = new Note();
 	Toggle filled = new Toggle();
 	Numeric izmDate = new Numeric();
@@ -47,9 +49,9 @@ public class ActivityLimitEdit extends Activity {
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		Bundle bundle = getIntent().getExtras();
-		if(bundle != null) {
+		if (bundle != null) {
 			String s = bundle.getString("_id");
-			if(s != null) {
+			if (s != null) {
 				_id = s;
 			}
 		}
@@ -58,17 +60,17 @@ public class ActivityLimitEdit extends Activity {
 		fillGUI();
 	}
 
-	void saveDB(String kod, String limit, String delay, String rem) {
-		if(_id.trim().length()>0) {
+	void saveDB(String kod, String limit, String delay, String plan,String potencial,String rem) {
+		if (_id.trim().length() > 0) {
 			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from LimitiList where _id=" + this._id.trim() + ";");
 		}
 		String sql = "insert into LimitiList ("//
 
-				             + "\n Podrazdelenie, Data, DataIzm, Otvetstvenniy, Kommentarii"//
-				             + "\n ) values ("//
-				             + "\n '" + kod + "', " + delay + ", " + limit //
-				             + ", " + ApplicationHoreca.getInstance().getClientInfo().getKod() + ",'" + rem + "'"//
-				             + "\n )";
+				+ "\n Podrazdelenie, Data, DataIzm, Otvetstvenniy,plan,potencial, Kommentarii"//
+				+ "\n ) values ("//
+				+ "\n '" + kod + "', " + delay + ", " + limit //
+				+ ", " + ApplicationHoreca.getInstance().getClientInfo().getKod() + ", " + plan+ ", " + potencial+ ",'" + rem + "'"//
+				+ "\n )";
 		System.out.println(sql);
 		try {
 			SQLiteStatement statement = ApplicationHoreca.getInstance().getDataBase().compileStatement(sql);
@@ -77,7 +79,7 @@ public class ActivityLimitEdit extends Activity {
 			Auxiliary.warn("Заявка сохранена. Добавьте файлы из меню.", ActivityLimitEdit.this);
 			kod1C = kod;
 			fillGUI();
-		} catch(Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 			Auxiliary.warn(t.getMessage(), ActivityLimitEdit.this);
 		}
@@ -88,9 +90,17 @@ public class ActivityLimitEdit extends Activity {
 		//final String url = "http://89.109.7.162/shatov/hs/UvelLimita/" + Cfg.currentHRC() + "/";
 		final String limit = "" + this.valueLimit.value();
 		final String delay = "" + this.valueOtsrochka.value();
+		final String plan = "" + this.valuePlan.value();
+		final String potencial = "" + this.valuePotencial.value();
 		final String rem = this.valueKommentariy.value();
 		ApplicationHoreca.getInstance().getClientInfo().getKod();
-		final String post = "{\"Лимит\":\"" + limit + "\",\"Отсрочка\":\"" + delay + "\",\"КодКлиента\":\"" + ApplicationHoreca.getInstance().getClientInfo().getKod() + "\",\"Комментарий\":\"" + rem + "\"}";
+		final String post = "{\"Лимит\":\"" + limit
+				+ "\",\"Отсрочка\":\"" + delay
+				+ "\",\"КодКлиента\":\"" + ApplicationHoreca.getInstance().getClientInfo().getKod()
+				+ "\",\"Потенциал\":\"" + potencial
+				+ "\",\"План\":\"" + plan
+				+ "\",\"Комментарий\":\"" + rem
+				+ "\"}";
 		System.out.println(url);
 		System.out.println(post);
 		final Bough raw = new Bough();
@@ -98,7 +108,7 @@ public class ActivityLimitEdit extends Activity {
 			@Override
 			public void doTask() {
 				try {
-					Bough b = Auxiliary.loadTextFromPrivatePOST(url, post.getBytes("UTF-8"), 33000,Cfg.whoCheckListOwner(),Cfg.hrcPersonalPassword(), true);
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url, post.getBytes("UTF-8"), 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
 					System.out.println(b.dumpXML());
 					String t = b.child("raw").value.property.value();
 					Bough json = Bough.parseJSON(t);
@@ -106,7 +116,7 @@ public class ActivityLimitEdit extends Activity {
 					raw.child("Статус").value.is(json.child("Статус").value.property.value());
 					raw.child("Сообщение").value.is(json.child("Сообщение").value.property.value());
 					raw.child("message").value.is(b.child("message").value.property.value());
-				} catch(Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -116,11 +126,10 @@ public class ActivityLimitEdit extends Activity {
 				System.out.println(raw.dumpXML());
 				String kod = raw.child("НомерЗаявки").value.property.value();
 				//_id
-				if(kod.trim().length() > 1) {
-					saveDB(kod, limit, delay, rem);
-				}
-				else {
-					saveDB("", limit, delay, rem);
+				if (kod.trim().length() > 1) {
+					saveDB(kod, limit, delay,plan,potencial, rem);
+				} else {
+					saveDB("", limit, delay, plan,potencial,rem);
 					Auxiliary.warn(raw.child("message").value.property.value() + "\n" + raw.child("Сообщение").value.property.value(), ActivityLimitEdit.this);
 				}
 			}
@@ -129,10 +138,10 @@ public class ActivityLimitEdit extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item == menuSave) {
+		if (item == menuSave) {
 			promptSave();
 		}
-		if(item == menuAdd) {
+		if (item == menuAdd) {
 			promptAdd();
 		}
 		return super.onOptionsItemSelected(item);
@@ -141,15 +150,14 @@ public class ActivityLimitEdit extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		//System.out.println("onActivityResult is " + requestCode);
-		switch(requestCode) {
+		switch (requestCode) {
 			case FILE_SELECT_RESULT: {
-				if(resultCode == RESULT_OK) {
+				if (resultCode == RESULT_OK) {
 					Uri uri = intent.getData();
 					String path = Auxiliary.pathForMediaURI(this, uri);
-					if(path != null && path.length() > 5) {
+					if (path != null && path.length() > 5) {
 						sendFile(path);
-					}
-					else {
+					} else {
 						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
 					}
 				}
@@ -161,20 +169,20 @@ public class ActivityLimitEdit extends Activity {
 
 	void sendFile(final String filePath) {
 		System.out.println(filePath);
-		String[] spl=filePath.split("\\.");
-		String rash=spl[spl.length-1];
+		String[] spl = filePath.split("\\.");
+		String rash = spl[spl.length - 1];
 		//http://89.109.7.162/hrc120107/hs/FileUvelLimita/000000001
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
-				                   + "/hs/FileUvelLimita/" + this.kod1C + "/?rash="+rash;
-//final String url = "http://89.109.7.162/shatov/hs/FileUvelLimita/" + this.kod1C + "/?rash="+rash;
+				+ "/hs/FileUvelLimita/" + this.kod1C + "/?rash=" + rash;
+		//final String url = "http://89.109.7.162/shatov/hs/FileUvelLimita/" + this.kod1C + "/?rash="+rash;
 		System.out.println(url);
 
-		final Bough result=new Bough();
+		final Bough result = new Bough();
 
 		try {
 			File iofile = new File(filePath);
 			int length = (int) iofile.length();
-			final byte[] bytes =new byte[length];
+			final byte[] bytes = new byte[length];
 			FileInputStream fileInputStream = new FileInputStream(iofile);
 			DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 			dataInputStream.readFully(bytes);
@@ -185,33 +193,34 @@ public class ActivityLimitEdit extends Activity {
 				@Override
 				public void doTask() {
 					try {
-						Bough b = Auxiliary.loadTextFromPrivatePOST(url, bytes, 33000, Cfg.whoCheckListOwner(),Cfg.hrcPersonalPassword(), false);
+						Bough b = Auxiliary.loadTextFromPrivatePOST(url, bytes, 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), false);
 						System.out.println(b.dumpXML());
 						result.child("raw").value.is(b.child("raw").value.property.value());
 						result.child("message").value.is(b.child("message").value.property.value());
 
-					} catch(Exception e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 			}).afterDone.is(new Task() {
 				@Override
 				public void doTask() {
-					if(result.child("raw").value.property.value().equals("Всё ОК")){
+					if (result.child("raw").value.property.value().equals("Всё ОК")) {
 						saveFile(filePath);
 					}
-					Auxiliary.warn(result.child("message").value.property.value()+": "+result.child("raw").value.property.value(),ActivityLimitEdit.this);
+					Auxiliary.warn(result.child("message").value.property.value() + ": " + result.child("raw").value.property.value(), ActivityLimitEdit.this);
 				}
 			}).status.is("Отправка файла").start(this);
-		}catch(Throwable t){
-			Auxiliary.warn(t.getMessage(),this);
+		} catch (Throwable t) {
+			Auxiliary.warn(t.getMessage(), this);
 		}
 	}
-	void saveFile(String path){
-		String sql="insert into limitidogovor (limitilist,kommentariitp) values ("//
-						   +"'"+this.kod1C//
-						   +"','"+path+"'"//
-				           +")";
+
+	void saveFile(String path) {
+		String sql = "insert into limitidogovor (limitilist,kommentariitp) values ("//
+				+ "'" + this.kod1C//
+				+ "','" + path + "'"//
+				+ ")";
 		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		fillGUI();
@@ -225,30 +234,28 @@ public class ActivityLimitEdit extends Activity {
 		try {
 			Intent chooser = Intent.createChooser(intent, "Выбрать файл");
 			startActivityForResult(chooser, FILE_SELECT_RESULT);
-		} catch(Throwable ex) {
+		} catch (Throwable ex) {
 			ex.printStackTrace();
 		}
 	}
 
 	void promptAdd() {
-		if(kod1C.equals("")) {
+		if (kod1C.equals("")) {
 			Auxiliary.warn("Сначала нужно выгрузить заявку.", ActivityLimitEdit.this);
-		}
-		else {
+		} else {
 			showFileChooser();
 		}
 	}
 
 	void promptSave() {
-		if(kod1C.equals("")) {
+		if (kod1C.equals("")) {
 			Auxiliary.pickConfirm(this, "Выгрузить документ?", "Выгрузить", new Task() {
 				@Override
 				public void doTask() {
 					vigruzit();
 				}
 			});
-		}
-		else {
+		} else {
 			System.out.println("uploaded already: " + this.kod1C);
 		}
 	}
@@ -262,10 +269,9 @@ public class ActivityLimitEdit extends Activity {
 
 	void fillGUI() {
 		grid.clearColumns();
-		if(kod1C.equals("")) {
+		if (kod1C.equals("")) {
 			filled.value(false);
-		}
-		else {
+		} else {
 			filled.value(true);
 		}
 		requery();
@@ -274,74 +280,75 @@ public class ActivityLimitEdit extends Activity {
 
 	void composeGUI() {
 		columnPath = new ColumnText();
-		if(this._id.trim().length() > 0) {
+		if (this._id.trim().length() > 0) {
 			Bough d = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(//
-					"select LimitiList._id as _id, DataIzm as limitval, Data as delay,Kommentarii as rem,Podrazdelenie as kod from LimitiList where _id=" + this._id, null));
+					"select LimitiList._id as _id, DataIzm as limitval, Data as delay,Kommentarii as rem,Podrazdelenie as kod, plan as plan, potencial as potencial from LimitiList where _id=" + this._id, null));
 			kod1C = d.child("row").child("kod").value.property.value();
 			valueLimit.value(Numeric.string2double(d.child("row").child("limitval").value.property.value()));
 			valueOtsrochka.value(Numeric.string2double(d.child("row").child("delay").value.property.value()));
+			valuePlan.value(Numeric.string2double(d.child("row").child("plan").value.property.value()));
+			valuePotencial.value(Numeric.string2double(d.child("row").child("potencial").value.property.value()));
 			valueKommentariy.value(d.child("row").child("rem").value.property.value());
 		}
-		this.setTitle("Лимиты: " + _id+" "+kod1C);
+		this.setTitle("Лимиты: " + _id + " " + kod1C);
 		grid = new DataGrid(this);
 		layoutless//
-				.child(new Decor(this).labelText.is("лимит").labelAlignRightCenter().labelStyleMediumNormal()//
-						       .left().is(0 * Auxiliary.tapSize).top().is(0 * Auxiliary.tapSize).width().is(3 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize)//
-				)//
-				.child(new RedactNumber(this).number.is(this.valueLimit).hidden().is(filled)//
-						       .left().is(3 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(6 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
-				)//
-				.child(new Decor(this).labelText.is(this.valueLimit.asNote()).labelAlignLeftCenter().hidden().is(filled.not())//
-						       .left().is(3 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(6 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
-				)//
-				.child(new Decor(this).labelText.is("отсрочка").labelAlignRightCenter().labelStyleMediumNormal()//
-						       .left().is(9 * Auxiliary.tapSize).top().is(0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize)//
-				)//
-				.child(new RedactNumber(this).number.is(this.valueOtsrochka).hidden().is(filled)//
-						       .left().is(11 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(6 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
-				)//
-				.child(new Decor(this).labelText.is(this.valueOtsrochka.asNote()).labelAlignLeftCenter().hidden().is(filled.not())//
-						       .left().is(11 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(6 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
-				)//
+				.child(new Decor(this).labelText.is("лимит").labelAlignRightCenter().labelStyleMediumNormal().left().is(0 * Auxiliary.tapSize).top().is(0 * Auxiliary.tapSize).width().is(3 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize))//
+				.child(new RedactNumber(this).number.is(this.valueLimit).hidden().is(filled).left().is(3 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+				.child(new Decor(this).labelText.is(this.valueLimit.asNote()).labelAlignLeftCenter().hidden().is(filled.not()).left().is(3 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+
+				.child(new Decor(this).labelText.is("отсрочка").labelAlignRightCenter().labelStyleMediumNormal().left().is(5 * Auxiliary.tapSize).top().is(0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize))//
+				.child(new RedactNumber(this).number.is(this.valueOtsrochka).hidden().is(filled).left().is(7 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+				.child(new Decor(this).labelText.is(this.valueOtsrochka.asNote()).labelAlignLeftCenter().hidden().is(filled.not()).left().is(7 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+
+				.child(new Decor(this).labelText.is("план").labelAlignRightCenter().labelStyleMediumNormal().left().is(9 * Auxiliary.tapSize).top().is(0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize))//
+				.child(new RedactNumber(this).number.is(this.valuePlan).hidden().is(filled).left().is(11 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+				.child(new Decor(this).labelText.is(this.valuePlan.asNote()).labelAlignLeftCenter().hidden().is(filled.not()).left().is(11 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+
+				.child(new Decor(this).labelText.is("потенциал").labelAlignRightCenter().labelStyleMediumNormal().left().is(13 * Auxiliary.tapSize).top().is(0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize))//
+				.child(new RedactNumber(this).number.is(this.valuePotencial).hidden().is(filled).left().is(15 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+				.child(new Decor(this).labelText.is(this.valuePotencial.asNote()).labelAlignLeftCenter().hidden().is(filled.not()).left().is(15 * Auxiliary.tapSize).top().is(8 + 0 * Auxiliary.tapSize).width().is(2 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize))//
+
+
 				.child(new Decor(this).labelText.is("комментарий").labelAlignRightCenter().labelStyleMediumNormal()//
-						       .left().is(0 * Auxiliary.tapSize).top().is(1 * Auxiliary.tapSize).width().is(3 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize)//
+						.left().is(0 * Auxiliary.tapSize).top().is(1 * Auxiliary.tapSize).width().is(3 * Auxiliary.tapSize - 8).height().is(Auxiliary.tapSize)//
 				)//
 				.child(new RedactText(this).text.is(this.valueKommentariy).hidden().is(filled)//
-						       .left().is(3 * Auxiliary.tapSize).top().is(8 + 1 * Auxiliary.tapSize).width().is(14 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
+						.left().is(3 * Auxiliary.tapSize).top().is(8 + 1 * Auxiliary.tapSize).width().is(14 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
 				)//
 				.child(new Decor(this).labelText.is(this.valueKommentariy).labelAlignLeftCenter().hidden().is(filled.not())//
-						       .left().is(3 * Auxiliary.tapSize).top().is(8 + 1 * Auxiliary.tapSize).width().is(14 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
+						.left().is(3 * Auxiliary.tapSize).top().is(8 + 1 * Auxiliary.tapSize).width().is(14 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize)//
 				)//
 		;
 		layoutless.child(grid//
-				                 .columns(new Column[]{ //
-						                 columnPath.title.is("Файл").width.is(layoutless.width().property)//
-				                 })//
-				                 .beforeFlip.is(new Task() {
+				.columns(new Column[]{ //
+						columnPath.title.is("Файл").width.is(layoutless.width().property)//
+				})//
+				.beforeFlip.is(new Task() {
 					@Override
 					public void doTask() {
 						requery();
 					}
 				})//
-				                 .pageSize.is(pageSize)//
-				                 .dataOffset.is(gridOffset)//
-				                 .top().is(2 * Auxiliary.tapSize)//
-				                 .width().is(layoutless.width().property)//
-				                 .height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
+				.pageSize.is(pageSize)//
+				.dataOffset.is(gridOffset)//
+				.top().is(2 * Auxiliary.tapSize)//
+				.width().is(layoutless.width().property)//
+				.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 		);
 	}
 
 	void requery() {
-		if(_id.equals("")) {
+		if (_id.equals("")) {
 			return;
 		}
-		String sql="select kommentariitp as path from limitidogovor where limitilist='"//
-						   +this.kod1C//
-						   +"'";
+		String sql = "select kommentariitp as path from limitidogovor where limitilist='"//
+				+ this.kod1C//
+				+ "'";
 		System.out.println(sql);
 		data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		System.out.println(data.dumpXML());
-		for(int i = 0; i < data.children.size(); i++) {
+		for (int i = 0; i < data.children.size(); i++) {
 			Bough row = data.children.get(i);
 			columnPath.cell(row.child("path").value.property.value());
 		}

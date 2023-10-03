@@ -38,6 +38,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 	}
 
 	public EParserResult UploadGPSPoints(String tpCode) {
+		//mDB.execSQL("delete from GPSPoints where date(BeginTime)>date('now','+1 days');");
 		String sql = "select _id,BeginTime,latitude,longitude from GPSPoints where Upload=0 order by _id limit 100";
 		Cursor c;
 		int biggestID = 0;
@@ -161,6 +162,8 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 	}*/
 
 	public EParserResult UploadVizits() {
+		//mDB.execSQL("delete from Vizits where date(BeginTime)>date('now','+1 days');");
+
 		//System.out.println("UploadVizits start");
 		StringBuilder resultString = new StringBuilder();
 		Cursor cursor = null;

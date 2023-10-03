@@ -789,7 +789,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return composeSQLall_Old(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
 				, poiskovoeSlovo, tipPoiska, etoTrafik, history, skladPodrazdelenia, limit//
 				, offset, isMustList, isTop, kuhnya, tochkaIdrref, individualcena, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch
-				, flagmanTovarSegmentKod);
+				, flagmanTovarSegmentKod,false,false,false,false);
 		// }
 	}
 
@@ -886,6 +886,10 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			, String ingredientIdrref
 			, String ingredientKluch
 			, String flagmanTovarSegmentKod
+			,boolean stmOnly
+			,boolean starsOnly
+			,boolean recomendaciaOnly
+			,boolean korzinaOnly
 	) {
 
 		refreshTovariGeroiDay(dataOtgruzki);
@@ -933,6 +937,10 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			//sql = sql + "\n 	,case curAssortiment.Trafic when x'01' then 'под заказ ' else '' end || n.[Naimenovanie] ";
 			sql = sql + "\n					  	,case curAssortiment.Trafic"
 					+ "\n			when x'01' then 'под заказ '"
+					+ "\n			else ''"
+					+ "\n			end"
+			+"\n					  	 || case brand.stm"
+					+ "\n			when x'01' then 'СТМ: '"
 					+ "\n			else ''"
 					+ "\n			end"
 					+ "\n		|| n.[Naimenovanie]";
@@ -1223,6 +1231,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n 	left join nomenklatura category3 on category2.Roditel=category3._idrref";
 		sql = sql + "\n 	left join nomenklatura category4 on category3.Roditel=category4._idrref";
 
+		sql = sql + "\n 	left join RecommendationAndBasket1221 recKorz on recKorz.Kontragent=parameters.kontragent and recKorz.nomenklatura=n._idrref";
 
 		if (uchetnayaCena(kontragentID)) {
 			sql = sql + "\n 	left join NacenkaKUchetnoiCene nk1 on nk1.klient=parameters.kontragent "//
@@ -1333,6 +1342,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		}
 		sql = sql + "\n  		left join atricle_count on atricle_count.artikul=n.artikul";
 		sql = sql + "\n  		left join stars on stars.artikul=n.artikul";
+		sql = sql + "\n  		left join brand on brand._idrref=n.brand";
 		String poisk = "";
 		if (poiskovoeSlovo == null) poiskovoeSlovo = "";
 		if (poiskovoeSlovo.trim().length() > 0) {
@@ -1351,10 +1361,10 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 							if (tipPoiska == ISearchBy.SEARCH_CHILDREN) {
 								//poisk = " ( n.Roditel=" + poiskovoeSlovo.trim().toUpperCase() + ") ";
 								poisk = " ( n.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ "or category1.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ "or category2.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ "or category3.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ "or category4.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+										+ " or category1.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+										+ " or category2.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+										+ " or category3.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+										+ " or category4.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
 										+ ") ";
 							} else {
 								if (tipPoiska == ISearchBy.SEARCH_IDRREF) {
@@ -1406,8 +1416,13 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		} else {
 			sql = sql + "\n where curAssortiment.zapret!=x'01' ";
 		}
+
 		if (poisk.length() > 0) {
 			sql = sql + "\n and " + poisk;
+		}
+		//stmOnly=true;
+		if(stmOnly){
+			sql = sql + "\n and brand.stm=x'01'" ;
 		}
 		if (isMustList == true) {
 			sql = sql + "\n and top20._id>0";
@@ -1425,11 +1440,23 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		if (ingredientIdrref != null) {
 			sql = sql + "\n and reprod.product is not null";
 		}
-		if(Activity_NomenclatureNew.filterByStar.value()){
+		//if(Activity_NomenclatureNew.filterByStar.value()){
+		//	sql = sql + "\n and stars.artikul=n.artikul";
+		//}
+		if(starsOnly){
 			sql = sql + "\n and stars.artikul=n.artikul";
 		}
+		if(korzinaOnly){
+			sql = sql + "\n and recKorz.vid='Корзина 1221'";
+		}
+		if(recomendaciaOnly){
+			sql = sql + "\n and recKorz.vid='Реком. 1221'";
+		}
+		/*if(stmOnly) {
+			sql=sql+" order by brand.stm desc, n.naimenovanie ";
+		}*/
 		sql = sql + "\n limit " + limit + " offset " + offset;
-		//System.out.println("poisk "+tipPoiska +"/"+ ISearchBy.SEARCH_HERO+"/"+poisk);
+		//System.out.println("stmOnly "+stmOnly);
 		//System.out.println( "composeSQLall_Old: " + sql);
 		return sql;
 	}

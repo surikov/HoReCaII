@@ -1041,14 +1041,14 @@ I/System.out: </>
 	}
 
 	void showVzaimoraschety() {
-		String curKod=ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
+		String curKod = ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
 		//System.out.println("showVzaimoraschety "+curKod);
 		//ActivityWebServicesReports.goLastPageTempName = "who";
 		int nn = 0;
 		Bough kk = Cfg.kontragentyForSelectedMarshrut();
 		for (int ii = 0; ii < kk.children.size(); ii++) {
-			Bough row=kk.children.get(ii);
-			String rowKod=row.child("kod").value.property.value().trim();
+			Bough row = kk.children.get(ii);
+			String rowKod = row.child("kod").value.property.value().trim();
 			//System.out.println("check "+curKod);
 			if (rowKod.equals(curKod)) {
 				nn = ii;
@@ -1057,7 +1057,7 @@ I/System.out: </>
 			}
 		}
 		//ActivityWebServicesReports.goLastPageTempValue = "" + nn;
-		ReportVzaioraschetySpokupatelem.temporaryWho=nn;
+		ReportVzaioraschetySpokupatelem.temporaryWho = nn;
 		//System.out.println("showVzaimoraschety "+nn);
 		Intent intent = new Intent();
 		intent.setClass(Activity_BidsContractsEtc_2.this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
@@ -1075,7 +1075,7 @@ I/System.out: </>
 		resetTitle();
 		Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod());
 		Cfg.refreshArtikleCount();
-		//Cfg.refreshNomenklatureGroups(ApplicationHoreca.getInstance().getDataBase());
+		Cfg.refreshNomenklatureGroups(ApplicationHoreca.getInstance().getDataBase());
 
 		dataGrid = new DataGrid(this).center.is(true)//
 				.headerHeight.is(0.5 * Auxiliary.tapSize).pageSize.is(gridPageSize)//
@@ -1739,9 +1739,10 @@ I/System.out: </>
 	void beginVizit() {
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		GPSInfo mGPSInfo = GPS.getGPSInfo();
-		String timeString = mGPSInfo.getVizitTimeString();
+		String timeString = Auxiliary.tryReFormatDate3(mGPSInfo.getVizitTimeString(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss");
+		//String timeString = mGPSInfo.getVizitTimeString();
 		mGPSInfo.BeginVizit(mAppInstance.getClientInfo().getKod());
-		Auxiliary.inform("Начало визита" + ": " + timeString, Activity_BidsContractsEtc_2.this);
+		Auxiliary.warn("Начало визита" + ": " + timeString, Activity_BidsContractsEtc_2.this);
 	}
 
 	void promptRepeatVizit(String lastVizitTime) {
@@ -1804,6 +1805,8 @@ I/System.out: </>
 	}
 
 	boolean mojnoZakrytVizit() {
+
+
 		//System.out.println("////////");
 		//System.out.println(Session.getGPSTime());
 		//System.out.println(new Date(Session.getGPSTime()));
@@ -1814,6 +1817,8 @@ I/System.out: </>
 			Auxiliary.warn("Нет координат за последние 30с. Проверьте GPS и настройки даты/времени.", Activity_BidsContractsEtc_2.this);
 			return false;
 		}*/
+
+
 		if (!gpsTimeExists30()) return false;
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
@@ -1824,14 +1829,19 @@ I/System.out: </>
 		//Cursor cursor = mDB.rawQuery(sql, null);
 		Bough b = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		//if(cursor.moveToFirst()) {
+		SimpleDateFormat userTime = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+		//mDateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		//userTime.setTimeZone(TimeZone.getTimeZone("GMT+03:00"));
+		java.util.Date now = new java.util.Date();
 		if (b.children.size() > 0) {
 			//DateFormat df;
-			SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			mDateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
 			try {
 				//java.util.Date beginDate = mDateTimeFormat.parse(cursor.getString(0));
+				SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+				mDateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 				java.util.Date beginDate = mDateTimeFormat.parse(b.child("row").child("BeginTime").value.property.value());
-				java.util.Date now = new java.util.Date();
+
 				duration = now.getTime() - beginDate.getTime();
 				//System.out.println(beginDate);
 				//System.out.println(now);
@@ -1843,8 +1853,13 @@ I/System.out: </>
 		//cursor.close();
 		//if (duration < 1000 * 60 * 15) {
 		if (duration < 1000 * 60 * 5) {
-			coarse = (int) (duration / (1000.0 * 60));
-			Auxiliary.warn("Визит должен длиться не меньше 5 мин., прошло только " + coarse + " мин.", Activity_BidsContractsEtc_2.this);
+			coarse = (int)Math.round(duration / (1000.0 * 60));
+
+			Auxiliary.warn("Визит должен длиться не меньше 5 мин.,\nс "
+					+ Auxiliary.tryReFormatDate3(b.child("row").child("BeginTime").value.property.value(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss")
+					+ "\nдо "
+					+ userTime.format(now)
+					+ "\nпрошло только " + coarse + " мин.", Activity_BidsContractsEtc_2.this);
 			return false;
 		}
 		long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
@@ -1875,7 +1890,9 @@ I/System.out: </>
 				//System.out.println(selection.value());
 				GPSInfo mGPSInfo = GPS.getGPSInfo();
 				ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
-				mGPSInfo.EndVisit(mAppInstance.getClientInfo().getKod(), b.children.get(selection.value().intValue()).child("Naimenovanie").value.property.value());
+				mGPSInfo.EndVisit(mAppInstance.getClientInfo().getKod()
+						, b.children.get(selection.value().intValue()).child("Naimenovanie").value.property.value()
+				);
 			}
 		}, null, null, null, null);
 	}

@@ -30,7 +30,7 @@ import tee.binding.it.*;
 
 public class Activity_NomenclatureNew extends Activity {
 	Layoutless layoutless;
-	int itemsMaxCount = 20;
+	int itemsMaxCount = 200;
 	static Numeric gridOffset = new Numeric();
 	static Numeric searchMode = new Numeric().value(1);
 	static Numeric searchKuhnya = new Numeric();
@@ -40,7 +40,11 @@ public class Activity_NomenclatureNew extends Activity {
 	RedactSingleChoice choiceKuhnya;
 	RedactText searchHistoryBox;
 	RedactText searchAllBox;
-	public static Toggle filterByStar = new Toggle();
+	//public static Toggle filterByStar = new Toggle();
+	//public static Toggle filterBySTM = new Toggle().value(false);
+
+
+
 	static Note searchWord = new Note();
 	static Note searchHistoryByName = new Note();
 	int gridCategoriesY = 0;
@@ -69,6 +73,19 @@ public class Activity_NomenclatureNew extends Activity {
 			}
 		}
 	};
+	Numeric filterStmStarRecomendaciaKorzina = new Numeric().afterChange(new Task() {
+		public void doTask() {
+			if (me == null) {
+				//
+			} else {
+				//System.out.println("now mode is " + mode.value());
+				gridOffset.value(0);
+				me.doRefreshData.start();
+			}
+		}
+	}, true);
+	RedactSingleChoice choiceStmStarRecomendaciaKorzina;
+
 	static Activity_NomenclatureNew me = null;
 	static Numeric mode = new Numeric().value(ShowViewPoisk).afterChange(new Task() {
 		public void doTask() {
@@ -152,26 +169,37 @@ public class Activity_NomenclatureNew extends Activity {
 			}
 		}).left().is(layoutless.width().property.multiply(2.0 / 3))//
 				.top().is(0).width().is(layoutless.width().property.divide(3)).height().is(1 * Auxiliary.tapSize));
+
+
 		layoutless.child(new Knob(this).labelText.is("Добавить").afterTap.is(new Task() {
 			public void doTask() {
 				returnSelectedRow();
 			}
-		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 3 * 1)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 3).height().is(1 * Auxiliary.tapSize));
+		})
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 1))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2.5).height()
+				.is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("Фото").afterTap.is(new Task() {
 			public void doTask() {
 				openFoto();
 			}
-		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 3 * 2)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 3).height().is(1 * Auxiliary.tapSize));
+		})
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 2))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2.5)
+				.height().is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("Запрос цен").afterTap.is(new Task() {
 			public void doTask() {
 				requestPriceNew();
 			}
-		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 3 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 3).height().is(1 * Auxiliary.tapSize));
+		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("Сертификат").afterTap.is(new Task() {
 			public void doTask() {
 				openCertificate();
 			}
-		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 3 * 4)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 3).height().is(1 * Auxiliary.tapSize));
+		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 4)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+		/*
 		layoutless.child(new Knob(this)
 				.labelText.is(new Note().value("★").when(filterByStar).otherwise("☆"))
 				.afterTap.is(new Task() {
@@ -180,10 +208,38 @@ public class Activity_NomenclatureNew extends Activity {
 						resetItemsGrid();
 					}
 				})
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (3 * 4 + 1)))
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.5 * 4 + 1)))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
 				.width().is(Auxiliary.tapSize * 1)
 				.height().is(1 * Auxiliary.tapSize));
+
+		layoutless.child(new Knob(this)
+				.labelText.is(new Note().value("✔ СТМ").when(filterBySTM).otherwise("СТМ"))
+				.afterTap.is(new Task() {
+					public void doTask() {
+						filterBySTM.value(!filterBySTM.value());
+						resetItemsGrid();
+					}
+				})
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.5 * 4 + 1 + 2)))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2)
+				.height().is(1 * Auxiliary.tapSize));
+*/
+		choiceStmStarRecomendaciaKorzina = new RedactSingleChoice(this);
+		layoutless.child(choiceStmStarRecomendaciaKorzina
+				.item("Вся номенклатура")
+				.item("СТМ")
+				.item("★")
+				.item("Рекомендованные")
+				.item("Корзина")
+				.selection.is(filterStmStarRecomendaciaKorzina)
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.5 * 4 + 5)))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(5 * Auxiliary.tapSize)
+				.height().is(Auxiliary.tapSize)
+		);
+
 		layoutless.child(new Decor(this).labelText.is(summaZakaza).labelAlignLeftCenter().left().is(Auxiliary.tapSize * 0.5).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 5).height().is(1 * Auxiliary.tapSize));
 		choiceKuhnya = new RedactSingleChoice(this);
 		layoutless.child(choiceKuhnya
@@ -269,9 +325,9 @@ public class Activity_NomenclatureNew extends Activity {
 	}
 
 	void requeryGridData() {
-		System.out.println("requeryGridData mode " + mode.value());
+		//System.out.println("requeryGridData mode " + filterBySTM.value());
 		if (mode.value() == ShowViewIstoria) {
-			String sql = Request_NomenclatureBase.composeSQLall(//
+			String sql = Request_NomenclatureBase.composeSQLall_Old(//.composeSQLall(//
 					DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
 					, ApplicationHoreca.getInstance().getClientInfo().getID()//
 					, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()//
@@ -286,7 +342,12 @@ public class Activity_NomenclatureNew extends Activity {
 					//, gridHistory.dataOffset.property.value().intValue()//
 					, gridOffset.value().intValue()//
 					, false//
-					, false, null, null, false, false, null, null, null);
+					, false, null, null, false, false, null, null, null
+					, filterStmStarRecomendaciaKorzina.value() == 1//,filterBySTM.value()
+					, filterStmStarRecomendaciaKorzina.value() == 2
+					, filterStmStarRecomendaciaKorzina.value() == 3
+					, filterStmStarRecomendaciaKorzina.value() == 4
+			);
 			itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		} else {
 			if (mode.value() == ShowViewPoisk) {
@@ -297,7 +358,7 @@ public class Activity_NomenclatureNew extends Activity {
 				if (searchKuhnya.value() > 0) kuhnya = choiceKuhnya.items.get(searchKuhnya.value().intValue());
 				String tochka = null;
 				if (searchTochka.value() > 0) tochka = tipTochkiData.children.get(searchTochka.value().intValue() - 1).child("_idrref").value.property.value();
-				String sql = Request_Search.composeSQLall(//
+				String sql = Request_Search.composeSQLall_Old(//.composeSQLall(//
 						DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
 						, ApplicationHoreca.getInstance().getClientInfo().getID()//
 						, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()//
@@ -319,7 +380,12 @@ public class Activity_NomenclatureNew extends Activity {
 						, null
 						, null
 						, null
+						, filterStmStarRecomendaciaKorzina.value() == 1//,filterBySTM.value()
+						, filterStmStarRecomendaciaKorzina.value() == 2
+						, filterStmStarRecomendaciaKorzina.value() == 3
+						, filterStmStarRecomendaciaKorzina.value() == 4
 				);
+				System.out.println(sql);
 				itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 				//}
 			} else {
@@ -330,7 +396,7 @@ public class Activity_NomenclatureNew extends Activity {
 						if (level3.trim().length() > 0) parent = "x'" + level3 + "'";
 						if (level4.trim().length() > 0) parent = "x'" + level4 + "'";
 						if (level5.trim().length() > 0) parent = "x'" + level5 + "'";
-						String sqlString = Request_NomenclatureBase.composeSQL(//
+						String sqlString = Request_NomenclatureBase.composeSQLall_Old(//
 								DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
 								, ApplicationHoreca.getInstance().getClientInfo().getID()//
 								, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()//
@@ -343,11 +409,12 @@ public class Activity_NomenclatureNew extends Activity {
 								, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()
 								, itemsMaxCount//gridPageSize * 3
 								, gridOffset.value().intValue()
-								, false
-								, false
-								, false
-								, null
-								, null
+								, false//
+								, false, null, null, false, false, null, null, null
+								, filterStmStarRecomendaciaKorzina.value() == 1//,filterBySTM.value()
+								, filterStmStarRecomendaciaKorzina.value() == 2
+								, filterStmStarRecomendaciaKorzina.value() == 3
+								, filterStmStarRecomendaciaKorzina.value() == 4
 						);
 						itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sqlString, null));
 					} else {
@@ -442,10 +509,11 @@ public class Activity_NomenclatureNew extends Activity {
 		}
 	}
 
-	void toggleStarFilter() {
-		filterByStar.value(!filterByStar.value());
-	}
-
+	/*
+		void toggleStarFilter() {
+			filterByStar.value(!filterByStar.value());
+		}
+	*/
 	void openCertificate() {
 		if (selectedRow == null) {
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
@@ -623,18 +691,18 @@ public class Activity_NomenclatureNew extends Activity {
 									+ "/" + itemsData.children.get(ii).child("lastSellCount").value.property.value()
 					);
 				} else {
-					columnPosledniaya.cell(" ", tap,"");
+					columnPosledniaya.cell(" ", tap, "");
 				}
 			}
 			if (itemsData.children.size() < 10) {
 				for (int ii = 0; ii < 10 - itemsData.children.size(); ii++) {
-					columnArtikul.cell("");
-					columnNomenklatura.cell("");
-					columnProizvoditel.cell("");
-					columnMinKolichestvo.cell("","");
-					columnCena.cell("","");
-					columnSkidka.cell("","");
-					columnPosledniaya.cell("","");
+					columnArtikul.cell("", 0xffffffff, null);
+					columnNomenklatura.cell("", 0xffffffff, null);
+					columnProizvoditel.cell("", 0xffffffff, null);
+					columnMinKolichestvo.cell("", 0xffffffff, null, "");
+					columnCena.cell("", 0xffffffff, null, "");
+					columnSkidka.cell("", 0xffffffff, null, "");
+					columnPosledniaya.cell("", 0xffffffff, null, "");
 				}
 			}
 
@@ -660,7 +728,7 @@ public class Activity_NomenclatureNew extends Activity {
 	}
 
 	void resetItemsGrid() {
-		System.out.println("resetItemsGrid");
+		//System.out.println("resetItemsGrid");
 		new Expect().status.is("Поиск...").task.is(new Task() {
 			public void doTask() {
 				//System.out.println("resetItemsGrid start");
@@ -689,8 +757,8 @@ public class Activity_NomenclatureNew extends Activity {
 		if (level4.trim().length() > 0) sql = sql + "\n		or (rod5=x'" + level4 + "')";
 		sql = sql + "\n	order by cat1,cat2,cat3,cat4,cat5;";
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		System.out.println("sql: "+sql);
-		System.out.println("data: "+data.dumpXML());
+		System.out.println("sql: " + sql);
+		System.out.println("rows: " + data.children.size());
 		String lastKey1 = "";
 		String lastKey2 = "";
 		String lastKey3 = "";
@@ -810,9 +878,9 @@ public class Activity_NomenclatureNew extends Activity {
 			newOffset = 0;
 		}
 		gridOffset.value(newOffset);
-		filterByStar.value(false);
+		//filterByStar.value(false);
 		//System.out.println("onPause " + newOffset + "/" + gridOffset.value() + "/" + this.gridItems.scrollView.getScrollY());
-
+		//filterStmStarRecomendaciaKorzina.value(0);
 	}
 
 	@Override

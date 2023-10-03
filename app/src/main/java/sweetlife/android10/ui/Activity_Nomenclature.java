@@ -526,7 +526,7 @@ public class Activity_Nomenclature extends Activity_Base implements OnTabChangeL
 		mCurrentRequest = null;
 		mTabHost.setCurrentTab(data.getActiveTab());
 		mTextOrderAmount = (TextView) findViewById(R.id.text_order_amount);
-		mTextOrderAmount.setText(getString(R.string.order_amount) + "  " + DecimalFormatHelper.format(mOrderAmount));
+		mTextOrderAmount.setText( "Сумма заказа: " + DecimalFormatHelper.format(mOrderAmount));
 		setupSearchModeSelection();
 		if (!lastClientID.equals(ApplicationHoreca.getInstance().getClientInfo().getID())) {
 			System.out.println("lastClientID " + lastClientID);

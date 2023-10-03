@@ -163,11 +163,24 @@ public class DatabaseHelper {
 		mDB.execSQL("create index if not exists IX_ReceptiiIngridienty_ingridient on ReceptiiIngridienty(ingridient);");
 		mDB.execSQL("create index if not exists IX_ReceptiiIngridienty_IDRRef on ReceptiiIngridienty(_IDRRef);");
 
+System.out.println("create RecommendationAndBasket1221");
+		mDB.execSQL("create table if not exists RecommendationAndBasket1221 ("//
+				+ "_id integer primary key asc"//
+				+ ", Kontragent blob null"//
+				+ ", Nomenklatura blob null"//
+				+ ", Vid  null"//
+				+ ");"//
+		);
+		mDB.execSQL("create index if not exists IX_RecommendationAndBasket1221_Kontragent on RecommendationAndBasket1221(Kontragent);");
+		mDB.execSQL("create index if not exists IX_RecommendationAndBasket1221_Nomenklatura on RecommendationAndBasket1221(Nomenklatura);");
+		mDB.execSQL("create index if not exists IX_RecommendationAndBasket1221_Vid on RecommendationAndBasket1221(Vid);");
+
+
 		mDB.execSQL("create table if not exists Zametki ("//
 				+ "_id integer primary key asc"//
 				+ ",kontragentKod numeric null"//
 				+ ",dateCreate date null"//
-				+ ",zametka text null"//
+				+ ",zametka text null"//text
 				+ ");"//
 		);
 
@@ -184,6 +197,27 @@ public class DatabaseHelper {
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}
+
+
+
+		mDB.execSQL("create table if not exists Brand ("//
+				+ "_id integer primary key asc"//
+				+ ",_idrref blob null"//
+				+ ",Naimenovanie text null"//
+				+ ",STM blob null"//
+				+ ");"//
+		);
+		mDB.execSQL("create index if not exists IX_Brand_idrref on Brand(_idrref);");
+		mDB.execSQL("create index if not exists IX_Brand_stm on Brand(stm);");
+
+		try {
+			mDB.execSQL("alter table Nomenklatura add column Brand blob;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
+		mDB.execSQL("create index if not exists IX_Nomenklatura_Brand on Nomenklatura(Brand);");
+
+
 		/*try {
 			mDB.execSQL("alter table MatricaRowsX add column KontragentImya text;");
 			mDB.execSQL("alter table MatricaRowsX add column KommentariiRD text;");
@@ -804,6 +838,12 @@ public class DatabaseHelper {
             System.out.println(t.getMessage());
         }*/
 		try {
+			mDB.execSQL("alter table LimitiList add column plan real;");
+			mDB.execSQL("alter table LimitiList add column potencial real;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
+		try {
 			mDB.execSQL("alter table Podrazdeleniya add column NeIspolzovatCR blob;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
@@ -1324,7 +1364,8 @@ public class DatabaseHelper {
 	public static void deleteOldData(SQLiteDatabase mDB) {
 		System.out.println("deleteOldData start");
 		mDB.execSQL("delete from GPSPoints where date(BeginTime)<date('now','-3 days');");
-		mDB.execSQL("delete from GPSPoints where date(BeginTime)>date('now','+3 days');");
+		//mDB.execSQL("delete from GPSPoints where date(BeginTime)>date('now','+3 days');");
+		mDB.execSQL("delete from GPSPoints where date(BeginTime)>date('now','+1 days');");
 
 		mDB.execSQL("delete from vizits where date(BeginTime)<date('now','-20 days');");
 		mDB.execSQL("delete from vizits where date(BeginTime)>date('now','+2 days');");

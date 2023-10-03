@@ -7,11 +7,13 @@ import reactive.ui.Decor;
 import reactive.ui.Knob;
 import reactive.ui.RedactDate;
 import reactive.ui.SubLayoutless;
+import sweetlife.android10.Settings;
 import tee.binding.Bough;
 import tee.binding.it.Numeric;
 
 import android.content.*;
 
+import java.net.URLEncoder;
 import java.util.*;
 
 import reactive.ui.*;
@@ -132,6 +134,54 @@ public class ReportStatusyZakazov extends Report_Base {
 	}
 
 	@Override
+	public String composeGetQuery(int queryKind) {
+//https://service.swlife.ru/hrc120107/hs/Report/СтатусыЗаказов/supernn_hrc?param=
+		// {""ДатаНачала"":""20230923"",""ДатаОкончания"":""20230923"",""Контрагент"":""87687"",""ТолькоНеПроведенные"":""ложь""}
+		int i = territory.value().intValue();
+		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
+
+		String p = "{\"ДатаНачала\":\"" + Cfg.formatMills(dateFrom.value(), "yyyyMMdd") + "\""//
+				+ ",\"ДатаОкончания\":\"" + Cfg.formatMills(dateTo.value(), "yyyyMMdd") + "\""//
+				;
+		if(whoPlus1.value().intValue() > 0) {
+			int nn = whoPlus1.value().intValue() - 1;
+			p = p + ",\"Контрагент\":\"" + kod(nn) + "\"";
+		}
+		p = p + ",\"ТолькоНеПроведенные\":\"" + (inValidOnly.value() ? "Истина" : "Ложь") + "\"";
+		p = p + "}";
+		String e = "";
+		try {
+			e = URLEncoder.encode(p, "UTF-8");
+		} catch(Throwable t) {
+			t.printStackTrace();
+			e = t.getMessage();
+		}
+		String serviceName = "СтатусыЗаказов";
+		try {
+			serviceName = URLEncoder.encode(serviceName, "UTF-8");
+		} catch(Throwable t) {
+			t.printStackTrace();
+			serviceName = t.getMessage();
+		}
+		String q = Settings.getInstance().getBaseURL()//
+				//+ "GolovaNew"//
+				//+"cehan_hrc"//
+				+ Settings.selectedBase1C()//
+				+ "/hs/Report/"//
+				+ serviceName + "/" //
+				+hrc//
+				//+ Cfg.currentHRC()//
+				+ "?param=" + e//
+				;
+		System.out.println(q);
+
+		q=q+tagForFormat( queryKind);
+		//System.out.println("composeGetQuery " + q);
+		return q;
+	}
+
+	/*
+	@Override
 	public String composeRequest() {
 		//long cu = new Date().getTime();
 		int i = territory.value().intValue();
@@ -172,7 +222,7 @@ public class ReportStatusyZakazov extends Report_Base {
 				+ "\n		</soap:Envelope>";
 		return xml;
 	}
-
+*/
 	@Override
 	public SubLayoutless getParametersView(Context context) {
 		if (propertiesForm == null) {

@@ -357,10 +357,11 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow {
 		if (mEditCount.getText().toString().length() != 0) {
 			count = Double.parseDouble(mEditCount.getText().toString().replace(',', '.'));
 		}
+		System.out.println("rollCount "+increase+": "+count);
 		if (increase) {
 			double nextKoefMest = mFoodstaff.getKoefMest() * (1 + Math.floor(count / mFoodstaff.getKoefMest()));
 			double nextMinNorma = mFoodstaff.getMinNorma() * (1 + Math.floor(count / mFoodstaff.getMinNorma()));
-			//System.out.println("nextKoefMest "+nextKoefMest+", nextMinNorma "+nextMinNorma);
+			System.out.println("nextKoefMest "+nextKoefMest+", nextMinNorma "+nextMinNorma);
 			if (count < mFoodstaff.getMinNorma()) {
 				count = mFoodstaff.getMinNorma();
 			} else {
@@ -369,7 +370,7 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow {
 		} else {
 			double preKoefMest = mFoodstaff.getKoefMest() * Math.floor(count / mFoodstaff.getKoefMest());
 			double preMinNorma = mFoodstaff.getMinNorma() * Math.floor(count / mFoodstaff.getMinNorma());
-			//System.out.println("preKoefMest "+preKoefMest+", preMinNorma "+preMinNorma);
+			System.out.println("preKoefMest "+preKoefMest+", preMinNorma "+preMinNorma);
 			if (preKoefMest == count) {
 				preKoefMest = preKoefMest - mFoodstaff.getKoefMest();
 			}
@@ -378,6 +379,9 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow {
 			}
 			count = preKoefMest < preMinNorma ? preMinNorma : preKoefMest;
 			count = count < 0 ? 0 : count;
+			if (count < mFoodstaff.getMinNorma()) {
+				count = mFoodstaff.getMinNorma();
+			}
 		}
 		mEditCount.setText(DecimalFormatHelper.format(mCountHelper.ReCalculateCount(count)));
 	}

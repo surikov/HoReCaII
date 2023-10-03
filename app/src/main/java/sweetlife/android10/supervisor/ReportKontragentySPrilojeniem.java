@@ -114,7 +114,7 @@ public class ReportKontragentySPrilojeniem extends Report_Base {
 
         b.child("docFrom").value.is("" + (d - 0 * 24 * 60 * 60 * 1000.0));
         b.child("docTo").value.is("" + (d + 0 * 24 * 60 * 60 * 1000.0));
-        b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
+        //b.child("territory").value.is("" + (Cfg.territory().children.size() - 1));
         String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
         Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
     }

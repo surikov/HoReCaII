@@ -84,10 +84,12 @@ public class Auxiliary {
 	//public static double accelerometerAverageY = 0;
 	//public static double accelerometerAverageZ = 0;
 	public static double accelerometerNoise = 1.0;
+	public static SimpleDateFormat mssqlTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	public static SimpleDateFormat sqliteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	public static SimpleDateFormat sqliteDate = new SimpleDateFormat("yyyy-MM-dd");
 	public static SimpleDateFormat short1cDate = new SimpleDateFormat("yyyyMMdd");
 	public static SimpleDateFormat rusDate = new SimpleDateFormat("dd.MM.yy");
+	public static SimpleDateFormat rusTimeDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 	public static double latitude = 0;//https://www.google.ru/maps/@56.3706531,44.0456248,10.25z - latitude+":"+longitude
 	public static double longitude = 0;//east-west, долгота
 	public static long gpsTime = 0;//last time
@@ -378,6 +380,23 @@ public class Auxiliary {
 		String r = "";
 		if (date.trim().length() > 0) {
 			SimpleDateFormat fromDate = new SimpleDateFormat(from);
+			SimpleDateFormat toDate = new SimpleDateFormat(to);
+			try {
+				Date d = fromDate.parse(date);
+				r = toDate.format(d);
+			} catch (ParseException e) {
+				System.out.println("tryReFormatDate: " + date + ", " + from + ", " + to);
+				e.printStackTrace();
+				r = date;
+			}
+		}
+		return r;
+	}
+	public static String tryReFormatDate3(String date, String from, String to) {
+		String r = "";
+		if (date.trim().length() > 0) {
+			SimpleDateFormat fromDate = new SimpleDateFormat(from);
+			fromDate.setTimeZone(TimeZone.getTimeZone("UTC"));
 			SimpleDateFormat toDate = new SimpleDateFormat(to);
 			try {
 				Date d = fromDate.parse(date);
@@ -868,7 +887,7 @@ public class Auxiliary {
 			}
 			bufferedInputStream.close();
 			byte[] raw = byteArrayOutputStream.toByteArray();
-			System.out.println("raw: " + (new String(raw, "windows-1251")));
+			//System.out.println("raw: " + (new String(raw, "windows-1251")));
 
 			r.child("raw").value.is(new String(raw, charset));
 		} catch (Throwable t) {
@@ -893,6 +912,10 @@ public class Auxiliary {
 	}
 
 	public static byte[] loadFileFromPrivateURL(String pathurl, String login, String password) throws Exception {
+		return loadFileFromPrivateURL(pathurl, login, password, "windows-1251");
+	}
+
+	public static byte[] loadFileFromPrivateURL(String pathurl, String login, String password, String encoding) throws Exception {
 		if (login == null || password == null) {
 			return loadFileFromPublicURL(pathurl);
 		}
@@ -923,9 +946,10 @@ public class Auxiliary {
 			output.write(data, 0, nn);
 		}
 		input.close();
-		String s = new String(output.toByteArray(), "windows-1251");
+		//String s = new String(output.toByteArray(), "windows-1251");
+		String s = new String(output.toByteArray(), encoding);
 
-		//System.out.println("loadFileFromPrivateURL " + connection.getResponseCode() + ": " + s);
+		System.out.println("loadFileFromPrivateURL " + connection.getResponseCode() + ": " + s);
 
 		input = connection.getErrorStream();
 		if (input != null) {
@@ -935,12 +959,13 @@ public class Auxiliary {
 			}
 			input.close();
 
-			String s2 = new String(output.toByteArray(), "windows-1251");
+			String s2 = new String(output.toByteArray(), encoding);
 			if (s2.length() > 0) {
 				s = s + "\n" + s2;
 			}
 		}
 
+		//System.out.println("loadFileFromPrivateURL " + connection.getResponseCode() + ": " + s);
 
 		return output.toByteArray();
 	}
@@ -1226,25 +1251,43 @@ public class Auxiliary {
 	}
 
 	public static void pickFilteredChoice(Context context, final String[] items, final Numeric selection, final Task callbackSelect) {
+		pickFilteredChoice(context, items, selection, null, callbackSelect, null, null, null, null, null, null);
+	}
+
+	public static void pickFilteredChoice(Context context, final String[] items, final Numeric selection, String title, final Task callbackSelect
+			, String positiveButtonTitle//
+			, final Task callbackPositiveBtn//
+			, String neutralButtonTitle//
+			, final Task callbackNeutralBtn//
+			, String negativeButtonTitle//
+			, final Task callbackNegativeBtn//
+	) {
 		final DataGrid grid = new DataGrid(context);
 		final ColumnText lines = new ColumnText();
 		final Note filter = new Note();
-		final AlertDialog alertDialog = Auxiliary.pick(context, "", new SubLayoutless(context)//
+		//Numeric dialogWidth = new Numeric();
+		final AlertDialog alertDialog = Auxiliary.pick(context
+				, title
+				, new SubLayoutless(context)//
 						.child(new RedactText(context).text.is(filter)
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 0.3)
-								.width().is(Auxiliary.tapSize * 10)
+								.width().is(Auxiliary.tapSize * 14)
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(grid.noHead.is(true).columns(new Column[]{
-								lines.title.is("data").width.is(Auxiliary.tapSize * 15 - Auxiliary.tapSize)
+								lines.title.is("data").width.is(Auxiliary.tapSize * 14)
 						})
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 1.0)
-								.width().is(Auxiliary.tapSize * 10)
-								.height().is(Auxiliary.tapSize * 8))//
-						.width().is(Auxiliary.tapSize * 21)//
-						.height().is(Auxiliary.tapSize * 9)//
-				, null, null, null, null, null, null);
+								.width().is(Auxiliary.tapSize * 14)
+								.height().is(Auxiliary.tapSize * 6.5))//
+						.width().is(Auxiliary.tapSize * 15)//
+						.height().is(Auxiliary.tapSize * 10)//
+				, positiveButtonTitle, callbackPositiveBtn//
+				, neutralButtonTitle, callbackNeutralBtn//
+				, negativeButtonTitle, callbackNegativeBtn
+		);
+
 		final Task refreshList = new Task() {
 			public void doTask() {
 				grid.clearColumns();
@@ -1325,13 +1368,102 @@ public class Auxiliary {
 		//builder.create().show();
 	}
 
-	public static void pickMultiChoice(Context context, CharSequence[] items, final They<Integer> defaultSelection//
+	public static void refreshFilteredMultiChoice(DataGrid grid, Vector<CheckRow> rows, Note filter, ColumnText lines) {
+		if (grid != null) {
+			//System.out.println("filter " + filter.property.value());
+			grid.clearColumns();
+			//String ss = "";
+			for (int i = 0; i < rows.size(); i++) {
+				if (rows.get(i).txt.toUpperCase().indexOf(filter.value().trim().toUpperCase()) > -1) {
+					if (rows.get(i).checked) {
+						final int nn = i;
+						Task rowtap = new Task() {
+							public void doTask() {
+								rows.get(nn).checked = false;
+								refreshFilteredMultiChoice(grid, rows, filter, lines);
+							}
+						};
+						lines.cell("✔ " + rows.get(i).txt, rowtap);
+						//if (ss.length() > 0) ss = ss + ", ";
+						//ss = ss + items.get(i).row;
+					}
+				}
+			}
+			//setText(ss);
+			for (int i = 0; i < rows.size(); i++) {
+				if (rows.get(i).txt.toUpperCase().indexOf(filter.value().trim().toUpperCase()) > -1) {
+					if (!rows.get(i).checked) {
+						final int nn = i;
+						Task rowtap = new Task() {
+							public void doTask() {
+								rows.get(nn).checked = true;
+								refreshFilteredMultiChoice(grid, rows, filter, lines);
+							}
+						};
+						lines.cell("" + rows.get(i).txt, rowtap);
+					}
+				}
+			}
+			grid.refresh();
+
+
+		}
+		//setTextLabel();
+
+	}
+
+	public static void pickFilteredMultiChoice(Context context, Vector<CheckRow> rows//
+			, String positiveButtonTitle, final Task callbackPositiveBtn
+			, String negativeButtonTitle, final Task callbackNegativeBtn
+			, String title
 	) {
-		pickMultiChoice(context, items, defaultSelection, null, null);
+		DataGrid grid = new DataGrid(context);
+		ColumnText lines = new ColumnText();
+		Note filter = new Note();
+		AlertDialog alertDialog = Auxiliary.pick(context, title, new SubLayoutless(context)//
+						.child(new RedactText(context).text.is(filter)
+								.left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 0.3)
+								.width().is(Auxiliary.tapSize * 10)
+								.height().is(Auxiliary.tapSize * 0.7))//
+						.child(grid.noHead.is(true).columns(
+								new Column[]{lines.title.is("data")
+										.width.is(Auxiliary.tapSize * 10)
+								})
+								.left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 1.0)
+								.width().is(Auxiliary.tapSize * 10)
+								.height().is(Auxiliary.tapSize * 8))//
+						.width().is(Auxiliary.tapSize * 11)//
+						.height().is(Auxiliary.tapSize * 9)//
+				, positiveButtonTitle, callbackPositiveBtn
+				, negativeButtonTitle, callbackNegativeBtn
+				, null, null);
+		//refreshFilteredMultiChoice(grid, rows, filter, lines);
+		filter.afterChange(new Task() {
+			@Override
+			public void doTask() {
+				refreshFilteredMultiChoice(grid, rows, filter, lines);
+			}
+		});
 	}
 
 	public static void pickMultiChoice(Context context, CharSequence[] items, final They<Integer> defaultSelection//
-			, String positiveButtonTitle, final Task callbackPositiveBtn) {
+	) {
+		pickMultiChoice(context, items, defaultSelection, null, null, null, null, null);
+	}
+
+	public static void pickMultiChoice(Context context, CharSequence[] items, final They<Integer> defaultSelection//
+			, String positiveButtonTitle, final Task callbackPositiveBtn
+	) {
+		pickMultiChoice(context, items, defaultSelection, positiveButtonTitle, callbackPositiveBtn, null, null, null);
+	}
+
+	public static void pickMultiChoice(Context context, CharSequence[] items, final They<Integer> defaultSelection//
+			, String positiveButtonTitle, final Task callbackPositiveBtn
+			, String negativeButtonTitle, final Task callbackNegativeBtn
+			, String title
+	) {
 		if (items.length > 0) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
 			boolean[] checks = new boolean[items.length];
@@ -1341,6 +1473,7 @@ public class Auxiliary {
 					checks[n] = true;
 				}
 			}
+			if (title != null) builder.setTitle(title);
 			builder.setMultiChoiceItems(items, checks, new DialogInterface.OnMultiChoiceClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which, boolean isChecked) {
@@ -1371,6 +1504,16 @@ public class Auxiliary {
 						dialog.dismiss();
 						if (callbackPositiveBtn != null) {
 							callbackPositiveBtn.start();
+						}
+					}
+				});
+			}
+			if (callbackNegativeBtn != null) {
+				builder.setNegativeButton(negativeButtonTitle, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+						if (callbackNegativeBtn != null) {
+							callbackNegativeBtn.start();
 						}
 					}
 				});
