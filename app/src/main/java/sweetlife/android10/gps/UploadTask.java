@@ -80,9 +80,9 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 				logAndPublishProgress("выгрузка GPS за " + BeginTime);
 				//RawSOAP rawSOAP = new RawSOAP().url.is(Settings.getInstance().getBaseURL()+"wsgetdebt/wsGPSAndroid.1cws").xml.is(xml);
 				String gpsURL = Settings.getInstance().getBaseURL() + "wsgetdebt/wsGPSAndroid.1cws";
-				if (Settings.getInstance().isPrimaryGate) {
+				//if (Settings.getInstance().isPrimaryGate) {
 					gpsURL = Settings.getInstance().getBaseURL() + "wsGPSAndroid.1cws";
-				}
+				//}
 				//RawSOAP rawSOAP = new RawSOAP().url.is(Settings.getInstance().getBaseURL() + "wsgetdebt/wsGPSAndroid.1cws").xml.is(xml);
 				RawSOAP rawSOAP = new RawSOAP().url.is(gpsURL).xml.is(xml);
 				//System.out.println("biggestID: " + biggestID);
@@ -200,7 +200,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 				try {
 					String endTime = null;
 					String activity = null;
-					String endField = cursor.getString(cursor.getColumnIndex(END_TIME));
+					String endField = cursor.getString(cursor.getColumnIndex(ENDTIMEfieldName));
 					if (endField == null) {
 						endField = "";
 					}

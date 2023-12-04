@@ -32,7 +32,7 @@ import tee.binding.*;
 import java.io.*;
 import java.text.*;
 
-public class ActivityWebServicesReports extends Activity {
+public class ActivityWebServicesReports extends Activity{
 	public static final int FILE_SELECT_SKD_RESULT = 112234;
 	public static final int FILE_PEREBIT_SKD_RESULT = 223322;
 	//public static final int NOMENKLATURA_NEW = 555333;
@@ -63,70 +63,70 @@ public class ActivityWebServicesReports extends Activity {
 	MenuItem menuClear;
 
 	Expect refreshFog = new Expect()//
-			.task.is(new Task() {
+			.task.is(new Task(){
 				@Override
-				public void doTask() {
-					if (brwsr != null) {
-						while (!brwsr.isEnabled()) {
-							try {
+				public void doTask(){
+					if(brwsr != null){
+						while(!brwsr.isEnabled()){
+							try{
 								Thread.sleep(99);
-							} catch (Throwable t) {
+							}catch(Throwable t){
 								break;
 							}
 						}
 					}
 				}
 			})//
-			.afterDone.is(new Task() {
+			.afterDone.is(new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					//
 				}
 			})//
 			.status.is("Подождите....");
 	private Layoutless layoutless;
 
-	public static String reformatDate(String d) {
-		try {
+	public static String reformatDate(String d){
+		try{
 			DateFormat from = new SimpleDateFormat("dd.MM.yyyy");
 			DateFormat to = new SimpleDateFormat("yyyy-MM-dd");
 			d = to.format(from.parse(d));
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		//System.out.println("d now is "+d);
 		return d;
 	}
 
-	public static String reformatDate2(String d) {
-		try {
+	public static String reformatDate2(String d){
+		try{
 			DateFormat from = new SimpleDateFormat("dd.MM.yyyy");
 			DateFormat to = new SimpleDateFormat("yyyyMMdd");
 			d = to.format(from.parse(d));
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		//System.out.println("d now is "+d);
 		return d;
 	}
 
-	public static String reformatDate3(String d) {
-		try {
+	public static String reformatDate3(String d){
+		try{
 			DateFormat from = new SimpleDateFormat("dd.MM.yyyy");
 			DateFormat to = new SimpleDateFormat("yyyy-MM-dd");
 			d = to.format(from.parse(d));
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		//System.out.println("d now is "+d);
 		return d;
 	}
 
-	public static double dateOnly(Calendar c) {
+	public static double dateOnly(Calendar c){
 		return dateOnly(c, 0);
 	}
 
-	public static double dateOnly(Calendar c, int days) {
+	public static double dateOnly(Calendar c, int days){
 		c.set(Calendar.HOUR, 0);
 		c.set(Calendar.MINUTE, 0);
 		c.set(Calendar.SECOND, 0);
@@ -135,30 +135,30 @@ public class ActivityWebServicesReports extends Activity {
 		return c.getTimeInMillis();
 	}
 
-	public static String pad2(int n) {
+	public static String pad2(int n){
 		String r = "" + n;
-		if (n < 10) {
+		if(n < 10){
 			r = "0" + r;
 		}
 		return r;
 	}
 
-	public static String naimenovanieKontragenta(int nn) {
-		if (nn < Cfg.kontragenty().children.size()) {
+	public static String naimenovanieKontragenta(int nn){
+		if(nn < Cfg.kontragenty().children.size()){
 			return Cfg.kontragenty().children.get(nn).child("naimenovanie").value.property.value();
 		}
 		return "(неизвестный контрагент " + nn + ")";
 	}
 
 	@Override
-	protected void onPause() {
-		try {
-			if (preReport != null) {
+	protected void onPause(){
+		try{
+			if(preReport != null){
 				Preferences.string("folder", "").value(preReport.getFolderKey());
 				Preferences.string("file", "").value(preKey);
 			}
 			Preferences.save();
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		reportGridScrollViewY = reportGrid.scrollView.getScrollY();
@@ -170,7 +170,7 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		System.out.println("ActivityWebServicesReports.onCreate");
 		super.onCreate(savedInstanceState);
 		layoutless = new Layoutless(this);
@@ -187,14 +187,14 @@ public class ActivityWebServicesReports extends Activity {
 			}
 		};*/
 		new Expect().status.is("Подождите")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Cfg.territory();
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				createGUI();
 				bindData();
 				goLastPage();
@@ -206,15 +206,15 @@ public class ActivityWebServicesReports extends Activity {
 
 	}
 
-	void waitForReportGridLayout() {
+	void waitForReportGridLayout(){
 		final View view = reportGrid;
 		ViewTreeObserver vto = view.getViewTreeObserver();
-		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
 			@Override
-			public void onGlobalLayout() {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			public void onGlobalLayout(){
+				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
 					view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-				} else {
+				}else{
 					view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 				}
 				//int width  = view.getMeasuredWidth();
@@ -226,34 +226,34 @@ public class ActivityWebServicesReports extends Activity {
 		});
 	}
 
-	void scrollBack() {
+	void scrollBack(){
 		System.out.println("scrollBack reportGridScrollViewY: " + reportGridScrollViewY
 				+ ": " + reportGrid.getMeasuredHeight()
 				+ ": " + reportGrid.scrollView.getMeasuredHeight()
 				+ ": " + reportName.strings.size());
-		if (reportGridScrollViewY > 0) {
+		if(reportGridScrollViewY > 0){
 			reportGrid.scrollView.scrollTo(0, reportGridScrollViewY);
 			reportGridScrollViewY = 0;
 		}
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume(){
 		super.onResume();
 		System.out.println("ActivityWebServicesReports.onResume needRefresh " + needRefresh);
-		if (needRefresh) {
+		if(needRefresh){
 			needRefresh = false;
 			//expectRequery.start(this);
-			if (preReport != null) {
+			if(preReport != null){
 				System.out.println("ActivityWebServicesReports preReport.writeCurrentPage");
-				new Expect().task.is(new Task() {
+				new Expect().task.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						preReport.writeCurrentPage();
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
 				}).status.is("Обновление....").start(this);
@@ -261,107 +261,107 @@ public class ActivityWebServicesReports extends Activity {
 		}
 	}
 
-	Report_Base createReport(String key) {
+	Report_Base createReport(String key){
 		Report_Base report = null;
-		if (key.equals(ReportAKBPoTP.folderKey())) {
+		if(key.equals(ReportAKBPoTP.folderKey())){
 			report = new ReportAKBPoTP(this);
 		}
-		if (key.equals(ReportStatistikaVozvratovAktovSverki.folderKey())) {
+		if(key.equals(ReportStatistikaVozvratovAktovSverki.folderKey())){
 			report = new ReportStatistikaVozvratovAktovSverki(this);
 		}
-		if (key.equals(ReportPechatSchetaNaOplatu.folderKey())) {
+		if(key.equals(ReportPechatSchetaNaOplatu.folderKey())){
 			report = new ReportPechatSchetaNaOplatu(this);
 		}
-		if (key.equals(ReportBonusyDlyaTP.folderKey())) {
+		if(key.equals(ReportBonusyDlyaTP.folderKey())){
 			report = new ReportBonusyDlyaTP(this);
 		}
-		if (key.equals(ReportVzaioraschetySpokupatelem.folderKey())) {
+		if(key.equals(ReportVzaioraschetySpokupatelem.folderKey())){
 			report = new ReportVzaioraschetySpokupatelem(this);
 		}
 		//if (key.equals(ReportRekomendaciiKlientam.folderKey())) {
 		//	report = new ReportRekomendaciiKlientam(this);
 		//}
-		if (key.equals(ReportZakazyVneMarshruta.folderKey())) {
+		if(key.equals(ReportZakazyVneMarshruta.folderKey())){
 			report = new ReportZakazyVneMarshruta(this);
 		}
-		if (key.equals(ReportZayavkiNaPerebitieNakladnih.folderKey())) {
+		if(key.equals(ReportZayavkiNaPerebitieNakladnih.folderKey())){
 			report = new ReportZayavkiNaPerebitieNakladnih(this);
 		}
-		if (key.equals(ReportZayavkiNaUvelichenieLimita.folderKey())) {
+		if(key.equals(ReportZayavkiNaUvelichenieLimita.folderKey())){
 			report = new ReportZayavkiNaUvelichenieLimita(this);
 		}
-		if (key.equals(ReportAssortimentFlagmanov.folderKey())) {
+		if(key.equals(ReportAssortimentFlagmanov.folderKey())){
 			report = new ReportAssortimentFlagmanov(this);
 		}
 
-		if (key.equals(ReportSravnitelniyAnaliz.folderKey())) {
+		if(key.equals(ReportSravnitelniyAnaliz.folderKey())){
 			report = new ReportSravnitelniyAnaliz(this);
 		}
-		if (key.equals(ReportTovarnieVozvrati.folderKey())) {
+		if(key.equals(ReportTovarnieVozvrati.folderKey())){
 			report = new ReportTovarnieVozvrati(this);
 		}
-		if (key.equals(ReportTovarnieNakladmie.folderKey())) {
+		if(key.equals(ReportTovarnieNakladmie.folderKey())){
 			report = new ReportTovarnieNakladmie(this);
 		}
-		if (key.equals(ReportAktSverki.folderKey())) {
+		if(key.equals(ReportAktSverki.folderKey())){
 			report = new ReportAktSverki(this);
 		}
-		if (key.equals(ReportVozmeschenie.folderKey())) {
+		if(key.equals(ReportVozmeschenie.folderKey())){
 			report = new ReportVozmeschenie(this);
 		}
-		if (key.equals(ReportDegustaciaDlyaTP.folderKey())) {
+		if(key.equals(ReportDegustaciaDlyaTP.folderKey())){
 			report = new ReportDegustaciaDlyaTP(this);
 		}
-		if (key.equals(ReportDistribucia.folderKey())) {
-			report = new ReportDistribucia(this);
-		}
-		if (key.equals(ReportAcciiDlyaKlientov.folderKey())) {
+		//if (key.equals(ReportDistribucia.folderKey())) {
+		//	report = new ReportDistribucia(this);
+		//}
+		if(key.equals(ReportAcciiDlyaKlientov.folderKey())){
 			report = new ReportAcciiDlyaKlientov(this);
 		}
-		if (key.equals(ReportSkidkiDlyaKlientov.folderKey())) {
+		if(key.equals(ReportSkidkiDlyaKlientov.folderKey())){
 			report = new ReportSkidkiDlyaKlientov(this);
 		}
-		if (key.equals(ReportDostavkaPoVoditelam.folderKey())) {
-			report = new ReportDostavkaPoVoditelam(this);
-		}
-		if (key.equals(ReportDostavkaPoMarshrutam.folderKey())) {
+		//if (key.equals(ReportDostavkaPoVoditelam.folderKey())) {
+		//	report = new ReportDostavkaPoVoditelam(this);
+		//}
+		if(key.equals(ReportDostavkaPoMarshrutam.folderKey())){
 			report = new ReportDostavkaPoMarshrutam(this);
 		}
-		if (key.equals(ReportSKUsOtgruzkami.folderKey())) {
+		if(key.equals(ReportSKUsOtgruzkami.folderKey())){
 			report = new ReportSKUsOtgruzkami(this);
 		}
 
-		if (key.equals(ReportKlassifikaciaKlientov.folderKey())) {
+		if(key.equals(ReportKlassifikaciaKlientov.folderKey())){
 			report = new ReportKlassifikaciaKlientov(this);
 		}
-		if (key.equals(ReportNalichieSkanov.folderKey())) {
+		if(key.equals(ReportNalichieSkanov.folderKey())){
 			report = new ReportNalichieSkanov(this);
 		}
-		if (key.equals(ReportDZDlyaTP.folderKey())) {
+		if(key.equals(ReportDZDlyaTP.folderKey())){
 			report = new ReportDZDlyaTP(this);
 		}
-		if (key.equals(ReportDZBlizhaishiePlateji.folderKey())) {
+		if(key.equals(ReportDZBlizhaishiePlateji.folderKey())){
 			report = new ReportDZBlizhaishiePlateji(this);
 		}
-		if (key.equals(ReportDistribuciaPoKluchevimPosiciam.folderKey())) {
-			report = new ReportDistribuciaPoKluchevimPosiciam(this);
-		}
-		if (key.equals(ReportFixirovannieCeny.folderKey())) {
+		//if (key.equals(ReportDistribuciaPoKluchevimPosiciam.folderKey())) {
+		//	report = new ReportDistribuciaPoKluchevimPosiciam(this);
+		//}
+		if(key.equals(ReportFixirovannieCeny.folderKey())){
 			report = new ReportFixirovannieCeny(this);
 		}
-		if (key.equals(ReportNakladnieNaKontrole.folderKey())) {
+		if(key.equals(ReportNakladnieNaKontrole.folderKey())){
 			report = new ReportNakladnieNaKontrole(this);
 		}
-		if (key.equals(ReportUsloviaOtgruzki.folderKey())) {
+		if(key.equals(ReportUsloviaOtgruzki.folderKey())){
 			report = new ReportUsloviaOtgruzki(this);
 		}
-		if (key.equals(ReportLimity.folderKey())) {
+		if(key.equals(ReportLimity.folderKey())){
 			report = new ReportLimity(this);
 		}
-		if (key.equals(ReportVestnik.folderKey())) {
+		if(key.equals(ReportVestnik.folderKey())){
 			report = new ReportVestnik(this);
 		}
-		if (key.equals(ReportValovayaPribil.folderKey())) {
+		if(key.equals(ReportValovayaPribil.folderKey())){
 			report = new ReportValovayaPribil(this);
 		}
 
@@ -369,117 +369,123 @@ public class ActivityWebServicesReports extends Activity {
 		if (key.equals(ReportLocalizasiaDlyaTP.folderKey())) {
 			report = new ReportLocalizasiaDlyaTP(this);
 		}*/
-		if (key.equals(ReportObjedineniaKlientov.folderKey())) {
+		if(key.equals(ReportObjedineniaKlientov.folderKey())){
 			report = new ReportObjedineniaKlientov(this);
 		}
 		//if (key.equals(ReportOtchetPoKassamDlyaTP.folderKey())) {
 		//	report = new ReportOtchetPoKassamDlyaTP(this);
 		//}
-		if (key.equals(ReportPlanPolevihRabot.folderKey())) {
+		if(key.equals(ReportPlanPolevihRabot.folderKey())){
 			report = new ReportPlanPolevihRabot(this);
 		}
-		if (key.equals(ReportPokazateliKPI.folderKey())) {
+		if(key.equals(ReportPokazateliKPI.folderKey())){
 			report = new ReportPokazateliKPI(this);
 		}
-		if (key.equals(ReportPredzakazyNaTrafiki.folderKey())) {
+		if(key.equals(ReportPredzakazyNaTrafiki.folderKey())){
 			report = new ReportPredzakazyNaTrafiki(this);
 		}
 
 
-		if (key.equals(ReportZayavkiNaDobavlenieVmatricu.folderKey())) {
+		if(key.equals(ReportZayavkiNaDobavlenieVmatricu.folderKey())){
 			report = new ReportZayavkiNaDobavlenieVmatricu(this);
 		}
 		/*if (key.equals(ReportProbegTPSV.folderKey())) {
 			report = new ReportProbegTPSV(this);
 		}*/
-		if (key.equals(ReportKontragentySPrilojeniem.folderKey())) {
+		if(key.equals(ReportKontragentySPrilojeniem.folderKey())){
 			report = new ReportKontragentySPrilojeniem(this);
 		}
-		if (key.equals(ReportStatisticaPodpisannihDS.folderKey())) {
+		if(key.equals(ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta.folderKey())){
+			report = new ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta(this);
+		}
+		if(key.equals(ReportStatisticaPodpisannihDS.folderKey())){
 			report = new ReportStatisticaPodpisannihDS(this);
 		}
-		if (key.equals(ReportStatistikaZakazov2.folderKey())) {
+		if(key.equals(ReportStatistikaZakazov2.folderKey())){
 			report = new ReportStatistikaZakazov2(this);
 		}
 
 
-
-		if (key.equals(ReportKontragentyPortalaSmart.folderKey())) {
+		if(key.equals(ReportKontragentyPortalaSmart.folderKey())){
 			report = new ReportKontragentyPortalaSmart(this);
 		}
 
 
-
-		if (key.equals(ReportProcentZapolneniyaChekListov.folderKey())) {
+		if(key.equals(ReportProcentZapolneniyaChekListov.folderKey())){
 			report = new ReportProcentZapolneniyaChekListov(this);
 		}
 		//if (key.equals(ReportStatusyRasporjazheniy.folderKey())) {
 		//	report = new ReportStatusyRasporjazheniy(this);
 		//}
-		if (key.equals(ReportStatusyRasporjazheniySKD.folderKey())) {
+		if(key.equals(ReportStatusyRasporjazheniySKD.folderKey())){
 			report = new ReportStatusyRasporjazheniySKD(this);
 		}
-		if (key.equals(ReportStatusyVozvratov.folderKey())) {
+		if(key.equals(ReportStatusyVozvratov.folderKey())){
 			report = new ReportStatusyVozvratov(this);
 		}
-		if (key.equals(ReportStatusyZakazov.folderKey())) {
+		if(key.equals(ReportStatusyZakazov.folderKey())){
 			report = new ReportStatusyZakazov(this);
 		}
-		if (key.equals(ReportSvodDlyaTP.folderKey())) {
+		if(key.equals(ReportSvodDlyaTP.folderKey())){
 			report = new ReportSvodDlyaTP(this);
 		}
 		//if (key.equals(ReportTrafiki.folderKey())) {
 		//	report = new ReportTrafiki(this);
 		//}
-		if (key.equals(ReportVipolnenieDopMotivaciy.folderKey())) {
+		if(key.equals(ReportVipolnenieDopMotivaciy.folderKey())){
 			report = new ReportVipolnenieDopMotivaciy(this);
 		}
-		if (key.equals(ReportSootvetstvieMercury.folderKey())) {
+		if(key.equals(ReportSootvetstvieMercury.folderKey())){
 			report = new ReportSootvetstvieMercury(this);
 		}
-		if (key.equals(ReportVizity.folderKey())) {
+		if(key.equals(ReportVizity.folderKey())){
 			report = new ReportVizity(this);
 		}
-		if (key.equals(ReportVipolneniePlanovPoPrilojeniu.folderKey())) {
+		if(key.equals(ReportVipolneniePlanovPoPrilojeniu.folderKey())){
 			report = new ReportVipolneniePlanovPoPrilojeniu(this);
 		}
-		if (key.equals(ReportNSK.folderKey())) {
+		if(key.equals(ReportNSK.folderKey())){
 			report = new ReportNSK(this);
 		}
-		if (key.equals(ReportProdajiFlagmanov.folderKey())) {
+		if(key.equals(ReportProdajiFlagmanov.folderKey())){
 			report = new ReportProdajiFlagmanov(this);
 		}
-		if (key.equals(ReportProdajiFlagmanovPoKontragentam.folderKey())) {
+		if(key.equals(ReportDistribucia2.folderKey())){
+			report = new ReportDistribucia2(this);
+		}
+
+
+		if(key.equals(ReportProdajiFlagmanovPoKontragentam.folderKey())){
 			report = new ReportProdajiFlagmanovPoKontragentam(this);
 		}
-		if (key.equals(ReportResultatyUtverjdenihSpecifikaciy.folderKey())) {
+		if(key.equals(ReportResultatyUtverjdenihSpecifikaciy.folderKey())){
 			report = new ReportResultatyUtverjdenihSpecifikaciy(this);
 		}
-		if (key.equals(ReportProdazhiSTM.folderKey())) {
+		if(key.equals(ReportProdazhiSTM.folderKey())){
 			report = new ReportProdazhiSTM(this);
 		}
-		if (key.equals(ReportVozvratyPoPodrazelen.folderKey())) {
+		if(key.equals(ReportVozvratyPoPodrazelen.folderKey())){
 			report = new ReportVozvratyPoPodrazelen(this);
 		}
-		if (key.equals(ReportFixirovanieKoordinat.folderKey())) {
+		if(key.equals(ReportFixirovanieKoordinat.folderKey())){
 			report = new ReportFixirovanieKoordinat(this);
 		}
 		return report;
 	}
 
-	void openLastOrCreate(String folder) {
+	void openLastOrCreate(String folder){
 		System.out.println("openLastOrCreate " + folder);
 		Vector<String> subs = Cfg.reportNames(folder);
-		for (int kk = 0; kk < subs.size(); kk++) {
+		for(int kk = 0; kk < subs.size(); kk++){
 			//if (subs.size() > 0) {
 			// String instKey = subs.get(0).replace(".xml", "");
 			String instKey = subs.get(kk).replace(".xml", "");
 			File html = new File(Cfg.pathToHTML(folder, instKey));
 			File xml = new File(Cfg.pathToXML(folder, instKey));
-			if (instKey.length() > 1 //
+			if(instKey.length() > 1 //
 					&& html.exists()//
 					&& xml.exists()//
-			) {
+			){
 				System.out.println("openLastOrCreate reuse " + folder + ":" + instKey);
 				resetInstance(folder, instKey);
 				return;
@@ -490,26 +496,26 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 
-	void goLastPage() {
+	void goLastPage(){
 		String goReportName = Auxiliary.activityExatras(this).child(ActivityWebServicesReports.goLastPageReportName).value.property.value().trim();
 		System.out.println("goLastPage " + goReportName);
 
-		if (goReportName.equals(ReportStatusyZakazov.folderKey())) {
+		if(goReportName.equals(ReportStatusyZakazov.folderKey())){
 			//tapReport2(ReportStatusyZakazov.folderKey());
 			propSplit.value(layoutless.width().property.value());
 			reportSplit.value(layoutless.width().property.value());
 			openLastOrCreate(ReportStatusyZakazov.folderKey());
-		} else {
-			if (goReportName.equals(ReportStatistikaZakazov2.folderKey())) {
+		}else{
+			if(goReportName.equals(ReportStatistikaZakazov2.folderKey())){
 				propSplit.value(layoutless.width().property.value());
 				reportSplit.value(layoutless.width().property.value());
 				openLastOrCreate(ReportStatistikaZakazov2.folderKey());
-			} else {
-				if (goReportName.equals(ReportVzaioraschetySpokupatelem.folderKey())) {
+			}else{
+				if(goReportName.equals(ReportVzaioraschetySpokupatelem.folderKey())){
 					propSplit.value(layoutless.width().property.value());
 					reportSplit.value(layoutless.width().property.value());
 					openLastOrCreate(ReportVzaioraschetySpokupatelem.folderKey());
-				} else {
+				}else{
 					System.out.println("goLastPage default");
 					String folder = Preferences.string("folder", "").value();
 					String file = Preferences.string("file", "").value();
@@ -520,16 +526,16 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 
-	void tapReport2(String folderKey) {
+	void tapReport2(String folderKey){
 		reportGridScrollViewY = reportGrid.scrollView.getScrollY();
-		if (preReport != null) {
+		if(preReport != null){
 			preReport.writeForm(preKey);
 		}
 		Report_Base report = createReport(folderKey);
 		preReport = report;
-		try {
+		try{
 			preKey = report.writeNewReport();
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		hideParameters();
@@ -544,27 +550,27 @@ public class ActivityWebServicesReports extends Activity {
 		report.expectRequery.start(this);
 	}
 
-	void hideParameters() {
+	void hideParameters(){
 		propertiesForm.removeAllViews();
 		propertiesForm.children.removeAllElements();
 	}
 
-	void tapInstance2(String folderKey, String instanceKey) {
+	void tapInstance2(String folderKey, String instanceKey){
 
 		tapInstanceReal(folderKey, instanceKey, false);
 	}
 
-	void resetInstance(String folderKey, String instanceKey) {
+	void resetInstance(String folderKey, String instanceKey){
 		tapInstanceReal(folderKey, instanceKey, true);
 	}
 
-	void tapInstanceReal(String folderKey, String instanceKey, boolean reset) {
+	void tapInstanceReal(String folderKey, String instanceKey, boolean reset){
 		//int scrollY=this.brwsr.getScrollY();
 		//report.scrollY=this.brwsr.getScrollY();
 		System.out.println("tapInstanceReal " + folderKey + "/" + instanceKey + "/" + reset);
 		hideParameters();
 		Report_Base report = createReport(folderKey);
-		if (report != null) {
+		if(report != null){
 
 			propertiesForm.child(report.getParametersView(this)//
 					.innerHeight.is(Auxiliary.tapSize * 15)//
@@ -572,40 +578,40 @@ public class ActivityWebServicesReports extends Activity {
 					.height().is(layoutless.height().property)//
 			);
 			report.setKey(instanceKey);
-			if (preReport != null) {
+			if(preReport != null){
 				preReport.writeForm(preKey);
 			}
 			preReport = report;
 			preKey = instanceKey;
 			String page = Cfg.pathToHTML(folderKey, instanceKey);
-			if (reset) {
+			if(reset){
 				report.writeDefaultForm(instanceKey);
 			}
 			report.readForm(instanceKey);
 			//System.out.println(instanceKey+": "+page);
 			brwsr.go("file://" + page);
-			if (reset) {
+			if(reset){
 				report.expectRequery.start(this);
 			}
-			refreshFog.afterDone.is(new Task() {
+			refreshFog.afterDone.is(new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					//
 				}
 			}).start(this);
 		}
 	}
 
-	public void goBlankPage() {
+	public void goBlankPage(){
 		hideParameters();
 		Auxiliary.writeTextToFile(new File("/sdcard/horeca/blanc.html"), "<html></html>", "utf-8");
 		brwsr.go("file:///sdcard/horeca/blanc.html");
 	}
 
-	public void promptDeleteRepoort(final Report_Base report, final String instanceKey) {
-		Auxiliary.pickConfirm(ActivityWebServicesReports.this, "Удалить отчёт?", "Удалить", new Task() {
+	public void promptDeleteRepoort(final Report_Base report, final String instanceKey){
+		Auxiliary.pickConfirm(ActivityWebServicesReports.this, "Удалить отчёт?", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				reportGridScrollViewY = reportGrid.scrollView.getScrollY();
 				deleteReport(report, instanceKey);
 				goBlankPage();
@@ -614,13 +620,13 @@ public class ActivityWebServicesReports extends Activity {
 		});
 	}
 
-	void deleteReport(Report_Base report, String instanceKey) {
+	void deleteReport(Report_Base report, String instanceKey){
 		new File(Cfg.pathToXML(report.getFolderKey(), instanceKey)).delete();
 		new File(Cfg.pathToHTML(report.getFolderKey(), instanceKey)).delete();
 		resetMenu2();
 	}
 
-	void bindData() {
+	void bindData(){
 		System.out.println("bindData");
 		//reportGridScrollViewY = reportGrid.scrollView.getScrollY();
 		int w = Auxiliary.screenWidth(this);
@@ -629,42 +635,42 @@ public class ActivityWebServicesReports extends Activity {
 		resetMenu2();
 	}
 
-	void addReportMenu2(final String folderKey, String menuLabel) {
-		Task tap = new Task() {
+	void addReportMenu2(final String folderKey, String menuLabel){
+		Task tap = new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				tapReport2(folderKey);
 			}
 		};
-		if (icon_doc_add == null) {
-			icon_doc_add = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), sweetlife.android10.R.drawable.i_doc_add), (int) Auxiliary.tapSize, (int) Auxiliary.tapSize, true);
+		if(icon_doc_add == null){
+			icon_doc_add = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), sweetlife.android10.R.drawable.i_doc_add), (int)Auxiliary.tapSize, (int)Auxiliary.tapSize, true);
 		}
-		if (icon_ok == null) {
-			icon_ok = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), sweetlife.android10.R.drawable.i_ok), (int) Auxiliary.tapSize, (int) Auxiliary.tapSize, true);
+		if(icon_ok == null){
+			icon_ok = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), sweetlife.android10.R.drawable.i_ok), (int)Auxiliary.tapSize, (int)Auxiliary.tapSize, true);
 		}
 		reportIcon.cell(icon_doc_add, tap);
 		reportName.cell(menuLabel, tap, "");
 		Vector<String> subs = Cfg.reportNames(folderKey);
-		for (int i = 0; i < subs.size(); i++) {
+		for(int i = 0; i < subs.size(); i++){
 			final String instKey = subs.get(i).replace(".xml", "");
 			File html = new File(Cfg.pathToHTML(folderKey, instKey));
 			File xml = new File(Cfg.pathToXML(folderKey, instKey));
-			if (instKey.length() > 1 //
+			if(instKey.length() > 1 //
 					&& html.exists()//
 					&& xml.exists()//
-			) {
-				reportIcon.cell(icon_ok, new Task() {
+			){
+				reportIcon.cell(icon_ok, new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						tapInstance2(folderKey, instKey);
 					}
 				});
 				Date d = new Date();
 				d.setTime(html.lastModified());
 				Report_Base report = createReport(folderKey);
-				reportName.cell(report.getShortDescription(instKey), new Task() {
+				reportName.cell(report.getShortDescription(instKey), new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						tapInstance2(folderKey, instKey);
 					}
 				}, report.getOtherDescription(instKey));
@@ -672,7 +678,7 @@ public class ActivityWebServicesReports extends Activity {
 		}
 	}
 
-	void resetMenu2() {
+	void resetMenu2(){
 		System.out.println("resetMenu2");
 		reportName.clear();
 		reportIcon.clear();
@@ -687,22 +693,29 @@ public class ActivityWebServicesReports extends Activity {
 		addReportMenu2(ReportVzaioraschetySpokupatelem.folderKey(), ReportVzaioraschetySpokupatelem.menuLabel());
 		addReportMenu2(ReportVozvratyPoPodrazelen.folderKey(), ReportVozvratyPoPodrazelen.menuLabel());
 
-		addReportMenu2(ReportVozmeschenie.folderKey(), ReportVozmeschenie.menuLabel());
+		//addReportMenu2(ReportVozmeschenie.folderKey(), ReportVozmeschenie.menuLabel());
 		addReportMenu2(ReportVipolnenieDopMotivaciy.folderKey(), ReportVipolnenieDopMotivaciy.menuLabel());
 		addReportMenu2(ReportVipolneniePlanovPoPrilojeniu.folderKey(), ReportVipolneniePlanovPoPrilojeniu.menuLabel());
 		addReportMenu2(ReportVizity.folderKey(), ReportVizity.menuLabel());
 		//addReportMenu2(ReportVipolneniePlanov.folderKey(), ReportVipolneniePlanov.menuLabel());
 		addReportMenu2(ReportDegustaciaDlyaTP.folderKey(), ReportDegustaciaDlyaTP.menuLabel());
+
 		addReportMenu2(ReportDZBlizhaishiePlateji.folderKey(), ReportDZBlizhaishiePlateji.menuLabel());
+
+
 		addReportMenu2(ReportDZDlyaTP.folderKey(), ReportDZDlyaTP.menuLabel());
-		addReportMenu2(ReportDistribucia.folderKey(), ReportDistribucia.menuLabel());
-		addReportMenu2(ReportDistribuciaPoKluchevimPosiciam.folderKey(), ReportDistribuciaPoKluchevimPosiciam.menuLabel());
-		addReportMenu2(ReportDostavkaPoVoditelam.folderKey(), ReportDostavkaPoVoditelam.menuLabel());
+
+		addReportMenu2(ReportDistribucia2.folderKey(), ReportDistribucia2.menuLabel());
+		//addReportMenu2(ReportDistribucia.folderKey(), ReportDistribucia.menuLabel());
+		//addReportMenu2(ReportDistribuciaPoKluchevimPosiciam.folderKey(), ReportDistribuciaPoKluchevimPosiciam.menuLabel());
+		//addReportMenu2(ReportDostavkaPoVoditelam.folderKey(), ReportDostavkaPoVoditelam.menuLabel());
 
 
 		addReportMenu2(ReportZakazyVneMarshruta.folderKey(), ReportZakazyVneMarshruta.menuLabel());
 
 		addReportMenu2(ReportZayavkiNaDobavlenieVmatricu.folderKey(), ReportZayavkiNaDobavlenieVmatricu.menuLabel());
+		addReportMenu2(ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta.folderKey(), ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta.menuLabel());
+
 		addReportMenu2(ReportZayavkiNaPerebitieNakladnih.folderKey(), ReportZayavkiNaPerebitieNakladnih.menuLabel());
 		addReportMenu2(ReportZayavkiNaUvelichenieLimita.folderKey(), ReportZayavkiNaUvelichenieLimita.menuLabel());
 		addReportMenu2(ReportKlassifikaciaKlientov.folderKey(), ReportKlassifikaciaKlientov.menuLabel());
@@ -721,7 +734,7 @@ public class ActivityWebServicesReports extends Activity {
 
 		addReportMenu2(ReportTovarnieVozvrati.folderKey(), ReportTovarnieVozvrati.menuLabel());
 		addReportMenu2(ReportTovarnieNakladmie.folderKey(), ReportTovarnieNakladmie.menuLabel());
-		if (Cfg.territory().children.size() > 1) {
+		if(Cfg.territory().children.size() > 1){
 			addReportMenu2(ReportPlanPolevihRabot.folderKey(), ReportPlanPolevihRabot.menuLabel());
 		}
 		addReportMenu2(ReportPokazateliKPI.folderKey(), ReportPokazateliKPI.menuLabel());
@@ -760,46 +773,46 @@ public class ActivityWebServicesReports extends Activity {
 		waitForReportGridLayout();
 	}
 
-	void doHOOKPerebitieNakladnoy(final String num) {
+	void doHOOKPerebitieNakladnoy(final String num){
 		Auxiliary.pick3Choice(this, "Заявка №" + num, "Утверждение заявки на перебитие накладной"//
-				, "Утвердить", new Task() {
+				, "Утвердить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendPerebitie(true, num);
 					}
-				}, "Запретить", new Task() {
+				}, "Запретить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendPerebitie(false, num);
 					}
-				}, "Добавить файл", new Task() {
+				}, "Добавить файл", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						showPerebitFileChooser(num);
 					}
 				});
 	}
 
-	void showPerebitFileChooser(String num) {
+	void showPerebitFileChooser(String num){
 		ActivityWebServicesReports.selectedDocNum = num;
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("*/*");
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
-		try {
+		try{
 			Intent chooser = Intent.createChooser(intent, "Выбрать файл");
 			startActivityForResult(chooser, FILE_PEREBIT_SKD_RESULT);
-		} catch (Throwable ex) {
+		}catch(Throwable ex){
 			ex.printStackTrace();
 		}
 	}
 
-	void sendPerebitie(final boolean otkaz, final String num) {
+	void sendPerebitie(final boolean otkaz, final String num){
 		System.out.println("sendPerebitie " + num + "/" + otkaz);
 		final Bough b = new Bough();
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 							//String url = "https://testservice.swlife.ru/shatov"
 							+ "/hs/PerebitieNakladnoy"
@@ -815,14 +828,14 @@ public class ActivityWebServicesReports extends Activity {
 					System.out.println(msg);
 					b.child("result").value.is(msg);
 					preReport.writeCurrentPage();
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					b.child("result").value.is(t.toString());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
@@ -830,26 +843,26 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void doHOOKSKD(final String num) {
+	void doHOOKSKD(final String num){
 		ActivityWebServicesReports.selectedDocNum = num;
-		Auxiliary.pickConfirm(this, "Распоряжение №" + num, "Добавить файл", new Task() {
+		Auxiliary.pickConfirm(this, "Распоряжение №" + num, "Добавить файл", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				showSKDFileChooser();
 			}
 		});
 	}
 
-	void doHOOKVzaimporascheti(final String num) {
+	void doHOOKVzaimporascheti(final String num){
 		Auxiliary.pick3Choice(this, "№" + num, "Создать счёт по реализации."//
-				, "На оплату", new Task() {
+				, "На оплату", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						createSchetNaoplatu(num);
 					}
-				}, "УПД", new Task() {
+				}, "УПД", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						createPechatUPD(num);
 					}
 				}, null, null);
@@ -862,41 +875,41 @@ public class ActivityWebServicesReports extends Activity {
 				});*/
 	}
 
-	void doHOOKReturn(final String num) {
+	void doHOOKReturn(final String num){
 		Auxiliary.pick3Choice(this, "Заявка №" + num, "Утверждение заявки на возврат."//
-				, "Утвердить", new Task() {
+				, "Утвердить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendReturnApprove(true, num);
 					}
-				}, "Запретить", new Task() {
+				}, "Запретить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendReturnApprove(false, num);
 					}
 				}, null, null);
 	}
 
-	void sendFixirovanieKoordinat(final String num) {
+	void sendFixirovanieKoordinat(final String num){
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/UtvKoordinat/" + num + "/" + Cfg.whoCheckListOwner();
 		final Note result = new Note().value("Утверждение координат");
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String msg = new String(bytes, "UTF-8");
 					//String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 					result.value(result.value() + "\n" + msg);
 					preReport.writeCurrentPage();
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					result.value(result.value() + "\n" + t.getMessage());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
@@ -904,12 +917,12 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void sendDegustaciaState(final String num, final int state) {
+	void sendDegustaciaState(final String num, final int state){
 		final Note result = new Note().value("Заявка на дегустацию");
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					String url = //https://service.swlife.ru/hrc120107/hs/Planshet/ApproveApplicationTasting/000032664/1
 							Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/ApproveApplicationTasting/" + num + "/" + state;
 					//System.out.println(url);
@@ -924,14 +937,14 @@ public class ActivityWebServicesReports extends Activity {
 					}*/
 					String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 					result.value(result.value() + "\n" + txt);
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					result.value(result.value() + "\n" + t.getMessage());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
@@ -939,26 +952,26 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void sendDeleteSpec(String url) {
+	void sendDeleteSpec(String url){
 		System.out.println(url);
 		final Note result = new Note().value("Удаление");
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String msg = new String(bytes, "UTF-8");
 					//String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 					result.value(result.value() + "\n" + msg);
 					preReport.writeCurrentPage();
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					result.value(result.value() + "\n" + t.getMessage());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
@@ -966,16 +979,68 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void promptReportDeleteSpec(final String num, final String art) {
-		final Numeric sel = new Numeric();
-		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки"}, sel, "№" + num, new Task() {
+	void sendReportApproveTerrChange(final String num, boolean approve){
+		System.out.println("sendReportApproveTerrChange " + num + ": " + approve);
+		final Note result = new Note().value("Результат");
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				if (sel.value() == 0) {
+			public void doTask(){
+				try{
+					String act="Ложь/Истина/";
+					if(approve){
+						act="Истина/Ложь/";
+					}
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkaNaKlienta/UtvIzmPodrr/"+num+"/" + act;
+					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url
+							,Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
+							//,"bot28","Molgav1024"
+					);
+					String msg = new String(bytes, "UTF-8");
+					result.value(result.value() + "\n" + msg);
+					preReport.writeCurrentPage();
+				}catch(Throwable t){
+					t.printStackTrace();
+					result.value(result.value() + "\n" + t.getMessage());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
+				tapInstance2(preReport.getFolderKey(), preKey);
+			}
+		});
+		expect.start(ActivityWebServicesReports.this);
+	}
+
+	void promptReportApproveTerrChange(final String num){
+		Auxiliary.pick3Choice(this, "№" + num, "Заявка на смену территории"
+				, "Утвердить", new Task(){
+					@Override
+					public void doTask(){
+						sendReportApproveTerrChange(num, true);
+					}
+				}
+				, "Отказать", new Task(){
+					@Override
+					public void doTask(){
+						sendReportApproveTerrChange(num, false);
+					}
+				}
+				, null, null
+		);
+	}
+
+	void promptReportDeleteSpec(final String num, final String art){
+		final Numeric sel = new Numeric();
+		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки"}, sel, "№" + num, new Task(){
+			@Override
+			public void doTask(){
+				if(sel.value() == 0){
 					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkiNaFiksCeny/DeleteSpec/" + num;
 					sendDeleteSpec(url);
-				} else {
-					if (sel.value() == 1) {
+				}else{
+					if(sel.value() == 1){
 						String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkiNaFiksCeny/DeleteLineSpec/" + num + "/" + art;
 						sendDeleteSpec(url);
 					}
@@ -984,35 +1049,35 @@ public class ActivityWebServicesReports extends Activity {
 		}, null, null, null, null);
 	}
 
-	void doHOOKFixirovanieKoordinat(final String num) {
+	void doHOOKFixirovanieKoordinat(final String num){
 		final Numeric sel = new Numeric();
-		Auxiliary.pickConfirm(this, "Новые координаты локализации в заявке №" + num, "Утвердить", new Task() {
+		Auxiliary.pickConfirm(this, "Новые координаты локализации в заявке №" + num, "Утвердить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				sendFixirovanieKoordinat(num);
 			}
 		});
 	}
 
-	void doHOOKDegustacia(final String num) {
+	void doHOOKDegustacia(final String num){
 		final Numeric sel = new Numeric();
-		Auxiliary.pickSingleChoice(this, new String[]{"Отказать", "Утвердить"}, sel, "№" + num, new Task() {
+		Auxiliary.pickSingleChoice(this, new String[]{"Отказать", "Утвердить"}, sel, "№" + num, new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				sendDegustaciaState(num, sel.value().intValue());
 			}
 		}, null, null, null, null);
 	}
 
-	void sendLimityState(final String num, final int state, final String comment) {
+	void sendLimityState(final String num, final int state, final String comment){
 		final Note result = new Note().value("Заявка на увеличение лимитов");
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 
 					String encodedtxt = URLEncoder.encode(comment, "UTF-8");
-					if (encodedtxt.length() < 1) {
+					if(encodedtxt.length() < 1){
 						encodedtxt = "-";
 					}
 					encodedtxt = encodedtxt.replace("+", "%20");
@@ -1027,14 +1092,14 @@ public class ActivityWebServicesReports extends Activity {
 					String msg = new String(bytes, "UTF-8");
 					String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 					result.value(result.value() + "\n" + txt);
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					result.value(result.value() + "\n" + t.getMessage());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
@@ -1042,28 +1107,28 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void promptUtverditZayavkuNaDobavlenieKlienta(final String num) {
-		Auxiliary.pickConfirm(this, "Утвердить заявку №" + num, "Утвердить", new Task() {
-			public void doTask() {
+	void promptUtverditZayavkuNaDobavlenieKlienta(final String num){
+		Auxiliary.pickConfirm(this, "Утвердить заявку №" + num, "Утвердить", new Task(){
+			public void doTask(){
 				final Note result = new Note().value("Утвердить заявку №" + num);
-				Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+				Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 									+ "/hs/KlientVMatricu/?Ndok=" + num + "&Utverdit=1&user=" + Cfg.whoCheckListOwner();
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							String msg = new String(bytes, "UTF-8");
 							String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 							result.value(result.value() + "\n" + txt);
-						} catch (Throwable t) {
+						}catch(Throwable t){
 							t.printStackTrace();
 							result.value(result.value() + "\n" + t.getMessage());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
@@ -1073,28 +1138,28 @@ public class ActivityWebServicesReports extends Activity {
 		});
 	}
 
-	void promptOtkazatZayavkuNaDobavlenieKlienta(final String num) {
-		Auxiliary.pickConfirm(this, "Отказать заявке №" + num, "Отказать", new Task() {
-			public void doTask() {
+	void promptOtkazatZayavkuNaDobavlenieKlienta(final String num){
+		Auxiliary.pickConfirm(this, "Отказать заявке №" + num, "Отказать", new Task(){
+			public void doTask(){
 				final Note result = new Note().value("Отказать заявке №" + num);
-				Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+				Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 									+ "/hs/KlientVMatricu/?Ndok=" + num + "&Utverdit=0&user=" + Cfg.whoCheckListOwner();
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							String msg = new String(bytes, "UTF-8");
 							String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 							result.value(result.value() + "\n" + txt);
-						} catch (Throwable t) {
+						}catch(Throwable t){
 							t.printStackTrace();
 							result.value(result.value() + "\n" + t.getMessage());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn(result.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
@@ -1104,29 +1169,31 @@ public class ActivityWebServicesReports extends Activity {
 		});
 	}
 
-	void doHOOKHookZayavkiNaDobavlenieVmatricu(final String num) {
+	void doHOOKHookZayavkiNaDobavlenieVmatricu(final String num){
 		//Auxiliary.warn(num,this);
 		Auxiliary.pick3Choice(this, "Заявка на добавление клиента", "№" + num
-				, "Удаление визита", new Task() {
+				/*, "Удаление визита", new Task() {
 					@Override
 					public void doTask() {
 						//
 					}
-				}, "Утвердить", new Task() {
+				}*/
+				, null, null
+				, "Утвердить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						promptUtverditZayavkuNaDobavlenieKlienta(num);
 					}
-				}, "Отказать", new Task() {
+				}, "Отказать", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						promptOtkazatZayavkuNaDobavlenieKlienta(num);
 					}
 				}
 		);
 	}
 
-	void doHOOKReportLimity(final String num) {
+	void doHOOKReportLimity(final String num){
 		//final Numeric sel=new Numeric();
 		final Note coment = new Note();
 		/*Auxiliary.pickSingleChoice(this,new String[]{"Отказать","Утвердить"},sel,"№"+num,new Task(){
@@ -1136,40 +1203,40 @@ public class ActivityWebServicesReports extends Activity {
 			}
 		},null,null,null,null);*/
 		Auxiliary.pickString(this, "Заявка №" + num, coment
-				, "Утвердить", new Task() {
+				, "Утвердить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendLimityState(num, 1, coment.value());
 					}
-				}, "Отказать", new Task() {
+				}, "Отказать", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendLimityState(num, 0, coment.value());
 					}
-				}, "Отмена", new Task() {
+				}, "Отмена", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//
 					}
 				}
 		);
 	}
 
-	void doHOOKAnswer(final String num, final String art) {
+	void doHOOKAnswer(final String num, final String art){
 		final Note text = new Note();
-		Auxiliary.pickString(this, "№" + num + ", арт." + art, text, "Ответить", new Task() {
-			public void doTask() {
+		Auxiliary.pickString(this, "№" + num + ", арт." + art, text, "Ответить", new Task(){
+			public void doTask(){
 				sendReturnAnswer(num, art, text.value());
 			}
 		});
 	}
 
-	void sendReturnAnswer(final String num, final String art, final String text) {
+	void sendReturnAnswer(final String num, final String art, final String text){
 		final Bough b = new Bough();
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/SoglasovanieVozvrata/" + URLEncoder.encode(Cfg.whoCheckListOwner().trim(), "utf-8")//
 							+ "/" + URLEncoder.encode(num, "utf-8")//
 							+ "/" + URLEncoder.encode(art, "utf-8")//
@@ -1179,14 +1246,14 @@ public class ActivityWebServicesReports extends Activity {
 					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
 					b.child("result").value.is(result.child("message").value.property.value());
 					preReport.writeCurrentPage();
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					b.child("result").value.is(t.toString());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
@@ -1194,12 +1261,12 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void sendFixPriceAnswer(final String num, final String art, final String text) {
+	void sendFixPriceAnswer(final String num, final String art, final String text){
 		final Bough b = new Bough();
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					String url = //"http://10.10.5.2/lednev_hrc/"
 							Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/fixprice/?Ndok=" + URLEncoder.encode(num, "utf-8")//
 									+ "&Art=" + URLEncoder.encode(art, "utf-8")//
@@ -1212,14 +1279,14 @@ public class ActivityWebServicesReports extends Activity {
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					b.child("result").value.is(new String(bytes, "UTF-8"));
 					preReport.writeCurrentPage();
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					b.child("result").value.is(t.toString());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
@@ -1227,11 +1294,11 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void sendReturnApprove(final boolean approve, final String num) {
+	void sendReturnApprove(final boolean approve, final String num){
 		final RawSOAP r = new RawSOAP();
-		new Expect().status.is("Выполнение...").task.is(new Task() {
+		new Expect().status.is("Выполнение...").task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				r.url.is(Settings.getInstance().getBaseURL() + "UtvVozvrat.1cws")//
 						.xml.is("<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
 								+ "\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
@@ -1252,39 +1319,39 @@ public class ActivityWebServicesReports extends Activity {
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				preReport.writeCurrentPage();
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
-				if (r.exception.property.value() != null) {
+			public void doTask(){
+				if(r.exception.property.value() != null){
 					Auxiliary.warn("Исключение: " + r.statusCode.property.value() + ": " + r.exception.property.value().getMessage(), ActivityWebServicesReports.this);
-				} else {
-					if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
+				}else{
+					if(r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300){
 						Auxiliary.warn("Результат: " //
 								+ r.data.child("soap:Body")//
 								.child("m:UtvResponse")//
 								.child("m:return")//
 								.value.property.value(), ActivityWebServicesReports.this);
-					} else {
+					}else{
 						Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), ActivityWebServicesReports.this);
 					}
 				}
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
-		}).afterCancel.is(new Task() {
+		}).afterCancel.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				//
 			}
 		}).start(this);
 	}
 
-	void sendDropWholeFix(final String num) {
+	void sendDropWholeFix(final String num){
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Подождите")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							String url = //"http://89.109.7.162/lednev_hrc/hs/fixprice/"//
 									//"http://89.109.7.162/shatov"
 									Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
@@ -1296,14 +1363,14 @@ public class ActivityWebServicesReports extends Activity {
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							b.child("result").value.is(new String(bytes));
 							preReport.writeCurrentPage();
-						} catch (Throwable t) {
+						}catch(Throwable t){
 							t.printStackTrace();
 							b.child("result").value.is(t.toString());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
@@ -1311,21 +1378,21 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void promptDropWholeFix(final String num) {
-		Auxiliary.pickConfirm(this, "Удалить заявку №" + num, "Удалить", new Task() {
-			public void doTask() {
+	void promptDropWholeFix(final String num){
+		Auxiliary.pickConfirm(this, "Удалить заявку №" + num, "Удалить", new Task(){
+			public void doTask(){
 				sendDropWholeFix(num);
 			}
 		});
 	}
 
-	void sendDropSingleFix(final String num, final String artikul) {
+	void sendDropSingleFix(final String num, final String artikul){
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Подождите")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {//http://service.swlife.ru/hrc120107/hs/ZayavkiNaFiksCeny/DeleteLine/0000709846/bot35/0
+					public void doTask(){
+						try{//http://service.swlife.ru/hrc120107/hs/ZayavkiNaFiksCeny/DeleteLine/0000709846/bot35/0
 							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 									+ "/hs/ZayavkiNaFiksCeny/DeleteLine"
 									+ "/" + URLEncoder.encode(num.trim(), "utf-8")
@@ -1338,14 +1405,14 @@ public class ActivityWebServicesReports extends Activity {
 							System.out.println(url + ": " + new String(bytes));
 							b.child("result").value.is(new String(bytes));
 							preReport.writeCurrentPage();
-						} catch (Throwable t) {
+						}catch(Throwable t){
 							t.printStackTrace();
 							b.child("result").value.is(t.toString());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
@@ -1353,9 +1420,9 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void promptDropSingleFix(final String num, final String artikul) {
-		Auxiliary.pickConfirm(this, "Удалить артикул " + artikul + " из заявки №" + num, "Удалить", new Task() {
-			public void doTask() {
+	void promptDropSingleFix(final String num, final String artikul){
+		Auxiliary.pickConfirm(this, "Удалить артикул " + artikul + " из заявки №" + num, "Удалить", new Task(){
+			public void doTask(){
 				sendDropSingleFix(num, artikul);
 			}
 		});
@@ -1368,7 +1435,7 @@ public class ActivityWebServicesReports extends Activity {
 		}, null, null);*/
 	}
 
-	void promptPoKontragentu(final String num) {
+	void promptPoKontragentu(final String num){
 		//System.out.println(num);
 		/*Auxiliary.pick(this, "Утвердить всё с таким же контрагентом" , "Утвердить", new Task() {
 			public void doTask() {
@@ -1379,8 +1446,8 @@ public class ActivityWebServicesReports extends Activity {
 		//cfrom.add(Calendar.DATE, 1);
 		Calendar cto = Calendar.getInstance();
 		cto.add(Calendar.DATE, 1);
-		final Numeric from = new Numeric().value((float) cfrom.getTimeInMillis());
-		final Numeric to = new Numeric().value((float) cto.getTimeInMillis());
+		final Numeric from = new Numeric().value((float)cfrom.getTimeInMillis());
+		final Numeric to = new Numeric().value((float)cto.getTimeInMillis());
 		Auxiliary.pick(this, "Утвердить всё с таким же контрагентом", new SubLayoutless(this)//
 						.child(new RedactDate(this).format.is("dd.MM.yyyy").date.is(from)
 								.left().is(Auxiliary.tapSize * 0.5)
@@ -1394,8 +1461,8 @@ public class ActivityWebServicesReports extends Activity {
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 7.5)//
 						.height().is(Auxiliary.tapSize * 4)//
-				, "Утвердить", new Task() {
-					public void doTask() {
+				, "Утвердить", new Task(){
+					public void doTask(){
 						//SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd")short1cDate
 						String dfrom = Auxiliary.short1cDate.format(new Date(from.value().longValue()));
 						String dto = Auxiliary.short1cDate.format(new Date(to.value().longValue()));
@@ -1416,26 +1483,26 @@ public class ActivityWebServicesReports extends Activity {
 				}, null, null, null, null);
 	}
 
-	void doHOOKApproveFixAction(int nn, String art, String num, final String row) {
-		if (nn == 0) {
+	void doHOOKApproveFixAction(int nn, String art, String num, final String row){
+		if(nn == 0){
 			promptDropWholeFix(num);
-		} else {
-			if (nn == 1) {
+		}else{
+			if(nn == 1){
 				promptDropSingleFix(num, art);
-			} else {
-				if (nn == 2) {
+			}else{
+				if(nn == 2){
 					sendFixApprove(art, num, "1", null);
-				} else {
-					if (nn == 3) {
+				}else{
+					if(nn == 3){
 						sendFixApprove(art, num, "0", null);
-					} else {
-						if (nn == 4) {
+					}else{
+						if(nn == 4){
 							promptFixPriceTxt(num, art);
-						} else {
-							if (nn == 5) {
+						}else{
+							if(nn == 5){
 								allFixApprove();
-							} else {
-								if (nn == 6) {
+							}else{
+								if(nn == 6){
 									promptPoKontragentu(num);
 								}
 							}
@@ -1446,7 +1513,7 @@ public class ActivityWebServicesReports extends Activity {
 		}
 	}
 
-	void doHOOKApproveFix(final String art, final String num, final String row) {
+	void doHOOKApproveFix(final String art, final String num, final String row){
 		String[] titles = new String[]{"Удалить всю заявку №" + num
 				, "Удалить арт." + art + " из заявки №" + num
 				, "Утвердить всю заявку №" + num
@@ -1455,37 +1522,37 @@ public class ActivityWebServicesReports extends Activity {
 				, "Утвердить всё найденное"
 				, "Утвердить всё с таким же контрагентом"};
 		final Numeric nn = new Numeric();
-		Auxiliary.pickSingleChoice(this, titles, nn, null, new Task() {
-			public void doTask() {
+		Auxiliary.pickSingleChoice(this, titles, nn, null, new Task(){
+			public void doTask(){
 				System.out.println("selected " + nn.value());
 				doHOOKApproveFixAction(nn.value().intValue(), art, num, row);
 			}
 		}, null, null, null, null);
 	}
 
-	void promptFixPriceTxt(final String num, final String art) {
+	void promptFixPriceTxt(final String num, final String art){
 		final Note comment = new Note();
 		Auxiliary.pickText(ActivityWebServicesReports.this//
 				, "Заявка " + num + ", арт. " + art //
 				, comment//
-				, "Отправить", new Task() {
+				, "Отправить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendFixPriceAnswer(num, art, comment.value());
 					}
 				});
 	}
 
-	void allFixApprove() {
-		Auxiliary.pickConfirm(this, "Утвердить все найденные документы?", "Утвердить", new Task() {
+	void allFixApprove(){
+		Auxiliary.pickConfirm(this, "Утвердить все найденные документы?", "Утвердить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				sendAllFixDocsApprove();
 			}
 		});
 	}
 
-	void sendAllFixDocsApprove() {
+	void sendAllFixDocsApprove(){
 		System.out.println("sendAllFixDocsApprove");
 		String page = Cfg.pathToHTML(ActivityWebServicesReports.this.preReport.getFolderKey(), ActivityWebServicesReports.this.preKey);
 
@@ -1494,19 +1561,19 @@ public class ActivityWebServicesReports extends Activity {
 		final Bough b = new Bough();
 		final Note statustext = new Note().value("Подождите");
 		Expect expect = new Expect().status.is(statustext)//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							System.out.println("sendAllFixDocsApprove start");
 							String result = "";
 							//String regexp = "(№(\\S+)\\s*,\\s*+Арт(\\S+\\d+))";
 							String regexp = "(>(\\S+)\\s*,\\s*+Арт\\s+(\\d+))";
 							Pattern pattern = Pattern.compile(regexp);
-							for (int i = 0; i < strings.size(); i++) {
+							for(int i = 0; i < strings.size(); i++){
 								//System.out.println(""+i+": "+strings.get(i));
 								Matcher matcher = pattern.matcher(strings.get(i));
-								if (matcher.find()) {
+								if(matcher.find()){
 									System.out.println("sendAllFixDocsApprove found " + strings.get(i));
 									String fixDocNum = matcher.group(2);
 									String fixArtikul = matcher.group(3);
@@ -1526,14 +1593,14 @@ public class ActivityWebServicesReports extends Activity {
 							b.child("result").value.is(result);
 							System.out.println("sendAllFixDocsApprove result" + result);
 							preReport.writeCurrentPage();
-						} catch (Throwable t) {
+						}catch(Throwable t){
 							t.printStackTrace();
 							b.child("result").value.is(t.toString());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn("Результат: " + b.child("result").value.property.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
@@ -1541,13 +1608,13 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void sendFixApprove(final String art, final String num, final String approve, final String txt) {
+	void sendFixApprove(final String art, final String num, final String approve, final String txt){
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Подождите")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							String url = //"http://89.109.7.162/lednev_hrc/hs/fixprice/"//
 									Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/fixprice/" + "?Ndok=" + URLEncoder.encode(num.trim(), "utf-8") //
 											+ "&Art=" + URLEncoder.encode(art.trim(), "utf-8") //
@@ -1558,14 +1625,14 @@ public class ActivityWebServicesReports extends Activity {
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							b.child("result").value.is(new String(bytes));
 							preReport.writeCurrentPage();
-						} catch (Throwable t) {
+						}catch(Throwable t){
 							t.printStackTrace();
 							b.child("result").value.is(t.toString());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
 						tapInstance2(preReport.getFolderKey(), preKey);
 					}
@@ -1573,7 +1640,7 @@ public class ActivityWebServicesReports extends Activity {
 		expect.start(ActivityWebServicesReports.this);
 	}
 
-	void doHOOKTekushieLimityTP(final int nn, String name) {
+	void doHOOKTekushieLimityTP(final int nn, String name){
 		Numeric lim = new Numeric().value(22);
 		int margin = 4;
 		final Numeric summa = new Numeric();
@@ -1615,19 +1682,19 @@ public class ActivityWebServicesReports extends Activity {
 								.width().is(Auxiliary.tapSize * 5).height().is(Auxiliary.tapSize * 0.8)//
 						)//
 						.width().is(Auxiliary.tapSize * 8 + margin * 2).height().is(Auxiliary.tapSize * 4)//
-				, null, null, null, null, "Отправить", new Task() {
+				, null, null, null, null, "Отправить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendLimitChange("" + nn, summa.value(), kolvo.value(), plan.value(), comment.value());
 					}
 				});
 	}
 
-	void sendLimitChange(final String num, final double summa, final double kolvo, final double plan, final String comment) {
+	void sendLimitChange(final String num, final double summa, final double kolvo, final double plan, final String comment){
 		final RawSOAP r = new RawSOAP();
-		new Expect().status.is("Выполнение...").task.is(new Task() {
+		new Expect().status.is("Выполнение...").task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				r.url.is(Settings.getInstance().getBaseURL() + "WebPostlimit.1cws")//
 						.xml.is("<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
 						+ "\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
@@ -1647,41 +1714,41 @@ public class ActivityWebServicesReports extends Activity {
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				preReport.writeCurrentPage();
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
-				if (r.exception.property.value() != null) {
+			public void doTask(){
+				if(r.exception.property.value() != null){
 					Auxiliary.warn("Ошибка: " + r.exception.property.value().getMessage(), ActivityWebServicesReports.this);
-				} else {
-					if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
+				}else{
+					if(r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300){
 						Auxiliary.warn("Результат: " //
 								+ r.data.child("soap:Body")//
 								.child("m:privResponse")//
 								.child("m:return")//
 								.value.property.value(), ActivityWebServicesReports.this);
-					} else {
+					}else{
 						Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), ActivityWebServicesReports.this);
 					}
 				}
 				tapInstance2(preReport.getFolderKey(), preKey);
 			}
-		}).afterCancel.is(new Task() {
+		}).afterCancel.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				//
 			}
 		}).start(this);
 	}
 
-	void doHookExternalLink(String url) {
+	void doHookExternalLink(String url){
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		startActivity(intent);
 	}
 
-	public Task interceptTask = new Task() {
+	public Task interceptTask = new Task(){
 		@Override
-		public void doTask() {
-			try {
+		public void doTask(){
+			try{
 				//String brwsrurl=
 				//final android.net.Uri uri = android.net.Uri.parse(brwsr.url.property.value());
 				//System.out.println(uri);
@@ -1690,66 +1757,73 @@ public class ActivityWebServicesReports extends Activity {
 				System.out.println("browserScrollY " + brwsr.browserScrollY);
 				System.out.println("url " + brwsr.url.property.value());
 
-				if (brwsr.url.property.value().contains("files.swlife.ru")) {
+				if(brwsr.url.property.value().contains("files.swlife.ru")){
 					doHookExternalLink(brwsr.url.property.value());
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKTekushieLimityTP)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKTekushieLimityTP)){
 					//int nn = Integer.parseInt(uri.getQueryParameter(Report_Base.FIELDGruppadogovorov));
 					int nn = Integer.parseInt(brwsr.getQueryParameter(Report_Base.FIELDGruppadogovorov));
 					String name = brwsr.getQueryParameter(Report_Base.FIELDKontragent).trim();
 					doHOOKTekushieLimityTP(nn, name);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKApproveFix)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKApproveFix)){
 					String art = brwsr.getQueryParameter(Report_Base.FIELDFixArt);
 					String num = brwsr.getQueryParameter(Report_Base.FIELDFixNum);
 					String row = brwsr.getQueryParameter(Report_Base.FIELDFixRow);
 					doHOOKApproveFix(art, num, row);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportReturnState)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportReturnState)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKReturn(num);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportVzaimoraschety)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportVzaimoraschety)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKVzaimporascheti(num);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportStatusSKD)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportStatusSKD)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKSKD(num);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOkReportPerebitieNakladnoy)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOkReportPerebitieNakladnoy)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKPerebitieNakladnoy(num);
 				}
 
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportReturnAnswer)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportReturnAnswer)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					String art = brwsr.getQueryParameter(Report_Base.FIELDArtikul);
 					doHOOKAnswer(num, art);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportDegustacia)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportDegustacia)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKDegustacia(num);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportFixKoordinat)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportFixKoordinat)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKFixirovanieKoordinat(num);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportDeleteSpec)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportDeleteSpec)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					String art = brwsr.getQueryParameter(Report_Base.FIELDArtikul);
 					promptReportDeleteSpec(num, art);
 				}
 
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportLimity)) {
+
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportApproveTerrChange)){
+					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
+					promptReportApproveTerrChange(num);
+				}
+
+
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportLimity)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKReportLimity(num);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HookZayavkiNaDobavlenieVmatricu)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HookZayavkiNaDobavlenieVmatricu)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKHookZayavkiNaDobavlenieVmatricu(num);
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportOrderState)) {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportOrderState)){
 					String urlDocumentDate = brwsr.getQueryParameter(Report_Base.FIELDDocumentDate);
 					String urlShipDate = brwsr.getQueryParameter(Report_Base.FIELDShipDate);
 					String urlKlientKod = brwsr.getQueryParameter(Report_Base.FIELDKlientKod).trim();
@@ -1773,10 +1847,10 @@ public class ActivityWebServicesReports extends Activity {
 					editor.hrc = Cfg.selectedOrDbHRC();
 					editor.start();
 				}
-				if (brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportPoVoditelam)) {
-					new Expect().task.is(new Task() {
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportPoVoditelam)){
+					new Expect().task.is(new Task(){
 						@Override
-						public void doTask() {
+						public void doTask(){
 							mapData = new Bough().name.is("mapData");
 							String documentNumber = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 							String q = "ВЫБРАТЬ первые 19"//
@@ -1815,14 +1889,14 @@ public class ActivityWebServicesReports extends Activity {
 									+ "&end=" + ms;
 							Vector<Bough> rr = raw.children("результат");
 							Bough autoData = null;
-							for (int i = 0; i < rr.size(); i++) {
+							for(int i = 0; i < rr.size(); i++){
 								autoData = new Bough().name.is("client");
 								autoData.child("name").value.is(rr.get(i).child("кнтргнт").value.property.value());
 								autoData.child("latitude").value.is(rr.get(i).child("lt").value.property.value());
 								autoData.child("longitude").value.is(rr.get(i).child("ln").value.property.value());
 								mapData.children.add(autoData);
 							}
-							try {
+							try{
 								byte[] bytes = Auxiliary.loadFileFromPublicURL(carOnlineURL);
 								String xml = new String(bytes, "UTF-8");
 								Bough data = Bough.parseXML(xml);
@@ -1831,13 +1905,13 @@ public class ActivityWebServicesReports extends Activity {
 								autoData.child("latitude").value.is(data.child("gps").child("latitude").value.property.value());
 								autoData.child("longitude").value.is(data.child("gps").child("longitude").value.property.value());
 								mapData.children.add(autoData);
-							} catch (Throwable t) {
+							}catch(Throwable t){
 								t.printStackTrace();
 							}
 						}
-					}).afterDone.is(new Task() {
+					}).afterDone.is(new Task(){
 						@Override
-						public void doTask() {
+						public void doTask(){
 							Intent intent = new Intent();
 							intent.putExtra("route", mapData.dumpXML());
 							intent.setClass(ActivityWebServicesReports.this, sweetlife.android10.supervisor.ActivityGPSMap.class);
@@ -1847,13 +1921,13 @@ public class ActivityWebServicesReports extends Activity {
 							.status.is("Подождите.....")//
 							.start(ActivityWebServicesReports.this);
 				}
-			} catch (Throwable t) {
+			}catch(Throwable t){
 				t.printStackTrace();
 			}
 		}
 	};
 
-	void createGUI() {
+	void createGUI(){
 		int winW = Auxiliary.screenWidth(this);
 		int winH = Auxiliary.screenWidth(this);
 		reportGrid = new DataGrid2(this).pageSize.is(200);
@@ -1900,10 +1974,10 @@ public class ActivityWebServicesReports extends Activity {
 		);
 	}
 
-	void doMenuClrear() {
-		Auxiliary.pickConfirm(this, "Удалить все отчёты", "Удалить", new Task() {
+	void doMenuClrear(){
+		Auxiliary.pickConfirm(this, "Удалить все отчёты", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				String path = Cfg.workFolder + "supervisor/reports/";
 				deleteRecursive(new File(path));
 				resetMenu2();
@@ -1911,20 +1985,20 @@ public class ActivityWebServicesReports extends Activity {
 		});
 	}
 
-	void deleteRecursive(File fileOrDirectory) {
-		if (fileOrDirectory.isDirectory()) {
-			for (File child : fileOrDirectory.listFiles()) {
+	void deleteRecursive(File fileOrDirectory){
+		if(fileOrDirectory.isDirectory()){
+			for(File child: fileOrDirectory.listFiles()){
 				deleteRecursive(child);
 			}
 		}
 		fileOrDirectory.delete();
 	}
 
-	void doMenuSendHTML() {
-		if (preReport == null) {
+	void doMenuSendHTML(){
+		if(preReport == null){
 			return;
 		}
-		if (preKey.length() < 1) {
+		if(preKey.length() < 1){
 			return;
 		}
 		final String path = Cfg.pathToHTML(preReport.getFolderKey(), preKey);
@@ -1935,19 +2009,19 @@ public class ActivityWebServicesReports extends Activity {
 		//intent.putExtra(Intent.EXTRA_STREAM, uri);
 		//startActivity(intent);
 		MediaScannerConnection.scanFile(ActivityWebServicesReports.this, new String[]{path}, null
-				, new MediaScannerConnection.OnScanCompletedListener() {
-					public void onScanCompleted(String path, Uri uri) {
+				, new MediaScannerConnection.OnScanCompletedListener(){
+					public void onScanCompleted(String path, Uri uri){
 						intent.putExtra(Intent.EXTRA_STREAM, uri);
 						startActivity(intent);
 					}
 				});
 	}
 
-	void doMenuSendXLS() {
-		if (preReport == null) {
+	void doMenuSendXLS(){
+		if(preReport == null){
 			return;
 		}
-		if (preKey.length() < 1) {
+		if(preKey.length() < 1){
 			return;
 		}
 		final String seed = "" + Math.round(Math.random() * 10000);
@@ -1957,16 +2031,16 @@ public class ActivityWebServicesReports extends Activity {
 		final String toPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + name + ".xls";
 		Expect expectRequery = new Expect()//
 				.status.is("Подождите.....")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						System.out.println("doMenuSendXLS exportXLS " + toPath);
 						preReport.exportXLS(toPath, ActivityWebServicesReports.this);
 					}
 				})//
-				.afterDone.is(new Task() {
+				.afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//Auxiliary.warn("Файл [" + name + seed + ".xls" + "] сохранён в папку Download", ActivityWebServicesReports.this);
 						final Intent intent = new Intent(Intent.ACTION_SEND);
 						intent.setType("text/plain");
@@ -1982,8 +2056,8 @@ public class ActivityWebServicesReports extends Activity {
 						Uri uri = Uri.fromFile(new File(toPath));
 						*/
 						MediaScannerConnection.scanFile(ActivityWebServicesReports.this, new String[]{toPath}, null
-								, new MediaScannerConnection.OnScanCompletedListener() {
-									public void onScanCompleted(String path, Uri uri) {
+								, new MediaScannerConnection.OnScanCompletedListener(){
+									public void onScanCompleted(String path, Uri uri){
 										intent.putExtra(Intent.EXTRA_STREAM, uri);
 										startActivity(intent);
 									}
@@ -1997,11 +2071,11 @@ public class ActivityWebServicesReports extends Activity {
 		expectRequery.start(this);
 	}
 
-	void doMenuSendPDF() {
-		if (preReport == null) {
+	void doMenuSendPDF(){
+		if(preReport == null){
 			return;
 		}
-		if (preKey.length() < 1) {
+		if(preKey.length() < 1){
 			return;
 		}
 		//final String seed = "" + Math.round(Math.random() * 10000);
@@ -2012,24 +2086,24 @@ public class ActivityWebServicesReports extends Activity {
 		System.out.println("doMenuSendPDF " + toPath);
 		Expect expectRequery = new Expect()//
 				.status.is("Подождите.....")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						System.out.println("doMenuSendXLS exportPDF " + toPath);
 						preReport.exportPDF(toPath, ActivityWebServicesReports.this);
 					}
 				})//
-				.afterDone.is(new Task() {
+				.afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//Auxiliary.warn("Файл [" + name + seed + ".xls" + "] сохранён в папку Download", ActivityWebServicesReports.this);
 						final Intent intent = new Intent(Intent.ACTION_SEND);
 						intent.setType("text/plain");
 						intent.putExtra(Intent.EXTRA_SUBJECT, "Отчёт");
 						//Uri uri = Uri.fromFile(new File(toPath));
 						MediaScannerConnection.scanFile(ActivityWebServicesReports.this, new String[]{toPath}, null
-								, new MediaScannerConnection.OnScanCompletedListener() {
-									public void onScanCompleted(String path, Uri uri) {
+								, new MediaScannerConnection.OnScanCompletedListener(){
+									public void onScanCompleted(String path, Uri uri){
 										intent.putExtra(Intent.EXTRA_STREAM, uri);
 										startActivity(intent);
 									}
@@ -2042,11 +2116,11 @@ public class ActivityWebServicesReports extends Activity {
 		expectRequery.start(this);
 	}
 
-	void doMenuExport2() {
-		if (preReport == null) {
+	void doMenuExport2(){
+		if(preReport == null){
 			return;
 		}
-		if (preKey.length() < 1) {
+		if(preKey.length() < 1){
 			return;
 		}
 		//String name = preReport.getMenuLabel();
@@ -2055,23 +2129,23 @@ public class ActivityWebServicesReports extends Activity {
 		String toPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + name + preKey + ".html";
 		File source = new File(fromPath);
 		File destination = new File(toPath);
-		try {
+		try{
 			FileChannel src = new FileInputStream(source).getChannel();
 			FileChannel dst = new FileOutputStream(destination).getChannel();
 			dst.transferFrom(src, 0, src.size());
 			src.close();
 			dst.close();
 			Auxiliary.warn("Файл [" + name + "] сохранён в папку Download", this);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 	}
 
-	void doMenuExportXLS() {
-		if (preReport == null) {
+	void doMenuExportXLS(){
+		if(preReport == null){
 			return;
 		}
-		if (preKey.length() < 1) {
+		if(preKey.length() < 1){
 			return;
 		}
 		//final String seed = "" + Math.round(Math.random() * 10000);
@@ -2081,15 +2155,15 @@ public class ActivityWebServicesReports extends Activity {
 		final String toPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + name + ".xls";
 		Expect expectRequery = new Expect()//
 				.status.is("Подождите.....")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						preReport.exportXLS(toPath, ActivityWebServicesReports.this);
 					}
 				})//
-				.afterDone.is(new Task() {
+				.afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn("Файл [" + name + ".xls" + "] сохранён в папку Download", ActivityWebServicesReports.this);
 					}
 				})//
@@ -2098,11 +2172,11 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 
-	void doMenuExportPDF() {
-		if (preReport == null) {
+	void doMenuExportPDF(){
+		if(preReport == null){
 			return;
 		}
-		if (preKey.length() < 1) {
+		if(preKey.length() < 1){
 			return;
 		}
 		//final String seed = "" + Math.round(Math.random() * 10000);
@@ -2111,15 +2185,15 @@ public class ActivityWebServicesReports extends Activity {
 		final String toPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + name + ".pdf";
 		Expect expectRequery = new Expect()//
 				.status.is("Подождите.....")//
-				.task.is(new Task() {
+				.task.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						preReport.exportPDF(toPath, ActivityWebServicesReports.this);
 					}
 				})//
-				.afterDone.is(new Task() {
+				.afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.warn("Файл [" + name + ".pdf" + "] сохранён в папку Download", ActivityWebServicesReports.this);
 					}
 				})//
@@ -2128,7 +2202,7 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		menuSendHTML = menu.add("Переслать по почте в .html");
 		menuSendXLS = menu.add("Переслать по почте в .xls");
 		menuSendPDF = menu.add("Переслать по почте в .pdf");
@@ -2140,48 +2214,48 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item == menuSendHTML) {
+	public boolean onOptionsItemSelected(MenuItem item){
+		if(item == menuSendHTML){
 			doMenuSendHTML();
 		}
-		if (item == menuSendXLS) {
+		if(item == menuSendXLS){
 			doMenuSendXLS();
 		}
-		if (item == menuSendPDF) {
+		if(item == menuSendPDF){
 			doMenuSendPDF();
 		}
-		if (item == menuExportXLS) {
+		if(item == menuExportXLS){
 			doMenuExportXLS();
 		}
-		if (item == menuExportPDF) {
+		if(item == menuExportPDF){
 			doMenuExportPDF();
 		}
-		if (item == menuClear) {
+		if(item == menuClear){
 			doMenuClrear();
 		}
 		return false;
 	}
 
-	void showSKDFileChooser() {
+	void showSKDFileChooser(){
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("*/*");
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
-		try {
+		try{
 			Intent chooser = Intent.createChooser(intent, "Выбрать файл");
 			startActivityForResult(chooser, FILE_SELECT_SKD_RESULT);
-		} catch (Throwable ex) {
+		}catch(Throwable ex){
 			ex.printStackTrace();
 		}
 	}
 
-	void createSchetNaoplatu(String num) {
+	void createSchetNaoplatu(String num){
 		String folderKey = ReportPechatSchetaNaOplatu.folderKey();
 		ReportPechatSchetaNaOplatu.tempInitKind = 1;
 		EditOrderViaWeb.documentNumber = num;
 		tapReport2(folderKey);
 	}
 
-	void createPechatUPD(String num) {
+	void createPechatUPD(String num){
 		String folderKey = ReportTovarnieNakladmie.folderKey();
 		ReportTovarnieNakladmie.tempInitKind = 2;
 		ReportTovarnieNakladmie.tempInitNum = num;
@@ -2189,27 +2263,27 @@ public class ActivityWebServicesReports extends Activity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		switch (requestCode) {
-			case FILE_SELECT_SKD_RESULT: {
-				if (resultCode == RESULT_OK) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+		switch(requestCode){
+			case FILE_SELECT_SKD_RESULT:{
+				if(resultCode == RESULT_OK){
 					Uri uri = intent.getData();
 					String path = Auxiliary.pathForMediaURI(this, uri);
-					if (path != null && path.length() > 5) {
+					if(path != null && path.length() > 5){
 						sendSKDFile(path);
-					} else {
+					}else{
 						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
 					}
 				}
 				break;
 			}
-			case FILE_PEREBIT_SKD_RESULT: {
-				if (resultCode == RESULT_OK) {
+			case FILE_PEREBIT_SKD_RESULT:{
+				if(resultCode == RESULT_OK){
 					Uri uri = intent.getData();
 					String path = Auxiliary.pathForMediaURI(this, uri);
-					if (path != null && path.length() > 5) {
+					if(path != null && path.length() > 5){
 						sendPerebitFile(path);
-					} else {
+					}else{
 						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
 					}
 				}
@@ -2273,47 +2347,48 @@ public class ActivityWebServicesReports extends Activity {
 		}
 		super.onActivityResult(requestCode, resultCode, intent);
 	}
-/*
-	void sendNewOrderItem(String orderNum, String artikul, String count, String price, String cr) {
-		//String url="https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/DobavitTovarVZakaz/12-1609303/97974/2/123/0/hrc297"
 
-		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
-				+ "/hs/ZakaziPokupatelya/DobavitTovarVZakaz"
-				+ "/" + orderNum
-				+ "/" + artikul
-				+ "/" + count
-				+ "/" + price
-				+ "/" + cr
-				+ "/" + Cfg.whoCheckListOwner();
-		System.out.println("sendNewOrderItem url " + url);
-		final Bough result = new Bough();
-		new Expect().task.is(new Task() {
-			@Override
-			public void doTask() {
-				try {
-					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					String msg = new String(bytes, "UTF-8");
-					result.child("result").value.is(msg);
-				} catch (Exception e) {
-					e.printStackTrace();
+	/*
+		void sendNewOrderItem(String orderNum, String artikul, String count, String price, String cr) {
+			//String url="https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/DobavitTovarVZakaz/12-1609303/97974/2/123/0/hrc297"
+
+			final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
+					+ "/hs/ZakaziPokupatelya/DobavitTovarVZakaz"
+					+ "/" + orderNum
+					+ "/" + artikul
+					+ "/" + count
+					+ "/" + price
+					+ "/" + cr
+					+ "/" + Cfg.whoCheckListOwner();
+			System.out.println("sendNewOrderItem url " + url);
+			final Bough result = new Bough();
+			new Expect().task.is(new Task() {
+				@Override
+				public void doTask() {
+					try {
+						byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+						String msg = new String(bytes, "UTF-8");
+						result.child("result").value.is(msg);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-			}
-		}).afterDone.is(new Task() {
-			@Override
-			public void doTask() {
-				Auxiliary.warn("Результат: " + result.child("result").value.property.value(), ActivityWebServicesReports.this);
-				ActivityWebServicesReports.this.tapInstanceReal(
-						ActivityWebServicesReports.this.preReport.getFolderKey()
-						, ActivityWebServicesReports.this.preKey
-						, false
-				);
-				//System.out.println("ActivityWebServicesReports.this.preReport.getFolderKey() " + ActivityWebServicesReports.this.preReport.getFolderKey());
-				//System.out.println("ActivityWebServicesReports.this.preKey " + ActivityWebServicesReports.this.preKey);
-			}
-		}).status.is("Отправка файла").start(this);
-	}
-*/
-	void sendPerebitFile(final String filePath) {
+			}).afterDone.is(new Task() {
+				@Override
+				public void doTask() {
+					Auxiliary.warn("Результат: " + result.child("result").value.property.value(), ActivityWebServicesReports.this);
+					ActivityWebServicesReports.this.tapInstanceReal(
+							ActivityWebServicesReports.this.preReport.getFolderKey()
+							, ActivityWebServicesReports.this.preKey
+							, false
+					);
+					//System.out.println("ActivityWebServicesReports.this.preReport.getFolderKey() " + ActivityWebServicesReports.this.preReport.getFolderKey());
+					//System.out.println("ActivityWebServicesReports.this.preKey " + ActivityWebServicesReports.this.preKey);
+				}
+			}).status.is("Отправка файла").start(this);
+		}
+	*/
+	void sendPerebitFile(final String filePath){
 		System.out.println("sendPerebitFile " + filePath);
 		String[] spl = filePath.split("\\.");
 		String rash = spl[spl.length - 1];
@@ -2327,9 +2402,9 @@ public class ActivityWebServicesReports extends Activity {
 				+ "/?rash=" + rash;
 		System.out.println("url " + url);
 		final Bough result = new Bough();
-		try {
+		try{
 			File iofile = new File(filePath);
-			int length = (int) iofile.length();
+			int length = (int)iofile.length();
 			final byte[] bytes = new byte[length];
 			FileInputStream fileInputStream = new FileInputStream(iofile);
 			DataInputStream dataInputStream = new DataInputStream(fileInputStream);
@@ -2337,10 +2412,10 @@ public class ActivityWebServicesReports extends Activity {
 			dataInputStream.close();
 			System.out.println(bytes.length);
 			final Bough raw = new Bough();
-			new Expect().task.is(new Task() {
+			new Expect().task.is(new Task(){
 				@Override
-				public void doTask() {
-					try {
+				public void doTask(){
+					try{
 						System.out.println(url);
 						//System.out.println(Cfg.hrcPersonalLogin);
 						//System.out.println(Cfg.hrcPersonalPassword);
@@ -2348,35 +2423,35 @@ public class ActivityWebServicesReports extends Activity {
 						System.out.println(b.dumpXML());
 						result.child("raw").value.is(b.child("raw").value.property.value());
 						result.child("message").value.is(b.child("message").value.property.value());
-					} catch (Exception e) {
+					}catch(Exception e){
 						e.printStackTrace();
 					}
 				}
-			}).afterDone.is(new Task() {
+			}).afterDone.is(new Task(){
 				@Override
-				public void doTask() {
-					if (result.child("raw").value.property.value().equals("Отправлено")) {
+				public void doTask(){
+					if(result.child("raw").value.property.value().equals("Отправлено")){
 						ActivityWebServicesReports.this.tapInstance2(ActivityWebServicesReports.this.preReport.getFolderKey(), ActivityWebServicesReports.this.preKey);
 					}
 					Auxiliary.warn(result.child("message").value.property.value() + ": " + result.child("raw").value.property.value()
 							, ActivityWebServicesReports.this);
 				}
 			}).status.is("Отправка файла").start(this);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			Auxiliary.warn(t.getMessage(), this);
 		}
 	}
 
-	void sendSKDFile(final String filePath) {
+	void sendSKDFile(final String filePath){
 		System.out.println(filePath);
 		String[] spl = filePath.split("\\.");
 		String rash = spl[spl.length - 1];
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
 				+ "/hs/FileRasporazenie/" + this.selectedDocNum + "/" + Cfg.whoCheckListOwner() + "/?rash=" + rash;
 		final Bough result = new Bough();
-		try {
+		try{
 			File iofile = new File(filePath);
-			int length = (int) iofile.length();
+			int length = (int)iofile.length();
 			final byte[] bytes = new byte[length];
 			FileInputStream fileInputStream = new FileInputStream(iofile);
 			DataInputStream dataInputStream = new DataInputStream(fileInputStream);
@@ -2384,10 +2459,10 @@ public class ActivityWebServicesReports extends Activity {
 			dataInputStream.close();
 			System.out.println(bytes.length);
 			final Bough raw = new Bough();
-			new Expect().task.is(new Task() {
+			new Expect().task.is(new Task(){
 				@Override
-				public void doTask() {
-					try {
+				public void doTask(){
+					try{
 						System.out.println(url);
 						//System.out.println(Cfg.hrcPersonalLogin);
 						//System.out.println(Cfg.hrcPersonalPassword);
@@ -2395,34 +2470,34 @@ public class ActivityWebServicesReports extends Activity {
 						System.out.println(b.dumpXML());
 						result.child("raw").value.is(b.child("raw").value.property.value());
 						result.child("message").value.is(b.child("message").value.property.value());
-					} catch (Exception e) {
+					}catch(Exception e){
 						e.printStackTrace();
 					}
 				}
-			}).afterDone.is(new Task() {
+			}).afterDone.is(new Task(){
 				@Override
-				public void doTask() {
-					if (result.child("raw").value.property.value().equals("Отправлено")) {
+				public void doTask(){
+					if(result.child("raw").value.property.value().equals("Отправлено")){
 						ActivityWebServicesReports.this.tapInstance2(ActivityWebServicesReports.this.preReport.getFolderKey(), ActivityWebServicesReports.this.preKey);
 					}
 					Auxiliary.warn(result.child("message").value.property.value() + ": " + result.child("raw").value.property.value()
 							, ActivityWebServicesReports.this);
 				}
 			}).status.is("Отправка файла").start(this);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			Auxiliary.warn(t.getMessage(), this);
 		}
 	}
 }
 
-class KontragentInfo {
+class KontragentInfo{
 	public String _idrref = "";
 	public String kod = "";
 	public String naimenovanie = "";
 	public Vector<String> groups = new Vector<String>();
 }
 
-class OrderItemInfo {
+class OrderItemInfo{
 	public String _idrref = "";
 	public String artikul = "";
 	public String naimenovanie = "";

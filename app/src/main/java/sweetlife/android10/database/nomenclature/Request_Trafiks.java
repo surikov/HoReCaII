@@ -279,7 +279,7 @@ public class Request_Trafiks implements ISearchBy, ITableColumnsNames {
 				, ISearchBy.SEARCH_CHILDREN//
 				, true//
 				, false//
-				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0,false,false,degustacia,null,null);
+				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0,false,false,degustacia,null,null,false);
 		//System.out.println("Request_Trafiks.RequestNomenclatureByParent.Request " );
 		Cursor c = db.rawQuery(sqlString, null);
 		return c;
@@ -492,7 +492,7 @@ public class Request_Trafiks implements ISearchBy, ITableColumnsNames {
 				, searchBy//
 				, true//
 				, false//
-				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0,false,false,degustacia,null,null);
+				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0,false,false,degustacia,null,null,false);
 		//System.out.println("Request_Trafiks.RequestNomenclatureBySearchString.Request ");
 		Cursor c = db.rawQuery(sqlString, null);
 		//System.out.println("RequestNomenclatureBySearchString.Request done");

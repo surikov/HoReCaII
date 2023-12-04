@@ -127,7 +127,7 @@ public class ReturnNomenclatureListAdapter extends ZoomListArrayAdapter {
 			mSpnReasons = (Spinner) row.findViewById(R.id.spinner_reason);
 
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-					row.getContext(), android.R.layout.simple_spinner_item, ZayavkaNaVozvrat_Tovary.ReasonsTypes);
+					row.getContext(), android.R.layout.simple_spinner_item, ZayavkaNaVozvrat_Tovary.ZayavkaNaVozvratPrichina);
 
 			arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -192,6 +192,7 @@ public class ReturnNomenclatureListAdapter extends ZoomListArrayAdapter {
 					break;
 				case ZayavkaNaVozvrat_Tovary.REASON_KOROTKIE_SROKI:
 					position = 4;
+					break;
 				case ZayavkaNaVozvrat_Tovary.REASON_OSHIBKA_PRI_ZAKAZE:
 					position = 5;
 					break;

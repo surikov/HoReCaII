@@ -412,7 +412,7 @@ public class Request_NomenclatureGroups extends Request_NomenclatureBase {
 				, ISearchBy.SEARCH_CHILDREN//
 				, false//
 				, false//
-				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0, false, false, degustacia, null, null);
+				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0, false, false, degustacia, null, null,false);
 		//System.out.println(" RequestNomenclatureByParent " + parent+"\n"+sqlString);
 		Cursor c = db.rawQuery(sqlString, null);
 		//System.out.println(" RequestNomenclatureByParent done ");
@@ -429,7 +429,7 @@ public class Request_NomenclatureGroups extends Request_NomenclatureBase {
 				, ISearchBy.SEARCH_CHILDREN//
 				, false//
 				, false//
-				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0, false, false, degustacia, null, null);
+				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(), 200, 0, false, false, degustacia, null, null,false);
 		System.out.println(" RequestNomenclatureByParent " + parent+"\n"+sqlString);
 		Cursor c = db.rawQuery(sqlString, null);
 		return c;

@@ -33,7 +33,7 @@ public class Activity_Disposals extends Activity_BasePeriod {
 		setContentView(R.layout.act_disposals);
 		super.onCreate(savedInstanceState);
 		mDB = ApplicationHoreca.getInstance().getDataBase();
-		setTitle(R.string.disposals_for_shipment);
+		setTitle("Распоряжения на отгрузку");
 		InitializeListView();
 	}
 

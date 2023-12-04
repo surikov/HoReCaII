@@ -77,10 +77,16 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.dialog_edit_disposal);
 		super.onCreate(savedInstanceState);
-		setTitle(R.string.disposals_for_shipment);
+		setTitle("Распоряжение на отгрузку");
 		Bundle extras = getIntent().getExtras();
 		mIsEditable = extras.getBoolean(IS_EDITABLE);
 		hexKlient = extras.getString("hexKlient");
+		String kontragentkod=extras.getString("kontragentkod");
+		if(kontragentkod==null){
+			//
+		}else{
+
+		}
 		//
 		if (hexKlient == null) {
 			//
@@ -427,7 +433,7 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 		LogHelper.debug(this.getClass().getCanonicalName() + ".ShowClientsListDialog: " + getString(R.string.choose_client));
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 		dialogBuilder.setView(clientsList);
-		dialogBuilder.setTitle(getString(R.string.choose_client));
+		dialogBuilder.setTitle("Клиенты в маршруте");
 		mClientsDialog = dialogBuilder.create();
 		mClientsDialog.show();
 	}

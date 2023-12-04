@@ -11,7 +11,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
 public class ZayavkaNaVozvrat_Tovary extends NomenclatureBasedItem {
-	public static final String[] ReasonsTypes = {"   "//
+	public static final String[] ZayavkaNaVozvratPrichina = {"   "//
 			//, "Брак"//
 			, "Не устроило качество"//
 			, "Пересорт"//
@@ -107,7 +107,7 @@ public class ZayavkaNaVozvrat_Tovary extends NomenclatureBasedItem {
 	}
 
 	public int getPrichina() {
-		//System.out.println("getPrichina "+mPrichina);
+		System.out.println("getPrichina "+mPrichina);
 		return mPrichina;
 	}
 /*

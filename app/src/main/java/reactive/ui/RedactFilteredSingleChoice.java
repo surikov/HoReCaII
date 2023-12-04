@@ -27,7 +27,7 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 	private NumericProperty<Rake> top = new NumericProperty<Rake>(this);
 	Paint dot = new Paint();
 	DataGrid grid;
-	ColumnText lines;
+	ColumnDescription lines;
 	boolean initialized = false;
 	String[] stringsRows = null;
 	AlertDialog lastAlertDialog=null;
@@ -85,7 +85,7 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 	AlertDialog pick(String[] strings) {
 		stringsRows = strings;
 		grid = new DataGrid(RedactFilteredSingleChoice.this.getContext());
-		lines = new ColumnText();
+		lines = new ColumnDescription();
 		AlertDialog d = Auxiliary.pick(RedactFilteredSingleChoice.this.getContext(), "", new SubLayoutless(RedactFilteredSingleChoice.this.getContext())//
 						.child(new RedactText(RedactFilteredSingleChoice.this.getContext()).text.is(filter.property)
 								.left().is(Auxiliary.tapSize * 0.5)
@@ -94,7 +94,7 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(grid.noHead.is(true).columns(new Column[]{
 								lines.title.is("data")
-										.width.is(Auxiliary.tapSize * 15 - Auxiliary.tapSize)
+										.width.is(Auxiliary.tapSize * 10)
 						})
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 1.0)
@@ -128,7 +128,7 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 						}
 					};
 					//rowtap
-					lines.cell(stringsRows[i], rowtap);
+					lines.cell(stringsRows[i], rowtap,"");
 				}
 			}
 			grid.refresh();

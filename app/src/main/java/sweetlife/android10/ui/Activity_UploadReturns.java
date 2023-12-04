@@ -155,9 +155,9 @@ public class Activity_UploadReturns extends Activity_BasePeriod implements Image
 			}
 			//System.out.println(Auxiliary.fromCursor(mListAdapter.getCursor(),false).dumpXML());
 			String url = Settings.getInstance().getBaseURL() + "WsUploadOrders/wsuploadvozvHRC.1cws";
-			if (Settings.getInstance().isPrimaryGate) {
+			//if (Settings.getInstance().isPrimaryGate) {
 				url = Settings.getInstance().getBaseURL() + "wsuploadvozvHRC.1cws";
-			}
+			//}
 			System.out.println(url);
 			UploadDocumentAsyncTask task = new UploadDocumentAsyncTask(mDB,
 					getApplicationContext(),

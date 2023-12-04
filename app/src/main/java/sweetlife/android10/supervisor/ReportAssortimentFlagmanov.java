@@ -115,7 +115,7 @@ String e = "";
 				           //+ "GolovaNew"//
 				           +Settings.selectedBase1C()//
 				           + "/hs/Report/"//
-				           + serviceName+"/" + Cfg.whoCheckListOwner()//
+				           + serviceName+"/" + Cfg.DBHRC()//Cfg.whoCheckListOwner()//
 				           + "?param=" + e//
 				;
 		q=q+tagForFormat( queryKind);

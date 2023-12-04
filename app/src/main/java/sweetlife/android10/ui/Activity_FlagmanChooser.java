@@ -325,7 +325,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				, false
 				, null, null, false
 				, false
-				, null, null, this.selectedSegmentKod
+				, null, null, this.selectedSegmentKod,false
 		);
 		System.out.println("nextProductData " + sql);
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -427,7 +427,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				, false
 				, null
 				, null
-				, this.selectedSegmentKod
+				, this.selectedSegmentKod,false
 		);
 		Cursor cursor = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
 		if (cursor.moveToFirst()) {

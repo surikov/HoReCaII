@@ -20,6 +20,7 @@ public abstract class Report_Base {
 	public final static String HOOKReportOrderState = "HookReportOrderState";
 	public final static String HOOKReportFixKoordinat = "HOOKReportFixKoordinat";
 	public final static String HOOKReportDeleteSpec = "HOOKReportDeleteSpec";
+	public final static String HOOKReportApproveTerrChange = "HOOKReportApproveTerrChange";
 	public final static String HookZayavkiNaDobavlenieVmatricu = "HookZayavkiNaDobavlenieVmatricu";
 	public final static String HOOKReportDegustacia = "HookReportDegustacia";
 	public final static String HOOKReportLimity = "HookReportLimity";

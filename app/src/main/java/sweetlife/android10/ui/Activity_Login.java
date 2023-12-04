@@ -8,6 +8,7 @@ import sweetlife.android10.database.Requests;
 import sweetlife.android10.ApplicationHoreca;
 import sweetlife.android10.Settings;
 import sweetlife.android10.consts.IAppConsts;
+import sweetlife.android10.gps.*;
 import sweetlife.android10.log.LogHelper;
 import sweetlife.android10.supervisor.Cfg;
 import sweetlife.android10.utils.Decompress;
@@ -36,12 +37,12 @@ import tee.binding.*;
 import tee.binding.it.*;
 import tee.binding.task.Task;
 
-public class Activity_Login extends Activity {
+public class Activity_Login extends Activity{
 	Layoutless layoutless;
-	Note loginHRC = new Note().value("");
-	Note password = new Note().value("");
+	Note loginHRC = new Note().value("" );
+	Note password = new Note().value("" );
 	Toggle showPassword = new Toggle().value(false);
-	Toggle mainProxy = new Toggle().value(true);
+	//Toggle mainProxy = new Toggle().value(true);
 	Toggle stopUpdate = new Toggle();
 	Toggle downloadDB = new Toggle();
 	Toggle stopVacuum = new Toggle();
@@ -52,10 +53,10 @@ public class Activity_Login extends Activity {
 	public static boolean noVacuum = false;
 	public static String packageVersion = "0";
 	boolean skipPrepareLogin = false;
-	Task taskPersonalLogin = new Task() {
+	Task taskPersonalLogin = new Task(){
 
 		@Override
-		public void doTask() {
+		public void doTask(){
 			//startRequestPermissions();
 /*
 			System.out.println("---");
@@ -73,28 +74,28 @@ public class Activity_Login extends Activity {
 	};
 
 
-	void adjustVipTerritoryParent() {
-		if (Cfg.whoCheckListOwner().toLowerCase().trim().equals("supervip_hrc")) {
+	void adjustVipTerritoryParent(){
+		if(Cfg.whoCheckListOwner().toLowerCase().trim().equals("supervip_hrc" )){
 			String sql = "update Podrazdeleniya set roditel=x'A003002264FA89D811E08BB0690A5B4A' where kod='х0067';";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-		} else {
-			if (Cfg.whoCheckListOwner().toLowerCase().trim().equals("region_c")) {
+		}else{
+			if(Cfg.whoCheckListOwner().toLowerCase().trim().equals("region_c" )){
 				String sql = "update Podrazdeleniya set roditel=x'BBAF20677C60FED011EA1749382D4BBE' where kod='х0084';";
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 		}
 	}
 
-	void startPermissions() {
-		Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:sweetlife.android10"));
+	void startPermissions(){
+		Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:sweetlife.android10" ));
 		startActivityForResult(intent, ResultFromPermission);
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		super.onActivityResult(requestCode, resultCode, data);
 		System.out.println("onActivityResult: " + resultCode + ": " + requestCode);
-		if (requestCode == ResultFromPermission) {
+		if(requestCode == ResultFromPermission){
 			//if (Environment.isExternalStorageManager()) {
 			//System.out.println("now Environment.isExternalStorageManager(): " + Environment.isExternalStorageManager());
 			//}
@@ -104,14 +105,14 @@ public class Activity_Login extends Activity {
 		//testEnter();
 	}
 
-	void promptPermissions() {
+	void promptPermissions(){
 		new AlertDialog.Builder(this)
-				.setTitle("Подтверждение доступа")
-				.setMessage("Нажмите ОК и в списке приложений включите перключатель для HoReCa v3")
+				.setTitle("Подтверждение доступа" )
+				.setMessage("Нажмите ОК и в списке приложений включите перключатель для HoReCa v3" )
 				//.setIcon(android.R.drawable.ic_dialog_alert)
-				.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+				.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
 
-					public void onClick(DialogInterface dialog, int whichButton) {
+					public void onClick(DialogInterface dialog, int whichButton){
 						//Toast.makeText(MainActivity333.this, "Yaay", Toast.LENGTH_SHORT).show();
 						startPermissions();
 					}
@@ -120,26 +121,26 @@ public class Activity_Login extends Activity {
 				.show();
 	}
 
-	void checkPermissionsOrLogin() {
+	void checkPermissionsOrLogin(){
 /*
 		this.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION
 				, Manifest.permission.ACCESS_FINE_LOCATION
 				, Manifest.permission.ACCESS_BACKGROUND_LOCATION
 		}, this.ResultFromPermission);
 		*/
-		if (!Environment.isExternalStorageManager()) {
+		if(!Environment.isExternalStorageManager()){
 			promptPermissions();
-		} else {
+		}else{
 			prepareLogin();
 			appLogin();
 		}
 	}
 
-	void checkPermissionAndPrepare() {
-		if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
+	void checkPermissionAndPrepare(){
+		if(this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
 				|| this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
 				|| this.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
-		) {
+		){
 			this.requestPermissions(new String[]{
 					Manifest.permission.ACCESS_COARSE_LOCATION
 					, Manifest.permission.ACCESS_FINE_LOCATION
@@ -151,16 +152,16 @@ public class Activity_Login extends Activity {
 		System.out.println(this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
 		System.out.println(this.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION));
 		*/
-		if (Environment.isExternalStorageManager()) {
+		if(Environment.isExternalStorageManager()){
 			prepareLogin();
 			skipPrepareLogin = true;
 		}
 	}
 
-	void prepareLogin() {
-		if (skipPrepareLogin) {
+	void prepareLogin(){
+		if(skipPrepareLogin){
 
-		} else {
+		}else{
 			ApplicationHoreca.getInstance().InitializeDB();
 			ApplicationHoreca.getInstance().FillAgentsInfo();
 			setTitleWithVersionOwner();
@@ -168,8 +169,8 @@ public class Activity_Login extends Activity {
 		}
 	}
 
-	void _____reinstall(Activity activity) throws Exception {
-		System.out.println("reinstall");
+	void _____reinstall(Activity activity) throws Exception{
+		System.out.println("reinstall" );
 
 		String path = "/sdcard/horeca/Horeca3.apk";
 		File file = new File(path);
@@ -190,7 +191,7 @@ public class Activity_Login extends Activity {
 		int byteRead = -1;
 		//int cntr = 0;
 		byte[] buffer = new byte[100100];
-		while ((byteRead = fileInputStream.read(buffer)) != -1) {
+		while((byteRead = fileInputStream.read(buffer)) != -1){
 			//bufferedOutputStream.write(byteRead);
 			sessionOutputStream.write(buffer, 0, byteRead);
 			//System.out.println( "byteRead: " + byteRead);
@@ -199,7 +200,7 @@ public class Activity_Login extends Activity {
 		}
 		//System.out.println("read " + cntr);
 
-		System.out.println("sync");
+		System.out.println("sync" );
 		session.fsync(sessionOutputStream);
 
 
@@ -208,7 +209,7 @@ public class Activity_Login extends Activity {
 		session.close();
 		//bufferedOutputStream.close();
 		//sessionOutputStream.close();
-		System.out.println("start apk");
+		System.out.println("start apk" );
 		session = packageInstaller.openSession(sessionId);
 		IntentSender statusReceiver = null;
 		//Intent intent = new Intent(activity, activity.getClass());
@@ -220,18 +221,18 @@ public class Activity_Login extends Activity {
 		int flags = 0;
 		PendingIntent pendingIntent = PendingIntent.getService(activity, requestCode, intent, flags);
 		IntentSender intentSender = pendingIntent.getIntentSender();
-		System.out.println("commit");
+		System.out.println("commit" );
 		session.commit(intentSender);
 		session.close();
-		System.out.println("done");
+		System.out.println("done" );
 	}
 
-	void appLogin() {
+	void appLogin(){
 
 		appLoginNext();
 	}
 
-	void appLoginNext() {
+	void appLoginNext(){
 		/*if (1 == 1) {
 			try {
 				sweetlife.android10.update.AppUpdater.reinstall(this,"/sdcard/horeca/Horeca3.apk");
@@ -242,10 +243,10 @@ public class Activity_Login extends Activity {
 			return;
 		}*/
 		noVacuum = stopVacuum.value();
-		if (!mainProxy.value()) Settings.getInstance().setSecondaryURL();
+		//if (!mainProxy.value()) Settings.getInstance().setSecondaryURL();
 		//Cfg.currentIMEI(this, user.getName().trim());
 		Cfg.hrcPersonalPasswordCached = password.value();
-		System.out.println("---");
+		System.out.println("---" );
 		SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, MODE_PRIVATE);
 		SharedPreferences.Editor editor = settings.edit();
 		editor.putString(hrcpasswordName, password.value());
@@ -254,17 +255,17 @@ public class Activity_Login extends Activity {
 		System.out.println("saved password " + password.value());
 
 
-		if (downloadDB.value()) {
+		if(downloadDB.value()){
 			promptReplaceDB();
-		} else {
-			if (stopUpdate.value()) {
+		}else{
+			if(stopUpdate.value()){
 				adjustVipTerritoryParent();
 				Intent intent = new Intent();
 				intent.setClass(Activity_Login.this, Activity_Route_2.class);
 				sweetlife.android10.utils.DatabaseHelper.adjustDataBase(ApplicationHoreca.getInstance().getDataBase());
 				startActivity(intent);
 
-			} else {
+			}else{
 
 				Intent intent = new Intent();
 				intent.setClass(Activity_Login.this, Activity_Update.class);
@@ -276,18 +277,18 @@ public class Activity_Login extends Activity {
 		}
 	}
 
-	void promptReplaceDB() {
-		Auxiliary.pickConfirm(Activity_Login.this, "Скачать новую базу?\n\nВнимание!\nВся информация и имеющиеся заказы будут удалены.", "Удалить и скачать", new Task() {
+	void promptReplaceDB(){
+		Auxiliary.pickConfirm(Activity_Login.this, "Скачать новую базу?\n\nВнимание!\nВся информация и имеющиеся заказы будут удалены.", "Удалить и скачать", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				final Expect ex = new Expect();
 				new Expect()//
-						.task.is(new Task() {
+						.task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							doDownloadReplaceDB();
-						} catch (Throwable t) {
+						}catch(Throwable t){
 							//Auxiliary.inform("Ошибка: " + t.getMessage(), Activity_Login.this);
 							ex.cancel.is(true);
 							t.printStackTrace();
@@ -295,23 +296,23 @@ public class Activity_Login extends Activity {
 						}
 					}
 				})//
-						.afterDone.is(new Task() {
+						.afterDone.is(new Task(){
 					@Override
-					public void doTask() {
-						if (ex.cancel.property.value()) {
+					public void doTask(){
+						if(ex.cancel.property.value()){
 							doDownloadReplaceDBCancel();
-						} else {
+						}else{
 							doDownloadReplaceDBOk();
 						}
 					}
 				})//
-						.afterCancel.is(new Task() {
+						.afterCancel.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						doDownloadReplaceDBCancel();
 					}
 				})//
-						.status.is("Ждите...")//
+						.status.is("Ждите..." )//
 						.start(Activity_Login.this);
 			}
 		});
@@ -319,17 +320,17 @@ public class Activity_Login extends Activity {
 	}
 
 
-	public void startCheckAccess() {
-		System.out.println("startCheckAccess");
-		Note result = new Note().value("!");
-		new Expect().status.is("Проверка доступа").task.is(new Task() {
-			public void doTask() {
+	public void startCheckAccess(){
+		System.out.println("startCheckAccess" );
+		Note result = new Note().value("!" );
+		new Expect().status.is("Проверка доступа" ).task.is(new Task(){
+			public void doTask(){
 				String access = Settings.check_1C_access();
 				result.value(access);
 			}
-		}).afterDone.is(new Task() {
-			public void doTask() {
-				if (result.value().length() > 0) {
+		}).afterDone.is(new Task(){
+			public void doTask(){
+				if(result.value().length() > 0){
 					Auxiliary.warn("Неверный пароль или нет доступа, просмотр отчётов и выгрузка документов недоступны:\n\n" + result.value(), Activity_Login.this);
 				}
 			}
@@ -384,17 +385,17 @@ public class Activity_Login extends Activity {
 		this.requestPermissions(permissionsList, Auxiliary.requestPermissionsCode);
 	}*/
 
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		System.out.println("Activity_Login.onCreate " + Auxiliary.bundle2bough(savedInstanceState).dumpXML());
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		//SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, 0);
-		String apkReinstallStatus = Auxiliary.activityExatras(this).child("apkReinstallStatus").value.property.value();
-		if (apkReinstallStatus.length() > 0) {
-			if (apkReinstallStatus.equals("0")) {
+		String apkReinstallStatus = Auxiliary.activityExatras(this).child("apkReinstallStatus" ).value.property.value();
+		if(apkReinstallStatus.length() > 0){
+			if(apkReinstallStatus.equals("0" )){
 				Auxiliary.warn("Установлена новая версия приложения", this);
-			} else {
+			}else{
 				Auxiliary.warn("Ощибка установки: " + apkReinstallStatus, this);
 			}
 		}
@@ -403,29 +404,33 @@ public class Activity_Login extends Activity {
 		//setTitleWithVersionOwner();
 
 		SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, 0);
-		password.value(settings.getString(hrcpasswordName, ""));
+		password.value(settings.getString(hrcpasswordName, "" ));
 
-		layoutless.child(new RedactToggle(this).labelText.is("Первичный шлюз").yes.is(mainProxy)
-				.top().is(1 * Auxiliary.tapSize)
-				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
-				.width().is(5 * Auxiliary.tapSize)
-				.height().is(1 * Auxiliary.tapSize)
-		).child(new RedactToggle(this).labelText.is("Вспомогательный шлюз").yes.is(mainProxy.not())
-				.top().is(1.5 * Auxiliary.tapSize)
-				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
-				.width().is(5 * Auxiliary.tapSize)
-				.height().is(1 * Auxiliary.tapSize)
-		).child(new RedactToggle(this).labelText.is("Запретить обновление").yes.is(stopUpdate)
-				.top().is(2 * Auxiliary.tapSize)
-				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
-				.width().is(5 * Auxiliary.tapSize)
-				.height().is(1 * Auxiliary.tapSize)
-		).child(new RedactToggle(this).labelText.is("Скачать новую базу").yes.is(downloadDB)
+		layoutless
+				/*
+						.child(new RedactToggle(this).labelText.is("Первичный шлюз").yes.is(mainProxy)
+								.top().is(1 * Auxiliary.tapSize)
+								.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
+								.width().is(5 * Auxiliary.tapSize)
+								.height().is(1 * Auxiliary.tapSize)
+						).child(new RedactToggle(this).labelText.is("Вспомогательный шлюз").yes.is(mainProxy.not())
+								.top().is(1.5 * Auxiliary.tapSize)
+								.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
+								.width().is(5 * Auxiliary.tapSize)
+								.height().is(1 * Auxiliary.tapSize)
+						)*/
+
+				.child(new RedactToggle(this).labelText.is("Запретить обновление" ).yes.is(stopUpdate)
+						.top().is(2 * Auxiliary.tapSize)
+						.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
+						.width().is(5 * Auxiliary.tapSize)
+						.height().is(1 * Auxiliary.tapSize)
+				).child(new RedactToggle(this).labelText.is("Скачать новую базу" ).yes.is(downloadDB)
 				.top().is(2.5 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
 				.height().is(1 * Auxiliary.tapSize)
-		).child(new RedactToggle(this).labelText.is("Запретить сжатие").yes.is(stopVacuum)
+		).child(new RedactToggle(this).labelText.is("Запретить сжатие" ).yes.is(stopVacuum)
 				.top().is(3 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
@@ -838,14 +843,14 @@ supernn_hrc - JRA61P
 
 
         ) {*/
-		layoutless.child(new Decor(this).labelText.is("Пароль")
+		layoutless.child(new Decor(this).labelText.is("Пароль" )
 				.top().is(4 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
 				.height().is(1 * Auxiliary.tapSize)
 		);
-		layoutless.child(new Knob(this).labelText.is("Показать пароль").afterTap.is(new Task() {
-					public void doTask() {
+		layoutless.child(new Knob(this).labelText.is("Показать пароль" ).afterTap.is(new Task(){
+					public void doTask(){
 						showPassword.value(true);
 					}
 				})
@@ -896,19 +901,49 @@ supernn_hrc - JRA61P
 		*/
 		checkPermissionAndPrepare();
 		startCheckAccess();
+		//access_token1221();
+	}
+/*
+	void access_token1221start(){
+		String url = "https://horeka-prod-api.1221systems.ru/horeca/auth";
+		String login = "sweetlife";
+		String password = "horeca";
+		String data = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
+		System.out.println("test1221start " + data);
+		System.out.println("url " + url);
+		Bough rr = Auxiliary.loadTextFromPublicPOST(url, data, 2 * 60 * 1000, "UTF-8", "application/json", "application/json" );
+		System.out.println(rr.dumpXML());
+		String raw = rr.child("raw" ).value.property.value();
+		Bough json = Bough.parseJSON(raw);
+		String access_token = json.child("access_token" ).value.property.value();
+		System.out.println("access_token " + access_token);
+		Session.access_token_1221 = access_token;
 	}
 
+	void access_token1221(){
+		if(Session.access_token_1221.trim().length() < 1){
+			new Expect().status.is("test" ).task.is(new Task(){
+				public void doTask(){
+					access_token1221start();
+				}
+			}).afterDone.is(new Task(){
+				public void doTask(){
 
-	void setTitleWithVersionOwner() {
-		try {
+				}
+			}).start(this);
+		}
+	}
+*/
+	void setTitleWithVersionOwner(){
+		try{
 			String chOwner = sweetlife.android10.supervisor.Cfg.whoCheckListOwner();
-			if (chOwner.length() > 0) {
+			if(chOwner.length() > 0){
 				tee.binding.Bough data = Auxiliary.fromCursor(
 						ApplicationHoreca.getInstance().getDataBase().rawQuery(
 								"select l.naimenovanie as name from PhizLicaPolzovatelya f join Polzovateli p on p._idrref=f.polzovatel join PhizicheskieLica l on l._idrref=f.phizlico where trim(p.kod)='"
 										+ chOwner + "' order by f.period desc;"
 								, null));
-				chOwner = chOwner + "/" + data.child("row").child("name").value.property.value();
+				chOwner = chOwner + "/" + data.child("row" ).child("name" ).value.property.value();
 			}
 			packageVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 			setTitle(chOwner
@@ -920,10 +955,10 @@ supernn_hrc - JRA61P
 					+ " " + Settings.getInstance().selectedWSDL()//
 			);
 
-			if (sweetlife.android10.supervisor.Cfg.whoCheckListOwner().length() > 0) {
+			if(sweetlife.android10.supervisor.Cfg.whoCheckListOwner().length() > 0){
 				stopUpdate.value(true);
-			} else {
-				if (!Requests.IsSyncronizationDateLater(0)) {
+			}else{
+				if(!Requests.IsSyncronizationDateLater(0)){
 					stopUpdate.value(true);
 				}
 			}
@@ -932,53 +967,53 @@ supernn_hrc - JRA61P
 			loginHRC.value("Вход для " + Cfg.whoCheckListOwner());
 
 			boolean noCRAvailable = Requests.IsSyncronizationDateLater(0);
-			if (noCRAvailable) {
+			if(noCRAvailable){
 				Calendar syncCalendar = LogHelper.getLastSuccessfulUpdate();
-				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-				updateWarning.value("Последнее успешное обновление " + sdf.format(syncCalendar.getTime()) + ".\nНеобходимо обновить данные.");
+				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy" );
+				updateWarning.value("Последнее успешное обновление " + sdf.format(syncCalendar.getTime()) + ".\nНеобходимо обновить данные." );
 			}
-		} catch (Throwable e) {
+		}catch(Throwable e){
 			setTitle(e.getMessage());
 			Auxiliary.warn("База данных повреждена", Activity_Login.this);
 		}
 	}
 
-	void doDownloadReplaceDB() throws Exception {
-		System.out.println("doDownloadReplaceDB");
+	void doDownloadReplaceDB() throws Exception{
+		System.out.println("doDownloadReplaceDB" );
 		String url = "swlife_database.zip";
 		System.out.println("url " + url);
 		ftpClient.downloadFile(Settings.getInstance().getTABLET_WORKING_DIR(), url);
-		System.out.println("doDownloadReplaceDB downloaded");
-		Bough rez = new Bough().name.is("config");
+		System.out.println("doDownloadReplaceDB downloaded" );
+		Bough rez = new Bough().name.is("config" );
 		//System.out.println("'" + ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim() + "'");
 		//System.out.println("'" + ApplicationHoreca.getInstance().getCurrentAgent().updateKod+ "'");
 		ApplicationHoreca.getInstance().getDataBase().close();
-		System.out.println("doDownloadReplaceDB db closed");
-		rez.child("userKey").value.is(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim());
-		rez.child("updateKey").value.is(ApplicationHoreca.getInstance().getCurrentAgent().updateKod);
-		System.out.println("doDownloadReplaceDB user infa catched");
-		Auxiliary.writeTextToFile(new File("/sdcard/horeca/Horeca2.xml"), "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + rez.dumpXML());
-		System.out.println("doDownloadReplaceDB config writed");
+		System.out.println("doDownloadReplaceDB db closed" );
+		rez.child("userKey" ).value.is(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim());
+		rez.child("updateKey" ).value.is(ApplicationHoreca.getInstance().getCurrentAgent().updateKod);
+		System.out.println("doDownloadReplaceDB user infa catched" );
+		Auxiliary.writeTextToFile(new File("/sdcard/horeca/Horeca2.xml" ), "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + rez.dumpXML());
+		System.out.println("doDownloadReplaceDB config writed" );
 		Decompress decompressor = new Decompress();
-		decompressor.unzip(Settings.getInstance().getTABLET_WORKING_DIR(), Settings.getInstance().getTABLET_WORKING_DIR() + "swlife_database.zip");
-		System.out.println("doDownloadReplaceDB done");
+		decompressor.unzip(Settings.getInstance().getTABLET_WORKING_DIR(), Settings.getInstance().getTABLET_WORKING_DIR() + "swlife_database.zip" );
+		System.out.println("doDownloadReplaceDB done" );
 	}
 
-	void doDownloadReplaceDBOk() {
-		System.out.println("doDownloadReplaceDBOk");
-		Auxiliary.pickConfirm(Activity_Login.this, "Перзайдите в приложение и обновите базу", "Закрыть", new Task() {
+	void doDownloadReplaceDBOk(){
+		System.out.println("doDownloadReplaceDBOk" );
+		Auxiliary.pickConfirm(Activity_Login.this, "Перзайдите в приложение и обновите базу", "Закрыть", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				finish();
 			}
 		});
 	}
 
-	void doDownloadReplaceDBCancel() {
-		System.out.println("doDownloadReplaceDBCancel");
-		Auxiliary.pickConfirm(Activity_Login.this, "Ошибка замены базы: " + coarse, "Закрыть", new Task() {
+	void doDownloadReplaceDBCancel(){
+		System.out.println("doDownloadReplaceDBCancel" );
+		Auxiliary.pickConfirm(Activity_Login.this, "Ошибка замены базы: " + coarse, "Закрыть", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				finish();
 			}
 		});

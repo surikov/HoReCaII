@@ -19,6 +19,7 @@ import sweetlife.android10.data.orders.ZayavkaPokupatelya;
 import sweetlife.android10.database.DataBaseOpenHelper;
 import sweetlife.android10.database.Requests;
 import sweetlife.android10.log.*;
+import sweetlife.android10.supervisor.*;
 import sweetlife.android10.utils.AsyncTaskManager;
 import sweetlife.android10.utils.Hex;
 import tee.binding.Bough;
@@ -409,6 +410,7 @@ public class ApplicationHoreca
 	public void setClientInfo(ClientInfo n) {
 
 		mClient = n;
+		Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod());
 	}
 	void testOptimization() {
 		//System.out.println("testOptimization");

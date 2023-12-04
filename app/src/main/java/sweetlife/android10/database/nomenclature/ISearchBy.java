@@ -10,4 +10,5 @@ public interface ISearchBy {
 	int SEARCH_CHILDREN = 5;
 	int SEARCH_CUSTOM = 6;
 	int SEARCH_HERO = 7;
+	int SEARCH_WEB = 8;
 }

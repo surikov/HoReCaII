@@ -250,7 +250,7 @@ public class Request_History extends Request_NomenclatureBase {
 				, 1//
 				, false//
 				, true//
-				, sklad,300,0,false,false,degustacia,null,null);
+				, sklad,300,0,false,false,degustacia,null,null,false);
 		//System.out.println(this.getClass().getCanonicalName() + " queryStr ");
 		mCursor = db.rawQuery(sql, null);
 		mCursor.moveToFirst();

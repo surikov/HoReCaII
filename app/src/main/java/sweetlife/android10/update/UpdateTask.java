@@ -43,7 +43,7 @@ import sweetlife.android10.R;
 import tee.binding.Bough;
 
 //
-public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterConsts, FilenameFilter {
+public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterConsts, FilenameFilter{
 	public static final int SUCCESSFULL = -1;
 	public static final int UPDATE_APP_FINISHED = 0;
 	public static final int ERROR_FTP_DOWNLOAD_XML = 1;
@@ -71,8 +71,8 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 	private String mNoneStableVersion = "";
 	private String mFTPDeltaFileName = "";
 
-	public UpdateTask(Context appContext, SQLiteDatabase db) {
-		super("" , appContext);
+	public UpdateTask(Context appContext, SQLiteDatabase db){
+		super("", appContext);
 		mApplicationContext = appContext;
 		mSettings = Settings.getInstance();
 		mUpdateChecker = new UpdateChecker();
@@ -81,13 +81,13 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//mDBLogging = ApplicationHoreca.getInstance().getLogDataBase();
 	}
 
-	public void logAndPublishProcess(String s) {
+	public void logAndPublishProcess(String s){
 		LogHelper.debug("logAndPublishProcess: " + s);
 		publishProgress(s);
 	}
 
 
-	int checkIMEI() {
+	int checkIMEI(){
 		//ERROR_FTP_DOWNLOAD_XML
 		//http://89.109.7.162/hrc120107/hs/surikovimei/352101051639433
 		//return SUCCESSFULL;
@@ -96,41 +96,41 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 			System.out.println("no check for hrc00");
 			return SUCCESSFULL;
 		}*/
-		try {
+		try{
 			//byte[] bytes=Auxiliary.loadFileFromURL("http://89.109.7.162/hrc120107/hs/surikovimei/" + Cfg.stripimei);
 			String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/surikovimei/" + Cfg.device_id();
 			System.out.println(url);
 			byte[] bytes = Auxiliary.loadFileFromPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-			String json = new String(bytes, "UTF-8");
+			String json = new String(bytes, "UTF-8" );
 			Bough bough = Bough.parseJSON(json);
 			String cuHRC = ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toUpperCase();
 			//System.out.println(cuHRC);
 			//System.out.println(bough.dumpXML());
-			for (int i = 0; i < bough.children.size(); i++) {
-				String h = bough.children.get(i).child("код").value.property.value().trim().toUpperCase();
-				String z = bough.children.get(i).child("запрет").value.property.value().trim().toUpperCase();
+			for(int i = 0; i < bough.children.size(); i++){
+				String h = bough.children.get(i).child("код" ).value.property.value().trim().toUpperCase();
+				String z = bough.children.get(i).child("запрет" ).value.property.value().trim().toUpperCase();
 				//System.out.println(h+"/"+z);
-				if (h.equals(cuHRC) || cuHRC.equals("HRC00")) {
-					if (z.equals("0")) {
+				if(h.equals(cuHRC) || cuHRC.equals("HRC00" )){
+					if(z.equals("0" )){
 						//System.out.println("found");
 						return SUCCESSFULL;
-					} else {
+					}else{
 						return LOCKED_IMEI;
 					}
 				}
 			}
 			//not found
 			return SUCCESSFULL;
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return UNKNOWN_IMEI;
 	}
 
 	@Override
-	protected Integer doInBackground(Object... arg0) {
+	protected Integer doInBackground(Object... arg0){
 		//System.out.println(this.getClass().getCanonicalName() + ".doInBackground: set priority");
-		try {
+		try{
 			int tid = android.os.Process.myTid();
 			//System.out.println(this.getClass().getCanonicalName()+": priority before change = " + android.os.Process.getThreadPriority(tid));
 			int pre = Thread.currentThread().getPriority();
@@ -138,7 +138,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 			android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
 			//System.out.println(this.getClass().getCanonicalName() + ": priority " + pre + " => " + android.os.Process.getThreadPriority(tid));
 			//System.out.println(this.getClass().getCanonicalName()+": current priority after change = " + Thread.currentThread().getPriority());
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			System.out.println(this.getClass().getCanonicalName() + ": " + t.getMessage());
 		}
 		UpdateTask.logUpdateStart();
@@ -150,7 +150,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//Читаем данные из базы логирования относительно резервного восстановления и первого на сегодня запуска
 		//int result = ReadDataFromLogDatabase();
 		int result = SUCCESSFULL;
-		if (result != SUCCESSFULL) {
+		if(result != SUCCESSFULL){
 			return result;
 		}
 
@@ -161,7 +161,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//		if(true) return UPDATE_APP_FINISHED;
 		//Проверяем наличие свободного места
 		logAndPublishProcess(mResources.getString(R.string.msg_check_free_space));
-		if (!HasFreeSpace()) {
+		if(!HasFreeSpace()){
 			return ERROR_FREE_SPACE;
 		}
 		logAndPublishProcess(mResources.getString(R.string.title_progress_update_temp_tables));
@@ -174,17 +174,17 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//}
 		logAndPublishProcess(mResources.getString(R.string.msg_connected));
 		//Если нет доспупа к сети интернет прерываем update
-		if (!NetworkHelper.IsNetworkConnectionAvailable(mApplicationContext)) {
+		if(!NetworkHelper.IsNetworkConnectionAvailable(mApplicationContext)){
 			return ERROR_NOT_FTP_CONNECTED;
 		}
 		//Загружаем и обновляем настройки
 		//		DownloadAndReadSettingsXML();
 		//Загружаем и парсим файл update.xml
-		if ((result = DownloadAndReadUpdateXML()) != SUCCESSFULL) {
+		if((result = DownloadAndReadUpdateXML()) != SUCCESSFULL){
 			return result;
 		}
 		//Проверяем есть ли обновления приложения
-		if (IsNeedAppUpdate(mUpdateChecker.getServerAppVersion())) {
+		if(IsNeedAppUpdate(mUpdateChecker.getServerAppVersion())){
 			return DownloadAndExecuteAppUpdate();
 		}
 		//Проверяем если было восстановление и версия приложения не поднялась - завершаем обновление
@@ -213,7 +213,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//SendResponseXML();
 		//Обновляем временные таблицы
 		update2();
-		logAndPublishProcess("Анализ базы данных");
+		logAndPublishProcess("Анализ базы данных" );
 		UpdateTempTables(mDeltaUpdater.getTempTablesInfo().getTempTablesFlags());
 		sweetlife.android10.utils.DatabaseHelper.adjustDataBase(mDB);
 		setupAndStripData(mDB, this);
@@ -228,15 +228,15 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//return 0;
 	}
 
-	Calendar stripDate(Calendar d) throws ParseException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+	Calendar stripDate(Calendar d) throws ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd" );
 		Date r = sdf.parse(sdf.format(d.getTime()));
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(r);
 		return cal;
 	}
 
-	void _testPrice() {
+	void _testPrice(){
 		String sql = "select count(price.vladelec),price.vladelec from Price price where price.vladelec=x'9E44002264FA89D811E17D93D0AD2C32' group by price.vladelec limit 100;";
 		//System.out.println(sql+" "+Auxiliary.fromCursor(mDB.rawQuery(sql, null)).dumpXML());
 		sql = "select count(price.vladelec),price.vladelec from Price_strip price where price.vladelec=x'9E44002264FA89D811E17D93D0AD2C32' group by price.vladelec limit 100;";
@@ -244,57 +244,56 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 	}
 
 
-	public static void logUpdateStart() {
-		System.out.println("logUpdateBegin");
+	public static void logUpdateStart(){
+		System.out.println("logUpdateBegin" );
 		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
 				//       +"/hs/ObnovlenieInfo/ЗаписатьНачалоОбновления/"+Cfg.currentHRC();
 				+ "/hs/ObnovlenieInfo/%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D0%9D%D0%B0%D1%87%D0%B0%D0%BB%D0%BE%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F/" + Cfg.whoCheckListOwner();
-		try {
+		try{
 			System.out.println(url);
 			byte[] bytes = Auxiliary.loadFileFromPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-			String json = new String(bytes, "UTF-8");
+			String json = new String(bytes, "UTF-8" );
 			Bough bough = Bough.parseJSON(json);
 			System.out.println(bough.dumpXML());
-			Cfg.currentLogUpdateKey = bough.child("Сессия").value.property.value();
+			Cfg.currentLogUpdateKey = bough.child("Сессия" ).value.property.value();
 			System.out.println("Cfg.currentLogUpdateKey: " + Cfg.currentLogUpdateKey);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 	}
 
-	public static void logUpdateFinished() {
-		System.out.println("logUpdateDone");
+	public static void logUpdateFinished(){
+		System.out.println("logUpdateDone" );
 		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
 				//+"/hs/ObnovlenieInfo/ЗаписатьОкончаниеОбновления/"+Cfg.currentHRC()+"/"+logUpdateKey;
 				+ "/hs/ObnovlenieInfo/%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C%D0%9E%D0%BA%D0%BE%D0%BD%D1%87%D0%B0%D0%BD%D0%B8%D0%B5%D0%9E%D0%B1%D0%BD%D0%BE%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F/"
 				+ Cfg.whoCheckListOwner() + "/" + Cfg.currentLogUpdateKey;
-		try {
+		try{
 			System.out.println(url);
 			byte[] bytes = Auxiliary.loadFileFromPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-			String json = new String(bytes, "UTF-8");
+			String json = new String(bytes, "UTF-8" );
 			Bough bough = Bough.parseJSON(json);
 			System.out.println(bough.dumpXML());
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 	}
 
-	boolean update2() {
-		System.out.println("update2");
+	boolean update2(){
+		System.out.println("update2" );
 		Calendar lastSuccessfulUpdate;
 		//logUpdateBegin();
-		try {
+		try{
 			lastSuccessfulUpdate = stripDate(LogHelper.getLastSuccessfulUpdate());
 			//lastSuccessfulUpdate.add(Calendar.DAY_OF_MONTH, -1);
 			Calendar now = stripDate(Calendar.getInstance());
 			now.add(Calendar.DAY_OF_MONTH, 1);
 
 
-
 			String hrc = ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim();
 			System.out.println("lastSuccessfulUpdate " + lastSuccessfulUpdate);
 			lastSuccessfulUpdate.add(Calendar.DAY_OF_MONTH, 1);
-			while (lastSuccessfulUpdate.getTimeInMillis() <= now.getTimeInMillis()) {
+			while(lastSuccessfulUpdate.getTimeInMillis() <= now.getTimeInMillis()){
 				updateCommon(lastSuccessfulUpdate);
 				lastSuccessfulUpdate.add(Calendar.DAY_OF_MONTH, 1);
 				//testPrice();
@@ -306,21 +305,21 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 			updatePersonal(hrc);
 			//testPrice();
 			//logUpdateDone();
-		} catch (ParseException e) {
+		}catch(ParseException e){
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return true;
 	}
 
-	void updateCommon(Calendar when) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+	void updateCommon(Calendar when){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd" );
 		String key = sdf.format(when.getTime());
 		String dt = Auxiliary.rusDate.format(when.getTime());
-		System.out.println("updateCommon " + Settings.getInstance().getBaseFileStoreURL() + "update2/common/" + key + ".zip");
+		System.out.println("updateCommon " + Settings.getInstance().getBaseFileStoreURL() + "update2/common/" + key + ".zip" );
 		//logAndPublishProcess("обновление " + key);
 		//if (executeUpdate("обновление " + key, "http://89.109.7.162/androbmen/update2/common/" + key + ".zip", key + ".sql")) {
-		if (executeUpdate("обновление за " + dt, Settings.getInstance().getBaseFileStoreURL() + "update2/common/" + key + ".zip" , key + ".sql")) {
+		if(executeUpdate("обновление за " + dt, Settings.getInstance().getBaseFileStoreURL() + "update2/common/" + key + ".zip", key + ".sql" )){
 			Calendar c = Calendar.getInstance();
 			c.setTimeInMillis(when.getTimeInMillis());
 			//c.add(Calendar.DAY_OF_MONTH, 1);
@@ -349,44 +348,44 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 	}
 
-	void updatePersonal(String hrc) {
+	void updatePersonal(String hrc){
 		//System.out.println("updatePersonal " + hrc);
 		//logAndPublishProcess(" обновление " + hrc);
 		//executeUpdate("обновление " + hrc, "http://89.109.7.162/androbmen/update2/personal/" + hrc + ".zip", hrc + ".sql");
-		executeUpdate("обновление " + hrc, Settings.getInstance().getBaseFileStoreURL() + "update2/personal/" + hrc + ".zip" , hrc + ".sql");
+		executeUpdate("обновление " + hrc, Settings.getInstance().getBaseFileStoreURL() + "update2/personal/" + hrc + ".zip", hrc + ".sql" );
 		int numRead = getLastKey();
 		//String wsURL = "http://89.109.7.162/hrc120107/hs/OthetOPrihtenii/" + hrc + "/" + numRead + "?komment=";
 		String wsURL = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/OthetOPrihtenii/" + hrc + "/" + numRead + "?komment=";
 		//String wsURL = Settings.getInstance().getBaseURL()+"GolovaNew/hs/OthetOPrihtenii/" + hrc + "/" + numRead + "?komment=";
 		byte[] b;
-		try {
+		try{
 			Calendar c = Calendar.getInstance();
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd-HH.mm");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd-HH.mm" );
 			//String version=getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-			String updateComment="v"+Activity_Login.packageVersion+"-"+sdf.format(c.getTime());
+			String updateComment = "v" + Activity_Login.packageVersion + "-" + sdf.format(c.getTime());
 			wsURL = wsURL + updateComment;
 			System.out.println("send " + wsURL);
 			b = Auxiliary.loadFileFromPrivateURL(wsURL, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-			logAndPublishProcess("Результат: " + new String(b, "UTF-8"));//02-14 17:46:14.369: I/System.out(9843): response: ок
-		} catch (Exception e) {
+			logAndPublishProcess("Результат: " + new String(b, "UTF-8" ));//02-14 17:46:14.369: I/System.out(9843): response: ок
+		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
 
-	int getLastKey() {
+	int getLastKey(){
 		String sql = "select NomerVersiiKonphiguracii from Consts limit 1;";
 		//System.out.println(sql);
-		try {
+		try{
 			Cursor c = mDB.rawQuery(sql, null);
 			c.moveToNext();
 			return c.getInt(0);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return 0;
 	}
 
-	void executeFile(String comment, File file) throws Exception {
+	void executeFile(String comment, File file) throws Exception{
 		System.out.println("executeFile " + comment);
 		long len = file.length();
 		long re = 0;
@@ -395,18 +394,18 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
 		String line = bufferedReader.readLine();
 		mDB.beginTransaction();
-		try {
-			while (line != null) {
+		try{
+			while(line != null){
 				re = re + line.length() + 2;
-				if (pre < re - 100000) {
-					logAndPublishProcess(comment + " - " + ((int) (100 * re / len)) + "%");//+pre+"/"+re+"/"+len);
+				if(pre < re - 100000){
+					logAndPublishProcess(comment + " - " + ((int)(100 * re / len)) + "%" );//+pre+"/"+re+"/"+len);
 					//System.out.println(pre + " / " + re + " / " + len + " / " + lineCounter + " / " + new java.util.Date());
 					pre = re;
-					try {
+					try{
 						System.runFinalization();
 						Runtime.getRuntime().gc();
 						System.gc();
-					} catch (Throwable t) {
+					}catch(Throwable t){
 						t.printStackTrace();
 					}
 				}
@@ -416,24 +415,24 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 			}
 			executeString(line);
 			mDB.setTransactionSuccessful();
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
-		} finally {
+		}finally{
 			mDB.endTransaction();
 		}
 		bufferedReader.close();
 		//System.out.println("done executeFile " + comment);
 	}
 
-	boolean executeString(String sql) {
-		if (sql != null) {
-			if (sql.length() > 1) {
-				try {
+	boolean executeString(String sql){
+		if(sql != null){
+			if(sql.length() > 1){
+				try{
 					//SQLiteDatabase mDB
 					//System.out.println("executeString " + sql.length() + ": " + sql);
 					//System.out.println("... " + sql.substring(sql.length() - 150, sql.length()));
 					mDB.execSQL(sql.trim());
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					System.out.println("executeString exception for " + sql);
 					t.printStackTrace();
 					return false;
@@ -443,15 +442,15 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		return true;
 	}
 
-	boolean executeUpdate(String comment, String url, String entry) {
+	boolean executeUpdate(String comment, String url, String entry){
 		System.out.println("executeUpdate " + url);
 		logAndPublishProcess(comment);
-		try {
+		try{
 			byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-			File file = new File("/sdcard/horeca/extract.sql");
+			File file = new File("/sdcard/horeca/extract.sql" );
 			saveFromZip(bytes, entry, file);
 			executeFile(comment, file);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 			return false;
 		}
@@ -459,20 +458,20 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		return true;
 	}
 
-	void saveFromZip(byte[] bytes, String entry, File file) throws Exception {
+	void saveFromZip(byte[] bytes, String entry, File file) throws Exception{
 		System.out.println("saveFromZip " + entry + " to " + file.getPath());
 		//file.createNewFile();
 		ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(bytes));
 		ZipEntry zipEntry = zipInputStream.getNextEntry();
-		while (zipEntry != null) {
+		while(zipEntry != null){
 			//System.out.println("zipEntry " + zipEntry.getName());
-			if (zipEntry.getName().equals(entry)) {
+			if(zipEntry.getName().equals(entry)){
 				int sz = 9999;
 				//ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
 				FileOutputStream fileOutputStream = new FileOutputStream(file);
 				byte buffer[] = new byte[sz];
 				int le = zipInputStream.read(buffer, 0, sz);
-				while (le > -1) {
+				while(le > -1){
 					//byteArrayOutputStream.write(buffer,0,le);
 					fileOutputStream.write(buffer, 0, le);
 					le = zipInputStream.read(buffer, 0, sz);
@@ -488,10 +487,10 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//System.out.println("done saveFromZip " + entry + " to " + file.getPath());
 	}
 
-	public static void tempAdjustPrice(SQLiteDatabase mDB) {
+	public static void tempAdjustPrice(SQLiteDatabase mDB){
 		//System.out.println("Анализ БД - Прайс");
-		mDB.execSQL("	drop table if exists Price_strip;	");
-		mDB.execSQL("	CREATE TABLE Price_strip (_id integer primary key asc,[_IDRRef] blob null,[Number] nvarchar(10) null,[Vladelec] blob null,[Nomenklatura] blob null,[Trafik] nvarchar(5) null);	");
+		mDB.execSQL("	drop table if exists Price_strip;	" );
+		mDB.execSQL("	CREATE TABLE Price_strip (_id integer primary key asc,[_IDRRef] blob null,[Number] nvarchar(10) null,[Vladelec] blob null,[Nomenklatura] blob null,[Trafik] nvarchar(5) null);	" );
 		mDB.execSQL("	insert into Price_strip (	"//
 				+ "\n	_idrref,number, vladelec,nomenklatura,trafik	"//
 				+ "\n	)	"//
@@ -499,39 +498,39 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	_idrref,number, vladelec,nomenklatura,trafik	"//
 				+ "\n	from Price	"//
 				+ "\n	group by _idrref,number, vladelec,nomenklatura,trafik	"//
-				+ "\n	;	");
+				+ "\n	;	" );
 		//System.out.println("delete from Price;");
-		mDB.execSQL("	delete from Price;	");
-		System.out.println("insert Price;");
+		mDB.execSQL("	delete from Price;	" );
+		System.out.println("insert Price;" );
 		mDB.execSQL("	insert into Price (	"//
 				+ "\n	_idrref,number, vladelec,nomenklatura,trafik	"//
-				+ "\n	) select _idrref,number, vladelec,nomenklatura,trafik from Price_strip" + "\n	;	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_IDRRef on Price_strip(_IDRRef);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Nomenklatura on Price_strip(Nomenklatura);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Number on Price_strip(Number);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Trafik on Price_strip(Trafik);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Vladelec on Price_strip(Vladelec);	");
+				+ "\n	) select _idrref,number, vladelec,nomenklatura,trafik from Price_strip" + "\n	;	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_IDRRef on Price_strip(_IDRRef);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Nomenklatura on Price_strip(Nomenklatura);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Number on Price_strip(Number);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Trafik on Price_strip(Trafik);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Vladelec on Price_strip(Vladelec);	" );
 
-		mDB.execSQL("	analyze;	");
-		System.out.println("done analyze after Price;");
+		mDB.execSQL("	analyze;	" );
+		System.out.println("done analyze after Price;" );
 	}
 
-	public static void setupAndStripData(SQLiteDatabase mDB, UpdateTask upd) {
+	public static void setupAndStripData(SQLiteDatabase mDB, UpdateTask upd){
 		//if(1==1)return;
-		System.out.println("setupStrippedData");
-		GPSInfo.lockInsert = true;
-		if (upd != null) {
-			upd.logAndPublishProcess("Проверка БД");
+		System.out.println("setupStrippedData" );
+		GPSInfo.lockInsertGPS = true;
+		if(upd != null){
+			upd.logAndPublishProcess("Проверка БД" );
 		}
 		//mDB.execSQL("	vacuum;	");
-		mDB.execSQL("	analyze;	");
+		mDB.execSQL("	analyze;	" );
 		String sql = "";
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Прайс");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Прайс" );
 		}
-		System.out.println("Анализ БД - Прайс");
-		mDB.execSQL("	drop table if exists Price_strip;	");
-		mDB.execSQL("	CREATE TABLE Price_strip (_id integer primary key asc,[_IDRRef] blob null,[Number] nvarchar(10) null,[Vladelec] blob null,[Nomenklatura] blob null,[Trafik] nvarchar(5) null);	");
+		System.out.println("Анализ БД - Прайс" );
+		mDB.execSQL("	drop table if exists Price_strip;	" );
+		mDB.execSQL("	CREATE TABLE Price_strip (_id integer primary key asc,[_IDRRef] blob null,[Number] nvarchar(10) null,[Vladelec] blob null,[Nomenklatura] blob null,[Trafik] nvarchar(5) null);	" );
 		mDB.execSQL("	insert into Price_strip (	"//
 				+ "\n	_idrref,number, vladelec,nomenklatura,trafik	"//
 				+ "\n	)	"//
@@ -539,30 +538,30 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	_idrref,number, vladelec,nomenklatura,trafik	"//
 				+ "\n	from Price	"//
 				+ "\n	group by _idrref,number, vladelec,nomenklatura,trafik	"//
-				+ "\n	;	");
-		System.out.println("delete from Price;");
-		mDB.execSQL("	delete from Price;	");
+				+ "\n	;	" );
+		System.out.println("delete from Price;" );
+		mDB.execSQL("	delete from Price;	" );
 		mDB.execSQL("	insert into Price (	"//
 				+ "\n	_idrref,number, vladelec,nomenklatura,trafik	"//
-				+ "\n	) select _idrref,number, vladelec,nomenklatura,trafik from Price_strip" + "\n	;	");
+				+ "\n	) select _idrref,number, vladelec,nomenklatura,trafik from Price_strip" + "\n	;	" );
 		//String pricestat="select count(price.vladelec),price.vladelec from Price_strip price group by price.vladelec limit 100;";
 		//Bough b=Auxiliary.fromCursor(mDB.rawQuery(pricestat, null));
 		//System.out.println(b.dumpXML());
 
 
-		if (upd != null) {
-			upd.logAndPublishProcess("Индексирование БД - Величины квантования");
+		if(upd != null){
+			upd.logAndPublishProcess("Индексирование БД - Величины квантования" );
 		}
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_IDRRef on Price_strip(_IDRRef);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Nomenklatura on Price_strip(Nomenklatura);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Number on Price_strip(Number);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Trafik on Price_strip(Trafik);	");
-		mDB.execSQL("	CREATE INDEX IX_Price_strip_Vladelec on Price_strip(Vladelec);	");
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Номенклатура");
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_IDRRef on Price_strip(_IDRRef);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Nomenklatura on Price_strip(Nomenklatura);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Number on Price_strip(Number);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Trafik on Price_strip(Trafik);	" );
+		mDB.execSQL("	CREATE INDEX IX_Price_strip_Vladelec on Price_strip(Vladelec);	" );
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Номенклатура" );
 		}
-		System.out.println("Анализ БД - Номенклатура");
-		mDB.execSQL("	drop table if exists Nomenklatura_sorted;	");
+		System.out.println("Анализ БД - Номенклатура" );
+		mDB.execSQL("	drop table if exists Nomenklatura_sorted;	" );
 
 		mDB.execSQL("	CREATE TABLE Nomenklatura_sorted (	"
 				+ "\n		_id integer primary key asc autoincrement, [_IDRRef] blob null,[_Version] timestamp null,[PometkaUdaleniya] blob null,[Predopredelennyy] blob null	"//
@@ -574,7 +573,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n		,[PoryadokPriPechatiPraysLista] numeric null,[OsnovnoyProizvoditel] blob null,[Prioritet] numeric null,[MinimalnyyOstatok] numeric null,[VetKategoriya] blob null	"//
 				+ "\n		,[ProcentEstestvennoyUbyli] numeric null,[SrokGodnosti] numeric null,[TovarPodZakaz] blob null,[Brend] blob null,[TovarPodZakazKazan] blob null, UpperName text null	"//
 				+ "\n		, skladEdIzm text, skladEdVes real, skladEdKoef real, otchEdIzm text, otchdEdVes real, otchEdKoef real, kvant real, product blob null, tegi text, mark blob null, brand blob null"//
-				+ "\n	);	");
+				+ "\n	);	" );
 		//System.out.println("101715 "+Auxiliary.fromCursor(mDB.rawQuery("select n._id,n.[_IDRRef],n.[Artikul] from Nomenklatura_sorted n where n.artikul=101715;",null)).dumpXML());
 		sql = "	insert into Nomenklatura_sorted (	"//
 				+ "\n			_IDRRef,_Version,PometkaUdaleniya,Predopredelennyy,Roditel,EtoGruppa,Kod,Naimenovanie,NaimenovaniePolnoe,Artikul,EdinicaKhraneniyaOstatkov	"//
@@ -602,10 +601,10 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//System.out.println(sql);
 		mDB.execSQL(sql);
 		//System.out.println("a 101715 "+Auxiliary.fromCursor(mDB.rawQuery("select n._id,n.[_IDRRef],n.[Artikul] from Nomenklatura_sorted n where n.artikul=101715;",null)).dumpXML());
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Номенклатура группы");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Номенклатура группы" );
 		}
-		System.out.println("Анализ БД - Номенклатура группы");
+		System.out.println("Анализ БД - Номенклатура группы" );
 		sql = "	insert into Nomenklatura_sorted (	"//
 				+ "\n			_IDRRef,_Version,PometkaUdaleniya,Predopredelennyy,Roditel,EtoGruppa,Kod,Naimenovanie,NaimenovaniePolnoe,Artikul,EdinicaKhraneniyaOstatkov	"//
 				+ "\n			,BazovayaEdinicaIzmereniya,StavkaNDS,Kommentariy,Usluga,Nabor,NomenklaturnayaGruppa,NomenklaturnayaGruppaZatrat	"//
@@ -684,33 +683,33 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 
 		mDB.execSQL("delete from Nomenklatura_sorted where _id in (select _id from Nomenklatura_sorted n group by n._idrref having count(_idrref)>1);");
 */
-		if (upd != null) {
-			upd.logAndPublishProcess("Индексирование БД - Номенклатура");
+		if(upd != null){
+			upd.logAndPublishProcess("Индексирование БД - Номенклатура" );
 		}
-		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted on Nomenklatura_sorted(_IDRRef);	");
-		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted_Artikul on Nomenklatura_sorted(Artikul);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_EdenicaKhraneniyaOstatkov] ON Nomenklatura_sorted([EdinicaKhraneniyaOstatkov]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_EdinicaDlyaOtchetov] ON Nomenklatura_sorted([EdinicaDlyaOtchetov]);	");
-		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted_IDRref on Nomenklatura_sorted(_IDRRef);	");
-		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted_Roditel on Nomenklatura_sorted(Roditel);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_OsnovnoyProizvoditel] ON Nomenklatura_sorted([OsnovnoyProizvoditel]);	");
+		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted on Nomenklatura_sorted(_IDRRef);	" );
+		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted_Artikul on Nomenklatura_sorted(Artikul);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_EdenicaKhraneniyaOstatkov] ON Nomenklatura_sorted([EdinicaKhraneniyaOstatkov]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_EdinicaDlyaOtchetov] ON Nomenklatura_sorted([EdinicaDlyaOtchetov]);	" );
+		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted_IDRref on Nomenklatura_sorted(_IDRRef);	" );
+		mDB.execSQL("	CREATE INDEX IX_Nomenklatura_sorted_Roditel on Nomenklatura_sorted(Roditel);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_OsnovnoyProizvoditel] ON Nomenklatura_sorted([OsnovnoyProizvoditel]);	" );
 
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_skladEdIzm] ON Nomenklatura_sorted([skladEdIzm]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_skladEdVes] ON Nomenklatura_sorted([skladEdVes]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_skladEdKoef] ON Nomenklatura_sorted([skladEdKoef]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_otchEdIzm] ON Nomenklatura_sorted([otchEdIzm]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_otchdEdVes] ON Nomenklatura_sorted([otchdEdVes]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_otchEdKoef] ON Nomenklatura_sorted([otchEdKoef]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_kvant] ON Nomenklatura_sorted([kvant]);	");
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_skladEdIzm] ON Nomenklatura_sorted([skladEdIzm]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_skladEdVes] ON Nomenklatura_sorted([skladEdVes]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_skladEdKoef] ON Nomenklatura_sorted([skladEdKoef]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_otchEdIzm] ON Nomenklatura_sorted([otchEdIzm]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_otchdEdVes] ON Nomenklatura_sorted([otchdEdVes]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_otchEdKoef] ON Nomenklatura_sorted([otchEdKoef]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Nomenklatura_sorted_kvant] ON Nomenklatura_sorted([kvant]);	" );
 
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Адреса по складам");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Адреса по складам" );
 		}
-		System.out.println("Анализ БД - Адреса по складам");
-		mDB.execSQL("	drop table if exists AdresaPoSkladam_last;	");
+		System.out.println("Анализ БД - Адреса по складам" );
+		mDB.execSQL("	drop table if exists AdresaPoSkladam_last;	" );
 		mDB.execSQL("	CREATE TABLE AdresaPoSkladam_last (	" //
 				+ "\n	_id integer primary key asc autoincrement, [Period] date null,[Baza] blob null,[Nomenklatura] blob null,[Sklad] blob null,[Traphik] blob null	"//
-				+ "\n	);	");
+				+ "\n	);	" );
 		mDB.execSQL("	insert into AdresaPoSkladam_last (	"//
 				+ "\n			Period,Baza,Nomenklatura,Sklad,Traphik	"//
 				+ "\n		)	"//
@@ -722,18 +721,18 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n					and a1.baza=a2.baza	"//
 				+ "\n				) and a1.sklad<>X'00000000000000000000000000000000'	 and a1.sklad<>X'00'	"//
 				+ "\n		group by a1.baza,a1.sklad,a1.nomenklatura	"//
-				+ "\n	;	");
-		if (upd != null) {
-			upd.logAndPublishProcess("Индексирование БД - Адреса по складам");
+				+ "\n	;	" );
+		if(upd != null){
+			upd.logAndPublishProcess("Индексирование БД - Адреса по складам" );
 		}
-		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Period on AdresaPoSkladam_last (Period);	");
-		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Nomenklatura on AdresaPoSkladam_last (Nomenklatura);	");
-		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Baza on AdresaPoSkladam_last (Baza);	");
-		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Sklad on AdresaPoSkladam_last (Sklad);	");
-		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Traphik on AdresaPoSkladam_last (Traphik);	");
+		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Period on AdresaPoSkladam_last (Period);	" );
+		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Nomenklatura on AdresaPoSkladam_last (Nomenklatura);	" );
+		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Baza on AdresaPoSkladam_last (Baza);	" );
+		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Sklad on AdresaPoSkladam_last (Sklad);	" );
+		mDB.execSQL("	CREATE INDEX IX_AdresaPoSkladam_last_Traphik on AdresaPoSkladam_last (Traphik);	" );
 		//////////////////
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Договоры контрагентов");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Договоры контрагентов" );
 		}
 		refreshDogovoryKontragentov_strip(mDB);
 		/*
@@ -798,16 +797,16 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_zakryt on DogovoryKontragentov_strip(zakryt);	");
 		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_GruppaDogovorov on DogovoryKontragentov_strip(GruppaDogovorov);	");
 		*/
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Цены номенклатуры склада");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Цены номенклатуры склада" );
 		}
-		System.out.println("Анализ БД - Цены номенклатуры склада");
-		mDB.execSQL("	drop table if exists CenyNomenklaturySklada_last;	");
+		System.out.println("Анализ БД - Цены номенклатуры склада" );
+		mDB.execSQL("	drop table if exists CenyNomenklaturySklada_last;	" );
 		mDB.execSQL("	CREATE TABLE CenyNomenklaturySklada_last (	"//
 				+ "\n	_id integer primary key asc autoincrement,[Period] date null,[Registrator] blob null,[NomerStroki] numeric null,[Aktivnost] blob null	"//
 				+ "\n	,[TipCen] blob null,[Nomenklatura] blob null,[Sklad] blob null,[Valyuta] blob null,[Cena] numeric null,[EdinicaIzmereniya] blob null	"//
 				+ "\n	,[ProcentSkidkiNacenki] numeric null	"//
-				+ "\n	);	");
+				+ "\n	);	" );
 		mDB.execSQL("	insert into CenyNomenklaturySklada_last (	"//
 				+ "\n	Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki	"//
 				+ "\n	)	"//
@@ -817,7 +816,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	join Nomenklatura_sorted on Nomenklatura_sorted._idrref=c1.nomenklatura	"//
 				+ "\n	where c1.Period=(select max(c2.Period) from CenyNomenklaturySklada c2 where c1.nomenklatura=c2.nomenklatura)	"//
 				+ "\n	group by nomenklatura	"//
-				+ "\n	;	");
+				+ "\n	;	" );
 		mDB.execSQL("	insert into CenyNomenklaturySklada_last (	"//
 				+ "\n	Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki	"//
 				+ "\n	)	"//
@@ -827,18 +826,18 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	join Nomenklatura_sorted on Nomenklatura_sorted._idrref=c1.nomenklatura	"//
 				+ "\n	where date(c1.period) >= date('now')	"//
 				+ "\n	group by nomenklatura	"//
-				+ "\n	;	");
-		if (upd != null) {
-			upd.logAndPublishProcess("Индексирование БД - Цены номенклатуры склада");
+				+ "\n	;	" );
+		if(upd != null){
+			upd.logAndPublishProcess("Индексирование БД - Цены номенклатуры склада" );
 		}
-		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Nomenklatura on CenyNomenklaturySklada_last(Nomenklatura);	");
-		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Period on CenyNomenklaturySklada_last(Period);	");
-		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Cena on CenyNomenklaturySklada_last(Cena);	");
+		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Nomenklatura on CenyNomenklaturySklada_last(Nomenklatura);	" );
+		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Period on CenyNomenklaturySklada_last(Period);	" );
+		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Cena on CenyNomenklaturySklada_last(Cena);	" );
 		/*if (upd != null) {
 			upd.logAndPublishProcess("Анализ БД - Единицы измерения");
 		}
 		System.out.println("Анализ БД - Единицы измерения");*/
-		mDB.execSQL("	drop table if exists EdinicyIzmereniya_strip;	");
+		mDB.execSQL("	drop table if exists EdinicyIzmereniya_strip;	" );
 		/*
 		mDB.execSQL("	CREATE TABLE EdinicyIzmereniya_strip (	"//
 				+ "\n	_id integer primary key asc autoincrement, [_IDRRef] blob null,[_Version] timestamp null,[PometkaUdaleniya] blob null	"//
@@ -865,14 +864,14 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		mDB.execSQL("	CREATE INDEX IX_EdinicyIzmereniya_strip_IDRRef on EdinicyIzmereniya_strip(_IDRRef);	");
 		*/
 
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Текущие цены остатков партий");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Текущие цены остатков партий" );
 		}
-		System.out.println("Анализ БД - Текущие цены остатков партий");
-		mDB.execSQL("	drop table if exists TekuschieCenyOstatkovPartiy_strip;	");
+		System.out.println("Анализ БД - Текущие цены остатков партий" );
+		mDB.execSQL("	drop table if exists TekuschieCenyOstatkovPartiy_strip;	" );
 		mDB.execSQL("	CREATE TABLE TekuschieCenyOstatkovPartiy_strip (	"//
 				+ "\n	_id integer primary key asc autoincrement, [Nomenklatura] blob null,[Cena] numeric null,[UstanavlivaetsyaVruchnuyu] blob null	"//
-				+ "\n	);	");
+				+ "\n	);	" );
 		mDB.execSQL("	insert into TekuschieCenyOstatkovPartiy_strip (	"//
 				+ "\n	Nomenklatura,Cena,UstanavlivaetsyaVruchnuyu	"//
 				+ "\n	)	"//
@@ -881,17 +880,17 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	from TekuschieCenyOstatkovPartiy	"//
 				+ "\n	join Nomenklatura_sorted n on n._idrref=TekuschieCenyOstatkovPartiy.nomenklatura	"//
 				+ "\n	group by n._idrref	"//
-				+ "\n	;	");
-		if (upd != null) {
-			upd.logAndPublishProcess("Индексирование БД - Текущие цены остатков партий");
+				+ "\n	;	" );
+		if(upd != null){
+			upd.logAndPublishProcess("Индексирование БД - Текущие цены остатков партий" );
 		}
-		mDB.execSQL("	CREATE INDEX IX_TekuschieCenyOstatkovPartiy_strip_Cena on TekuschieCenyOstatkovPartiy_strip(Cena);	");
-		mDB.execSQL("	CREATE INDEX IX_TekuschieCenyOstatkovPartiy_strip_Nomenklatura on TekuschieCenyOstatkovPartiy_strip(nomenklatura);	");
+		mDB.execSQL("	CREATE INDEX IX_TekuschieCenyOstatkovPartiy_strip_Cena on TekuschieCenyOstatkovPartiy_strip(Cena);	" );
+		mDB.execSQL("	CREATE INDEX IX_TekuschieCenyOstatkovPartiy_strip_Nomenklatura on TekuschieCenyOstatkovPartiy_strip(nomenklatura);	" );
 		/*if (upd != null) {
 			upd.logAndPublishProcess("Анализ БД - Величины квантования");
 		}
 		System.out.println("Анализ БД - Величины квантования");*/
-		mDB.execSQL("	drop table if exists VelichinaKvantovNomenklatury_strip;	");
+		mDB.execSQL("	drop table if exists VelichinaKvantovNomenklatury_strip;	" );
 		/*
 		mDB.execSQL("	CREATE TABLE VelichinaKvantovNomenklatury_strip (	"//
 				+ "\n	_id integer primary key asc autoincrement, [Nomenklatura] blob null,[Kvant] blob null,[Sklad] blob null,[Kolichestvo] numeric null,[_SimpleKey] blob null	"//
@@ -910,22 +909,22 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 		mDB.execSQL("	CREATE INDEX [IX_VelichinaKvantovNomenklatury_strip_Nomenklatura] ON [VelichinaKvantovNomenklatury_strip] ([Nomenklatura]);	");
 		*/
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - категории номенклатуры");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - категории номенклатуры" );
 		}
-		System.out.println("Анализ БД - категории номенклатуры");
+		System.out.println("Анализ БД - категории номенклатуры" );
 		Cfg.refreshNomenklatureGroups(mDB);
 
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Фикс. цены");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Фикс. цены" );
 		}
-		System.out.println("Анализ БД - Фикс. цены");
-		mDB.execSQL("	drop table if exists FiksirovannyeCeny_actual;	");
+		System.out.println("Анализ БД - Фикс. цены" );
+		mDB.execSQL("	drop table if exists FiksirovannyeCeny_actual;	" );
 		mDB.execSQL("	CREATE TABLE FiksirovannyeCeny_actual (	"//
 				+ "\n	_id integer primary key asc,[Period] date null,[Registrator] blob null"//
 				+ "\n	,[PoluchatelSkidki] blob null,[Nomenklatura] blob null,[FixCena] numeric null"//
 				+ "\n	,[DataOkonchaniya] date null,[Obyazatelstva] numeric null	"//
-				+ "\n	);	");
+				+ "\n	);	" );
 		/*
 		mDB.execSQL("	insert into FiksirovannyeCeny_actual (Period,Registrator,PoluchatelSkidki,Nomenklatura,FixCena,DataOkonchaniya,Obyazatelstva)"//
 				+ "\n		select Period,Registrator,PoluchatelSkidki,Nomenklatura,FixCena,DataOkonchaniya,Obyazatelstva"//
@@ -937,16 +936,14 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		*/
 
 
-		System.out.println("clear Skidki prilojenie,smartpro,internet");
-		mDB.execSQL("delete from skidki where polzovatel=X'80610050568B3C6811E851EC0C38C23A'");
-		mDB.execSQL("delete from skidki where polzovatel=X'BBC320677C60FED011ECB65846ED9A78'");
-		mDB.execSQL("delete from skidki where polzovatel=X'8215002264FA89D811E111E6B52DD7BA'");
-
-
+		System.out.println("clear Skidki prilojenie,smartpro,internet" );
+		mDB.execSQL("delete from skidki where polzovatel=X'80610050568B3C6811E851EC0C38C23A'" );
+		mDB.execSQL("delete from skidki where polzovatel=X'BBC320677C60FED011ECB65846ED9A78'" );
+		mDB.execSQL("delete from skidki where polzovatel=X'8215002264FA89D811E111E6B52DD7BA'" );
 
 
 		String cuHRC = ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toUpperCase();
-		if (!cuHRC.equals("HRC00")) {
+		if(!cuHRC.equals("HRC00" )){
 			mDB.execSQL("	insert into FiksirovannyeCeny_actual (Period,Registrator,PoluchatelSkidki,Nomenklatura,FixCena,DataOkonchaniya,Obyazatelstva)"//
 					+ "\n		select Period,Registrator,PoluchatelSkidki,Nomenklatura,FixCena,DataOkonchaniya,Obyazatelstva"//
 					+ "\n				from kontragenty"//
@@ -955,51 +952,50 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 					+ "\n					join nomenklatura n on n._idrref=FiksirovannyeCeny.nomenklatura"//
 					+ "\n				where dataokonchaniya>=date('now') and period<=date('now')"//
 					+ "\n				group by PoluchatelSkidki,Nomenklatura"//
-					+ "\n	;	");
-		} else {
-			if (upd != null) {
-				upd.logAndPublishProcess("skip for hrc00 Анализ БД - Фикс. цены");
+					+ "\n	;	" );
+		}else{
+			if(upd != null){
+				upd.logAndPublishProcess("skip for hrc00 Анализ БД - Фикс. цены" );
 			}
 		}
-		if (upd != null) {
-			upd.logAndPublishProcess("Индексирование БД - Фикс. цены");
+		if(upd != null){
+			upd.logAndPublishProcess("Индексирование БД - Фикс. цены" );
 		}
-		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_Period] ON [FiksirovannyeCeny_actual] ([Period]);	");
-		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_PoluchatelSkidki] ON [FiksirovannyeCeny_actual] ([PoluchatelSkidki]);	");
-		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_Nomenklatura] ON [FiksirovannyeCeny_actual] ([Nomenklatura]);	");
-		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_DataOkonchaniya] ON [FiksirovannyeCeny_actual] ([DataOkonchaniya]);	");
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД - Продажи");
+		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_Period] ON [FiksirovannyeCeny_actual] ([Period]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_PoluchatelSkidki] ON [FiksirovannyeCeny_actual] ([PoluchatelSkidki]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_Nomenklatura] ON [FiksirovannyeCeny_actual] ([Nomenklatura]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_FiksirovannyeCeny_actual_DataOkonchaniya] ON [FiksirovannyeCeny_actual] ([DataOkonchaniya]);	" );
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД - Продажи" );
 		}
 		refreshProdazhi_last(mDB);
 
 
 		System.out.println("noVacuum " + Activity_Login.noVacuum);
-		if (!Activity_Login.noVacuum) {
-			if (upd != null) {
-				upd.logAndPublishProcess("Сжатие БД");
+		if(!Activity_Login.noVacuum){
+			if(upd != null){
+				upd.logAndPublishProcess("Сжатие БД" );
 			}
-			System.out.println("Сжатие БД");
-			mDB.execSQL("	vacuum;	");
+			System.out.println("Сжатие БД" );
+			mDB.execSQL("	vacuum;	" );
 		}
-		if (upd != null) {
-			upd.logAndPublishProcess("Анализ БД");
+		if(upd != null){
+			upd.logAndPublishProcess("Анализ БД" );
 		}
-		System.out.println("Анализ БД");
-		mDB.execSQL("	analyze;	");
-		if (upd != null) {
-			upd.logAndPublishProcess("Завершение проверки БД");
+		System.out.println("Анализ БД" );
+		mDB.execSQL("	analyze;	" );
+		if(upd != null){
+			upd.logAndPublishProcess("Завершение проверки БД" );
 		}
-		System.out.println("Завершение проверки БД");
+		System.out.println("Завершение проверки БД" );
 		//System.out.println("strip done");
-		GPSInfo.lockInsert = false;
+		GPSInfo.lockInsertGPS = false;
 	}
 
 
-
-	public static void refreshProdazhi_CR(SQLiteDatabase mDB, String kontragentID) {
-		System.out.println("Анализ БД - Продажи ЦР " + kontragentID);
-		mDB.execSQL("	drop table if exists Prodazhi_CR;	");
+	public static void refreshProdazhi_CR(SQLiteDatabase mDB, String kontragentID){
+		System.out.println("Анализ БД - ЦР " + kontragentID);
+		mDB.execSQL("	drop table if exists Prodazhi_CR;	" );
 		mDB.execSQL("	CREATE TABLE Prodazhi_CR (	"//
 				+ "\n	_id integer primary key asc autoincrement, [Period] date null,[Registrator_0] blob null,[Registrator_1] blob null,[NomerStroki] numeric null	"//
 				+ "\n	,[Aktivnost] blob null,[Nomenklatura] blob null,[KharakteristikaNomenklatury] blob null,[ZakazPokupatelya_0] blob null,[ZakazPokupatelya_1] blob null	"//
@@ -1007,7 +1003,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	,[DokumentProdazhi_2] blob null,[Proekt] blob null,[Podrazdelenie] blob null,[Kolichestvo] numeric null,[Stoimost] numeric null	"//
 				+ "\n	,[StoimostBezSkidok] numeric null,[Sebestoimost] numeric null,[SummaVozvrataNacenki] numeric null	"//
 				+ "\n	,[kartaKod] text null,[VidSkidki] blob null"//
-				+ "\n	);	");
+				+ "\n	);	" );
 		String sql = "	insert into Prodazhi_CR (	"//
 				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
 				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
@@ -1029,180 +1025,161 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	;	";
 		//System.out.println("Prodazhi_CR " + sql);
 		mDB.execSQL(sql);
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Nomenklatura] ON [Prodazhi_CR] ([Nomenklatura]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Period] ON [Prodazhi_CR] ([Period]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Stoimost] ON [Prodazhi_CR] ([Stoimost]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_kolichestvo] ON [Prodazhi_CR] ([kolichestvo]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Dogovorkontragenta ] ON [Prodazhi_CR] ([DogovorKontragenta]);	");
+		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Nomenklatura] ON [Prodazhi_CR] ([Nomenklatura]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Period] ON [Prodazhi_CR] ([Period]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Stoimost] ON [Prodazhi_CR] ([Stoimost]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_kolichestvo] ON [Prodazhi_CR] ([kolichestvo]);	" );
+		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_CR_Dogovorkontragenta ] ON [Prodazhi_CR] ([DogovorKontragenta]);	" );
 
 	}
 
-	public static void refreshProdazhi_last(SQLiteDatabase mDB) {
-		System.out.println("Анализ БД - Продажи");
-		mDB.execSQL("	drop table if exists Prodazhi_last;	");
-		mDB.execSQL("	CREATE TABLE Prodazhi_last (	"//
-				+ "\n	_id integer primary key asc autoincrement, [Period] date null,[Registrator_0] blob null,[Registrator_1] blob null,[NomerStroki] numeric null	"//
-				+ "\n	,[Aktivnost] blob null,[Nomenklatura] blob null,[KharakteristikaNomenklatury] blob null,[ZakazPokupatelya_0] blob null,[ZakazPokupatelya_1] blob null	"//
-				+ "\n	,[ZakazPokupatelya_2] blob null,[DogovorKontragenta] blob null,[DokumentProdazhi_0] blob null,[DokumentProdazhi_1] blob null	"//
-				+ "\n	,[DokumentProdazhi_2] blob null,[Proekt] blob null,[Podrazdelenie] blob null,[Kolichestvo] numeric null,[Stoimost] numeric null	"//
-				+ "\n	,[StoimostBezSkidok] numeric null,[Sebestoimost] numeric null,[SummaVozvrataNacenki] numeric null	"//
-				+ "\n	,[kartaKod] text null"//
-				+ "\n	);	");
-		String sql = "	insert into Prodazhi_last (	"//
-				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n		,kartaKod"//
-				+ "\n	)	"//
-				+ "\n	select	"//
-				+ "\n		max(Period) as Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,main.Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n		,''"//
-				+ "\n	from Prodazhi main"//
-				+ "\n		join dogovorykontragentov d1 on d1._idrref=main.dogovorkontragenta "//
-				+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Gazeta + "'"//914f887f023f24874f33033ac1cacceb'"
-				+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_PoOtvetstvennove + "'"//b6642d98b55a8d5e48c45c1c3731b72e'"
-				+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Promokod + "'"//a24b2ee11974f13a4fbac0f8a4e35589'"
-				+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Targetnie + "'"//a0c42e5e2beab7e74a98e440d5099464'"
-				+ "\n		group by d1.vladelec,main.nomenklatura"//
-				+ "\n		order by main.period desc"//
-				+ "\n		limit 50000"//
-				+ "\n	;	";
-		//System.out.println("Prodazhi_last without gazeta " + sql);
-		mDB.execSQL(sql);
-		sql = "	insert into Prodazhi_last (	"//
-				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n		,kartaKod"//
-				+ "\n	)	"//
-				+ "\n	select	"//
-				+ "\n		max(Period) as Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,main.Podrazdelenie,Kolichestvo	"//
-				+ "\n		,0,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n		,''"//
-				+ "\n	from Prodazhi main"//
-				+ "\n		join dogovorykontragentov d1 on d1._idrref=main.dogovorkontragenta "//
-				+ "\n				and (ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Gazeta + "'"//914f887f023f24874f33033ac1cacceb'"
-				+ "\n				    or ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_PoOtvetstvennove + "'"//b6642d98b55a8d5e48c45c1c3731b72e'"
-				+ "\n				    or ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Promokod + "'"//a24b2ee11974f13a4fbac0f8a4e35589'"
-				+ "\n				    or ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Targetnie + "'"//a0c42e5e2beab7e74a98e440d5099464')"
-				+ "\n				    )"
-				+ "\n		group by d1.vladelec,main.nomenklatura"//
-				+ "\n		order by main.period desc"//
-				+ "\n		limit 50000"//
-				+ "\n	;	";
-		//System.out.println("Prodazhi_last for gazeta " + sql);
-		mDB.execSQL(sql);
-		mDB.execSQL("	insert into Prodazhi_last (	"//
-				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n		,kartaKod"//
-				+ "\n	)	"//
-				+ "\n	select	"//
-				+ "\n		date('2020-01-01') as Period	"//
-				+ "\n		,0 as Registrator_0	"//
-				+ "\n		,0 as Registrator_1	"//
-				+ "\n		,0 as NomerStroki	"//
-				+ "\n		,0 as Aktivnost	"//
-				+ "\n		,nomenklatura._idrref as Nomenklatura	"//
-				+ "\n		,0 as KharakteristikaNomenklatury	"//
-				+ "\n		,0 as ZakazPokupatelya_0	"//
-				+ "\n		,0 as ZakazPokupatelya_1	"//
-				+ "\n		,0 as ZakazPokupatelya_2	"//
-				+ "\n		,dogovorykontragentov._idrref as DogovorKontragenta	"//
-				+ "\n		,0 as DokumentProdazhi_0	"//
-				+ "\n		,0 as DokumentProdazhi_1	"//
-				+ "\n		,0 as DokumentProdazhi_2	"//
-				+ "\n		,0 as Proekt	"//
-				+ "\n		,0 as Podrazdelenie	"//
-				+ "\n		,0 as Kolichestvo	"//
-				+ "\n		,0 as Stoimost	"//
-				+ "\n		,0 as StoimostBezSkidok	"//
-				+ "\n		,0 as Sebestoimost	"//
-				+ "\n		,0 as SummaVozvrataNacenki	"//
-				+ "\n		,1 as kartaKod	"//
-				+ "\n	from KartaKlientaDok2	"//
-				+ "\n		join KartaKlientaKlient2 on KartaKlientaKlient2.UIN=KartaKlientaDok2.UIN	"//
-				+ "\n		join KartaKlientaNomenklatura2 on KartaKlientaNomenklatura2.UIN=KartaKlientaDok2.UIN	"//
-				+ "\n		join nomenklatura on nomenklatura._idrref=KartaKlientaNomenklatura2.tovar	"//
-				+ "\n		join kontragenty on kontragenty._idrref=KartaKlientaKlient2.vladelec	"//
-				+ "\n		join dogovorykontragentov on dogovorykontragentov.vladelec=kontragenty._idrref	"//
-				+ "\n	group by KartaKlientaKlient2.vladelec,KartaKlientaNomenklatura2.tovar	"//
-				+ "\n	;	");
-        /*
-        mDB.execSQL("update Prodazhi_last set Stoimost=0"
-                + "\n			where EXISTS("
-                + "\n					select _id"
-                + "\n			from Prodazhi"
-                + "\n			where Prodazhi_last.Registrator_1=Prodazhi.Registrator_1"
-                + "\n			and Prodazhi_last.period=Prodazhi.period"
-                + "\n			and Prodazhi_last.dogovorkontragenta=Prodazhi.dogovorkontragenta"
-                + "\n			and Prodazhi_last.nomenklatura=Prodazhi.nomenklatura"
-                + "\n			and ("
-                + "\n				Prodazhi.VidSkidki=x'914f887f023f24874f33033ac1cacceb'"
-                + "\n				or Prodazhi.VidSkidki=x'b6642d98b55a8d5e48c45c1c3731b72e'"
-                + "\n				or Prodazhi.VidSkidki=x'a24b2ee11974f13a4fbac0f8a4e35589'"
-                + "\n				or Prodazhi.VidSkidki=x'a0c42e5e2beab7e74a98e440d5099464'"
-                + "\n		)"
-                + "\n	);");
-         */
+	public static void refreshProdazhi_last(SQLiteDatabase mDB){
+		refreshProdazhi_last(mDB, "" );
+	}
 
+	static String lastKontragent_idrref = "";
 
-		/*
-		mDB.execSQL("	insert into Prodazhi_last (	"//
-				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n	)	"//
-				+ "\n	select	"//
-				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,main.Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n	from nomenklatura_sorted n	"//
-				+ "\n		join Prodazhi main on n._idrref=main.Nomenklatura	"//
-				+ "\n		join dogovorykontragentov d1 on d1._idrref=main.dogovorkontragenta "//
-				+ "\n			and main.period=("//
-				+ "\n				select max(sub.period) from Prodazhi sub"//
-				+ "\n					join dogovorykontragentov d2 on d2._idrref=sub.dogovorkontragenta" //
-				+ "\n					and sub.nomenklatura=main.nomenklatura "//
-				+ "\n					and d1.vladelec=d2.vladelec"//
-				+ "\n				)	"//
-				+ "\n	;	");
-		
-		System.out.println("delete from Prodazhi;");
-		mDB.execSQL("	delete from Prodazhi;	");
-		mDB.execSQL("	insert into Prodazhi (	"//
-				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n	)	"//
-				+ "\n	select	"//
-				+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
-				+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
-				+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
-				+ "\n	from Prodazhi_last	"//
-				+ "\n	;	");
-		*/
-		/*if (upd != null) {
-			upd.logAndPublishProcess("Индексирование БД - Продажи");
-		}*/
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Nomenklatura] ON [Prodazhi_last] ([Nomenklatura]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Period] ON [Prodazhi_last] ([Period]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Stoimost] ON [Prodazhi_last] ([Stoimost]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_kolichestvo] ON [Prodazhi_last] ([kolichestvo]);	");
-		mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Dogovorkontragenta ] ON [Prodazhi_last] ([DogovorKontragenta]);	");
+	public static void refreshProdazhi_last(SQLiteDatabase mDB, String kontragent_idrref){
+		System.out.println("Анализ БД - Продажи " + kontragent_idrref);
+		if(kontragent_idrref.length() > 0){
+			if(!lastKontragent_idrref.equals(kontragent_idrref)){
+				lastKontragent_idrref = kontragent_idrref;
+				System.out.println("refreshProdazhi_last start");
+				String sql = "	delete from Prodazhi_last;	";
+				mDB.execSQL(sql);
+				sql = "	insert into Prodazhi_last (	"//
+						+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
+						+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
+						+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
+						+ "\n		,kartaKod"//
+						+ "\n	)	"//
+						+ "\n	select	"//
+						+ "\n		max(Period) as Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
+						+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,main.Podrazdelenie,Kolichestvo	"//
+						+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
+						+ "\n		,''"//
+						+ "\n	from Prodazhi main"//
+						+ "\n		join dogovorykontragentov d1 on d1._idrref=main.dogovorkontragenta "//
+						+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Gazeta + "'"//914f887f023f24874f33033ac1cacceb'"
+						+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_PoOtvetstvennove + "'"//b6642d98b55a8d5e48c45c1c3731b72e'"
+						+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Promokod + "'"//a24b2ee11974f13a4fbac0f8a4e35589'"
+						+ "\n				and ifnull(main.VidSkidki,x'00') <> x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Targetnie + "'"//a0c42e5e2beab7e74a98e440d5099464'"
+						+ "\n		join kontragenty on kontragenty._idrref=d1.vladelec and kontragenty._idrref=" + kontragent_idrref
+						+ "\n		group by d1.vladelec,main.nomenklatura"//
+						+ "\n		order by main.period desc"//
+						+ "\n		limit 50000"//
+						+ "\n	;	";
+				mDB.execSQL(sql);
+				sql = "	insert into Prodazhi_last (	"//
+						+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
+						+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
+						+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
+						+ "\n		,kartaKod"//
+						+ "\n	)	"//
+						+ "\n	select	"//
+						+ "\n		max(Period) as Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
+						+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,main.Podrazdelenie,Kolichestvo	"//
+						+ "\n		,0,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
+						+ "\n		,''"//
+						+ "\n	from Prodazhi main"//
+						+ "\n		join dogovorykontragentov d1 on d1._idrref=main.dogovorkontragenta "//
+						+ "\n				and (ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Gazeta + "'"//914f887f023f24874f33033ac1cacceb'"
+						+ "\n				    or ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_PoOtvetstvennove + "'"//b6642d98b55a8d5e48c45c1c3731b72e'"
+						+ "\n				    or ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Promokod + "'"//a24b2ee11974f13a4fbac0f8a4e35589'"
+						+ "\n				    or ifnull(main.VidSkidki,x'00') = x'" + sweetlife.android10.supervisor.Cfg.skidkaId_x_Targetnie + "'"//a0c42e5e2beab7e74a98e440d5099464')"
+						+ "\n				    )"
+						+ "\n		join kontragenty on kontragenty._idrref=d1.vladelec and kontragenty._idrref=" + kontragent_idrref
+						+ "\n		group by d1.vladelec,main.nomenklatura"//
+						+ "\n		order by main.period desc"//
+						+ "\n		limit 50000"//
+						+ "\n	;	";
+				mDB.execSQL(sql);
+				sql = "	insert into Prodazhi_last (	"//
+						+ "\n		Period,Registrator_0,Registrator_1,NomerStroki,Aktivnost,Nomenklatura,KharakteristikaNomenklatury,ZakazPokupatelya_0,ZakazPokupatelya_1	"//
+						+ "\n		,ZakazPokupatelya_2,DogovorKontragenta,DokumentProdazhi_0,DokumentProdazhi_1,DokumentProdazhi_2,Proekt,Podrazdelenie,Kolichestvo	"//
+						+ "\n		,Stoimost,StoimostBezSkidok,Sebestoimost,SummaVozvrataNacenki	"//
+						+ "\n		,kartaKod"//
+						+ "\n	)	"//
+						+ "\n	select	"//
+						+ "\n		date('2020-01-01') as Period	"//
+						+ "\n		,0 as Registrator_0	"//
+						+ "\n		,0 as Registrator_1	"//
+						+ "\n		,0 as NomerStroki	"//
+						+ "\n		,0 as Aktivnost	"//
+						+ "\n		,nomenklatura._idrref as Nomenklatura	"//
+						+ "\n		,0 as KharakteristikaNomenklatury	"//
+						+ "\n		,0 as ZakazPokupatelya_0	"//
+						+ "\n		,0 as ZakazPokupatelya_1	"//
+						+ "\n		,0 as ZakazPokupatelya_2	"//
+						+ "\n		,dogovorykontragentov._idrref as DogovorKontragenta	"//
+						+ "\n		,0 as DokumentProdazhi_0	"//
+						+ "\n		,0 as DokumentProdazhi_1	"//
+						+ "\n		,0 as DokumentProdazhi_2	"//
+						+ "\n		,0 as Proekt	"//
+						+ "\n		,0 as Podrazdelenie	"//
+						+ "\n		,0 as Kolichestvo	"//
+						+ "\n		,0 as Stoimost	"//
+						+ "\n		,0 as StoimostBezSkidok	"//
+						+ "\n		,0 as Sebestoimost	"//
+						+ "\n		,0 as SummaVozvrataNacenki	"//
+						+ "\n		,1 as kartaKod	"//
+						+ "\n	from KartaKlientaDok2	"//
+						+ "\n		join KartaKlientaKlient2 on KartaKlientaKlient2.UIN=KartaKlientaDok2.UIN	"//
+						+ "\n		join KartaKlientaNomenklatura2 on KartaKlientaNomenklatura2.UIN=KartaKlientaDok2.UIN	"//
+						+ "\n		join nomenklatura on nomenklatura._idrref=KartaKlientaNomenklatura2.tovar	"//
+						+ "\n		join kontragenty on kontragenty._idrref=KartaKlientaKlient2.vladelec	 and kontragenty._idrref=" + kontragent_idrref
+						+ "\n		join dogovorykontragentov on dogovorykontragentov.vladelec=kontragenty._idrref	"//
+						+ "\n	group by KartaKlientaKlient2.vladelec,KartaKlientaNomenklatura2.tovar	"//
+						+ "\n	;	";
+				mDB.execSQL(sql);
+				sql = "update Prodazhi_last as p1 set aktivnost=0;";
+				mDB.execSQL(sql);
+				sql = "create table if not exists Prodazhi_count (sm number, rf blob);";
+				mDB.execSQL(sql);
+				sql = "delete from Prodazhi_count;";
+				mDB.execSQL(sql);
+				sql = "insert into Prodazhi_count (sm, rf)"
+						+ "\n select sum(pp.kolichestvo) as sm, pp.nomenklatura as rf"
+						+ "\n 	from Prodazhi pp"
+						+ "\n 	join dogovorykontragentov dd on dd._idrref=pp.dogovorkontragenta and dd.vladelec="+kontragent_idrref
+						+ "\n 	where (date('now', 'start of month') <= date(pp.period))"
+						+ "\n 	group by pp.nomenklatura;";
+				mDB.execSQL(sql);
+				mDB.execSQL("	CREATE INDEX if not exists [IX_Prodazhi_count_rf] ON [Prodazhi_count] ([rf]);	" );
+				sql = "update Prodazhi_last as pr set aktivnost=("
+						+ "\n select sm "
+						+ "\n from Prodazhi_count cc "
+						+ "\n where cc.rf=pr.nomenklatura"
+						+ "\n );";
+				mDB.execSQL(sql);
+				System.out.println("refreshProdazhi_last done");
+			}
+		}else{
+			mDB.execSQL("	drop table if exists Prodazhi_last;	" );
+			mDB.execSQL("	CREATE TABLE Prodazhi_last (	"//
+					+ "\n	_id integer primary key asc autoincrement, [Period] date null,[Registrator_0] blob null,[Registrator_1] blob null,[NomerStroki] numeric null	"//
+					+ "\n	,[Aktivnost] blob null,[Nomenklatura] blob null,[KharakteristikaNomenklatury] blob null,[ZakazPokupatelya_0] blob null,[ZakazPokupatelya_1] blob null	"//
+					+ "\n	,[ZakazPokupatelya_2] blob null,[DogovorKontragenta] blob null,[DokumentProdazhi_0] blob null,[DokumentProdazhi_1] blob null	"//
+					+ "\n	,[DokumentProdazhi_2] blob null,[Proekt] blob null,[Podrazdelenie] blob null,[Kolichestvo] numeric null,[Stoimost] numeric null	"//
+					+ "\n	,[StoimostBezSkidok] numeric null,[Sebestoimost] numeric null,[SummaVozvrataNacenki] numeric null	"//
+					+ "\n	,[kartaKod] text null"//
+					+ "\n	);	" );
+			mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Nomenklatura] ON [Prodazhi_last] ([Nomenklatura]);	" );
+			mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Period] ON [Prodazhi_last] ([Period]);	" );
+			mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Stoimost] ON [Prodazhi_last] ([Stoimost]);	" );
+			mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_kolichestvo] ON [Prodazhi_last] ([kolichestvo]);	" );
+			mDB.execSQL("	CREATE INDEX [IX_Prodazhi_last_Dogovorkontragenta ] ON [Prodazhi_last] ([DogovorKontragenta]);	" );
+		}
+
 
 	}
 
-	public static void refreshDogovoryKontragentov_strip(SQLiteDatabase mDB) {
-		System.out.println("Анализ БД - Договоры контрагентов");
-		mDB.execSQL("	drop table if exists DogovoryKontragentov_strip;	");
+	public static void refreshDogovoryKontragentov_strip(SQLiteDatabase mDB){
+		System.out.println("Анализ БД - Договоры контрагентов" );
+		mDB.execSQL("	drop table if exists DogovoryKontragentov_strip;	" );
 		mDB.execSQL("	CREATE TABLE DogovoryKontragentov_strip (	" //
 				+ "\n	_id integer primary key autoincrement, [_IDRRef] blob null,[_Version] timestamp null,[PometkaUdaleniya] blob null,[Predopredelennyy] blob null,[Vladelec] blob null,[Roditel] blob null,[EtoGruppa] blob null,[Kod] nchar (10) null,[Naimenovanie] nvarchar (150) null,[Data] date null,[Nomer] nvarchar (20) null,[ValyutaVzaimoraschetov] blob null,[VedenieVzaimoraschetov] blob null,[VidVzaimoraschetov] blob null,[VidUsloviyDogovora] blob null,[DerzhatRezervBezOplatyOgranichennoeVremya] blob null,[DopustimayaSummaZadolzhennosti] numeric null,[DopustimoeChisloDneyZadolzhennosti] numeric null,[Kommentariy] text null,[KontrolirovatSummuZadolzhennosti] blob null,[KontrolirovatChisloDneyZadolzhennosti] blob null,[ObosoblennyyUchetTovarovPoZakazamPokupateley] blob null,[Organizaciya] blob null,[ProcentKomissionnogoVoznagrazhdeniya] numeric null,[ProcentPredoplaty] numeric null,[SposobRaschetaKomissionnogoVoznagrazhdeniya] blob null,[UdalitTipSkidkiNacenki] blob null,[TipCen_0] blob null,[TipCen_1] blob null,[TipCen_2] blob null,[ChisloDneyRezervaBezOplaty] numeric null,[VidDogovora] blob null,[UchetAgentskogoNDS] blob null,[VidAgentskogoDogovora] blob null,[KontrolirovatDenezhnyeSredstvaKomitenta] blob null,[RaschetyVUslovnykhEdinicakh] blob null,[Podrazdelenie] blob null,[GruppaDogovorov] blob null,[DataOkonchaniya] date null,[Zakryt] blob null,[ZadolzhennostVBankDnyakh] blob null,[ReytingPoOplate] numeric null,[BespalletnayaPostavka] blob null,[Khoreka_VidOplaty] blob null,[OtdelnayaPoslednyayaOplachennayaNakladnaya] blob null,[PhormaDogovora] nvarchar (100) null,[Dostavka] nvarchar (200) null	"//
-				+ "\n	);	");
+				+ "\n	);	" );
 		String sql = "	insert into DogovoryKontragentov_strip (	"//
 				+ "\n [_IDRRef],[_Version],[PometkaUdaleniya],[Predopredelennyy],[Vladelec],[Roditel],[EtoGruppa] "//
 				+ " ,[Kod],[Naimenovanie],[Data],[Nomer],[ValyutaVzaimoraschetov],[VedenieVzaimoraschetov] "//
@@ -1252,17 +1229,17 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		/*if (upd != null) {
 			upd.logAndPublishProcess("Индексирование БД - Договоры контрагентов");
 		}*/
-		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_id on DogovoryKontragentov_strip(_id);	");
-		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_idrref on DogovoryKontragentov_strip(_idrref);	");
-		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_vladelec on DogovoryKontragentov_strip(vladelec);	");
-		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_roditel on DogovoryKontragentov_strip(roditel);	");
-		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_zakryt on DogovoryKontragentov_strip(zakryt);	");
-		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_GruppaDogovorov on DogovoryKontragentov_strip(GruppaDogovorov);	");
+		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_id on DogovoryKontragentov_strip(_id);	" );
+		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_idrref on DogovoryKontragentov_strip(_idrref);	" );
+		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_vladelec on DogovoryKontragentov_strip(vladelec);	" );
+		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_roditel on DogovoryKontragentov_strip(roditel);	" );
+		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_zakryt on DogovoryKontragentov_strip(zakryt);	" );
+		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_GruppaDogovorov on DogovoryKontragentov_strip(GruppaDogovorov);	" );
 
 	}
 
 	@Override
-	protected void onPostExecute(Integer result) {
+	protected void onPostExecute(Integer result){
 		LogHelper.debug(this.getClass().getCanonicalName() + ".onPostExecute: " + result);
 		/*if (mExecuteQueriesTimer != null) {
 			mExecuteQueriesTimer.purge();
@@ -1275,33 +1252,33 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		super.onPostExecute(result);
 	}
 
-	private boolean HasFreeSpace() {
+	private boolean HasFreeSpace(){
 		logAndPublishProcess(mResources.getString(R.string.msg_check_free_space));
-		if (MemoryStatus.getAvailableExternalMemorySize() < mSettings.getMINIMAL_FREE_SPACE()) {
+		if(MemoryStatus.getAvailableExternalMemorySize() < mSettings.getMINIMAL_FREE_SPACE()){
 			return false;
 		}
 		return true;
 	}
 
-	private void UpdateTempTables(long flags) {
+	private void UpdateTempTables(long flags){
 		logAndPublishProcess(mResources.getString(R.string.title_progress_update_temp_tables));
 		UpdateTempTables.update(mDB, flags);
 	}
 
-	private void CreateDatabaseBackup() {
+	private void CreateDatabaseBackup(){
 		logAndPublishProcess(mResources.getString(R.string.msg_reserve_db));
-		if (mIsTodayFirstTime) {
-			System.out.println("CreateDatabaseBackup start");
+		if(mIsTodayFirstTime){
+			System.out.println("CreateDatabaseBackup start" );
 			boolean b = mDB.isDatabaseIntegrityOk();
-			System.out.println("done integrity check");
-			if (b) {
+			System.out.println("done integrity check" );
+			if(b){
 				Backup.reserveDatabase();
-			} else {
-				System.out.println("corrupted database");
+			}else{
+				System.out.println("corrupted database" );
 			}
 			//System.out.println("new backup");
 			//Backup._reserveDatabase();
-			System.out.println("done CreateDatabaseBackup");
+			System.out.println("done CreateDatabaseBackup" );
 		}
 		/*if (!Backup.reserveDatabase()) {
 			LogNoneStableAppVersion();
@@ -1319,125 +1296,125 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 			LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_SETTINGS_DOWNLOAD, null);
 		}
 	}*/
-	private boolean IsNeedAppUpdate(String serverVersion) {
-		try {
+	private boolean IsNeedAppUpdate(String serverVersion){
+		try{
 			String appVersion = mApplicationContext.getPackageManager().getPackageInfo(mApplicationContext.getPackageName(), 0).versionName;
 			return mUpdateChecker.IsNeedAppUpdate(appVersion);
-		} catch (NameNotFoundException e) {
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "IsNeedAppUpdate");
+		}catch(NameNotFoundException e){
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "IsNeedAppUpdate" );
 			ErrorReporter.getInstance().handleSilentException(e);
 			return false;
 		}
 	}
 
-	private int DownloadAndReadUpdateXML() {
-		LogHelper.debug(this.getClass().getCanonicalName() + ": DownloadAndReadUpdateXML");
-		logAndPublishProcess(mResources.getString(R.string.msg_check_update));
-		if (mUpdateChecker.DownloadFile()) {
-			if (mUpdateChecker.ReadUpdateFile()) {
+	private int DownloadAndReadUpdateXML(){
+		LogHelper.debug(this.getClass().getCanonicalName() + ": DownloadAndReadUpdateXML" );
+		logAndPublishProcess("Проверка обновлений…" );
+		if(mUpdateChecker.DownloadFile()){
+			if(mUpdateChecker.ReadUpdateFile()){
 				return SUCCESSFULL;
-			} else {
-				ErrorReporter.getInstance().putCustomData("DownloadAndReadUpdateXML ReadUpdateFile" , "NoneStableVersion " + mNoneStableVersion);
+			}else{
+				ErrorReporter.getInstance().putCustomData("DownloadAndReadUpdateXML ReadUpdateFile", "NoneStableVersion " + mNoneStableVersion);
 				ErrorReporter.getInstance().handleSilentException(null);
 				return ERROR_PARSE_XML;
 			}
-		} else {
+		}else{
 			return ERROR_FTP_DOWNLOAD_XML;
 		}
 	}
 
-	private int DownloadAndExecuteAppUpdate() {
+	private int DownloadAndExecuteAppUpdate(){
 		String pathToDownloadedFile = null;
 		logAndPublishProcess(mResources.getString(R.string.msg_download_update));
-		try {
-			if (!mIsRestored) {
+		try{
+			if(!mIsRestored){
 				pathToDownloadedFile = ftpClient.downloadFile(mSettings.getTABLET_WORKING_DIR(), mUpdateChecker.getPathToFTPFile());
 				LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_APP_DOWNLOAD, pathToDownloadedFile);
 			}
-		} catch (Exception e) {
+		}catch(Exception e){
 			e.printStackTrace();
 			LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_APP_DOWNLOAD, pathToDownloadedFile);
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "DownloadAndExecuteAppUpdate");
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "DownloadAndExecuteAppUpdate" );
 			ErrorReporter.getInstance().handleSilentException(e);
 			return ERROR_FTP_DOWNLOAD_APK;
 		}
-		try {
+		try{
 			logAndPublishProcess(mResources.getString(R.string.msg_reserve_app));
 			Backup.reserveApp();
-		} catch (Exception e) {
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "DownloadAndExecuteAppUpdate Backup.reserveApp");
+		}catch(Exception e){
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "DownloadAndExecuteAppUpdate Backup.reserveApp" );
 			ErrorReporter.getInstance().handleSilentException(e);
 		}
-		try {
+		try{
 			logAndPublishProcess("Install update from " + pathToDownloadedFile);
 			AppUpdater.Update(mApplicationContext, pathToDownloadedFile);
-		} catch (Exception e) {
+		}catch(Exception e){
 			e.printStackTrace();
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "DownloadAndExecuteAppUpdate AppUpdater.Update");
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "DownloadAndExecuteAppUpdate AppUpdater.Update" );
 			ErrorReporter.getInstance().handleSilentException(e);
 			return ERROR_APK_FILE_NOT_FOUND;
 		}
 		return UPDATE_APP_VERSION;
 	}
 
-	private void LogNoneStableAppVersion() {
-		try {
+	private void LogNoneStableAppVersion(){
+		try{
 			mNoneStableVersion = mApplicationContext.getPackageManager().getPackageInfo(mApplicationContext.getPackageName(), 0).versionName;
 			LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_BAD_APP_VERSION, mNoneStableVersion);
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "IsNeedAppUpdate");
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "IsNeedAppUpdate" );
 			ErrorReporter.getInstance().handleSilentException(null);
-		} catch (NameNotFoundException e) {
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "IsNeedAppUpdate");
+		}catch(NameNotFoundException e){
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "IsNeedAppUpdate" );
 			ErrorReporter.getInstance().handleSilentException(e);
 		}
 	}
 
-	void xmlToDb(String xmlName) {
+	void xmlToDb(String xmlName){
 		System.out.println("xmlName " + xmlName);
 	}
 
-	private int DownloadAndReadDelta() {
-		LogHelper.debug(this.getClass().getCanonicalName() + ": DownloadAndReadDelta start");
-		logAndPublishProcess(mResources.getString(R.string.msg_check_update));
+	private int DownloadAndReadDelta3232323(){
+		LogHelper.debug(this.getClass().getCanonicalName() + ": DownloadAndReadDelta start" );
+		logAndPublishProcess("Проверка обновлений…" );
 		String pathToDownloadedFile = null;
-		try {
+		try{
 			/*pathToDownloadedFile = IsNeedDeltaUpdate();
 			if (pathToDownloadedFile == null) {
 				return UPDATE_APP_FINISHED;
 			}*/
 			String nodeName = null;
-			Cursor cursor = mDB.rawQuery("select [Kod] from Android" , null);
+			Cursor cursor = mDB.rawQuery("select [Kod] from Android", null);
 			cursor.moveToFirst();
-			if (cursor.getString(0).startsWith("12-")) {
+			if(cursor.getString(0).startsWith("12-" )){
 				//serverName = cursor.getString(0);
-			} else {
+			}else{
 				nodeName = cursor.getString(0);
 			}
 			cursor.moveToNext();
-			if (cursor.getString(0).startsWith("12-")) {
+			if(cursor.getString(0).startsWith("12-" )){
 				//serverName = cursor.getString(0);
-			} else {
+			}else{
 				nodeName = cursor.getString(0);
 			}
 			pathToDownloadedFile = "AndroidExchange_12-_" + nodeName.trim() + ".zip";
 			logAndPublishProcess(mResources.getString(R.string.msg_download_delta));
 			pathToDownloadedFile = ftpClient.downloadFile(mSettings.getTABLET_DELTA_DIR(), pathToDownloadedFile);
 			LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_DOWNLOAD, pathToDownloadedFile);
-		} catch (Exception e) {
+		}catch(Exception e){
 			e.printStackTrace();
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "DownloadAndReadDelta ftpClient.downloadFile");
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "DownloadAndReadDelta ftpClient.downloadFile" );
 			ErrorReporter.getInstance().handleSilentException(e);
 			LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_DOWNLOAD, pathToDownloadedFile);
 			return ERROR_FTP_DOWNLOAD_DELTA;
 		}
-		try {
+		try{
 			logAndPublishProcess(mResources.getString(R.string.msg_unzip_update));
 			Decompress decompressor = new Decompress();
 			decompressor.unzip(mSettings.getTABLET_DELTA_DIR(), pathToDownloadedFile);
 			LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_UNZIP, pathToDownloadedFile);
-		} catch (Exception e) {
+		}catch(Exception e){
 			e.printStackTrace();
-			ErrorReporter.getInstance().putCustomData("UpdateTask" , "DownloadAndReadDelta unzip");
+			ErrorReporter.getInstance().putCustomData("UpdateTask", "DownloadAndReadDelta unzip" );
 			ErrorReporter.getInstance().handleSilentException(e);
 			LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_UNZIP, pathToDownloadedFile);
 			return ERROR_UNZIP_DELTA;
@@ -1451,26 +1428,26 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}else{
 			System.out.println("no, skip clear MarshrutyAgentov");
 		}*/
-		System.out.println("clear MarshrutyAgentov");
-		mDB.execSQL("delete from MarshrutyAgentov");
+		System.out.println("clear MarshrutyAgentov" );
+		mDB.execSQL("delete from MarshrutyAgentov" );
 		//System.out.println("delete from tovaryDlyaDozakaza;");
 		//mDB.execSQL("	delete from tovaryDlyaDozakaza;	");
-		System.out.println("clear TekuschieCenyOstatkovPartiy");
-		mDB.execSQL("delete from TekuschieCenyOstatkovPartiy");
-		System.out.println("clear CenyNomenklaturySklada");
-		mDB.execSQL("delete from CenyNomenklaturySklada");
-		System.out.println("clear MinimalnyeNacenkiProizvoditeley_1");
-		mDB.execSQL("delete from MinimalnyeNacenkiProizvoditeley_1");
+		System.out.println("clear TekuschieCenyOstatkovPartiy" );
+		mDB.execSQL("delete from TekuschieCenyOstatkovPartiy" );
+		System.out.println("clear CenyNomenklaturySklada" );
+		mDB.execSQL("delete from CenyNomenklaturySklada" );
+		System.out.println("clear MinimalnyeNacenkiProizvoditeley_1" );
+		mDB.execSQL("delete from MinimalnyeNacenkiProizvoditeley_1" );
 
 
-		System.out.println("clear SkidkaPartneraKarta");
+		System.out.println("clear SkidkaPartneraKarta" );
 		Calendar now = Calendar.getInstance();
 		//now.add(Calendar.DAY_OF_MONTH, -1);
-		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd" );
 		String dsql = "delete from SkidkaPartneraKarta where date(DataOkonchaniya)<date('" + f.format(now.getTime()) + "')";
 		System.out.println(dsql);
 		mDB.execSQL(dsql);
-		logAndPublishProcess("Пересчёт прайса");
+		logAndPublishProcess("Пересчёт прайса" );
 		UpdateTask.tempAdjustPrice(mDB);
 		logAndPublishProcess(mResources.getString(R.string.msg_parse_delta));
 		/*if (mExecuteQueriesTimer == null) {
@@ -1480,33 +1457,33 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}*/
 		long timeStarted, timeEnded, time;
 		LogHelper.debug(this.getClass().getCanonicalName() + ": pathToDownloadedFile: " + pathToDownloadedFile);
-		if (pathToDownloadedFile != null && pathToDownloadedFile.length() > 3) {
+		if(pathToDownloadedFile != null && pathToDownloadedFile.length() > 3){
 			/*if(pathToDownloadedFile.length() > 3){
 				String xmlName=pathToDownloadedFile.substring(0, pathToDownloadedFile.length() - 3) + "xml";
 				xmlToDb(xmlName);
 				return SUCCESSFULL;
 			}*/
-			try {
+			try{
 				timeStarted = System.currentTimeMillis();
-				mDeltaUpdater.parse(pathToDownloadedFile.substring(0, pathToDownloadedFile.length() - 3) + "xml");
+				mDeltaUpdater.parse(pathToDownloadedFile.substring(0, pathToDownloadedFile.length() - 3) + "xml" );
 				long timeParse = (System.currentTimeMillis() - timeStarted) / 1000;
 				QueriesList queriesList = mDeltaUpdater.getQueriesList();
-				while (queriesList.getCount() != 0) {
-					try {
+				while(queriesList.getCount() != 0){
+					try{
 						Thread.sleep(5000);
-					} catch (InterruptedException e) {
+					}catch(InterruptedException e){
 					}
 				}
 				timeEnded = System.currentTimeMillis();
 				time = (timeEnded - timeStarted) / 1000;
 				LogHelper.debug(this.getClass().getCanonicalName() + "Records count: " + mDeltaUpdater.getDeltaParser().getRecordsCount() + "; Time Parse - " + String.valueOf(timeParse)
-						+ " seconds; Time WriteDB - " + String.valueOf(time) + " seconds");
-				if (mDeltaUpdater.getDeltaParser().HasBodyParseErrors() || mDeltaUpdater.getDeltaParser().HasHeaderParseErrors()
+						+ " seconds; Time WriteDB - " + String.valueOf(time) + " seconds" );
+				if(mDeltaUpdater.getDeltaParser().HasBodyParseErrors() || mDeltaUpdater.getDeltaParser().HasHeaderParseErrors()
 					//|| mExecuteQueriesTask.HasErrors()
-				) {
-					LogHelper.debug(this.getClass().getCanonicalName() + "__________________has errors________________________");
-					LogHelper.debug(this.getClass().getCanonicalName() + "__________________has errors________________________");
-					LogHelper.debug(this.getClass().getCanonicalName() + "__________________has errors________________________");
+				){
+					LogHelper.debug(this.getClass().getCanonicalName() + "__________________has errors________________________" );
+					LogHelper.debug(this.getClass().getCanonicalName() + "__________________has errors________________________" );
+					LogHelper.debug(this.getClass().getCanonicalName() + "__________________has errors________________________" );
 				}
 				//LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_PARSE, pathToDownloadedFile);
 				//LogHelper.setLastUpdateStatus(LogHelper.LOG_TYPE_SUCCESS);
@@ -1515,7 +1492,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				System.out.println("---------" + sql);
 				System.out.println("---------" + b.dumpXML());
 				System.out.println("-----------------------");*/
-			} catch (Exception e) {
+			}catch(Exception e){
 				e.printStackTrace();
 				/*
 				LogHelper.setLastUpdateStatus(this.getClass().getCanonicalName() + ": " + e.getMessage());
@@ -1529,7 +1506,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				*/
 			}
 		}
-		LogHelper.debug(this.getClass().getCanonicalName() + ": DownloadAndReadDelta success");
+		LogHelper.debug(this.getClass().getCanonicalName() + ": DownloadAndReadDelta success" );
 		return SUCCESSFULL;
 	}
 
@@ -1568,15 +1545,15 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 		return SUCCESSFULL;
 	}*/
-	private void DeletePreviousResponseXML() {
+	private void DeletePreviousResponseXML(){
 		int responseFilesCount = ftpClient.mResponces.size();
-		for (int i = 0; i < responseFilesCount; i++) {
+		for(int i = 0; i < responseFilesCount; i++){
 			ftpClient.deleteFile(ftpClient.mResponces.get(i));
 		}
 	}
 
-	void uploadUpdateAnswer(String From, String MessageNo, String ReceivedNo) {
-		System.out.println("uploadUpdateAnswer");
+	void uploadUpdateAnswer(String From, String MessageNo, String ReceivedNo){
+		System.out.println("uploadUpdateAnswer" );
 		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
 				+ "\n	<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
 				+ "\n		<soap:Body><Sozdadim xmlns=\"http://ws.swl/SozdadimXML\">"//
@@ -1589,76 +1566,76 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		System.out.println(xml);
 		RawSOAP r = new RawSOAP();
 		r.xml.is(xml);
-		r.url.is(Settings.getInstance().getBaseURL() + "SozdadimXML.1cws");
+		r.url.is(Settings.getInstance().getBaseURL() + "SozdadimXML.1cws" );
 		Report_Base.startPing();
 		r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-		try {
+		try{
 			System.out.println("done " + r.exception.property.value() + " / " + r.statusCode.property.value() + " / " + r.data.dumpXML());
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 	}
 
-	private void SendResponseXML() {
+	private void SendResponseXML(){
 		DeletePreviousResponseXML();
 		logAndPublishProcess(mResources.getString(R.string.msg_upload_response));
 		DeltaData deltaData = mDeltaUpdater.getDeltaParser().getDeltaData();
 		ResponseXML responseXml = new ResponseXML(deltaData);
 		String pathToFile = String.format(mSettings.getFTP_DELTA_NAME(), deltaData.getTo(), deltaData.getFrom());
-		String no = String.format("%d" , deltaData.getReceivedNo() + 1);
+		String no = String.format("%d", deltaData.getReceivedNo() + 1);
 		int noLen = no.length();
-		for (int i = 0; i < 10 - noLen; i++) {
+		for(int i = 0; i < 10 - noLen; i++){
 			pathToFile += "0";
 		}
 		pathToFile += no;
 		String ftpDir = "";
 		int sepIndex = pathToFile.lastIndexOf(File.separator);
-		if (sepIndex > 0) {
+		if(sepIndex > 0){
 			ftpDir = pathToFile.substring(0, sepIndex + 1);
 			pathToFile = pathToFile.substring(sepIndex + 1, pathToFile.length());
 		}
 		String destinationDir = mSettings.getTABLET_WORKING_DIR();
-		responseXml.create(destinationDir + pathToFile + ".xml");
+		responseXml.create(destinationDir + pathToFile + ".xml" );
 		Compress compressor = new Compress();
 		compressor.addFiles(new String[]{destinationDir + pathToFile + ".xml"});
-		try {
-			compressor.zip(destinationDir + pathToFile + ".zip");
-			LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_RESPONSE_ZIP, ftpDir + pathToFile + ".zip");
-			try {
+		try{
+			compressor.zip(destinationDir + pathToFile + ".zip" );
+			LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_RESPONSE_ZIP, ftpDir + pathToFile + ".zip" );
+			try{
 				//ftpClient.uploadFile(destinationDir + pathToFile + ".zip", ftpDir + pathToFile + ".zip");
 				uploadUpdateAnswer(deltaData.getTo()//
-						, String.format("%d" , deltaData.getReceivedNo() + 1)//
-						, String.format("%d" , deltaData.getMessageNo()));
-				File deleteXmlFile = new File(destinationDir + pathToFile + ".xml");
-				System.out.println("delete " + destinationDir + pathToFile + ".xml");
+						, String.format("%d", deltaData.getReceivedNo() + 1)//
+						, String.format("%d", deltaData.getMessageNo()));
+				File deleteXmlFile = new File(destinationDir + pathToFile + ".xml" );
+				System.out.println("delete " + destinationDir + pathToFile + ".xml" );
 				deleteXmlFile.delete();
-				File deleteZipFile = new File(destinationDir + pathToFile + ".zip");
-				System.out.println("delete " + destinationDir + pathToFile + ".zip");
+				File deleteZipFile = new File(destinationDir + pathToFile + ".zip" );
+				System.out.println("delete " + destinationDir + pathToFile + ".zip" );
 				deleteZipFile.delete();
-				LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_UPLOAD_RESPONSE, ftpDir + pathToFile + ".zip");
-			} catch (Exception e) {
-				LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_UPLOAD_RESPONSE, ftpDir + pathToFile + ".zip");
+				LogHelper.writeLog(LogHelper.LOG_TYPE_SUCCESS, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_UPLOAD_RESPONSE, ftpDir + pathToFile + ".zip" );
+			}catch(Exception e){
+				LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_UPLOAD_RESPONSE, ftpDir + pathToFile + ".zip" );
 			}
-		} catch (Exception e) {
-			LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_RESPONSE_ZIP, ftpDir + pathToFile + ".zip");
+		}catch(Exception e){
+			LogHelper.writeLog(LogHelper.LOG_TYPE_ERROR, LogHelper.LOG_OWNER_UPDATE, LogHelper.LOG_MESSAGE_DELTA_RESPONSE_ZIP, ftpDir + pathToFile + ".zip" );
 		}
 	}
 
-	private String IsNeedDeltaUpdate() {
-		LogHelper.debug("IsNeedDeltaUpdate start");
+	private String IsNeedDeltaUpdate(){
+		LogHelper.debug("IsNeedDeltaUpdate start" );
 		String serverName = null;
 		String nodeName = null;
-		Cursor cursor = mDB.rawQuery("select [Kod] from Android" , null);
+		Cursor cursor = mDB.rawQuery("select [Kod] from Android", null);
 		cursor.moveToFirst();
-		if (cursor.getString(0).startsWith("12-")) {
+		if(cursor.getString(0).startsWith("12-" )){
 			serverName = cursor.getString(0);
-		} else {
+		}else{
 			nodeName = cursor.getString(0);
 		}
 		cursor.moveToNext();
-		if (cursor.getString(0).startsWith("12-")) {
+		if(cursor.getString(0).startsWith("12-" )){
 			serverName = cursor.getString(0);
-		} else {
+		}else{
 			nodeName = cursor.getString(0);
 		}
 		cursor.close();
@@ -1669,19 +1646,19 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				, String.format(mSettings.getFTP_DELTA_NAME(), nodeName.trim(), serverName.trim())//
 		);
 		LogHelper.debug("deltaPath is " + deltaPath);
-		if (deltaPath == null) {
+		if(deltaPath == null){
 			return null;
 		}
-		if (!IsNeedDownloadDelta(deltaPath)) {
+		if(!IsNeedDownloadDelta(deltaPath)){
 			return null;
 		}
 		return deltaPath;
 	}
 
-	private boolean IsNeedDownloadDelta(String pathToDelta) {
+	private boolean IsNeedDownloadDelta(String pathToDelta){
 		LogHelper.debug("IsNeedDownloadDelta for " + pathToDelta);
 		int sepIndex = pathToDelta.lastIndexOf(File.separator);
-		if (sepIndex != -1) {
+		if(sepIndex != -1){
 			mFTPDeltaFileName = pathToDelta.substring(sepIndex + 1, pathToDelta.length());
 		}
 		File dir = new File(mSettings.getTABLET_DELTA_DIR());
@@ -1693,16 +1670,16 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 	}
 
 	@Override
-	public boolean accept(File dir, String name) {
+	public boolean accept(File dir, String name){
 		return name.compareToIgnoreCase(mFTPDeltaFileName) == 0;
 	}
 
-	@SuppressWarnings("unused")
-	private int RestoreData() {
-		try {
+	@SuppressWarnings("unused" )
+	private int RestoreData(){
+		try{
 			logAndPublishProcess(mResources.getString(R.string.msg_restore_db));
 			Backup.restoreDatabase();
-		} catch (Exception exRestore) {
+		}catch(Exception exRestore){
 			sweetlife.android10.log.LogHelper.debug(this.getClass().getCanonicalName() + "Exception restore - " + exRestore);
 		}
 		return UPDATE_APP_FINISHED;

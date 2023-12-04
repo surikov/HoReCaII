@@ -15,6 +15,8 @@ import android.database.sqlite.*;
 import reactive.ui.*;
 import sweetlife.android10.ApplicationHoreca;
 import sweetlife.android10.Settings;
+import sweetlife.android10.gps.GPSInfo;
+import sweetlife.android10.gps.SWLifeGpsService;
 import sweetlife.android10.gps.Session;
 //import sweetlife.horeca.reports.ActivityReports;
 
@@ -1349,8 +1351,10 @@ public class ActivityOdnaAnketa extends Activity {
 		layoutless.child(new Knob(this).labelText.is("текущие").afterTap.is(new Task() {
 					@Override
 					public void doTask() {
-						shirota.value(Session.getLatitude());
-						dolgota.value(Session.getLongitude());
+						//shirota.value(Session.getLatitude());
+						shirota.value(GPSInfo.lastLatitude());
+						//dolgota.value(Session.getLongitude());
+						dolgota.value(GPSInfo.lastLongitude());
 					}
 				})//
 						.left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(6.1 * Auxiliary.tapSize)))//

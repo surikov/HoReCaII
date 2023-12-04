@@ -114,7 +114,8 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 			if (!mGPSInfo.estDalnieVizity(mAppInstance.getClientInfo())) {
 				long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
 				if (distanceToClient == GPSInfo.GPS_NOT_AVAILABLE) {
-					CreateErrorDialog(R.string.gps_vizit_not_available).show();
+					CreateErrorDialog("GPS данные недоступны. Невозможно начать визит."//R.string.gps_vizit_not_available
+					).show();
 				} else {
 					final String timeString = mGPSInfo.getVizitTimeString();
 					if (distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
@@ -695,7 +696,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 	private void StartReturnsActivity(final boolean isEditable, ZayavkaNaVozvrat bid) {
 		if (bid == null) {
 			final Numeric defaultSelection = new Numeric();
-			Auxiliary.pickSingleChoice(this, ZayavkaNaVozvrat_Tovary.ReasonsTypes, defaultSelection, "Причина", new Task() {
+			Auxiliary.pickSingleChoice(this, ZayavkaNaVozvrat_Tovary.ZayavkaNaVozvratPrichina, defaultSelection, "Причина", new Task() {
 				@Override
 				public void doTask() {
 					if (defaultSelection.value() > 0) {

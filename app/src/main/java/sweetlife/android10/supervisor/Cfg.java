@@ -116,12 +116,11 @@ public class Cfg {
 			hrcPersonalPasswordCached = settings.getString(Activity_Login.hrcpasswordName, "");
 		}
 		return hrcPersonalPasswordCached;
+		//return "Molgav1024";
 	}
 
 	public static String whoCheckListOwner() {
-		//System.out.println("whoCheckListOwner "+checkListOwner+" / "+checkListOwnerCfg);
 		if (checkListOwnerCfg == null) {
-
 			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/HorecaL.xml")));
 			try {
 				checkListOwnerCfg = Bough.parseXML(xml);
@@ -134,11 +133,9 @@ public class Cfg {
 			if (checkListOwnerCfg == null) {
 				checkListOwnerCfg = new Bough();
 			}
-			//System.out.println("checkListOwner "+checkListOwner+" / "+checkListOwnerCfg);
 		}
-		//System.out.println("whoCheckListOwner " + checkListOwner + " / " + checkListOwnerCfg.dumpXML());
 		return checkListOwner;
-		//return "hrc297";
+		//return "bot28";
 	}
 
 
@@ -1124,7 +1121,7 @@ public class Cfg {
 				//"  left join Kontragenty prnt on prnt._IDRRef=Kontragenty.GolovnoyKontragent\n" +
 				//"  where Kontragenty.kod="+skidkiLastKontragentKod+" or prnt.kod="+skidkiLastKontragentKod +
 				" group by NomenklaturaPostavshhik;";
-		//System.out.println(sql);
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic  , klient_idrref             , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)"
@@ -1237,7 +1234,7 @@ public class Cfg {
 
 
 		String idrf = findCurrentDogGroupIDRREF();
-		System.out.println("findCRGroup " + idrf + "/" + artikul);
+		//System.out.println("findCRGroup " + idrf + "/" + artikul);
 		for (int i = 0; i < crGroupCache.size(); i++) {
 			if (crGroupCache.get(i).equals(idrf) && crArtikulCache.get(i).equals(artikul)) {
 				//System.out.println("found " + crCenaCache.get(i));

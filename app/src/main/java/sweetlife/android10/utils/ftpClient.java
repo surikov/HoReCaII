@@ -263,7 +263,7 @@ public class ftpClient
 		//try {
 		String urlReal=base+remoteFile;
 		//urlReal=urlReal.replace(".apk", ".zip");
-		//System.out.println(urlReal);
+		System.out.println("downloadFile "+urlReal);
 			url = new URL(urlReal);
 
 			connection = (HttpURLConnection) url.openConnection();

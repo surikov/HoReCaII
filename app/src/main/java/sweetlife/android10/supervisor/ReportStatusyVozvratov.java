@@ -1,6 +1,7 @@
 package sweetlife.android10.supervisor;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.Date;
 
 import reactive.ui.Auxiliary;
@@ -8,9 +9,11 @@ import reactive.ui.Decor;
 import reactive.ui.Knob;
 import reactive.ui.RedactDate;
 import reactive.ui.RedactSingleChoice;
+import reactive.ui.RedactToggle;
 import reactive.ui.SubLayoutless;
+import sweetlife.android10.Settings;
 import tee.binding.Bough;
-import tee.binding.it.Numeric;
+import tee.binding.it.*;
 import tee.binding.task.Task;
 import android.content.Context;
 
@@ -18,6 +21,7 @@ public class ReportStatusyVozvratov extends Report_Base {
 	Numeric dateCreateFrom = new Numeric();
 	Numeric dateCreateTo = new Numeric();
 	Numeric territory = new Numeric();
+	Toggle notApprovedOnly=new Toggle();
 	public  static String menuLabel() {
 		return "Статусы возвратов";
 	}
@@ -79,6 +83,7 @@ public class ReportStatusyVozvratov extends Report_Base {
 		}
 		dateCreateFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
 		dateCreateTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
+		notApprovedOnly.value(b.child("notApprovedOnly").value.property.value().equals("yes"));
 		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
 	}
 	@Override
@@ -87,6 +92,7 @@ public class ReportStatusyVozvratov extends Report_Base {
 		b.child("docFrom").value.is("" + dateCreateFrom.value());
 		b.child("docTo").value.is("" + dateCreateTo.value());
 		b.child("territory").value.is("" + territory.value());
+		b.child("notApprovedOnly").value.is("" + (notApprovedOnly.value()?"yes":"no"));
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
 	}
@@ -99,8 +105,42 @@ public class ReportStatusyVozvratov extends Report_Base {
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
 	}
+
 	@Override
-	public String composeRequest() {
+	public String composeGetQuery(int queryKind) {
+		// https://testservice.swlife.ru/golovanew/hs/Report/СтатусыВозвратов/region3?param={"ДатаНачала":"20230912","ДатаОкончания":"20230912", "ТолькоНеУтвержденные":"Истина"}
+		int i = territory.value().intValue();
+		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
+		String p = "{\"ДатаНачала\":\"" + Cfg.formatMills(dateCreateFrom.value(), "yyyyMMdd") + "\""//
+				+ ",\"ДатаОкончания\":\"" + Cfg.formatMills(dateCreateTo.value(), "yyyyMMdd") + "\""//
+				+ ",\"ТолькоНеУтвержденные\":\"" + (notApprovedOnly.value()?"Истина":"Ложь") + "\""//
+				+ "}";
+		String e = "";
+		try {
+			e = URLEncoder.encode(p, "UTF-8");
+		} catch(Throwable t) {
+			t.printStackTrace();
+			e = t.getMessage();
+		}
+		String serviceName = "СтатусыВозвратов";
+		try {
+			serviceName = URLEncoder.encode(serviceName, "UTF-8");
+		} catch(Throwable t) {
+			t.printStackTrace();
+			serviceName = t.getMessage();
+		}
+		String q =  Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Report/"//
+				//"https://testservice.swlife.ru/golovanew/hs/Report/"
+				+ serviceName + "/" //
+				+hrc//
+				+ "?param=" + e//
+				;
+		q=q+tagForFormat( queryKind);
+		System.out.println("composeGetQuery " + q);
+		return q;
+	}
+	//@Override
+	public String _composeRequest() {
 		int i = territory.value().intValue();
 		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
 		
@@ -148,6 +188,7 @@ RedactSingleChoice terr = new RedactSingleChoice(context);
 					.input(context, 1, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(dateCreateFrom).format.is("dd.MM.yyyy"))//
 					.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
 					.input(context, 3, Auxiliary.tapSize * 0.3, "Территория", terr)//
+					.input(context, 4, Auxiliary.tapSize * 0.3, "", new RedactToggle(context).labelText.is("только неутверждённые").yes.is(notApprovedOnly))//
 			/*.input(context, 3, Auxiliary.tapSize * 0.3, "", new Knob(context).labelText.is("Обновить").afterTap.is(new Task() {
 				@Override
 				public void doTask() {
@@ -167,7 +208,7 @@ RedactSingleChoice terr = new RedactSingleChoice(context);
 						}
 					})//
 							.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-							.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 0.5)))//
+							.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 0.5)))//
 							.width().is(Auxiliary.tapSize * 2.5)//
 							.height().is(Auxiliary.tapSize * 0.8)//
 					);
@@ -180,7 +221,7 @@ RedactSingleChoice terr = new RedactSingleChoice(context);
 						}
 					})//
 							.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-							.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 1 + 0.5)))//
+							.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 1 + 0.5)))//
 							.width().is(Auxiliary.tapSize * 2.5)//
 							.height().is(Auxiliary.tapSize * 0.8)//
 					);
@@ -194,7 +235,7 @@ RedactSingleChoice terr = new RedactSingleChoice(context);
 						}
 					})//
 							.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-							.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 2 + 0.5)))//
+							.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 2 + 0.5)))//
 							.width().is(Auxiliary.tapSize * 2.5)//
 							.height().is(Auxiliary.tapSize * 0.8)//
 					);

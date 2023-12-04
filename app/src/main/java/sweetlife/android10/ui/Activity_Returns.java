@@ -92,7 +92,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		setContentView(R.layout.act_returns);
 		super.onCreate(savedInstanceState);
 		ReadExtras();
-		setTitle("Заявка на возврат от " + mClient.getName());
+		setTitle("Заявка на возврат от " + mClient.getName());//+": "+getIntent().getExtras().getInt("prichina")+": "+prichinaNum);
 		InitializeControls();
 		mCameraHelper = new CameraCaptureHelper();
 	}
@@ -145,6 +145,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 				break;
 			case 4:
 				prichinaNum = ZayavkaNaVozvrat_Tovary.REASON_KOROTKIE_SROKI;
+				break;
 			case 5:
 				prichinaNum = ZayavkaNaVozvrat_Tovary.REASON_OSHIBKA_PRI_ZAKAZE;
 				break;

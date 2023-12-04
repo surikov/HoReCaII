@@ -6,6 +6,7 @@ import android.content.*;
 import android.database.sqlite.*;
 import android.location.*;
 import android.os.*;
+
 import sweetlife.android10.gps.*;
 import sweetlife.android10.log.*;
 
@@ -18,6 +19,7 @@ public class GPS {
 	private static String agentIDstr = null;
 	private static ServiceConnection mGpsServiceConnection = null;
 	private static PowerManager.WakeLock mWakeLock = null;
+
 	public static boolean SetServiceClient(IGpsLoggerServiceClient client) {
 		//System.out.println("SetServiceClient "+client+" for "+mGPSService);
 		if (mGPSService != null) {
@@ -26,12 +28,14 @@ public class GPS {
 		}
 		return false;
 	}
+
 	public static void DeleteServiceClient() {
 		//System.out.println("DeleteServiceClient");
 		if (mGPSService != null) {
 			mGPSService.DeleteServiceClient();
 		}
 	}
+
 	private static void StartAndBindService(final Context context) {
 		//System.out.println("StartAndBindService");
 		//sweetlife.horeca.monitor.SQLexec.go();
@@ -44,6 +48,7 @@ public class GPS {
 				//System.out.println("onServiceDisconnected " + name);
 				mGPSService = null;
 			}
+
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				//System.out.println("onServiceConnected " + name);
 				mGPSService = ((SWLifeGpsService.GpsLoggingBinder) service).getService();
@@ -55,7 +60,10 @@ public class GPS {
 						//System.out.println("OnLocationUpdate");
 						Calendar calendar = Calendar.getInstance();
 						calendar.setTimeInMillis(location.getTime());
-						getGPSInfo().insertPoint(calendar, location.getLatitude(), location.getLongitude());
+						Calendar now = Calendar.getInstance();
+						if (Math.abs(now.getTimeInMillis() - calendar.getTimeInMillis()) < 2 * 24 * 60 * 60 * 1000) {
+							getGPSInfo().insertGpsPoint(calendar, location.getLatitude(), location.getLongitude());
+						}
 					}
 				});
 			}
@@ -65,18 +73,18 @@ public class GPS {
 		//}
 		//System.out.println("done StartAndBindService");
 	}
+
 	/*public static void StartGPSService(Context context) {
 		StartAndBindService(context);
 	}*/
 	public static void StopAndUnbindServiceIfRequired(Context context) {
 		//System.out.println("StopAndUnbindServiceIfRequired " + Session.isBoundToService());
 		try {
-			mGPSInfo=null;
+			mGPSInfo = null;
 			if (Session.isBoundToService() && mGpsServiceConnection != null) {
 				try {
 					context.unbindService(mGpsServiceConnection);
-				}
-				catch (Throwable t) {
+				} catch (Throwable t) {
 					t.printStackTrace();
 				}
 				Session.setBoundToService(false);
@@ -84,8 +92,7 @@ public class GPS {
 			if (!Session.isStarted() && mGPSServiceIntent != null) {
 				try {
 					context.stopService(mGPSServiceIntent);
-				}
-				catch (Throwable t) {
+				} catch (Throwable t) {
 					t.printStackTrace();
 				}
 				mGPSServiceIntent = null;
@@ -96,11 +103,11 @@ public class GPS {
 				mGpsServiceConnection = null;
 			}
 			DestroyWakeLock();
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
+
 	public static void StartGPSLog(Context context, SQLiteDatabase db, String agentid) {
 		//System.out.println("StartGPSLog " + mGPSService);
 		if (mGPSService == null) {
@@ -119,8 +126,7 @@ public class GPS {
 					getGPSInfo().insertPoint(calendar, location.getLatitude(), location.getLongitude());
 				}
 			});*/
-		}
-		else {
+		} else {
 			LogHelper.debug(context.getClass().getCanonicalName() + " already StartGPSLog " + mGPSService);
 		}
 		//if (mGPSService != null && !mGPSService.HasLocationChangeClient()) {
@@ -192,8 +198,8 @@ public class GPS {
 			t.printStackTrace();
 		}
 		}*/
-	
-	static  void InitializeWakeLock(Context c) {
+
+	static void InitializeWakeLock(Context c) {
 		if (mWakeLock == null) {
 
 			PowerManager pm = (PowerManager) c.getSystemService(Context.POWER_SERVICE);
@@ -202,14 +208,15 @@ public class GPS {
 			mWakeLock.acquire();
 		}
 	}
-	static  void DestroyWakeLock() {
+
+	static void DestroyWakeLock() {
 		if (mWakeLock != null) {
 			mWakeLock.release();
 			mWakeLock = null;
 		}
 	}
-	
-	
+
+
 	public static GPSInfo getGPSInfo() {
 		//System.out.println("mGPSInfo is " + mGPSInfo);
 		if (mGPSInfo == null) {

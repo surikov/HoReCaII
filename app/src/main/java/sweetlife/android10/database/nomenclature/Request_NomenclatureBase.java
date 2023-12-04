@@ -9,6 +9,7 @@ import sweetlife.android10.data.common.Sales;
 import sweetlife.android10.database.ISklady;
 import sweetlife.android10.supervisor.Cfg;
 import sweetlife.android10.ui.Activity_NomenclatureNew;
+import sweetlife.android10.update.*;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.utils.Hex;
@@ -266,469 +267,6 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		}
 	}
 
-	public static String ______composeCategoriesSQL(//
-											  String dataOtgruzki//2013-01-30
-			, String kontragentID//
-			, String polzovatelID//
-			, String dataNachala//
-			, String dataKonca//
-			, String poiskovoeSlovo//
-											  //, int tipPoiska//ISearchBy
-			, boolean etoTrafik//
-											  //, boolean history//
-			, String skladPodrazdelenia//
-			, int limit//
-			, int offset//
-											  //, boolean isMustList//
-			, boolean isTop//
-	) {
-		/*System.out.println("composeCategoriesSQL: " + dataOtgruzki//2013-01-30
-				+ ", " + kontragentID//
-				+ ", " + polzovatelID//
-				+ ", " + dataNachala//
-				+ ", " + dataKonca//
-				//+ ", " + poiskovoeSlovo//
-				//+ ", " + tipPoiska//ISearchBy
-				+ ", " + etoTrafik//
-				//+ ", " + history//
-				+ ", " + skladPodrazdelenia//
-				+ ", " + limit//
-				+ ", " + offset//
-				//+ ", " + isMustList//
-				+ ", " + isTop//
-		);*/
-		//System.out.println("ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya() " + ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya());
-		//System.out.println("skladPodrazdelenia " + skladPodrazdelenia);
-		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-		if (Cfg.selectedOrDbHRC().equals("hrc00")) {
-			polzovatelID = "x'00'";
-		}
-		//if (ApplicationHoreca.getInstance().currentHRCmarshrut.length() > 0) {
-		if (Cfg.isChangedHRC()) {
-			//polzovatelID = "x'" + ApplicationHoreca.getInstance().currentIDmarshrut + "'";
-			polzovatelID = "x'" + Cfg.selectedHRC_idrref() + "'";
-		}
-		int zapretOtgruzokOtvetsvennogo = getZapretOtgruzokOtvetsvennogo(kontragentID, polzovatelID);
-		//System.out.println("zapretOtgruzokOtvetsvennogo: " + zapretOtgruzokOtvetsvennogo);
-		boolean letuchka = dataOtgruzki.equals(DateTimeHelper.SQLDateString(new Date()));
-		String defaultSklad = "";
-		if (skladPodrazdelenia.trim().toUpperCase().equals(ISklady.HORECA_ID.trim().toUpperCase())) {
-			defaultSklad = " and baza=" + ISklady.HORECA_ID;
-		} else {
-			if (skladPodrazdelenia.trim().toUpperCase().equals(ISklady.KAZAN_ID.trim().toUpperCase())) {
-				if (letuchka) {
-					defaultSklad = " and baza=" + ISklady.KAZAN_ID;
-				} else {
-					//
-				}
-			} else {
-				if (skladPodrazdelenia.trim().toUpperCase().equals(ISklady.MOSKVA_ID.trim().toUpperCase())) {
-					if (letuchka) {
-						defaultSklad = " and baza=" + ISklady.MOSKVA_ID;
-					}
-				} else {
-					//LogHelper.debug("Unknown skladPodrazdelenia " + skladPodrazdelenia);
-				}
-			}
-		}
-		String sql = " select n._id "//
-				+ "\n 	,n.[_IDRRef] "//
-				+ "\n 	,n.[Artikul] "//
-				+ "\n 	,n.[Naimenovanie] "//
-				+ " || ' (склад '"//
-				+ " || case (select sklad from AdresaPoSkladam_last where nomenklatura=n._idrref " + defaultSklad + " order by baza limit 1)"//
-				+ " when " + ISklady.HORECA_sklad_8 + " then 8"//
-				+ " when " + ISklady.HORECA_sklad_10 + " then 10"//
-				+ " when " + ISklady.HORECA_sklad_12 + " then 12"//
-				+ " when " + ISklady.KAZAN_sklad_14 + " then 14"//
-				+ " when " + ISklady.MOSKVA_sklad_17 + " then 17"//
-				+ " else '?' end" //
-				+ "\n			 || ')' || case ifnull(top20.nomenklatura,'') when '' then '' else '`' end"//
-				+ " as Naimenovanie"//
-				+ "\n 	,n.[OsnovnoyProizvoditel] "//
-				+ "\n 	,przv.Naimenovanie as ProizvoditelNaimenovanie ";
-		if (uchetnayaCena(kontragentID)) {
-			sql = sql + "\n 	,TekuschieCenyOstatkovPartiy.Cena*(100+ifnull(nk1.procent,ifnull(nk2.procent,0)))/100 as Cena ";
-		} else {
-			sql = sql + "\n 	,(select c.Cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as Cena ";
-		}
-		//sql = sql + "\n 	,(select c.Cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as Cena "//
-		sql = sql + "\n 	,0 as Skidka "//
-				+ "\n 	,0 as CenaSoSkidkoy "//
-				+ "\n 	,x'00' as VidSkidki "//
-				+ "\n 	,n.skladEdIzm || ' по ' || n.skladEdVes || 'кг' as [EdinicyIzmereniyaNaimenovanie] "//
-				+ "\n 	,n.kvant as MinNorma "//
-				+ "\n 	,n.otchEdKoef as [Koephphicient] "//
-				+ "\n  	,x'00' as [EdinicyIzmereniyaID] "//
-				+ "\n  	,n.Roditel as Roditel "//
-		;
-		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-		//	sql = sql + "\n 	,0 as MinCena ";
-		//} else {
-		if (uchetnayaCena(kontragentID)) {
-			sql = sql + "\n 	,0 as MinCena";
-		} else {
-			sql = sql + "\n 	,case when ifnull(nk1.ProcentSkidkiNacenki,nk2.ProcentSkidkiNacenki)>0";
-			sql = sql + "\n 		then 0"//
-					+ "\n 		else (1.000+ifnull(n1.nacenka,ifnull(n2.nacenka,ifnull(n3.nacenka,ifnull(n4.nacenka,n5.nacenka))))*0.01)*TekuschieCenyOstatkovPartiy.Cena"//
-
-
-					+ "\n 		end as MinCena ";
-		}
-
-		;
-		//}
-		sql = sql + "\n 	,(select 1.1*c.Cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as MaxCena "//
-				+ "\n 	,TekuschieCenyOstatkovPartiy.cena as BasePrice "//
-				+ "\n 	,Prodazhi.Stoimost/Prodazhi.kolichestvo as LastPrice "//
-		;
-		if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-			sql = sql + "\n 	,0 as Nacenka ";
-		} else {
-			if (uchetnayaCena(kontragentID)) {
-				sql = sql + "\n 	,ifnull(nk1.Procent,nk2.Procent) as Nacenka ";
-			} else {
-				sql = sql + "\n 	,ifnull(nk1.ProcentSkidkiNacenki,nk2.ProcentSkidkiNacenki) as Nacenka ";
-			}
-		}
-		sql = sql + "\n 	,ZapretSkidokTov.Individualnye as ZapretSkidokTovIndividualnye "//
-				+ "\n 	,ZapretSkidokTov.Nokopitelnye as ZapretSkidokTovNokopitelnye "//
-				+ "\n 	,ZapretSkidokTov.Partner as ZapretSkidokTovPartner "//
-				+ "\n 	,ZapretSkidokTov.Razovie as ZapretSkidokTovRazovie "//
-				+ "\n 	,ZapretSkidokTov.Nacenki as ZapretSkidokTovNacenki "//
-				+ "\n 	,ZapretSkidokProizv.Individualnye as ZapretSkidokProizvIndividualnye "//
-				+ "\n 	,ZapretSkidokProizv.Nokopitelnye as ZapretSkidokProizvNokopitelnye "//
-				+ "\n 	,ZapretSkidokProizv.Partner as ZapretSkidokProizvPartner "//
-				+ "\n 	,ZapretSkidokProizv.Razovie as ZapretSkidokProizvRazovie "//
-				+ "\n 	,ZapretSkidokProizv.Nacenki as ZapretSkidokProizvNacenki "//
-				+ "\n 	,ifnull(fx1.FixCena,fx2.FixCena) as FiksirovannyeCeny "//
-		;
-		if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-			sql = sql + "\n 			,0 as SkidkaPartneraKarta ";
-		} else {
-			sql = sql + "\n 			,ifnull(skpk1.ProcentSkidkiNacenki,ifnull(skpk2.ProcentSkidkiNacenki,ifnull(skpk3.ProcentSkidkiNacenki,ifnull(skpk4.ProcentSkidkiNacenki,ifnull(skpk5.ProcentSkidkiNacenki,0))))) as SkidkaPartneraKarta " //
-			;
-		}
-		sql = sql + "\n 	,(select max(ProcentSkidkiNacenki) from NakopitelnyeSkidki"//
-				+ "\n 			where PoluchatelSkidki=parameters.kontragent"//
-				+ "\n 			and date(period)<=date(parameters.dataOtgruzki) "//
-				+ "\n 			and date(DataOkonchaniya)>=date(parameters.dataOtgruzki) ) " //
-				+ "\n 		as NakopitelnyeSkidki"//
-				+ "\n 	,Prodazhi.period as LastSell "//
-				+ "\n	,n.skladEdVes as vesedizm"//
-		;
-		if (zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoInclude) {
-			sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-					+ "\n				where Otvetstvenniy=parameters.polzovatel"//
-					+ "\n				and ObjectZapreta=parameters.kontragent"//
-					+ "\n				and proizvoditel=n._idrref"//
-					+ "\n				limit 1) as zooSelf"//
-			;
-			sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-					+ "\n				where Otvetstvenniy=parameters.polzovatel"//
-					+ "\n				and ObjectZapreta=parameters.kontragent"//
-					+ "\n				and proizvoditel=n.roditel"//
-					+ "\n				limit 1) as zooParent"//
-			;
-			sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-					+ "\n				where Otvetstvenniy=parameters.polzovatel"//
-					+ "\n				and ObjectZapreta=parameters.kontragent"//
-					+ "\n				and proizvoditel=parent.roditel"//
-					+ "\n				limit 1) as zooParentParent"//
-			;
-			sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-					+ "\n				where Otvetstvenniy=parameters.polzovatel"//
-					+ "\n				and ObjectZapreta=parameters.kontragent"//
-					+ "\n				and proizvoditel=n.[OsnovnoyProizvoditel]"//
-					+ "\n				limit 1) as zooProizvoditel"//
-			;
-		} else {
-			if (zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoExclude) {
-				sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-						+ "\n				where ObjectZapreta=parameters.kontragent"//
-						+ "\n				and proizvoditel=n._idrref"//
-						+ "\n				limit 1) as zooSelf"//
-				;
-				sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-						+ "\n				where ObjectZapreta=parameters.kontragent"//
-						+ "\n				and proizvoditel=n.roditel"//
-						+ "\n				limit 1) as zooParent"//
-				;
-				sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-						+ "\n				where ObjectZapreta=parameters.kontragent"//
-						+ "\n				and proizvoditel=parent.roditel"//
-						+ "\n				limit 1) as zooParentParent"//
-				;
-				sql = sql + "\n  		,(select 1 from zapretotgruzokotvetsvennogo"//
-						+ "\n				where ObjectZapreta=parameters.kontragent"//
-						+ "\n				and proizvoditel=n.[OsnovnoyProizvoditel]"//
-						+ "\n				limit 1) as zooProizvoditel"//
-				;
-			}
-		}
-		sql = sql + "\n 	,(select sklad from AdresaPoSkladam_last where nomenklatura=n._idrref and baza="//
-				+ ISklady.KAZAN_ID //+ " and Traphik=" + isTraphik
-				+ " limit 1) as skladKazan ";//
-		sql = sql + "\n 	,(select sklad from AdresaPoSkladam_last where nomenklatura=n._idrref and baza=" //
-				+ ISklady.HORECA_ID //+ " and Traphik=" + isTraphik
-				+ " limit 1) as skladHoreca ";//
-		sql = sql + "\n 	,(select sklad from AdresaPoSkladam_last where nomenklatura=n._idrref and baza="//
-				+ ISklady.MOSKVA_ID //+ " and Traphik=" + isTraphik
-				+ " limit 1) as skladMoskva "//
-		;
-		sql = sql + "\n						,top20._id as mustListId";
-		sql = sql + "\n						,(select  (c.Cena - TekuschieCenyOstatkovPartiy.cena) / TekuschieCenyOstatkovPartiy.cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as rPrice";
-		//----------------------------------------------------------------------------------------
-		//----------------------------------------------------------------------------------------
-		//----------------------------------------------------------------------------------------
-		sql = sql + "\n  	from Nomenklatura_sorted n ";
-		sql = sql + "\n 	cross join Consts const ";
-		sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
-		//sql = sql + "\n 	cross join price_artikul Price on Price.nomenklatura=n.[_IDRRef] and Price.price_doc=x'" + getPriceVladelecID(kontragentID) + "'"//
-		sql = sql + "\n 	cross join (select "//
-				+ "\n 			'" + dataOtgruzki + "' as dataOtgruzki "//
-				+ "\n 			," + kontragentID + " as kontragent "//
-				+ "\n 			," + polzovatelID + " as polzovatel "//
-				+ "\n 		) parameters "//
-		//+ "\n 	cross join TekuschieCenyOstatkovPartiy_strip TekuschieCenyOstatkovPartiy on TekuschieCenyOstatkovPartiy.nomenklatura=n.[_IDRRef] "//
-		;
-		if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-			//
-		} else {
-			sql = sql + "\n 	cross join Polzovateli on Polzovateli._idrref=parameters.polzovatel "//
-					+ "\n 	cross join Podrazdeleniya p1 on p1._idrref=Polzovateli.podrazdelenie "//
-			;
-		}
-		sql = sql + "\n 	cross join kontragenty on kontragenty._idrref=parameters.kontragent ";
-
-		sql = sql//
-				+ "\n 	left join Prodazhi_last Prodazhi on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
-				+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
-
-		//cacheTop20(polzovatelID, dataOtgruzki.substring(0, 8) + "01");
-		cacheTop20(polzovatelID, dataOtgruzki);
-		sql = sql + "\n  	left join dopmotivaciya_cache top20 on top20.nomenklatura=n._idrref";
-		sql = sql//
-				+ "\n 	left join TekuschieCenyOstatkovPartiy_strip TekuschieCenyOstatkovPartiy on TekuschieCenyOstatkovPartiy.nomenklatura=n.[_IDRRef] "//
-		;
-		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-		//
-		//} else {
-		if (uchetnayaCena(kontragentID)) {
-			sql = sql + "\n 	left join NacenkaKUchetnoiCene nk1 on nk1.PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 			and nk1.Period=(select max(Period) from NacenkaKUchetnoiCene "//
-					+ "\n 				where PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 					and date(period)<=date(parameters.dataOtgruzki)"// "//
-					+ "\n 				) "//
-			;
-			sql = sql + "\n 	left join (select Procent from NacenkaKUchetnoiCene " //
-					+ "\n 			join kontragenty on kontragenty._idrref=" + kontragentID //
-					+ "\n 			where PoluchatelSkidki=kontragenty.GolovnoyKontragent"//
-					+ "\n 				and period=("//
-					+ "\n 					select max(period)"//
-					+ "\n 					from NacenkaKUchetnoiCene"//
-					+ "\n 					join kontragenty on kontragenty._idrref=" + kontragentID //
-					+ "\n 					where PoluchatelSkidki=kontragenty.GolovnoyKontragent and date(DataOkonchaniya)<=date('" + dataOtgruzki + "')"//
-					+ "\n 					)"//
-					+ "\n 			limit 1"//
-					+ "\n 		) nk2"
-			;
-		} else {
-			sql = sql + "\n 	left join NacenkiKontr nk1 on nk1.PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 			and nk1.Period=(select max(Period) from NacenkiKontr "//
-					+ "\n 				where PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 					and date(period)<=date(parameters.dataOtgruzki) and date(DataOkonchaniya)>=date(parameters.dataOtgruzki) and podrazdelenie=p1._idrref"// "//
-					+ "\n 				) "//
-			;
-			sql = sql + "\n 	left join (select ProcentSkidkiNacenki from NacenkiKontr " //
-					+ "\n 			join kontragenty on kontragenty._idrref=" + kontragentID //
-					+ "\n 			where PoluchatelSkidki=kontragenty.GolovnoyKontragent"//
-					+ "\n 				and period=("//
-					+ "\n 					select max(period)"//
-					+ "\n 					from NacenkiKontr"//
-					+ "\n 					join kontragenty on kontragenty._idrref=" + kontragentID //
-					+ "\n 					where PoluchatelSkidki=kontragenty.GolovnoyKontragent and date(DataOkonchaniya)>=date('" + dataOtgruzki + "')"//
-					+ "\n 					)"//
-					+ "\n 			limit 1"//
-					+ "\n 		) nk2"
-			;
-		}
-
-		sql = sql + "\n 	left join ZapretSkidokTov on ZapretSkidokTov.Nomenklatura=n.[_IDRRef] "//
-				+ "\n 			and ZapretSkidokTov.Period=(select max(Period) from ZapretSkidokTov "//
-				+ "\n 				where Nomenklatura=n.[_IDRRef] "//
-				+ "\n 					and date(period)<=date(parameters.dataOtgruzki) "//
-				+ "\n 				) "//
-				+ "\n 	left join ZapretSkidokProizv on ZapretSkidokProizv.Proizvoditel=n.[OsnovnoyProizvoditel] "//
-				+ "\n 				and ZapretSkidokProizv.Period=(select max(Period) from ZapretSkidokProizv "//
-				+ "\n 					where Proizvoditel=n.[OsnovnoyProizvoditel] "//
-				+ "\n 						and date(period)<=date(parameters.dataOtgruzki) "//
-				+ "\n 					) "//
-		;
-		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-		//
-		//} else {
-		sql = sql + "\n 	left join Podrazdeleniya p2  on p1.roditel=p2._idrref "//
-				+ "\n 	left join Podrazdeleniya p3  on p2.roditel=p3._idrref "//
-				+ "\n 	left join Podrazdeleniya p4  on p3.roditel=p4._idrref "//
-				+ "\n 	left join MinimalnyeNacenkiProizvoditeley_1 n1  on n1.podrazdelenie=p1._idrref "//
-				+ "\n 				and n1.NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 				and n1.period=(select max(period) from MinimalnyeNacenkiProizvoditeley_1 "//
-				+ "\n 					where podrazdelenie=p1._idrref "//
-				+ "\n 					and NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 					) "//
-				+ "\n 	left join MinimalnyeNacenkiProizvoditeley_1 n2  on n2.podrazdelenie=p2._idrref "//
-				+ "\n 				and n2.NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 				and n2.period=(select max(period) from MinimalnyeNacenkiProizvoditeley_1 "//
-				+ "\n 					where podrazdelenie=p2._idrref "//
-				+ "\n 					and NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 					) "//
-				+ "\n 	left join MinimalnyeNacenkiProizvoditeley_1 n3  on n3.podrazdelenie=p3._idrref "//
-				+ "\n 				and n3.NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 				and n3.period=(select max(period) from MinimalnyeNacenkiProizvoditeley_1 "//
-				+ "\n 					where podrazdelenie=p3._idrref "//
-				+ "\n 					and NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 					) "//
-				+ "\n 	left join MinimalnyeNacenkiProizvoditeley_1 n4  on n4.podrazdelenie=p4._idrref "//
-				+ "\n 				and n4.NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 				and n4.period=(select max(period) from MinimalnyeNacenkiProizvoditeley_1 "//
-				+ "\n 					where podrazdelenie=p4._idrref "//
-				+ "\n 					and NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 					) "//
-				+ "\n 	left join MinimalnyeNacenkiProizvoditeley_1 n5  on (n5.podrazdelenie=X'00000000000000000000000000000000' or n5.podrazdelenie=X'00') "//
-				+ "\n 				and n5.NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 				and n5.period=(select max(period) from MinimalnyeNacenkiProizvoditeley_1 "//
-				+ "\n 					where (podrazdelenie=X'00000000000000000000000000000000' or podrazdelenie=X'00') "//
-				+ "\n 					and NomenklaturaProizvoditel_2=n._idrref "//
-				+ "\n 					) "//
-		;
-		//}
-		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-		//
-		//} else {
-		sql = sql + "\n		left join SkidkaPartneraKarta skpk1 on skpk1.Podrazdelenie=p1._idrref " //
-				+ "\n					and skpk1.PoluchatelSkidki=n.[_IDRRef] " //
-				+ "\n					and date(skpk1.period)<=date(parameters.dataOtgruzki) " //
-				+ "\n					and date(skpk1.DataOkonchaniya)>=date(parameters.dataOtgruzki) " //
-				+ "\n		left join SkidkaPartneraKarta skpk2 on skpk2.Podrazdelenie=p2._idrref " //
-				+ "\n					and skpk2.PoluchatelSkidki=n.[_IDRRef] " //
-				+ "\n					and date(skpk2.period)<=date(parameters.dataOtgruzki) " //
-				+ "\n					and date(skpk2.DataOkonchaniya)>=date(parameters.dataOtgruzki) " //
-				+ "\n		left join SkidkaPartneraKarta skpk3 on skpk3.Podrazdelenie=p3._idrref " //
-				+ "\n					and skpk3.PoluchatelSkidki=n.[_IDRRef] " //
-				+ "\n					and date(skpk3.period)<=date(parameters.dataOtgruzki) " //
-				+ "\n					and date(skpk3.DataOkonchaniya)>=date(parameters.dataOtgruzki) " //
-				+ "\n		left join SkidkaPartneraKarta skpk4 on skpk4.Podrazdelenie=p4._idrref " //
-				+ "\n					and skpk4.PoluchatelSkidki=n.[_IDRRef] " //
-				+ "\n					and date(skpk4.period)<=date(parameters.dataOtgruzki) " //
-				+ "\n					and date(skpk4.DataOkonchaniya)>=date(parameters.dataOtgruzki) "//
-				+ "\n		left join SkidkaPartneraKarta skpk5 on (skpk5.Podrazdelenie=X'00000000000000000000000000000000' or skpk5.Podrazdelenie=X'00') " //
-				+ "\n					and skpk5.PoluchatelSkidki=n.[_IDRRef] " //
-				+ "\n					and date(skpk5.period)<=date(parameters.dataOtgruzki) " //
-				+ "\n					and date(skpk5.DataOkonchaniya)>=date(parameters.dataOtgruzki) "//
-		;
-		//}
-		sql = sql + "\n 	left join Proizvoditel przv on n.[OsnovnoyProizvoditel] = przv._IDRRef ";
-		if (uchetnayaCena(kontragentID)) {
-			sql = sql + "\n 	left join FiksirovannyeCenyUchet fx1 on fx1.DataOkonchaniya=( "//
-					+ "\n 					select max(DataOkonchaniya) from FiksirovannyeCenyUchet "//
-					+ "\n 						where PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 						and date(period)<=date(parameters.dataOtgruzki) "//
-					+ "\n 						and date(DataOkonchaniya)>=date(parameters.dataOtgruzki) "//
-					+ "\n 						and Nomenklatura=n.[_IDRRef] "//
-					+ "\n 				) and fx1.PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 				and fx1.Nomenklatura=n.[_IDRRef] "//
-					+ "\n 	left join FiksirovannyeCenyUchet fx2 on fx2.DataOkonchaniya=( "//
-					+ "\n 					select max(DataOkonchaniya) from FiksirovannyeCenyUchet "//
-					+ "\n 						where PoluchatelSkidki=kontragenty.GolovnoyKontragent "//
-					+ "\n 						and date(period)<=date(parameters.dataOtgruzki) "//
-					+ "\n 						and date(DataOkonchaniya)>=date(parameters.dataOtgruzki) "//
-					+ "\n 						and Nomenklatura=n.[_IDRRef] "//
-					+ "\n 				) and fx2.PoluchatelSkidki=kontragenty.GolovnoyKontragent "//
-					+ "\n 				and fx2.Nomenklatura=n.[_IDRRef] "//
-			;
-		} else {
-			sql = sql + "\n 	left join FiksirovannyeCeny_actual fx1 on fx1.DataOkonchaniya=( "//
-					+ "\n 					select max(DataOkonchaniya) from FiksirovannyeCeny_actual "//
-					+ "\n 						where PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 						and date(period)<=date(parameters.dataOtgruzki) "//
-					+ "\n 						and date(DataOkonchaniya)>=date(parameters.dataOtgruzki) "//
-					+ "\n 						and Nomenklatura=n.[_IDRRef] "//
-					+ "\n 				) and fx1.PoluchatelSkidki=parameters.kontragent "//
-					+ "\n 				and fx1.Nomenklatura=n.[_IDRRef] "//
-					+ "\n 	left join FiksirovannyeCeny_actual fx2 on fx2.DataOkonchaniya=( "//
-					+ "\n 					select max(DataOkonchaniya) from FiksirovannyeCeny_actual "//
-					+ "\n 						where PoluchatelSkidki=kontragenty.GolovnoyKontragent "//
-					+ "\n 						and date(period)<=date(parameters.dataOtgruzki) "//
-					+ "\n 						and date(DataOkonchaniya)>=date(parameters.dataOtgruzki) "//
-					+ "\n 						and Nomenklatura=n.[_IDRRef] "//
-					+ "\n 				) and fx2.PoluchatelSkidki=kontragenty.GolovnoyKontragent "//
-					+ "\n 				and fx2.Nomenklatura=n.[_IDRRef] "//
-			;
-		}
-		if (zapretOtgruzokOtvetsvennogo != ZapretOtgruzokOtvetsvennogoNone) {
-			sql = sql + "\n  		left join Nomenklatura parent on n.roditel=parent._idrref";
-		}
-		/*String poisk = "";
-		if (poiskovoeSlovo.trim().length() > 0) {
-			if (tipPoiska == ISearchBy.SEARCH_NAME) {
-				poisk = " ( n.[UpperName] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%') ";
-			}
-			else {
-				if (tipPoiska == ISearchBy.SEARCH_ARTICLE) {
-					poisk = " ( n.[Artikul] = '" + poiskovoeSlovo.trim().toUpperCase() + "') ";
-				}
-				else {
-					if (tipPoiska == ISearchBy.SEARCH_VENDOR) {
-						poisk = " ( ProizvoditelNaimenovanie like '%" + poiskovoeSlovo.trim().toUpperCase() + "%') ";
-					}
-					else {
-						if (tipPoiska == ISearchBy.SEARCH_CHILDREN) {
-							poisk = " ( n.Roditel=" + poiskovoeSlovo.trim().toUpperCase() + ") ";
-						}
-						else {
-							if (tipPoiska == ISearchBy.SEARCH_IDRREF) {
-								poisk = " ( n.[_IDRRef] = " + poiskovoeSlovo.trim().toUpperCase() + ") ";
-							}
-							else {
-								if (tipPoiska == ISearchBy.SEARCH_CUSTOM) {
-									poisk = " ( " + poiskovoeSlovo + ") ";
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (etoTrafik) {
-			sql = sql + "\n where  (Price.Trafik=x'01' or Price.Trafik='true')";
-		}
-		else {
-			sql = sql + "\n where (Price.Trafik=x'00' or Price.Trafik='false')";
-		}
-		if (poisk.length() > 0) {
-			sql = sql + "\n and " + poisk;
-		}*/
-		if (zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoInclude) {
-			sql = sql + "\n		and (ifnull(zooSelf,0)=1 or ifnull(zooParent,0)=1 or ifnull(zooParentParent,0)=1 or ifnull(zooProizvoditel,0)=1)";
-		} else {
-			if (zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoExclude) {
-				sql = sql + "\n		and (not (ifnull(zooSelf,0)=1 or ifnull(zooParent,0)=1 or ifnull(zooParentParent,0)=1 or ifnull(zooProizvoditel,0)=1))";
-			} else {
-				//
-			}
-		}
-		/*if (isMustList == true) {
-			sql = sql + "\n and top20._id>0";
-		}
-		else {
-			if (isTop == true) {
-				sql = sql + "\n and rPrice>0.2499";
-			}
-		}*/
-		sql = sql + "\n limit " + limit + " offset " + offset;
-		return sql;
-	}
 
 	public static String composeSQL(//
 									String dataOtgruzki//2013-01-30
@@ -750,10 +288,11 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			, boolean DEGUSTACIA_POISK
 									//, String receptID
 			, String ingredientIdrref, String ingredientKluch
+									,boolean no_assortiment
 	) {
 		return composeSQLall(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
 				, poiskovoeSlovo, tipPoiska, etoTrafik, history, skladPodrazdelenia, limit//
-				, offset, isMustList, isTop, null, null, false, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch, null);
+				, offset, isMustList, isTop, null, null, false, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch, null,no_assortiment);
 	}
 
 	public static String composeSQLall(//
@@ -780,6 +319,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 
 			, boolean DEGUSTACIA_POISK//
 			, String ingredientIdrref, String ingredientKluch, String flagmanTovarSegmentKod
+									   ,boolean no_assortiment
 	) {
         /*if (Cfg.useNewSkidkaCalculation) {
             return composeSQLall_NewSkidka(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
@@ -789,7 +329,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return composeSQLall_Old(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
 				, poiskovoeSlovo, tipPoiska, etoTrafik, history, skladPodrazdelenia, limit//
 				, offset, isMustList, isTop, kuhnya, tochkaIdrref, individualcena, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch
-				, flagmanTovarSegmentKod,false,false,false,false);
+				, flagmanTovarSegmentKod,false,false,false,false,no_assortiment);
 		// }
 	}
 
@@ -890,10 +430,11 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			,boolean starsOnly
 			,boolean recomendaciaOnly
 			,boolean korzinaOnly
+			,boolean no_assortiment
 	) {
 
 		refreshTovariGeroiDay(dataOtgruzki);
-
+		UpdateTask.refreshProdazhi_last(ApplicationHoreca.getInstance().getDataBase(),kontragentID);
 
 
 
@@ -1174,12 +715,15 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n  	,n4.minCena as n4minCena ";
 		sql = sql + "\n  	,n5.minCena as n5minCena ";
 		sql = sql + "\n  	,atricle_count.artikul as artCount ";
-		sql = sql + "\n 	,'' || Prodazhi.kolichestvo || n.skladEdIzm as lastSellCount ";
+		sql = sql + "\n 	,'' || Prodazhi.kolichestvo || '/' || Prodazhi.aktivnost || n.skladEdIzm as lastSellCount ";
 		sql = sql + "\n  	,stars.artikul as stars_artikul ";
 		sql = sql + "\n  	,newSkidki.datastart as datastart, newSkidki.dataend as dataend";
+		//sql = sql + "\n  	,Prodazhi.aktivnost as aktivnostMonth ";
 		sql = sql + "\n	from Nomenklatura_sorted n ";
 		sql = sql + "\n 	cross join Consts const ";
-		sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
+		if(!no_assortiment){
+			sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
+		}
 		sql = sql + "\n 	cross join (select "//
 				+ "\n 			'" + dataOtgruzki + "' as dataOtgruzki "//
 				+ "\n 			," + kontragentID + " as kontragent "//
@@ -1198,11 +742,15 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			sql = sql + "\n 	cross join FlagmanTovar on  FlagmanTovar.Articul=n.Artikul and FlagmanTovar.SegmentKod='" + flagmanTovarSegmentKod + "'  ";
 		}
 		if (history) {
+			/*
 			sql = sql//
 					+ "\n 	cross join Prodazhi_last Prodazhi"
 					+ "\n 				on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
 					+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
+			*/
+			sql = sql + "\n 	cross join Prodazhi_last Prodazhi on Prodazhi.nomenklatura=n.[_IDRRef] ";
 		} else {
+			/*
 			if (flagmanTovarSegmentKod != null) {
 				//Calendar c = Calendar.getInstance();
 				//c.set(Calendar.DAY_OF_MONTH, 1);
@@ -1216,6 +764,11 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 						+ "\n 	left join Prodazhi_last Prodazhi on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
 						+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
 			}
+			*/
+			sql = sql + "\n 	left join Prodazhi_last Prodazhi on Prodazhi.nomenklatura=n.[_IDRRef] ";
+		}
+		if(no_assortiment){
+			sql = sql + "\n 	left join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
 		}
 		sql = sql + "\n 	left join Prodazhi_CR on Prodazhi_CR.nomenklatura=n.[_IDRRef] ";
 		cacheTop20(polzovatelID, dataOtgruzki);
@@ -1411,10 +964,14 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 						+ ") ";
 			}
 		}
-		if (etoTrafik) {
-			sql = sql + "\n where  curAssortiment.Trafic=x'01' and curAssortiment.zapret!=x'01' ";
-		} else {
-			sql = sql + "\n where curAssortiment.zapret!=x'01' ";
+		if(no_assortiment){
+			sql = sql + "\n where 1=1 ";
+		}else{
+			if(etoTrafik){
+				sql = sql + "\n where  curAssortiment.Trafic=x'01' and curAssortiment.zapret!=x'01' ";
+			}else{
+				sql = sql + "\n where curAssortiment.zapret!=x'01' ";
+			}
 		}
 
 		if (poisk.length() > 0) {

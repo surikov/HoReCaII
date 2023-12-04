@@ -27,6 +27,8 @@ public class Settings {
 	public static int colorTop20 = 0xff9999ff;
 	public static int colorNacenka25 = 0xffff9966;
 	public static int colorOlder = 0xffff6666;
+	public static int colorSTM = 0xffff66ff;
+	public static int colorTransparent = 0x00000000;
 	//private static String _primaryURL = "89.109.7.162";
 	//private  static String _secondaryURL = "95.79.111.216";
 
@@ -40,10 +42,12 @@ public class Settings {
 	private static String _primaryURL = "https://service.swlife.ru";
 	//private static String _primaryURL = "https://testservice.swlife.ru";
 
-	private static String _secondaryURL = "https://95.79.111.216";//"http://89.109.7.162";
+	//private static String _secondaryURL = "https://95.79.111.216";//"http://89.109.7.162";
+	private static String _secondaryURL = "http://95.79.111.216";//"http://89.109.7.162";
 	private static String _primaryFileStoreURL = "https://androbmen.swlife.ru/";//android/Update2.xml";
-	private static String _secondaryFileStoreURL = "https://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
-	public static boolean isPrimaryGate = true;
+	//private static String _secondaryFileStoreURL = "https://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
+	//private static String _secondaryFileStoreURL = "http://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
+	//public static boolean isPrimaryGate = true;
 	//http://89.109.7.162/androbmen/android/Update2.xml
 	//https://androbmen.swlife.ru/android/Update2.xml
 
@@ -239,7 +243,7 @@ public class Settings {
 		}
 		return instance;
 	}
-
+/*
 	public void setPrimaryURL() {
 		_baseURL = _primaryURL;
 		_baseFileStoreURL = _primaryFileStoreURL;
@@ -253,7 +257,7 @@ public class Settings {
 		//System.out.println("Settings.baseURL " + Settings._baseURL);
 		isPrimaryGate = false;
 	}
-
+*/
 	public String getBaseURL() {
 		/*if(Cfg.hrcPersonalLogin==null) {
 			return "http://" + _baseURL + "/";

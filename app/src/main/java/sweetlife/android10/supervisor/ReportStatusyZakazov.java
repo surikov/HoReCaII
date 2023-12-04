@@ -322,7 +322,7 @@ public class ReportStatusyZakazov extends Report_Base {
 				String dat = extract(strings[i - 2], '>', '<');
 				String ship = extract(strings[i + 1], '>', '<');
 				String kname = extract(strings[i + 2], '>', '<');
-				//System.out.println("kname "+kname);
+				//System.out.println(" - "+num+": "+dat+" - "+ship+" - "+kname);
 				String[] partsNum = kname.split(":");
 				if (num.length() > 2 && dat.trim().length() == 10 && ship.trim().length() == 10 && partsNum.length > 1) {
 					String[] partsRemn = kname.split("/");

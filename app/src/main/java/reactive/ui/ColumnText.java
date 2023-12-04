@@ -10,8 +10,8 @@ import android.widget.TextView.BufferType;
 
 import java.util.*;
 
-import tee.binding.it.Numeric;
-import tee.binding.properties.NumericProperty;
+import tee.binding.it.*;
+import tee.binding.properties.*;
 import tee.binding.task.*;
 
 public class ColumnText extends Column {
@@ -23,6 +23,7 @@ public class ColumnText extends Column {
 	protected Rect sz;
 	int presell = -1;
 	public NumericProperty<ColumnText> headerBackground = new NumericProperty<ColumnText>(this);
+	public ToggleProperty<ColumnText> center = new ToggleProperty<ColumnText>(this);
 
 	@Override
 	public String export(int row) {
@@ -83,6 +84,9 @@ public class ColumnText extends Column {
 				}
 			}
 		};
+		if(this.center.property.value()){
+			cell.labelAlignCenterTop();
+		}
 		if (row > -1 && row < backgrounds.size()) {
 			if (backgrounds.get(row) != null) {
 				cell.background.is(backgrounds.get(row));

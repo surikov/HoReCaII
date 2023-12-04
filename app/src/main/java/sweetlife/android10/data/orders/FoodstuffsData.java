@@ -102,7 +102,7 @@ public class FoodstuffsData extends NomenclatureBasedDocumentItems {
 							 //, String skidkaProcent//
 							 //, String skidkaNaimenovanie//
 	) {
-		System.out.println("newFoodstuff " + vidSkidki);
+		//System.out.println("newFoodstuff " + vidSkidki+"/"+minimalnayaCena+"/"+cenaSoSkidkoy+"/"+maksimalnayaCena);
 
 		if (minimalnayaCena > 0) {
 			if (vidSkidki.toLowerCase().trim().equals("цр")) {
@@ -127,7 +127,7 @@ public class FoodstuffsData extends NomenclatureBasedDocumentItems {
 			}
 
 		}
-		System.out.println("set newFoodstuff " + vidSkidki);
+		//System.out.println("set newFoodstuff " + vidSkidki+"/"+minimalnayaCena+"/"+cenaSoSkidkoy+"/"+maksimalnayaCena);
 		mNomenclaureList.add(0, new ZayavkaPokupatelya_Foodstaff(0, ++mNomenclatureNumber, nomenklaturaID, artikul, nomenklaturaNaimenovanie
 				, mZayavka.getIDRRef(), edinicaIzmereniya, edinicaIzmereniyaNaimenovanie
 				, kolichestvo, 0.00D, cena, cenaSoSkidkoy

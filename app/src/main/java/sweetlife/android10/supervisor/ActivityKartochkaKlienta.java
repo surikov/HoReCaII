@@ -359,7 +359,7 @@ public class ActivityKartochkaKlienta extends Activity implements ITableColumnsN
                 , false
                 , false
                 , false
-                , null, null
+                , null, null,false
         );
         Cursor cursor = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
         if (cursor.moveToFirst()) {

@@ -2,24 +2,17 @@ package sweetlife.android10.ui;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Vector;
+import java.util.*;
 
-import reactive.ui.Auxiliary;
-import reactive.ui.Expect;
+import reactive.ui.*;
 import sweetlife.android10.ApplicationHoreca;
 import sweetlife.android10.Settings;
-import sweetlife.android10.data.common.IStateChanged;
-import sweetlife.android10.data.common.NomenclatureBasedDocument;
-import sweetlife.android10.data.orders.UploadBidsAsyncTask;
-import sweetlife.android10.data.orders.UploadBidsListAdapter;
-import sweetlife.android10.data.orders.ZayavkaPokupatelya;
+import sweetlife.android10.data.common.*;
+import sweetlife.android10.data.orders.*;
 import sweetlife.android10.database.Request_Bids;
+import sweetlife.android10.database.nomenclature.*;
 import sweetlife.android10.log.LogHelper;
-import sweetlife.android10.supervisor.Cfg;
+import sweetlife.android10.supervisor.*;
 import sweetlife.android10.utils.AsyncTaskManager;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.ManagedAsyncTask;
@@ -31,6 +24,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,19 +34,26 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import sweetlife.android10.R;
+import sweetlife.android10.widgets.*;
 import tee.binding.*;
 import tee.binding.it.Numeric;
+import tee.binding.properties.*;
 import tee.binding.task.Task;
 
-public class Activity_UploadBids extends Activity_BasePeriod implements ImageView.OnClickListener, IStateChanged, Observer {
+public class Activity_UploadBids extends Activity_BasePeriod implements ImageView.OnClickListener, IStateChanged, Observer{
 	static boolean showUploaded = false;
 	private static UploadBidsListAdapter mListAdapter;
 	private static ListView mList;
 	private static ImageView mCheckAll;
 	MenuItem menuOtchety;
+	View lastDialogView=null;
 
-	public static String composeUploadOrderString(String key) {
-		SQLiteDatabase mDB= ApplicationHoreca.getInstance().getDataBase();
+	public static String composeUploadOrderString(String key){
+		return composeUploadOrderString(key, "");
+	}
+
+	public static String composeUploadOrderString(String key, String vneshniyNomer){
+		SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
 		String request = "";
 		String sql = "select doc.Nomer as Nomer,doc.DataOtgruzki as DataOtgruzki,dgvr.Kod as Kod,kntr.kod as kntr,doc.tipOplaty as tipOplaty,doc.Kommentariy as kommentariy from"//
 				+ "\n ZayavkaPokupatelyaIskhodyaschaya doc"//
@@ -62,7 +63,12 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		System.out.println("composeUploadOrderString " + sql);
 		Bough doc = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		System.out.println("doc " + doc.dumpXML());
-		request = request + "\"ВнешнийНомер\": \"" + doc.child("row").child("Nomer").value.property.value() + "\"";
+		if(vneshniyNomer.length() > 1){
+			request = request + "\"ВнешнийНомер\": \"" + vneshniyNomer + "\"";
+		}else{
+			request = request + "\"ВнешнийНомер\": \"" + doc.child("row").child("Nomer").value.property.value() + "\"";
+		}
+
 		request = request + ",\"ДатаОтгрузки\": \"" + Auxiliary.tryReFormatDate(doc.child("row").child("DataOtgruzki").value.property.value(), "yyyy-MM-dd", "yyyyMMdd") + "\"";
 
 
@@ -70,14 +76,14 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		//String tipOplatyLabel = "ТовЧек";
 		String tipOplatyLabel = "нет типа оплаты";
 		//if (tipOplaty.compareToIgnoreCase("b8a71648be9e99d3492dab9257e5d773") == 0) {
-		if (("x'" + tipOplaty.trim() + "'").compareToIgnoreCase(Cfg.tip_nalichnie) == 0) {
+		if(("x'" + tipOplaty.trim() + "'").compareToIgnoreCase(Cfg.tip_nalichnie) == 0){
 			tipOplatyLabel = "Нал";
-		} else {
+		}else{
 			//if (tipOplaty.compareToIgnoreCase("838d51b55d9490754fb77f3d5fe02c1e") == 0) {
-			if (("x'" + tipOplaty.trim() + "'").compareToIgnoreCase(Cfg.tip_beznal) == 0) {
+			if(("x'" + tipOplaty.trim() + "'").compareToIgnoreCase(Cfg.tip_beznal) == 0){
 				tipOplatyLabel = "БезНал";
-			} else {
-				if (("x'" + tipOplaty.trim() + "'").compareToIgnoreCase(Cfg.tip_tovcheck) == 0) {
+			}else{
+				if(("x'" + tipOplaty.trim() + "'").compareToIgnoreCase(Cfg.tip_tovcheck) == 0){
 					tipOplatyLabel = "ТовЧек";
 				}
 			}
@@ -98,10 +104,10 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		Bough tovar = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		System.out.println("tovar " + tovar.dumpXML());
 
-		if (tovar.children.size() > 0) {
+		if(tovar.children.size() > 0){
 			request = request + ",\"Товары\":[";
-			for (int tc = 0; tc < tovar.children.size(); tc++) {
-				if (tc > 0) {
+			for(int tc = 0; tc < tovar.children.size(); tc++){
+				if(tc > 0){
 					request = request + ",";
 				}
 				Bough row = tovar.children.get(tc);
@@ -112,7 +118,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 				//if (row.child("vidSkidki").value.property.value().trim().toUpperCase().equals("99D730123902D40541B2F8954FE1E089")) {
 				System.out.println("vidSkidki::::::::::" + row.child("vidSkidki").value.property.value() + "::::::::::");
 
-				if (//wrong
+				if(//wrong
 						row.child("vidSkidki").value.property.value().trim().toUpperCase().equals("X'" + Cfg.skidkaIdOldCenovoyeReagirovanie + "'")
 								|| row.child("vidSkidki").value.property.value().trim().toUpperCase().equals("X'" + Cfg.skidkaIdCenovoyeReagirovanie + "'")
 								|| row.child("vidSkidki").value.property.value().trim().toUpperCase().equals("X'" + Cfg.skidkaIdAutoReagirovanie + "'")
@@ -120,15 +126,15 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 								|| row.child("vidSkidki").value.property.value().trim().toUpperCase().equals(Cfg.skidkaIdOldCenovoyeReagirovanie)
 								|| row.child("vidSkidki").value.property.value().trim().toUpperCase().equals(Cfg.skidkaIdCenovoyeReagirovanie)
 								|| row.child("vidSkidki").value.property.value().trim().toUpperCase().equals(Cfg.skidkaIdAutoReagirovanie)
-				) {
+				){
 					request = request + ",\"Цена\": " + row.child("cenaSoSkidkoy").value.property.value() + "";
 					request = request + ",\"ЦР\": true";
-				} else {
-					if (row.child("vidSkidki").value.property.value().trim().toUpperCase().equals("X'" + Cfg.skidkaId_TGCR + "'")
-							|| row.child("vidSkidki").value.property.value().trim().toUpperCase().equals(Cfg.skidkaId_TGCR)) {
+				}else{
+					if(row.child("vidSkidki").value.property.value().trim().toUpperCase().equals("X'" + Cfg.skidkaId_TGCR + "'")
+							|| row.child("vidSkidki").value.property.value().trim().toUpperCase().equals(Cfg.skidkaId_TGCR)){
 						request = request + ",\"Цена\": " + row.child("cenaSoSkidkoy").value.property.value() + "";
 						request = request + ",\"ТГ\": true";
-					} else {
+					}else{
 						request = request + ",\"Цена\": " + row.child("cenaSoSkidkoy").value.property.value() + "";
 						request = request + ",\"ЦР\": false";
 					}
@@ -149,10 +155,10 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		System.out.println("usluga " + usluga.dumpXML());
 
 
-		if (usluga.children.size() > 0) {
+		if(usluga.children.size() > 0){
 			request = request + ",\"Услуги\":[";
-			for (int tc = 0; tc < usluga.children.size(); tc++) {
-				if (tc > 0) {
+			for(int tc = 0; tc < usluga.children.size(); tc++){
+				if(tc > 0){
 					request = request + ",";
 				}
 				Bough row = usluga.children.get(tc);
@@ -172,10 +178,10 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 				+ "\n where doc.nomer='" + key + "'";
 		Bough trafik = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		System.out.println("trafik " + trafik.dumpXML());
-		if (trafik.children.size() > 0) {
+		if(trafik.children.size() > 0){
 			request = request + ",\"Трафики\":[";
-			for (int tc = 0; tc < trafik.children.size(); tc++) {
-				if (tc > 0) {
+			for(int tc = 0; tc < trafik.children.size(); tc++){
+				if(tc > 0){
 					request = request + ",";
 				}
 				Bough row = trafik.children.get(tc);
@@ -190,40 +196,547 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		return request;
 	}
 
-	public static void ___logToFile(String ext, String txt) {
+	public static void ___logToFile(String ext, String txt){
 
-		SimpleDateFormat sqliteTime = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss_SSS");
+		SimpleDateFormat sqliteTime = new SimpleDateFormat("yyyy.showUploadResultMM.dd_HH.mm.ss_SSS");
 		String name = "/sdcard/horeca/log/" + sqliteTime.format(new Date()) + "." + ext;
 		System.out.println("logToFile " + name + ": " + txt);
 		Auxiliary.createAbsolutePathForFile(name);
 		Auxiliary.writeTextToFile(new File(name), txt, "utf-8");
 	}
 
-	private View.OnClickListener nextUploadClick = new OnClickListener() {
+	void showUploadResult(String msg, Bough result){
+		buildDialogResult(msg, result);
+	}
+
+	void buildDialogResult(String msg, Bough result){
+		if(result.child("Сообщение").value.property.value().length() > 0){
+			msg = msg + result.child("Сообщение").value.property.value().trim() + "\n";
+		}
+		ColumnDescription zakazyNomenklatura = new ColumnDescription();
+		final ColumnDescription kolichestvo = new ColumnDescription();
+		Vector<Bough> danniePoZkzm = result.children("ДанныеПоЗаказам");
+		String tableName = "";
+		Vector<String> newArtikuls = new Vector<String>();
+		Vector<String> oldOrders = new Vector<String>();
+		final Vector<Double> newCounts = new Vector<Double>();
+		final Vector<Double> newPrices = new Vector<Double>();
+		Vector<String> newClients = new Vector<String>();
+		int dataRowCounter = 0;
+		int gridCounter = 0;
+		for(int ii = 0; ii < danniePoZkzm.size(); ii++){
+			Bough row = danniePoZkzm.get(ii);
+			double rowStatus = Numeric.string2double(row.child("Статус").value.property.value());
+			String vneshniyNomer = row.child("ВнешнийНомер").value.property.value();
+			String sql = "select ka.kod as kod,ka._idrref as _idrref,ka.naimenovanie as naimenovanie,DataOtgruzki as dataOtgruzki"
+					+ " from ZayavkaPokupatelyaIskhodyaschaya zpi"
+					+ " join Kontragenty ka on ka._idrref=zpi.kontragent"
+					+ " where zpi.nomer='" + vneshniyNomer + "';";
+			Bough data = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+			String kontragent = data.child("row").child("naimenovanie").value.property.value();
+			String kod = data.child("row").child("kod").value.property.value();
+			String dataOtgruzki = data.child("row").child("dataOtgruzki").value.property.value();
+			msg = msg + vneshniyNomer + ": " + kontragent + "\n";
+			if(row.child("Сообщение").value.property.value().length() > 0){
+				msg = msg + row.child("Сообщение").value.property.value().trim() + "\n";
+			}
+			zakazyNomenklatura.cell(kontragent, 0x110000ff, "дата отгрузки " + Auxiliary.tryReFormatDate(dataOtgruzki, "yyyy-MM-dd", "dd.MM.yyyy"));
+			kolichestvo.cell("", 0x110000ff, "");
+			gridCounter++;
+			Vector<Bough> zakazy = row.children("Заказы");
+			for(int ff = 0; ff < zakazy.size(); ff++){
+				String nomer = zakazy.get(ff).child("Номер").value.property.value();
+				String zakazSoobshenie = zakazy.get(ff).child("Сообщение").value.property.value().trim();
+				msg = msg + "№" + nomer + ": " + zakazSoobshenie + "\n";
+				Vector<Bough> nepodtverjdenniePosisii = zakazy.get(ff).children("НеПодтвержденныеПозиции");
+				for(int nn = 0; nn < nepodtverjdenniePosisii.size(); nn++){
+					Bough one = nepodtverjdenniePosisii.get(nn);
+					String[] nomenklatura = one.child("Номенклатура").value.property.value().split(",");
+					String art = nomenklatura[0];
+					String name = one.child("Номенклатура").value.property.value();
+					String kolZakazano = one.child("КоличествоЗаказано").value.property.value();
+					String kolPodtverjseno = one.child("КоличествоПодтверждено").value.property.value();
+					String txt = one.child("Текст").value.property.value();
+					if(nomenklatura.length > 0){
+						name = nomenklatura[1];
+					}
+					msg = msg + "не подтвержден " + " арт." + art + " " + name + ", " + kolPodtverjseno + " из " + kolZakazano + " " + txt + "\n";
+					zakazyNomenklatura.cell(name, 0x11000000, "арт." + art + ": заказано " + kolZakazano + " подверждено " + kolPodtverjseno + ", цена " + 12.34 + "р.");
+					kolichestvo.cell("", 0x11000000, "");
+					gridCounter++;
+					Vector<Bough> analogi = one.children("Аналоги");
+					for(int aa = 0; aa < analogi.size(); aa++){
+						Bough analog = analogi.get(aa);
+						final String anart = analog.child("Артикул").value.property.value();
+						final String ananame = analog.child("Наименование").value.property.value();
+						final int rowNum = dataRowCounter;
+						final int gridNum = gridCounter;
+						Task tap = new Task(){
+							@Override
+							public void doTask(){
+								/*newCounts.set(rowNum, newCounts.get(rowNum) + 1);
+								kolichestvo.strings.set(rowNum, "" + newCounts.get(rowNum));
+								kolichestvo.descriptions.set(rowNum, "/" + newCounts.get(rowNum));
+								kolichestvo.update(rowNum);*/
+								//ZayavkaPokupatelya_Foodstaff zayavkaPokupatelya_Foodstaff = mBidData.getFoodStuffs().getFoodstuff(position);
+
+								String sql = "select"//
+										+ "\n 		zp._id as _id"//
+										+ "\n 		,zp._idrref as _idrref"//
+										+ "\n 		,zp.data as data"//
+										+ "\n 		,zp.nomer as nomer"//
+										+ "\n 		,zp.dataOtgruzki as dataOtgruzki"//
+										+ "\n 		,zp.proveden as proveden"//
+										+ "\n 		,zp.dogovorKontragenta as dogovorKontragenta"//
+										+ "\n 		,zp.summaDokumenta as summaDokumenta"//
+										+ "\n 		,zp.kontragent as kontragent"//
+										+ "\n 		,zp.kommentariy as kommentariy"//
+										+ "\n 		,zp.tipOplaty as tipOplaty"//
+										+ "\n 		,zp.sebestoimost as sebestoimost"//
+										+ "\n 		,kntr.Naimenovanie as kontragentNaimenovanie"//
+										+ "\n 		,kntr._idrref as kontragent_idrref"//
+										+ "\n 		,kntr.kod as kontragent_kod"//
+										+ "\n 		,dk.Naimenovanie as dogovorNaimenovanie"//
+										+ "\n 		,tiO._idrref as tip_idrref"//
+										+ "\n 		,tiO.Poryadok as poryadok"//
+										+ "\n 	from [ZayavkaPokupatelyaIskhodyaschaya] zp"//
+										+ "\n 		join Kontragenty kntr on zp.[Kontragent] = kntr.[_idrref]"//
+										+ "\n 		left join TipyOplaty tiO on zp.[TipOplaty] = tiO._IDRRef"//
+										+ "\n 		left join DogovoryKontragentov dk on zp.[DogovorKontragenta] = dk.[_IDRRef]"//
+										+ "\n 	where zp.[nomer] = '" + oldOrders.get(rowNum) + "'"//
+										//+ "\n 	order by date(zp.dataOtgruzki) desc, zp._id desc"//
+										//+ "\n 	limit 77"//
+										+ "\n 	;";
+								Bough data = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+								//System.out.println(sql);
+								//System.out.println(data.dumpXML());
+								String dataOtgruzki = data.child("row").child("dataOtgruzki").value.property.value();
+								String clientID = "x'" + data.child("row").child("kontragent_idrref").value.property.value() + "'";
+
+								ClientInfo clientInfo = new ClientInfo(mDB, clientID);
+								ApplicationHoreca.getInstance().setClientInfo(clientInfo);
+								String polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
+								String sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
+								sql = Request_NomenclatureBase.composeSQL(//
+										dataOtgruzki//
+										, clientID//
+										, polzovatelID//
+										, ""//
+										, ""//
+										, anart
+										, ISearchBy.SEARCH_ARTICLE//
+										, false//
+										, false//
+										, sklad//
+										, 200//
+										, 0, false, false, false, null, null, false);
+								Bough found = Auxiliary.fromCursor(mDB.rawQuery(sql, null)).child("row");
+								double CENA = Numeric.string2double(found.child("Cena").value.property.value());
+								double SKIDKA = Numeric.string2double(found.child("Skidka").value.property.value());
+								String VID_SKIDKI = found.child("VidSkidki").value.property.value();
+								double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
+								ZayavkaPokupatelya_Foodstaff zayavkaPokupatelya_Foodstaff = new ZayavkaPokupatelya_Foodstaff(
+										0
+										, 0
+										, "x'" + found.child("_IDRRef").value.property.value() + "'"
+										, found.child("Artikul").value.property.value().trim()
+										, found.child("Naimenovanie").value.property.value()
+										, ""
+										, found.child("EdinicyIzmereniyaID").value.property.value()
+										, found.child("EdinicyIzmereniyaNaimenovanie").value.property.value()
+										, 0.0
+										, 0.0
+										, CENA
+										, CENA_SO_SKIDKOY
+										, Numeric.string2double(found.child("MinCena").value.property.value())
+										, Numeric.string2double(found.child("MaxCena").value.property.value())
+										, SKIDKA
+										, VID_SKIDKI
+										, Numeric.string2double(found.child("MinNorma").value.property.value())//
+										, Numeric.string2double(found.child("Koephphicient").value.property.value())//
+										, Numeric.string2double(found.child("BasePrice").value.property.value())//
+										, Numeric.string2double(found.child("LastPrice").value.property.value())//
+										, true
+								);
+								BetterPopupWindow.OnCloseListener mOnPopupClose = new BetterPopupWindow.OnCloseListener(){
+									public void onClose(int param){
+										System.out.println("BetterPopupWindow.OnCloseListenerюonClose: " + param
+												+": "+ zayavkaPokupatelya_Foodstaff.getCenaSoSkidkoy()
+												+": "+zayavkaPokupatelya_Foodstaff.getKolichestvo()
+												+": "+zayavkaPokupatelya_Foodstaff.isCRAvailable()
+										);
+										newCounts.set(rowNum, zayavkaPokupatelya_Foodstaff.getKolichestvo());
+										newPrices.set(rowNum, zayavkaPokupatelya_Foodstaff.getCenaSoSkidkoy());
+										kolichestvo.strings.set(gridNum, "" + newCounts.get(rowNum));
+										kolichestvo.descriptions.set(gridNum,  newPrices.get(rowNum)+"р");
+										kolichestvo.update(gridNum);
+									}
+								};
+								Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(
+										//Activity_UploadBids.this.mList
+										Activity_UploadBids.this.lastDialogView
+										, mOnPopupClose
+										, zayavkaPokupatelya_Foodstaff);
+								popup.showLikeQuickAction();
+							}
+						};
+						zakazyNomenklatura.cell("&nbsp;↳&nbsp;" + ananame
+								, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "арт." + anart + ", цена " + 222.333
+						);
+						kolichestvo.cell("0.0", tap, "");
+						dataRowCounter++;
+						gridCounter++;
+						newArtikuls.add(anart);
+						newCounts.add(0.0);
+						newPrices.add(0.0);
+						newClients.add(kod);
+						oldOrders.add(vneshniyNomer);
+						tableName = "Замена на аналог";
+					}
+				}
+			}
+			if(rowStatus > 0){
+				sql = "update ZayavkaPokupatelyaIskhodyaschaya set proveden=x'01' where nomer='" + vneshniyNomer.trim() + "';";
+				mDB.execSQL(sql);
+			}else{
+				//
+			}
+			msg = msg + "\n";
+		}
+		String buttonTitle = null;
+		Task buttonAction = null;
+		if(newArtikuls.size() > 0){
+			buttonTitle = "Добавить заказы с аналогами";
+			buttonAction = new Task(){
+				@Override
+				public void doTask(){
+					createZakazAnalog(newArtikuls, newCounts, newPrices,newClients, oldOrders);
+				}
+			};
+		}
+		SubLayoutless subLayoutless=new SubLayoutless(this) ;
+		lastDialogView=subLayoutless;
+		AlertDialog alertDialog=Auxiliary.pick(this, ""
+				,subLayoutless.child(new Decor(this)
+						.labelText.is(msg)
+						.left().is(Auxiliary.tapSize * 0.5)
+						.top().is(Auxiliary.tapSize * 0.5)
+						.width().is(Auxiliary.tapSize * 13)
+						.height().is(Auxiliary.tapSize * 5))//
+						.child(new DataGrid2(this).columns(
+								new Column[]{
+										zakazyNomenklatura.title.is("Заказы/Номенклатура").width.is(17.5 * Auxiliary.tapSize)
+										, kolichestvo.title.is("Кол-во").width.is(1.5 * Auxiliary.tapSize)
+								})
+								.left().is(Auxiliary.tapSize * 0)
+								.top().is(Auxiliary.tapSize * 5.5)
+								.width().is(Auxiliary.tapSize * 19)
+								.height().is(Auxiliary.tapSize * 5.5))
+						.width().is(Auxiliary.tapSize * 19)//
+						.height().is(Auxiliary.tapSize * 12)
+				, buttonTitle, buttonAction
+				, null, null, null, null);
+
+	}
+
+	void createZakazAnalog(Vector<String> newArtikuls, Vector<Double> newCounts, Vector<Double> newPrices, Vector<String> newClients, Vector<String> oldOrders){
+		HashMap<String, BidData> orders = new HashMap<String, BidData>();
+		for(int ii = 0; ii < newArtikuls.size(); ii++){
+			if(newCounts.get(ii) > 0){
+				BidData bidData = orders.get(oldOrders.get(ii));
+				if(bidData == null){
+					String sql = "select"//
+							+ "\n 		zp._id as _id"//
+							+ "\n 		,zp._idrref as _idrref"//
+							+ "\n 		,zp.data as data"//
+							+ "\n 		,zp.nomer as nomer"//
+							+ "\n 		,zp.dataOtgruzki as dataOtgruzki"//
+							+ "\n 		,zp.proveden as proveden"//
+							+ "\n 		,zp.dogovorKontragenta as dogovorKontragenta"//
+							+ "\n 		,zp.summaDokumenta as summaDokumenta"//
+							+ "\n 		,zp.kontragent as kontragent"//
+							+ "\n 		,zp.kommentariy as kommentariy"//
+							+ "\n 		,zp.tipOplaty as tipOplaty"//
+							+ "\n 		,zp.sebestoimost as sebestoimost"//
+							+ "\n 		,kntr.Naimenovanie as kontragentNaimenovanie"//
+							+ "\n 		,kntr._idrref as kontragent_idrref"//
+							+ "\n 		,kntr.kod as kontragent_kod"//
+							+ "\n 		,dk.Naimenovanie as dogovorNaimenovanie"//
+							+ "\n 		,tiO._idrref as tip_idrref"//
+							+ "\n 		,tiO.Poryadok as poryadok"//
+							+ "\n 	from [ZayavkaPokupatelyaIskhodyaschaya] zp"//
+							+ "\n 		join Kontragenty kntr on zp.[Kontragent] = kntr.[_idrref]"//
+							+ "\n 		left join TipyOplaty tiO on zp.[TipOplaty] = tiO._IDRRef"//
+							+ "\n 		left join DogovoryKontragentov dk on zp.[DogovorKontragenta] = dk.[_IDRRef]"//
+							+ "\n 	where zp.[nomer] = '" + oldOrders.get(ii) + "'"//
+							//+ "\n 	order by date(zp.dataOtgruzki) desc, zp._id desc"//
+							//+ "\n 	limit 77"//
+							+ "\n 	;";
+					Bough data = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+					Bough row = data.child("row");
+					Calendar chosedDay = Calendar.getInstance();
+					chosedDay.setTimeInMillis(DateTimeHelper.SQLDateToDate(row.child("dataOtgruzki").value.property.value()).getTime());
+					ClientInfo clientInfo = new ClientInfo(mDB, "x'" + row.child("kontragent").value.property.value() + "'");
+					ZayavkaPokupatelya zayavkaPokupatelya = new ZayavkaPokupatelya(mDB, clientInfo, chosedDay);
+					zayavkaPokupatelya.setContract("x'" + row.child("dogovorKontragenta").value.property.value() + "'");
+					zayavkaPokupatelya.setTipOplaty("x'" + row.child("tipOplaty").value.property.value() + "'");
+					bidData = new BidData();
+					bidData.setBid(zayavkaPokupatelya);
+					bidData.setFoodStuffs(new FoodstuffsData(mDB, zayavkaPokupatelya));
+					bidData.setClientID(zayavkaPokupatelya.getClientID());
+					orders.put(oldOrders.get(ii), bidData);
+				}
+				ClientInfo clientInfo = new ClientInfo(mDB, bidData.getClientID());
+				ApplicationHoreca.getInstance().setClientInfo(clientInfo);
+				String dataOtgruzki = Auxiliary.sqliteDate.format(bidData.getBid().getShippingDate());
+				String clientID = bidData.getClientID();
+				String polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
+				String sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
+				String sql = Request_NomenclatureBase.composeSQL(//
+						dataOtgruzki//
+						, clientID//
+						, polzovatelID//
+						, ""//
+						, ""//
+						, newArtikuls.get(ii).trim()
+						, ISearchBy.SEARCH_ARTICLE//
+						, false//
+						, false//
+						, sklad//
+						, 200//
+						, 0, false, false, false, null, null, false);
+				Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+				Bough found = bb.child("row");
+				double CENA = Numeric.string2double(found.child("Cena").value.property.value());
+				double SKIDKA = Numeric.string2double(found.child("Skidka").value.property.value());
+				String VID_SKIDKI = found.child("VidSkidki").value.property.value();
+				double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
+				bidData.getFoodStuffs().newFoodstuff(
+						"x'" + found.child("_IDRRef").value.property.value() + "'"//
+						, found.child("Artikul").value.property.value().trim()//
+						, found.child("Naimenovanie").value.property.value()//
+						, "x'" + found.child("EdinicyIzmereniyaID").value.property.value() + "'"//
+						, found.child("EdinicyIzmereniyaNaimenovanie").value.property.value()//
+						, newCounts.get(ii) //Numeric.string2double(existed.child("Количество" ).value.property.value())//
+						, CENA//
+						, newPrices.get(ii)//CENA_SO_SKIDKOY//
+						, Numeric.string2double(found.child("MinCena").value.property.value())//
+						, Numeric.string2double(found.child("MaxCena").value.property.value())//
+						, SKIDKA//
+						, VID_SKIDKI//
+						, Numeric.string2double(found.child("MinNorma").value.property.value())//
+						, Numeric.string2double(found.child("Koephphicient").value.property.value())//
+						, Numeric.string2double(found.child("BasePrice").value.property.value())//
+						, Numeric.string2double(found.child("LastPrice").value.property.value())//
+				);
+			}
+		}
+		BidData createdBidData = null;
+		for(Map.Entry<String, BidData> entry: orders.entrySet()){
+			createdBidData = entry.getValue();
+			ClientInfo clientInfo = new ClientInfo(mDB, createdBidData.getClientID());
+			ApplicationHoreca.getInstance().setClientInfo(clientInfo);
+			createdBidData.getBid().setSumma(createdBidData.getFoodStuffs().getAmount());
+			createdBidData.getBid().writeToDataBase(mDB);
+			createdBidData.getFoodStuffs().WriteToDataBase(mDB);
+		}
+		if(createdBidData != null){
+			System.out.println("open " + createdBidData);
+			ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
+			ClientInfo clientInfo = new ClientInfo(mDB, createdBidData.getClientID());
+			ApplicationHoreca.getInstance().setClientInfo(clientInfo);
+			Intent intent = new Intent();
+			intent.setClass(Activity_UploadBids.this, Activity_Bid.class);
+			intent.putExtra("client_id", createdBidData.getClientID());
+			intent.putExtra("ZayavkaPokupatelya", createdBidData.getBid());
+			this.startActivity(intent);
+		}
+	}
+
+	void _testResponse(){
+		String json = "{\n" +
+				"	\"Статус\": 1,\n" +
+				"	\"Сообщение\": \"\",\n" +
+				"	\"ДанныеПоЗаказам\": [{\n" +
+				//"			\"ВнешнийНомер\": \"HRC703-1121085526106\",\n" +
+				"			\"ВнешнийНомер\": \"HRC238-1123141608740\",\n" +
+				"			\"Статус\": 1,\n" +
+				"			\"Сообщение\": \"\",\n" +
+				"			\"Заказы\": [{\n" +
+				"					\"Номер\": \"12-2346019\",\n" +
+				"					\"Тип\": \"Заказ покупателя\",\n" +
+				"					\"Статус\": 2,\n" +
+				"					\"Сообщение\": \"При сохранении заказа изменились цены: \\nарт.110995 Филе грудки куриное зам. монолит Особое Богородские Деликатесы ~ 12 кг - с 374,9 на 357,1; \\n\",\n" +
+				"					\"НеПодтвержденныеПозиции\": [{\n" +
+				"							\"Номенклатура\": \"111444, ыыеире11444 \",\n" +
+				"							\"КоличествоЗаказано\": 6,\n" +
+				"							\"КоличествоДефицит\": 6,\n" +
+				"							\"КоличествоПодтверждено\": 0,\n" +
+				"							\"ДатаПоступления\": \"20231122\",\n" +
+				"							\"Текст\": \"тестирование\",\n" +
+				"							\"Аналоги\": [{\n" +
+				"									\"Артикул\": \"112025\",\n" +
+				"									\"Наименование\": \" 112025ыиыиекыиеыки\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}, {\n" +
+				"									\"Артикул\": \"63172\",\n" +
+				"									\"Наименование\": \" 63172гщюдргшбп ьпно\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}\n" +
+				"							]\n" +
+				"						}\n" +
+				"					],\n" +
+				"					\"ДругиеЦены\": [{\n" +
+				"							\"Артикул\": \"105526\",\n" +
+				"							\"Наименование\": \"105526вановкено\",\n" +
+				"							\"ЦенаБыло\": 374.9,\n" +
+				"							\"ЦенаЗаказа\": 357.1\n" +
+				"						}\n" +
+				"					]\n" +
+				"				}\n" +
+				"				,{\n" +
+				"					\"Номер\": \"12-2346019\",\n" +
+				"					\"Тип\": \"Заказ покупателя\",\n" +
+				"					\"Статус\": 2,\n" +
+				"					\"Сообщение\": \"При сохранении заказа изменились цены: \\nарт.110995 Филе грудки куриное зам. монолит Особое Богородские Деликатесы ~ 12 кг - с 374,9 на 357,1; \\n\",\n" +
+				"					\"НеПодтвержденныеПозиции\": [{\n" +
+				"							\"Номенклатура\": \"109203, Сайра Ультрамарин натуральная с ключом ГОСТ 7452-2014 240 гр \",\n" +
+				"							\"КоличествоЗаказано\": 6,\n" +
+				"							\"КоличествоДефицит\": 6,\n" +
+				"							\"КоличествоПодтверждено\": 0,\n" +
+				"							\"ДатаПоступления\": \"20231122\",\n" +
+				"							\"Текст\": \"тестирование\",\n" +
+				"							\"Аналоги\": [{\n" +
+				"									\"Артикул\": \"115419\",\n" +
+				"									\"Наименование\": \" Бульон Говяжий Dinner Service Халяль 2кг\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}, {\n" +
+				"									\"Артикул\": \"115419\",\n" +
+				"									\"Наименование\": \" Бульон Говяжий Dinner Service Халяль 2кг\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}\n" +
+				"							]\n" +
+				"						}\n" +
+				"					],\n" +
+				"					\"ДругиеЦены\": [{\n" +
+				"							\"Артикул\": \"110995\",\n" +
+				"							\"Наименование\": \"Филе грудки куриное зам. монолит Особое Богородские Деликатесы ~ 12 кг\",\n" +
+				"							\"ЦенаБыло\": 374.9,\n" +
+				"							\"ЦенаЗаказа\": 357.1\n" +
+				"						}\n" +
+				"					]\n" +
+				"				}\n" +
+				"			]\n" +
+				"		}\n" +
+				"		,{\n" +
+				//"			\"ВнешнийНомер\": \"HRC703-1121085526106\",\n" +
+				"			\"ВнешнийНомер\": \"HRC238-1128073846554\",\n" +
+				"			\"Статус\": 1,\n" +
+				"			\"Сообщение\": \"\",\n" +
+				"			\"Заказы\": [{\n" +
+				"					\"Номер\": \"12-2346019\",\n" +
+				"					\"Тип\": \"Заказ покупателя\",\n" +
+				"					\"Статус\": 2,\n" +
+				"					\"Сообщение\": \"При сохранении заказа изменились цены: \\nарт.110995 Филе грудки куриное зам. монолит Особое Богородские Деликатесы ~ 12 кг - с 374,9 на 357,1; \\n\",\n" +
+				"					\"НеПодтвержденныеПозиции\": [{\n" +
+				"							\"Номенклатура\": \"111444, ыыеире11444 \",\n" +
+				"							\"КоличествоЗаказано\": 6,\n" +
+				"							\"КоличествоДефицит\": 6,\n" +
+				"							\"КоличествоПодтверждено\": 0,\n" +
+				"							\"ДатаПоступления\": \"20231122\",\n" +
+				"							\"Текст\": \"тестирование\",\n" +
+				"							\"Аналоги\": [{\n" +
+				"									\"Артикул\": \"112025\",\n" +
+				"									\"Наименование\": \" 112025ыиыиекыиеыки\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}, {\n" +
+				"									\"Артикул\": \"63172\",\n" +
+				"									\"Наименование\": \" 63172гщюдргшбп ьпно\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}\n" +
+				"							]\n" +
+				"						}\n" +
+				"					],\n" +
+				"					\"ДругиеЦены\": [{\n" +
+				"							\"Артикул\": \"105526\",\n" +
+				"							\"Наименование\": \"105526вановкено\",\n" +
+				"							\"ЦенаБыло\": 374.9,\n" +
+				"							\"ЦенаЗаказа\": 357.1\n" +
+				"						}\n" +
+				"					]\n" +
+				"				}\n" +
+				"				,{\n" +
+				"					\"Номер\": \"12-2346019\",\n" +
+				"					\"Тип\": \"Заказ покупателя\",\n" +
+				"					\"Статус\": 2,\n" +
+				"					\"Сообщение\": \"При сохранении заказа изменились цены: \\nарт.110995 Филе грудки куриное зам. монолит Особое Богородские Деликатесы ~ 12 кг - с 374,9 на 357,1; \\n\",\n" +
+				"					\"НеПодтвержденныеПозиции\": [{\n" +
+				"							\"Номенклатура\": \"109203, Сайра Ультрамарин натуральная с ключом ГОСТ 7452-2014 240 гр \",\n" +
+				"							\"КоличествоЗаказано\": 6,\n" +
+				"							\"КоличествоДефицит\": 6,\n" +
+				"							\"КоличествоПодтверждено\": 0,\n" +
+				"							\"ДатаПоступления\": \"20231122\",\n" +
+				"							\"Текст\": \"тестирование\",\n" +
+				"							\"Аналоги\": [{\n" +
+				"									\"Артикул\": \"115419\",\n" +
+				"									\"Наименование\": \" Бульон Говяжий Dinner Service Халяль 2кг\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}, {\n" +
+				"									\"Артикул\": \"115419\",\n" +
+				"									\"Наименование\": \" Бульон Говяжий Dinner Service Халяль 2кг\",\n" +
+				"									\"ДоступноеКоличество\": 91\n" +
+				"								}\n" +
+				"							]\n" +
+				"						}\n" +
+				"					],\n" +
+				"					\"ДругиеЦены\": [{\n" +
+				"							\"Артикул\": \"110995\",\n" +
+				"							\"Наименование\": \"Филе грудки куриное зам. монолит Особое Богородские Деликатесы ~ 12 кг\",\n" +
+				"							\"ЦенаБыло\": 374.9,\n" +
+				"							\"ЦенаЗаказа\": 357.1\n" +
+				"						}\n" +
+				"					]\n" +
+				"				}\n" +
+				"			]\n" +
+				"		}\n" +
+				"	]\n" +
+				"}";
+		Bough data = Bough.parseJSON(json);
+		//String msg =
+		showUploadResult("test\n", data);
+		//System.out.println(msg);
+	}
+
+
+	private View.OnClickListener nextUploadClick = new OnClickListener(){
 		@Override
-		public void onClick(View v) {
+		public void onClick(View v){
 			System.out.println("start upload bids");
-			((Button) findViewById(R.id.btn_upload)).setEnabled(false);
+			((Button)findViewById(R.id.btn_upload)).setEnabled(false);
+			/*testResponse();
+			if(1 == 1){
+				return;
+			}*/
 /*
 			if(!(v==null)){
 				Auxiliary.alertBreak("p[robe msg",Activity_UploadBids.this);
 				System.out.println("test");
 			}*/
 
-			if (!SystemHelper.IsNetworkAvailable(Activity_UploadBids.this)) {
+			if(!SystemHelper.IsNetworkAvailable(Activity_UploadBids.this)){
 				Auxiliary.warn("Нет подключения к сети. Проверьте инет.", Activity_UploadBids.this);
 				return;
 			}
 			ArrayList<Boolean> stateList = mListAdapter.getStateList();
 			int count = stateList.size();
 			boolean documentsSelected = false;
-			for (int i = 0; i < count; i++) {
-				if (stateList.get(i)) {
+			for(int i = 0; i < count; i++){
+				if(stateList.get(i)){
 					documentsSelected = true;
 					break;
 				}
 			}
-			if (!documentsSelected) {
+			if(!documentsSelected){
 				Auxiliary.warn("Не выбран ни один документ.", Activity_UploadBids.this);
 				return;
 			}
@@ -232,15 +745,15 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 			SimpleDateFormat toDate = new SimpleDateFormat("yyyyMMdd");
 			int docCount = 0;
 			String request = "[";
-			for (int i = 0; i < count; i++) {
-				if (stateList.get(i)) {
+			for(int i = 0; i < count; i++){
+				if(stateList.get(i)){
 					Cursor cursor = mListAdapter.getCursor();
 					cursor.moveToPosition(i);
 					String key = Request_Bids.getNomer(cursor);
 					System.out.println("key " + key);
-					if (docCount > 0) {
+					if(docCount > 0){
 						request = request + ",{";
-					} else {
+					}else{
 						request = request + "{";
 					}
 
@@ -265,14 +778,14 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 
 			//System.out.println(Cfg.hrcPersonalLogin+": "+Cfg.hrcPersonalPassword+": "+url);
 			final Bough result = new Bough();
-			final String post //="[{\n" + "\t\t\"ВнешнийНомер\": \"0930062645330\",\n" + "\t\t\"ДатаОтгрузки\": \"20171024\",\n" + "\t\t\"ТипОплаты\": \"БезНал\",\n" + "\t\t\"КодДоговора\": \"27364\",\n" + "\t\t\"КодКонтрагента\": 80075,\n" + "\t\t\"Товары\": [{\n" + "\t\t\t\t\"Артикул\": \"78411\",\n" + "\t\t\t\t\"Количество\": 500\n" + "\t\t\t}\n" + "\t\t]\n" + "\t}\n" + "]";
+			final String post //="[{\n" + "		\"ВнешнийНомер\": \"0930062645330\",\n" + "		\"ДатаОтгрузки\": \"20171024\",\n" + "		\"ТипОплаты\": \"БезНал\",\n" + "		\"КодДоговора\": \"27364\",\n" + "		\"КодКонтрагента\": 80075,\n" + "		\"Товары\": [{\n" + "				\"Артикул\": \"78411\",\n" + "				\"Количество\": 500\n" + "			}\n" + "		]\n" + "	}\n" + "]";
 					= request;
 			//logToFile("post.json", request);
-			new Expect().task.is(new Task() {
+			new Expect().task.is(new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					System.out.println("post: " + post);
-					try {
+					try{
 						//Bough txt = Auxiliary.loadTextFromPOST(url, post, 300 * 1000, "UTF-8");
 						//Bough txt = Auxiliary.loadTextFromPrivatePOST(url, post, 300 * 1000, "UTF-8","hrc429","123nop");
 						Bough txt = Auxiliary.loadTextFromPrivatePOST(url, post, 300 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
@@ -280,26 +793,33 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 						System.out.println("post result is " + txt.dumpXML());
 						//result.child("response").value.is(txt);
 						result.children.add(txt);
-					} catch (Throwable t) {
+					}catch(Throwable t){
 						t.printStackTrace();
 					}
 				}
 			})//
-					.afterDone.is(new Task() {
+					.afterDone.is(new Task(){
 				@Override
-				public void doTask() {
-					String msg = "";
+				public void doTask(){
+					//String msg = "";
 					System.out.println("afterDone");
-					try {
+					try{
 						String response = result.child("result").child("raw").value.property.value();
 						//logToFile("response.json", response);
-						Bough b = Bough.parseJSONorThrow(response);
+						Bough bb = Bough.parseJSONorThrow(response);
 						//Bough b = Bough.parseJSON(result.child("result").child("raw").value.property.value());
 						//System.out.println("result is "+result);
-						//System.out.println("b is "+b.dumpXML());
-						if (b.children.size() > 0) {
-							msg = msg + "Выгрузка (" + result.child("result").child("code").value.property.value() + ", " + result.child("result").child("message").value.property.value() + "):\n" + b.child("Сообщение").value.property.value() + "\n";
-							Vector<Bough> forOrders = b.children("ДанныеПоЗаказам");
+						System.out.println("bb is " + bb.dumpXML());
+						if(bb.children.size() > 0){
+
+							//Vector<Bough> forOrders = bb.children("ДанныеПоЗаказам");
+
+							String msg = "Выгрузка (" + result.child("result").child("code").value.property.value()
+									+ ", " + result.child("result").child("message").value.property.value() + "):\n"
+									+ bb.child("Сообщение").value.property.value();
+							showUploadResult(msg, bb);
+							/*
+							Vector<Bough> forOrders = bb.children("ДанныеПоЗаказам");
 							for (int rr = 0; rr < forOrders.size(); rr++) {
 								Bough row = forOrders.get(rr);
 								//System.out.println("row " + row.dumpXML());
@@ -343,20 +863,22 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 									mDB.execSQL(sql);
 								}
 							}
-						} else {
+*/
+						}else{
 							System.out.println("Empty " + result.dumpXML());
-							msg = msg + " \nВозможны ошибки при выгрузке" //+ result.dumpXML();
+							String msg = " \nВозможны ошибки при выгрузке" //+ result.dumpXML();
 									+ "\n\nПроверьте статус заказов в отчёте, возможно необходимо удалить повторы"//
 									+ "\n\nТекст ответа:"//
 									+ result.dumpXML().substring(0, 160).replace("\n", "").replace("  ", " ");
+							Auxiliary.alertBreak(msg, Activity_UploadBids.this);
 						}
-					} catch (Throwable t) {
-						msg = msg + "/ Ошибка /" + t.toString() + "/" //
-						;
+					}catch(Throwable t){
+						String msg = "/ Ошибка /" + t.toString() + "/";
+						Auxiliary.alertBreak(msg, Activity_UploadBids.this);
 					}
 
 					//Auxiliary.warn(msg, Activity_UploadBids.this);
-					Auxiliary.alertBreak(msg, Activity_UploadBids.this);
+
 					Requery();
 				}
 			})//
@@ -366,31 +888,31 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 			System.out.println("done upload bids");
 		}
 	};
-	private View.OnClickListener mUploadClick = new OnClickListener() {
+	private View.OnClickListener mUploadClick = new OnClickListener(){
 		@Override
-		public void onClick(View v) {
+		public void onClick(View v){
 			System.out.println("------------------");
-			if (!SystemHelper.IsNetworkAvailable(Activity_UploadBids.this)) {
+			if(!SystemHelper.IsNetworkAvailable(Activity_UploadBids.this)){
 				CreateErrorDialog(R.string.network_isnot_available).show();
 				return;
 			}
 			ArrayList<Boolean> stateList = mListAdapter.getStateList();
 			int count = stateList.size();
 			boolean documentsSelected = false;
-			for (int i = 0; i < count; i++) {
-				if (stateList.get(i)) {
+			for(int i = 0; i < count; i++){
+				if(stateList.get(i)){
 					documentsSelected = true;
 					break;
 				}
 			}
-			if (!documentsSelected) {
+			if(!documentsSelected){
 				CreateErrorDialog(R.string.documents_not_selected).show();
 				return;
 			}
 			ArrayList<NomenclatureBasedDocument> dataRequestList = new ArrayList<NomenclatureBasedDocument>();
 			Cursor cursor = null;
-			for (int i = 0; i < count; i++) {
-				if (stateList.get(i)) {
+			for(int i = 0; i < count; i++){
+				if(stateList.get(i)){
 					cursor = mListAdapter.getCursor();
 					cursor.moveToPosition(i);
 					String key = Request_Bids.getNomer(cursor);
@@ -398,7 +920,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 					/*System.out.println("key: "+key);
 					System.out.println(keys.length);
 					System.out.println(key.split("п").length);*/
-					if (keys.length > 1) {
+					if(keys.length > 1){
 						key = keys[keys.length - 1];
 					}
 					key = key.trim();
@@ -431,15 +953,15 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	};
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		setContentView(R.layout.act_bids_upload);
 		super.onCreate(savedInstanceState);
 		setTitle("Выгрузка заявок на заказы");
 		InitializeControls();
 	}
 
-	private void InitializeControls() {
-		mCheckAll = (ImageView) findViewById(R.id.check_all);
+	private void InitializeControls(){
+		mCheckAll = (ImageView)findViewById(R.id.check_all);
 		mCheckAll.setImageResource(android.R.drawable.checkbox_off_background);//.checkbox_on_background);
 		mCheckAll.setTag(Boolean.FALSE);//.TRUE);
 		mCheckAll.setOnClickListener(this);
@@ -454,29 +976,29 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		} else {
 			((Button) findViewById(R.id.btn_upload)).setOnClickListener(mUploadClick);
 		}*/
-		((Button) findViewById(R.id.btn_upload)).setOnClickListener(nextUploadClick);
+		((Button)findViewById(R.id.btn_upload)).setOnClickListener(nextUploadClick);
 		//((Button) findViewById(R.id.btn_upload)).setOnClickListener(mUploadClick);
 		InitializeListView();
 	}
 
-	private void InitializeListView() {
-		mList = (ListView) findViewById(R.id.list_bids);
+	private void InitializeListView(){
+		mList = (ListView)findViewById(R.id.list_bids);
 		mListAdapter = new UploadBidsListAdapter(this, Request_Bids.RequestPeriod(mDB, DateTimeHelper.SQLDateString(mFromPeriod.getTime()), DateTimeHelper.SQLDateString(mToPeriod.getTime()), true), this);
 		mList.setAdapter(mListAdapter);
 		mList.setOnTouchListener(this);
 	}
 
 	@Override
-	public void update(Observable observable, Object data) {
-		String result = ((Bundle) data).getString(ManagedAsyncTask.RESULT_STRING);
-		if (result != null) {
+	public void update(Observable observable, Object data){
+		String result = ((Bundle)data).getString(ManagedAsyncTask.RESULT_STRING);
+		if(result != null){
 			LogHelper.debug(this.getClass().getCanonicalName() + ".update: " + this.getString(R.string.confirm));
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setTitle(R.string.confirm);
 			builder.setMessage(result);
-			builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+			builder.setNegativeButton("OK", new DialogInterface.OnClickListener(){
 				@Override
-				public void onClick(DialogInterface dialog, int arg1) {
+				public void onClick(DialogInterface dialog, int arg1){
 					dialog.dismiss();
 					Requery();
 				}
@@ -486,18 +1008,18 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	}
 
 	@Override
-	public void onClick(View v) {
+	public void onClick(View v){
 		boolean newState = false;
 		ArrayList<Boolean> stateList = mListAdapter.getStateList();
-		if ((Boolean) mCheckAll.getTag()) {
+		if((Boolean)mCheckAll.getTag()){
 			newState = false;
 			mCheckAll.setImageResource(android.R.drawable.checkbox_off_background);
-		} else {
+		}else{
 			newState = true;
 			mCheckAll.setImageResource(android.R.drawable.checkbox_on_background);
 		}
 		int count = stateList.size();
-		for (int i = 0; i < count; i++) {
+		for(int i = 0; i < count; i++){
 			stateList.set(i, newState);
 		}
 		mCheckAll.setTag(newState);
@@ -522,11 +1044,11 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		Requery();
 	}*/
 	@Override
-	protected void OnDateChanged(Date fromDate, Date toDate) {
+	protected void OnDateChanged(Date fromDate, Date toDate){
 		Requery();
 	}
 
-	private void Requery() {
+	private void Requery(){
 		System.out.println("showUploaded " + showUploaded);
 		mListAdapter.changeCursor(Request_Bids//
 				.RequestPeriod(mDB//
@@ -538,19 +1060,19 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	}
 
 	@Override
-	public void onChange() {
+	public void onChange(){
 		//setCheckAllState();
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		menuOtchety = menu.add("Отчёты");
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item == menuOtchety) {
+	public boolean onOptionsItemSelected(MenuItem item){
+		if(item == menuOtchety){
 			Intent intent = new Intent();
 			intent.setClass(this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
 			startActivity(intent);

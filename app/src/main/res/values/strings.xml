@@ -123,7 +123,7 @@
 	<string name="noncash">Безналичная</string>
 	<string name="cash_memo">Товарный чек</string>
 	<string name="msg_reserve_db">Создание резервной копии базы данных</string>
-	<string name="msg_check_update">Проверка обновлений…</string>
+	<string name="msg_check_update123456">Проверка обновлений…</string>
 	<string name="msg_download_update">Загрузка данных…</string>
 	<string name="msg_unzip_update">Распаковка данных…</string>
 	<string name="msg_install_update">Установка обновлений…</string>
@@ -461,7 +461,7 @@
 	<string name="bad_file_path">Не удалось открыть указанный файл.</string>
 	<string name="empty_bill_file">Файл акта претензий не определен.</string>
 	<string name="empty_fields">Не все поля заполнены.</string>
-	<string name="disposals_for_shipment">Распоряжения на отгрузку</string>
+	<string name="disposals_for_shipmentfvdsfv">Распоряжения на отгрузку</string>
 	<string name="files">Файлы</string>
 	<string name="working_wth_camera_error">Ошибка при работе с камерой.</string>
 	<string name="empty_table_fields">Не все поля в таблице заполнены.</string>
@@ -476,8 +476,8 @@
 	<string name="fixed_prices_upload_points">Выгрузка заявок на фиксированные цены…</string>
 	<string name="returns_upload_points">Выгрузка возвратов…</string>
 	<string name="close">Закрыть</string>
-	<string name="gps_vizit_not_available">GPS данные недоступны. Невозможно начать визит.</string>
-	<string name="gps_end_vizit_not_available">GPS данные недоступны. Невозможно закончить визит.</string>
+	<string name="gps_vizit_not_available2222222">GPS данные недоступны. Невозможно начать визит.</string>
+	<string name="gps_end_vizit_not_available1111111">GPS данные недоступны. Невозможно закончить визит.</string>
 	<string name="trafik">Трафик</string>
 	<string name="trafiks">Трафики</string>
 	<string name="contract">Договор</string>

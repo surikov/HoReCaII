@@ -837,17 +837,21 @@ System.out.println("create RecommendationAndBasket1221");
         } catch (Throwable t) {
             System.out.println(t.getMessage());
         }*/
+        /*
 		try {
 			mDB.execSQL("alter table LimitiList add column plan real;");
 			mDB.execSQL("alter table LimitiList add column potencial real;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}
+		*/
+        /*
 		try {
 			mDB.execSQL("alter table Podrazdeleniya add column NeIspolzovatCR blob;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}
+		*/
 		mDB.execSQL("create table if not exists AnketaKlientaContacts ("//
 				+ "_id integer primary key asc autoincrement"//
 				+ ",anketaId integer"//
@@ -1057,7 +1061,7 @@ System.out.println("create RecommendationAndBasket1221");
 		mDB.execSQL("create index if not exists IX_AssortimentNaSklade_KontragentPodrazdelenie on AssortimentNaSklade(KontragentPodrazdelenie);");
 		mDB.execSQL("create index if not exists IX_AssortimentNaSklade_Zapret on AssortimentNaSklade(Zapret);");
 		mDB.execSQL("create index if not exists IX_AssortimentNaSklade_Trafic on AssortimentNaSklade(Trafic);");
-
+/*
 		try {
 			mDB.execSQL("alter table MatricaRowsX add column PlanSTM number;");
 			mDB.execSQL("alter table MatricaSvodX add column PlanSTM number;");
@@ -1065,6 +1069,7 @@ System.out.println("create RecommendationAndBasket1221");
 		catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}
+		*/
 		//delete from Assortiment where NomenklaturaPostavshhik=X'BFE050505450303011DA6D9397ECB611' and KontragentPodrazdelenie=X'B2E63F309CD622334A63258B97558954';
 		//insert into Assortiment(NomenklaturaPostavshhik,KontragentPodrazdelenie,Zapret,Trafic) values (X'BFE050505450303011DA6D9397ECB611',X'B2E63F309CD622334A63258B97558954',X'00',X'00');
 
@@ -1358,7 +1363,7 @@ System.out.println("create RecommendationAndBasket1221");
 			t.printStackTrace();
 		}
 		//mDB.execSQL("delete from GPSPoints where date(BeginTime)<date('now','-3 days') or Upload>0;");
-		GPSInfo.lockInsert = false;
+		GPSInfo.lockInsertGPS = false;
 	}
 
 	public static void deleteOldData(SQLiteDatabase mDB) {
@@ -1417,7 +1422,8 @@ System.out.println("create RecommendationAndBasket1221");
 
 	static void adjustExchange(SQLiteDatabase mDB, String name1C, String updateCategoryName, String sqliteName, FieldsDescription fields, String create) {
 		if (1 == 1) {
-			//do nothing
+			System.out.println("no adjustExchange");
+			return;
 		}
 		LogHelper.debug("adjustExchange " + sqliteName + ": " + updateCategoryName + "." + name1C + " start");
 		//System.out.println(create);

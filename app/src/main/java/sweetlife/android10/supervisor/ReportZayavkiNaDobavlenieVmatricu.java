@@ -3,6 +3,7 @@ package sweetlife.android10.supervisor;
 
 import android.content.*;
 
+import java.net.*;
 import java.util.*;
 
 import reactive.ui.*;
@@ -15,8 +16,8 @@ import tee.binding.*;
 import java.io.*;
 
 public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
-	//Numeric dateFrom = new Numeric();
-	//Numeric dateTo = new Numeric();
+	Numeric dateFrom = new Numeric();
+	Numeric dateTo = new Numeric();
 	//Numeric dateShip = new Numeric();
 	Numeric territory = new Numeric();
 
@@ -43,15 +44,16 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 
 	@Override
 	public String getShortDescription(String key) {
-		/*Bough b = null;
+		Bough b = null;
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
 		try {
 			b = Bough.parseXML(xml);
-			String d = Cfg.formatMills(Numeric.string2double(b.child("ship").value.property.value()), "dd.MM.yyyy");
-			return d;
+			String d = Cfg.formatMills(Numeric.string2double(b.child("from").value.property.value()), "dd.MM.yyyy");
+			String d2 = Cfg.formatMills(Numeric.string2double(b.child("to").value.property.value()), "dd.MM.yyyy");
+			return d+" - "+d2;
 		} catch (Throwable t) {
 			//
-		}*/
+		}
 		return "";
 	}
 
@@ -83,8 +85,8 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 		if (b == null) {
 			b = new Bough();
 		}
-		//dateFrom.value(Numeric.string2double(b.child("from").value.property.value()));
-		//dateTo.value(Numeric.string2double(b.child("to").value.property.value()));
+		dateFrom.value(Numeric.string2double(b.child("from").value.property.value()));
+		dateTo.value(Numeric.string2double(b.child("to").value.property.value()));
 		//dateShip.value(Numeric.string2double(b.child("ship").value.property.value()));
 		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
 	}
@@ -92,8 +94,8 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 	@Override
 	public void writeForm(String instanceKey) {
 		Bough b = new Bough().name.is(getFolderKey());
-		//b.child("from").value.is("" + dateFrom.value());
-		//b.child("to").value.is("" + dateTo.value());
+		b.child("from").value.is("" + dateFrom.value());
+		b.child("to").value.is("" + dateTo.value());
 		//b.child("ship").value.is("" + dateShip.value());
 		b.child("territory").value.is("" + territory.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
@@ -104,8 +106,8 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 	public void writeDefaultForm(String instanceKey) {
 		Bough b = new Bough().name.is(getFolderKey());
 		long d = new Date().getTime();
-		//b.child("from").value.is("" + (d - 30 * 24 * 60 * 60 * 1000.0));
-		//b.child("to").value.is("" + (d));
+		b.child("from").value.is("" + (d - 30 * 24 * 60 * 60 * 1000.0));
+		b.child("to").value.is("" + (d));
 		//b.child("ship").value.is("" + (d + 1 * 24 * 60 * 60 * 1000.0));
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		//System.out.println(xml);
@@ -114,10 +116,18 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 
 	@Override
 	public String composeGetQuery(int queryKind) {
-		String hrc = Cfg.whoCheckListOwner();
+		//String hrc = Cfg.whoCheckListOwner();
 		//hrc = "region1";
+		int i = territory.value().intValue();
+		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
 		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
-				+ "/hs/Report/УтверждениеЗаявокНаДобавлениеКлиентовВМатрицу/" + hrc;
+				+ "/hs/Report/УтверждениеЗаявокНаДобавлениеКлиентовВМатрицу/"
+				+ hrc+"?param="
+				+"{"
+				+"\"ДатаНачала\":\"" + Cfg.formatMills(dateFrom.value(), "yyyyMMdd") + "\""//
+				+",\"ДатаОкончания\":\"" + Cfg.formatMills(dateTo.value(), "yyyyMMdd") + "\""//
+				+"}";
+
 		return url;
 	}
 
@@ -134,7 +144,9 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 			propertiesForm//
 					.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
 					//.input(context, 1, Auxiliary.tapSize * 0.3, "Дата отгрузки", new RedactDate(context).date.is(dateShip).format.is("dd.MM.yyyy"))//
-					.input(context, 2, Auxiliary.tapSize * 0.3, "Территория", terr)//
+					.input(context, 1, Auxiliary.tapSize * 0.3, "Территория", terr)//
+					.input(context, 2, Auxiliary.tapSize * 0.3, "Дата от", new RedactDate(context).date.is(dateFrom).format.is("dd.MM.yyyy"))//
+					.input(context, 3, Auxiliary.tapSize * 0.3, "до", new RedactDate(context).date.is(dateTo).format.is("dd.MM.yyyy"))//
 					/*.input(context, 2, Auxiliary.tapSize * 0.3, "", new Knob(context).labelText.is("Обновить").afterTap.is(new Task() {
 						@Override
 						public void doTask() {
@@ -170,7 +182,7 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 2 + 1 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 1 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -184,7 +196,7 @@ public class ReportZayavkiNaDobavlenieVmatricu extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 2 + 2 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 2 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);

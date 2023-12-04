@@ -2,6 +2,7 @@ package sweetlife.android10.supervisor;
 
 import android.app.Activity;
 
+import android.net.*;
 import android.view.*;
 import android.content.*;
 import android.os.Bundle;
@@ -29,15 +30,15 @@ import java.io.*;
 
 import reactive.ui.Layoutless;
 
-class ListCellInfo {
-	public ListCellInfo(String artikul, String name, String edizm, double price, double skidka,String datastart,String dataend) {
+class ListCellInfo{
+	public ListCellInfo(String artikul, String name, String edizm, double price, double skidka, String datastart, String dataend){
 		this.artikul = artikul;
 		this.name = name;
 		this.price = price;
 		this.edizm = edizm;
 		this.skidka = skidka;
-		this.datastart=datastart;
-		this.dataend=dataend;
+		this.datastart = datastart;
+		this.dataend = dataend;
 	}
 
 	String name = "";
@@ -45,11 +46,11 @@ class ListCellInfo {
 	String edizm = "";
 	double price = 0.0;
 	double skidka = 0.0;
-	String datastart="st";
-	String dataend="nd";
+	String datastart = "st";
+	String dataend = "nd";
 }
 
-public class Activity_Listovka extends Activity implements ITableColumnsNames {
+public class Activity_Listovka extends Activity implements ITableColumnsNames{
 	Layoutless layoutless;
 	WebRender brwsr;
 	String path = "/sdcard/horeca/listovka.html";
@@ -79,39 +80,39 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menuSortABC = menu.add("По алфавиту");
-		menuSortPrice = menu.add("По цене");
-		menuSortSkidka = menu.add("По скидке");
+	public boolean onCreateOptionsMenu(Menu menu){
+		menuSortABC = menu.add("По алфавиту" );
+		menuSortPrice = menu.add("По цене" );
+		menuSortSkidka = menu.add("По скидке" );
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item){
 		super.onOptionsItemSelected(item);
-		if (item == menuSortABC) {
+		if(item == menuSortABC){
 			sortMode = sortABC;
-			if (selectedCat == null) {
+			if(selectedCat == null){
 				this.fillGUI(true);
-			} else {
+			}else{
 				this.fillCat(true);
 			}
 			return true;
 		}
-		if (item == menuSortPrice) {
+		if(item == menuSortPrice){
 			sortMode = sortPrice;
-			if (selectedCat == null) {
+			if(selectedCat == null){
 				this.fillGUI(true);
-			} else {
+			}else{
 				this.fillCat(true);
 			}
 			return true;
 		}
-		if (item == menuSortSkidka) {
+		if(item == menuSortSkidka){
 			sortMode = sortSkidka;
-			if (selectedCat == null) {
+			if(selectedCat == null){
 				this.fillGUI(true);
-			} else {
+			}else{
 				this.fillCat(true);
 			}
 			return true;
@@ -120,42 +121,42 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
-		this.setTitle("Газета (листовка)");
+		this.setTitle("Газета (листовка)" );
 		Preferences.init(this);
 		Bough b = Auxiliary.activityExatras(this);
 		//System.out.println(b.dumpXML());
-		dataOtgruzki = b.child("dataOtgruzki").value.property.value();
-		clientID = b.child("clientID").value.property.value();
-		polzovatelID = b.child("polzovatelID").value.property.value();
-		sklad = b.child("sklad").value.property.value();
+		dataOtgruzki = b.child("dataOtgruzki" ).value.property.value();
+		clientID = b.child("clientID" ).value.property.value();
+		polzovatelID = b.child("polzovatelID" ).value.property.value();
+		sklad = b.child("sklad" ).value.property.value();
 		createGUI();
 		//final Vector<Bough> catData = new Bough();
-		Expect requery = new Expect().status.is("Ожидание ответа").task.is(new Task() {
+		Expect requery = new Expect().status.is("Ожидание ответа" ).task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()//
 						+ "/hs/Planshet/GetBannerForTablet/"//
 						//+ ApplicationHoreca.getInstance().hrcSelectedRoute();
-				+Cfg.selectedOrDbHRC();
+						+ Cfg.selectedOrDbHRC();
 				System.out.println(url);
-				try {
+				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					String s = new String(b, "utf-8");
+					String s = new String(b, "utf-8" );
 					//System.out.println("GetBannerForTablet "+s);
-					Bough d = Bough.parseJSON("{row:" + s + "}");
+					Bough d = Bough.parseJSON("{row:" + s + "}" );
 					//System.out.println(d.dumpXML());
 					catData.children = d.children;
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				fillGUI(false);
 			}
 		});
@@ -168,34 +169,34 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 
 	}
 
-	void fillGUI(boolean fromCache) {
+	void fillGUI(boolean fromCache){
 		String html = composeData(fromCache);
 		//System.out.println(html);
-		Auxiliary.writeTextToFile(new File(path), html, "utf-8");
+		Auxiliary.writeTextToFile(new File(path), html, "utf-8" );
 		brwsr.go("file://" + path);
 	}
 
-	void fillCat(boolean fromCache) {
+	void fillCat(boolean fromCache){
 		System.out.println("fillCat " + selectedCat);
 		mIsCRAvailable = true;
 		String html = composeCat(fromCache);
-		Auxiliary.writeTextToFile(new File(path), html, "utf-8");
+		Auxiliary.writeTextToFile(new File(path), html, "utf-8" );
 		brwsr.go("file://" + path);
 	}
 
-	void readCellsData(boolean fromCache) {
-		if (!fromCache) {
+	void readCellsData(boolean fromCache){
+		if(!fromCache){
 			cellRows.clear();
 			String clientID = "0";
 			String polzovatelID = "0";
 			String dataOtgruzki = "0";
 			String sklad = "0";
-			try {
+			try{
 				clientID = ApplicationHoreca.getInstance().getClientInfo().getID();
 				polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
 				dataOtgruzki = DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime());
 				sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
-			} catch (Throwable ttt) {
+			}catch(Throwable ttt){
 				ttt.printStackTrace();
 			}
 			String sql = Request_NomenclatureBase.composeSQLall_Old(//
@@ -220,24 +221,25 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 					, null
 					, null
 					, null
-					,false
-					,false
-					,false
+					, false
+					, false
+					, false
+					, false
 					,false
 			);
 			//System.out.println(sql);
 			final Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			//System.out.println(b.dumpXML());
-			for (int i = 0; i < b.children.size(); i++) {
+			for(int i = 0; i < b.children.size(); i++){
 				Bough row = b.children.get(i);
 				cellRows.add(new ListCellInfo(
-						row.child("Artikul").value.property.value()
-						, row.child("Naimenovanie").value.property.value()
-						, row.child("EdinicyIzmereniyaNaimenovanie").value.property.value()
-						, Numeric.string2double(row.child("Cena").value.property.value())
-						, Numeric.string2double(row.child("CenaSoSkidkoy").value.property.value())
-						,row.child("datastart").value.property.value()
-						,row.child("dataend").value.property.value()
+						row.child("Artikul" ).value.property.value()
+						, row.child("Naimenovanie" ).value.property.value()
+						, row.child("EdinicyIzmereniyaNaimenovanie" ).value.property.value()
+						, Numeric.string2double(row.child("Cena" ).value.property.value())
+						, Numeric.string2double(row.child("CenaSoSkidkoy" ).value.property.value())
+						, row.child("datastart" ).value.property.value()
+						, row.child("dataend" ).value.property.value()
 
 				));
 			/*
@@ -249,32 +251,32 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		}
 	}
 
-	String gridCellsHTML() {
+	String gridCellsHTML(){
 		String html = "";
-		Collections.sort(cellRows, new Comparator<ListCellInfo>() {
-			public int compare(ListCellInfo s1, ListCellInfo s2) {
-				try {
-					if (sortMode == sortABC) {
+		Collections.sort(cellRows, new Comparator<ListCellInfo>(){
+			public int compare(ListCellInfo s1, ListCellInfo s2){
+				try{
+					if(sortMode == sortABC){
 						return s1.name.compareTo(s2.name);
-					} else {
-						if (sortMode == sortPrice) {
-							return (int) (s1.skidka - s2.skidka);
-						} else {
-							return (int) (100 * ((s1.skidka / s1.price) - (s2.skidka / s2.price)));
+					}else{
+						if(sortMode == sortPrice){
+							return (int)(s1.skidka - s2.skidka);
+						}else{
+							return (int)(100 * ((s1.skidka / s1.price) - (s2.skidka / s2.price)));
 						}
 					}
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 				return 0;
 			}
 		});
-		for (int i = 0; i < cellRows.size(); i++) {
-			double skidka=Math.round(cellRows.get(i).skidka);
-			double cena=Math.round(cellRows.get(i).price);
-			double ratio=Math.round(100*skidka/cena);
+		for(int i = 0; i < cellRows.size(); i++){
+			double skidka = Math.round(cellRows.get(i).skidka);
+			double cena = Math.round(cellRows.get(i).price);
+			double ratio = Math.round(100 * skidka / cena);
 			//System.out.println("cell: "+cellRows.get(i).artikul+": "+skidka+" / "+cena+": "+ratio);
-			if(skidka<0) {
+			if(skidka < 0){
 				html = html + this.htmlBannerCell(
 						cellRows.get(i).artikul
 						, "" + cellRows.get(i).price + "р. / " + cellRows.get(i).edizm
@@ -298,7 +300,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		return html;
 	}
 
-	String composeData(boolean fromCache) {
+	String composeData(boolean fromCache){
 		String html = this.htmlPageHead(false);
 		readCellsData(fromCache);
 		html = html + gridCellsHTML();
@@ -306,26 +308,28 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		html = html + this.htmlPageBottom();
 		return html;
 	}
+
 	@Override
 	public void onBackPressed(){
-		System.out.println("onBackPressed "+selectedCat);
-		if(selectedCat==null){
+		System.out.println("onBackPressed " + selectedCat);
+		if(selectedCat == null){
 			super.onBackPressed();
 		}else{
-			selectedCat=null;
+			selectedCat = null;
 			this.fillGUI(false);
 		}
 
 	}
-	void readCatData(boolean fromCache) {
-		if (!fromCache) {
+
+	void readCatData(boolean fromCache){
+		if(!fromCache){
 			cellRows.clear();
 			String artikuls = "false";
-			for (int i = 0; i < this.catData.children.size(); i++) {
-				if (this.catData.children.get(i).child("НомерДокумента").value.property.value().trim().equals(selectedCat.trim())) {
-					Vector<Bough> arts = this.catData.children.get(i).children("Товары");
-					for (int nn = 0; nn < arts.size(); nn++) {
-						String aa = arts.get(nn).child("Артикул").value.property.value();
+			for(int i = 0; i < this.catData.children.size(); i++){
+				if(this.catData.children.get(i).child("НомерДокумента" ).value.property.value().trim().equals(selectedCat.trim())){
+					Vector<Bough> arts = this.catData.children.get(i).children("Товары" );
+					for(int nn = 0; nn < arts.size(); nn++){
+						String aa = arts.get(nn).child("Артикул" ).value.property.value();
 						artikuls = artikuls + " or n.artikul='" + aa + "'";
 					}
 				}
@@ -352,28 +356,29 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 					, null
 					, null
 					, null
-					,false
-					,false
-					,false
+					, false
+					, false
+					, false
+					, false
 					,false
 			);
 			final Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			//System.out.println(b.dumpXML());
-			for (int i = 0; i < this.catData.children.size(); i++) {
-				if (this.catData.children.get(i).child("НомерДокумента").value.property.value().trim().equals(selectedCat.trim())) {
-					Vector<Bough> arts = this.catData.children.get(i).children("Товары");
-					for (int nn = 0; nn < arts.size(); nn++) {
-						String artikul = arts.get(nn).child("Артикул").value.property.value().trim();
+			for(int i = 0; i < this.catData.children.size(); i++){
+				if(this.catData.children.get(i).child("НомерДокумента" ).value.property.value().trim().equals(selectedCat.trim())){
+					Vector<Bough> arts = this.catData.children.get(i).children("Товары" );
+					for(int nn = 0; nn < arts.size(); nn++){
+						String artikul = arts.get(nn).child("Артикул" ).value.property.value().trim();
 						String name = "?";
 						double price = 0.0;
 						double skidka = 0.0;
 						String edizm = "?";
-						for (int rr = 0; rr < b.children.size(); rr++) {
-							if (b.children.get(rr).child("Artikul").value.property.value().trim().equals(artikul)) {
-								name = b.children.get(rr).child("Naimenovanie").value.property.value().trim();
-								skidka = Numeric.string2double(b.children.get(rr).child("CenaSoSkidkoy").value.property.value());
-								price = Numeric.string2double(b.children.get(rr).child("Cena").value.property.value());
-								edizm = b.children.get(rr).child("EdinicyIzmereniyaNaimenovanie").value.property.value().trim();
+						for(int rr = 0; rr < b.children.size(); rr++){
+							if(b.children.get(rr).child("Artikul" ).value.property.value().trim().equals(artikul)){
+								name = b.children.get(rr).child("Naimenovanie" ).value.property.value().trim();
+								skidka = Numeric.string2double(b.children.get(rr).child("CenaSoSkidkoy" ).value.property.value());
+								price = Numeric.string2double(b.children.get(rr).child("Cena" ).value.property.value());
+								edizm = b.children.get(rr).child("EdinicyIzmereniyaNaimenovanie" ).value.property.value().trim();
 								break;
 							}
 						}
@@ -384,8 +389,8 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 								, edizm
 								, price
 								, -1
-								,""
-								,""
+								, ""
+								, ""
 						));
 					}
 				}
@@ -394,7 +399,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 	}
 
 
-	String composeCat(boolean fromCache) {
+	String composeCat(boolean fromCache){
 		this.setTitle("Баннер №" + selectedCat);
 		String html = this.htmlPageHead(true);
 		readCatData(fromCache);
@@ -403,19 +408,19 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		return html;
 	}
 
-	void createGUI() {
+	void createGUI(){
 
 		int winW = Auxiliary.screenWidth(this);
 		int winH = Auxiliary.screenWidth(this);
-		brwsr = new WebRender(this).afterLink.is(new Task() {
+		brwsr = new WebRender(this).afterLink.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				final android.net.Uri uri = android.net.Uri.parse(brwsr.url.property.value());
 				//System.out.println("uri " + uri);
-				String num = ("" + uri).split("=")[1];
-				if (uri.toString().indexOf("selectArtikul") > -1) {
+				String num = ("" + uri).split("=" )[1];
+				if(uri.toString().indexOf("selectArtikul" ) > -1){
 					selectArtikul(num);
-				} else {
+				}else{
 					selectedCat = num;
 					fillCat(false);
 				}
@@ -425,10 +430,23 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				.width().is(winW)//
 				.height().is(winH)//
 		);
+		layoutless.child(new Knob(this).labelText.is("Все газеты >>" ).afterTap.is(new Task(){
+					@Override
+					public void doTask(){
+						String url = "https://portal.swlife-horeca.ru/listovki/";
+						Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+						startActivity(browserIntent);
+					}
+				})
+						.width().is(3 * Auxiliary.tapSize)
+						.height().is(1 * Auxiliary.tapSize)
+						.left().is(layoutless.width().property.minus( 3 * Auxiliary.tapSize))
+						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
+		);
 	}
 
 
-	void selectArtikul(String art) {
+	void selectArtikul(String art){
 		System.out.println("tap " + art);
 		String sql = Request_NomenclatureBase.composeSQL(//
 				dataOtgruzki//
@@ -446,37 +464,37 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				, false
 				, false
 				, false
-				, null, null
+				, null, null,false
 		);
 		Cursor cursor = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
-		if (cursor.moveToFirst()) {
+		if(cursor.moveToFirst()){
 			Intent resultIntent = new Intent();
 			String vidSkidki = Request_NomenclatureBase.getVidSkidki(cursor);
-//            boolean mIsCRAvailable=false;
-			if (Request_NomenclatureBase.getMinCena(cursor) == null || !mIsCRAvailable) {
+			//            boolean mIsCRAvailable=false;
+			if(Request_NomenclatureBase.getMinCena(cursor) == null || !mIsCRAvailable){
 				//System.out.println(": 1");
 				resultIntent.putExtra(MIN_CENA, 0.00D);
 				resultIntent.putExtra(MAX_CENA, 0.00D);
-				if (vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
-				) {
+				if(vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
+				){
 					//System.out.println(": 2");
 					resultIntent.putExtra(VID_SKIDKI, Request_NomenclatureBase.getVidSkidki(cursor));
 					resultIntent.putExtra(CENA_SO_SKIDKOY, Double.parseDouble(Request_NomenclatureBase.getCenaSoSkidkoy(cursor)));
-				} else {
-					System.out.println(": 3");
-					resultIntent.putExtra(VID_SKIDKI, "x'00'");
+				}else{
+					System.out.println(": 3" );
+					resultIntent.putExtra(VID_SKIDKI, "x'00'" );
 					resultIntent.putExtra(CENA_SO_SKIDKOY, 0.00D);
 				}
-			} else {
+			}else{
 				//System.out.println(": 4");
-				if (vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
-				) {
+				if(vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
+				){
 					//System.out.println(": 5");
 					resultIntent.putExtra(VID_SKIDKI, Request_NomenclatureBase.getVidSkidki(cursor));
 					resultIntent.putExtra(CENA_SO_SKIDKOY, Double.parseDouble(Request_NomenclatureBase.getCenaSoSkidkoy(cursor)));
-				} else {
+				}else{
 					//System.out.println(": 6");
-					resultIntent.putExtra(VID_SKIDKI, "x'00'");
+					resultIntent.putExtra(VID_SKIDKI, "x'00'" );
 					resultIntent.putExtra(CENA_SO_SKIDKOY, Double.parseDouble(Request_NomenclatureBase.getCena(cursor)));
 				}
 				resultIntent.putExtra(MIN_CENA, Double.parseDouble(Request_NomenclatureBase.getMinCena(cursor)));
@@ -484,15 +502,15 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 			}
 			String sale = Request_NomenclatureBase.getSkidka(cursor);
 			//System.out.println(": 7");
-			if (sale != null) {
+			if(sale != null){
 				//System.out.println(": 8");
-				try {
+				try{
 					resultIntent.putExtra(SKIDKA, Double.parseDouble(sale));
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					System.out.println(t.getMessage());
 					resultIntent.putExtra(SKIDKA, 0.00D);
 				}
-			} else {
+			}else{
 				resultIntent.putExtra(SKIDKA, 0.00D);
 			}
 			resultIntent.putExtra(CENA, Double.parseDouble(Request_NomenclatureBase.getCena(cursor)));
@@ -514,7 +532,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		}
 	}
 
-	String htmlPageHead(boolean noCat) {
+	String htmlPageHead(boolean noCat){
 		String html = "<html>\n" +
 				"\n" +
 				"<head>\n" +
@@ -566,7 +584,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				"			padding: 0cm;\n" +
 				"			margin: 0cm;\n" +
 				"			border2: 1px solid #ccc;\n" +
-				"		}\n" +		
+				"		}\n" +
 				"		.infoColumn{\n" +
 				"			width:4cm;\n" +
 				"			padding-left: 0.25cm;\n" +
@@ -608,7 +626,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				"</head>\n" +
 				"\n" +
 				"<body>\n";
-		if (!noCat) {
+		if(!noCat){
 			html = html + "	<div class='mainDiv'>" +
 					htmlCat() +
 					"	</div>";
@@ -617,7 +635,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		return html;
 	}
 
-	String htmlCat() {
+	String htmlCat(){
 		/*
 		String html = "\n<a href='selectCat?cat=123'>\n" +
 				"			<div class=\"bigCell\">\n" +
@@ -631,17 +649,17 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				"		</a>";
 		*/
 		String html = "";
-		for (int i = 0; i < catData.children.size(); i++) {
-			html = html + "\n<a href='fillCat?cat=" + catData.children.get(i).child("НомерДокумента").value.property.value() + "'>\n" +
+		for(int i = 0; i < catData.children.size(); i++){
+			html = html + "\n<a href='fillCat?cat=" + catData.children.get(i).child("НомерДокумента" ).value.property.value() + "'>\n" +
 					"			<div class=\"bigCell\">\n" +
-					"				<img class='bigImg' src='" + catData.children.get(i).child("УРЛПревью").value.property.value() + "' />\n" +
+					"				<img class='bigImg' src='" + catData.children.get(i).child("УРЛПревью" ).value.property.value() + "' />\n" +
 					"			</div>\n" +
 					"		</a>";
 		}
 		return html;
 	}
 
-	String htmlCell(String artikul, String old, String cena, String info,String dataend) {
+	String htmlCell(String artikul, String old, String cena, String info, String dataend){
 		String html = "\n		<a href='selectArtikul?art=" + artikul + "'>\n" +
 				"			<div class=\"oneCell\">\n" +
 				"				<div class='imgColumn'>\n" +
@@ -653,7 +671,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				"					<div class='countCell'>\n" +
 				"						<div class='priceOld'>" + old + "</div>\n" +
 				//"						<div class='priceNew'>" + cena + "</div>\n" +
-				"						<div class='priceNew'>" + cena + "<br/>до "+Auxiliary.tryReFormatDate(dataend,"yyyy-MM-dd","dd.MM.yy")+"</div>\n" +
+				"						<div class='priceNew'>" + cena + "<br/>до " + Auxiliary.tryReFormatDate(dataend, "yyyy-MM-dd", "dd.MM.yy" ) + "</div>\n" +
 				//"						<div class='buyCell'>- 8 +</div>\n" +
 				"					</div>\n" +
 				"				</div>\n" +
@@ -661,7 +679,8 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 				"		</a>";
 		return html;
 	}
-	String htmlBannerCell(String artikul, String old, String info) {
+
+	String htmlBannerCell(String artikul, String old, String info){
 		String html = "\n		<a href='selectArtikul?art=" + artikul + "'>\n" +
 				"			<div class=\"oneCell\">\n" +
 				"				<div class='imgColumn'>\n" +
@@ -681,7 +700,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames {
 		return html;
 	}
 
-	String htmlPageBottom() {
+	String htmlPageBottom(){
 		String html = "\n	</div>\n" +
 				"</body>\n" +
 				"\n" +

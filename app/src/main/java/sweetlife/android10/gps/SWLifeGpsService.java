@@ -25,6 +25,10 @@ public class SWLifeGpsService extends Service {
 	public static int RED_COLOR = Color.rgb(204, 0, 51);
 	public static int YELLOW_COLOR = Color.rgb(255, 204, 0);
 
+	public static long lastSavedGPSms = 0;
+	public static long whenSavedGPSms = 0;
+	public static long maxLocalGpsDiffMs=24*60*60*1000;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -106,7 +110,7 @@ public class SWLifeGpsService extends Service {
 
 	private void StopLogging() {
 		Session.setStarted(false);
-		Session.setCurrentLocationInfo(null);
+		//Session.setCurrentLocationInfo(null);
 		StopGPSStatusListener();
 		StopGpsManager();
 		StopDetailsServiceClient();
@@ -194,6 +198,8 @@ public class SWLifeGpsService extends Service {
 		}
 	}
 
+
+
 	void OnLocationChanged(Location loc) {
 
 		if (loc.isFromMockProvider()) {
@@ -201,18 +207,24 @@ public class SWLifeGpsService extends Service {
 			loc.setLongitude(1);
 		}
 
-		Session.setLatitude(loc.getLatitude());
-		Session.setLongitude(loc.getLongitude());
-		Session.setGPSTime(loc.getTime());
+		//Session.setLatitude(loc.getLatitude());
+		//Session.setLongitude(loc.getLongitude());
+		//Session.setGPSTime(loc.getTime());
 		if (IsGPSInfoFormVisible()) {
 			mDetailsServiceClient.OnLocationUpdate(loc);
 		}
-		if ((System.currentTimeMillis() - Session.getLocalTime()) < mPeriod) {
+		//if ((System.currentTimeMillis() - Session.getLocalTime()) < mPeriod) {
+		if ((System.currentTimeMillis() - lastSavedGPSms) < mPeriod) {
 			return;
 		}
-		Session.setLocalTime(System.currentTimeMillis());
-		Session.setGPSTime(loc.getTime());
-		Session.setCurrentLocationInfo(loc);
+		if (Math.abs(System.currentTimeMillis() - loc.getTime()) > maxLocalGpsDiffMs) {
+			return;
+		}
+		//Session.setLocalTime(System.currentTimeMillis());
+		//Session.setGPSTime(loc.getTime());
+		lastSavedGPSms = loc.getTime();
+		whenSavedGPSms = System.currentTimeMillis();
+		//Session.setCurrentLocationInfo(loc);
 		if (mLocationChangeClient != null) {
 			mLocationChangeClient.OnLocationUpdate(loc);
 		}

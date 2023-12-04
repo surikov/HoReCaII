@@ -6,7 +6,7 @@ public interface ITableColumnsNames {
 	String IDRREF                                    = "_IDRRef";
 	String BEGIN_DATE                                = "BeginDate";
 	String BEGIN_TIME                                = "BeginTime";
-	String END_TIME                                  = "EndTime";
+	String ENDTIMEfieldName = "EndTime";
 	String LONGITUDE                                 = "longitude";
 	String LATITUDE	                                 = "latitude";
 	String UPLOAD                                    = "Upload";

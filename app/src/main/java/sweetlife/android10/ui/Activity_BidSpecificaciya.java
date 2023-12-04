@@ -141,7 +141,7 @@ public class Activity_BidSpecificaciya extends Activity {
 					, sklad//
 					, 200//
 					, 0, false
-					, false, false, null, null);
+					, false, false, null, null,false);
 			//final Bough b = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 			final Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			for (int i = 0; i < artikuls.length; i++) {
@@ -851,7 +851,7 @@ public class Activity_BidSpecificaciya extends Activity {
 						, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()//
 						, 1//
 						, 0, false
-						, false, false, null, null);
+						, false, false, null, null,false);
 				//System.out.println(sql);
 				Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 				//System.out.println(b.dumpXML());
@@ -952,7 +952,7 @@ public class Activity_BidSpecificaciya extends Activity {
 				, false//
 				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()//
 				, 1//
-				, 0, false, false, false, null, null);
+				, 0, false, false, false, null, null,false);
 		//System.out.println(sql);
 		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		System.out.println(b.dumpXML());

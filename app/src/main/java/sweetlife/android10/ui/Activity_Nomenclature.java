@@ -90,7 +90,7 @@ public class Activity_Nomenclature extends Activity_Base implements OnTabChangeL
 					System.out.println(selectedSearchMode + ": " + selectedSearchByMode);
 				}
 			});
-			Auxiliary.pickSingleChoice(Activity_Nomenclature.this, new String[]{"Артикул", "Наименование", "Производитель"}, r);
+			Auxiliary.pickSingleChoice(Activity_Nomenclature.this, new String[]{"Артикул", "Наименование", "Производитель", "Поиск"}, r);
 		}
 	};
 	OnClickListener clickSearchKuhnya = new OnClickListener() {
@@ -1306,8 +1306,15 @@ I/System.out: </soap:Envelope>
 				selectedSearchByMode = SEARCH_NAME;
 				((Button) findViewById(R.id.btn_search_mode)).setText("Наименование");
 			} else {
-				selectedSearchByMode = SEARCH_VENDOR;
-				((Button) findViewById(R.id.btn_search_mode)).setText("Производитель");
+				if (selectedSearchMode == 2) {
+					selectedSearchByMode = SEARCH_VENDOR;
+					((Button) findViewById(R.id.btn_search_mode)).setText("Производитель" );
+				} else {
+					if (selectedSearchMode == 3) {
+						selectedSearchByMode = SEARCH_WEB;
+						((Button) findViewById(R.id.btn_search_mode)).setText("Поиск" );
+					}
+				}
 			}
 		}
 		if (selectedSearchByKuhnya == 0) {

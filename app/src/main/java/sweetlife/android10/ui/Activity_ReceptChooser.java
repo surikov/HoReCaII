@@ -306,7 +306,7 @@ public class Activity_ReceptChooser extends Activity_Base implements ITableColum
 
 
 				, false
-				, selectedIngredientIdrref, selectedIngredientKluch
+				, selectedIngredientIdrref, selectedIngredientKluch,false
 		);
 		//System.out.println(sql);
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -361,7 +361,7 @@ public class Activity_ReceptChooser extends Activity_Base implements ITableColum
 				, false
 				, false
 				, false
-				, null, null
+				, null, null,false
 		);
 		Cursor cursor = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
 		if (cursor.moveToFirst()) {

@@ -29,7 +29,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 	private SQLiteDatabase mDB;
 	private SimpleDateFormat mDateTimeFormat;
 	private SimpleDateFormat mDateTimeFormatNoShift;
-	public static boolean lockInsert = false;
+	public static boolean lockInsertGPS = false;
 
 	public GPSInfo(SQLiteDatabase db, String agentID) {
 		//System.out.println("GPSInfo create");
@@ -227,18 +227,18 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 	public void setUploadPointGPS() {
 		ContentValues updateValues = new ContentValues();
 		updateValues.put(UPLOAD, TRUE);
-		DatabaseHelper.updateInTranzaction(mDB, GPS_POINTS, updateValues, null, null);
+		DatabaseHelper.updateInTranzaction(mDB, GPSPOINTStableName, updateValues, null, null);
 	}
 
 	public void setUploadVisits() {
 		//System.out.println("setUploadVisits");
 		ContentValues updateValues = new ContentValues();
 		updateValues.put(UPLOAD, TRUE);
-		DatabaseHelper.updateInTranzaction(mDB, VISITS, updateValues, "Upload = 0 and EndTime is not null", null);
+		DatabaseHelper.updateInTranzaction(mDB, VizitsTableName, updateValues, "Upload = 0 and EndTime is not null", null);
 	}
 
-	public synchronized void insertPoint(Calendar time, double lat, double lon) {
-		if (lockInsert) {
+	public synchronized void insertGpsPoint(Calendar time, double lat, double lon) {
+		if (lockInsertGPS) {
 			//System.out.println("insertPoint locked");
 			//return;
 		}
@@ -257,7 +257,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		initialValues.put(UPLOAD, FALSE);
 		if (IsDatabaseOpened()) {
 			//LogHelper.debug(this.getClass().getCanonicalName() + " insertPoint "+mDateTimeFormat.format(date));
-			DatabaseHelper.insertInTranzaction(mDB, GPS_POINTS, initialValues);
+			DatabaseHelper.insertInTranzaction(mDB, GPSPOINTStableName, initialValues);
 		}
 	}
 
@@ -275,14 +275,14 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		initialValues.put(TP, mPhizlicoCode);
 		initialValues.put(UPLOAD, FALSE);
 		if (IsDatabaseOpened()) {
-			DatabaseHelper.insertInTranzaction(mDB, VISITS, initialValues);
+			DatabaseHelper.insertInTranzaction(mDB, VizitsTableName, initialValues);
 		}
 		return false;
 	}
 
 	public String getVizitTimeString() {
 		Calendar satellitesTime = Calendar.getInstance();
-		satellitesTime.setTimeInMillis(Session.getGPSTime());
+		//satellitesTime.setTimeInMillis(Session.getGPSTime());
 		/*
 				if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
 
@@ -312,9 +312,11 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		}
 		String timeString = getVizitTimeString();
 		//System.out.println(END_TIME + ": " + timeString);
-		initialValues.put(END_TIME, timeString);
+		initialValues.put(ENDTIMEfieldName, timeString);
 		if (IsDatabaseOpened()) {
-			DatabaseHelper.updateInTranzaction(mDB, VISITS, initialValues, "Client = " + clientCode + " and EndTime is null", null);
+			DatabaseHelper.updateInTranzaction(mDB, VizitsTableName, initialValues, "Client = " + clientCode + " and EndTime is null", null);
+			//DatabaseHelper.updateInTranzaction(mDB, VISITS, initialValues, "Client = " + clientCode + " and EndTime is null", null);
+			//DatabaseHelper.updateInTranzaction(mDB, VISITS, initialValues, "Client = " + clientCode + " and ((EndTime is null) or (length(EndTime)<4) or (EndTime=BeginTime))", null);
 		} else {
 			return false;
 		}
@@ -329,6 +331,35 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		return false;
 	}
 
+	public static double lastLatitude() {
+		Bough last = getLastSavedGPSpoin();
+		double latitude = Numeric.string2double(last.child("row").child("latitude").value.property.value());
+		return latitude;
+	}
+
+	public static double lastLongitude() {
+		Bough last = getLastSavedGPSpoin();
+		double longitude = Numeric.string2double(last.child("row").child("longitude").value.property.value());
+		return longitude;
+	}
+
+	public static long lastDateTime() {
+		Bough last = getLastSavedGPSpoin();
+		String timeString=last.child("row").child("beginTime").value.property.value();
+		try {
+			Date date = Auxiliary.mssqlTime.parse(timeString);
+			long ms = date.getTime();
+			Calendar cal = Calendar.getInstance();
+			TimeZone tz = cal.getTimeZone();
+			int offset=tz.getRawOffset();
+			//return ms + 3 * 60 * 60 * 1000;
+			return ms + offset;
+		}catch(Throwable t){
+			t.printStackTrace();
+			return -1;
+		}
+	}
+
 	public static Bough getLastSavedGPSpoin() {
 		String sql = "select beginTime as beginTime, '' || longitude as longitude, '' || latitude as latitude from GPSPoints order by beginTime desc limit 1;";
 		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -337,7 +368,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 
 	public ArrayList<CoordGPS> getGPSPointsArray() {
 		ArrayList<CoordGPS> list = new ArrayList<CoordGPS>();
-		Cursor cursor = mDB.query(GPS_POINTS, new String[]{BEGIN_TIME, LATITUDE, LONGITUDE},
+		Cursor cursor = mDB.query(GPSPOINTStableName, new String[]{BEGIN_TIME, LATITUDE, LONGITUDE},
 				//"date(BeginDate) = date() and Upload = " + FALSE, null, null, null, null);
 				" Upload = " + FALSE, null, null, null, null);
 		if (cursor.moveToFirst()) {
@@ -355,18 +386,26 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 	}
 
 	public static long isTPNearClient(double lat, double lon) {
-		if (System.currentTimeMillis() == 0 || Session.getLocalTime() == 0) {
+		/*
+		//if (System.currentTimeMillis() == 0 || Session.getLocalTime() == 0) {
+		if (System.currentTimeMillis() == 0 || SWLifeGpsService.whenSavedGPSms == 0) {
 			return GPS_NOT_AVAILABLE;
 		}
-		if ((System.currentTimeMillis() - Session.getLocalTime()) > Settings.getInstance().getSPY_GPS_PERIOD()) {
+		//if ((System.currentTimeMillis() - Session.getLocalTime()) > Settings.getInstance().getSPY_GPS_PERIOD()) {
+		if ((System.currentTimeMillis() - SWLifeGpsService.whenSavedGPSms) > Settings.getInstance().getSPY_GPS_PERIOD()) {
 			return GPS_NOT_AVAILABLE;
 		}
+		*/
 		Location clientLocation = new Location("ClientLocation");
 		clientLocation.setLatitude(lat);
 		clientLocation.setLongitude(lon);
 		Location lastKnownLocation = new Location("MyLocation");
-		lastKnownLocation.setLatitude(Session.getLatitude());
-		lastKnownLocation.setLongitude(Session.getLongitude());
+
+
+		//lastKnownLocation.setLatitude(Session.getLatitude());
+		lastKnownLocation.setLongitude(GPSInfo.lastLatitude());
+		//lastKnownLocation.setLongitude(Session.getLongitude());
+		lastKnownLocation.setLatitude(GPSInfo.lastLongitude());
 		return Float.valueOf(lastKnownLocation.distanceTo(clientLocation)).longValue();
 	}
 

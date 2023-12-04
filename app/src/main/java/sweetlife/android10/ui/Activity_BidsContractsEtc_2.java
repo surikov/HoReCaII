@@ -32,7 +32,7 @@ import java.util.Vector;
 import sweetlife.android10.gps.*;
 import sweetlife.android10.*;
 
-public class Activity_BidsContractsEtc_2 extends Activity {
+public class Activity_BidsContractsEtc_2 extends Activity{
 
 	static String checkedTerritoryKod = null;
 
@@ -82,7 +82,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 	private Calendar mChosedDay;
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		menuOtchety = menu.add("Отчёты");
 		menuPechati = menu.add("Печати контрагента");
 		menuVzaimoraschety = menu.add("Взаиморасчёты с контрагентом");
@@ -108,12 +108,12 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item == menuPechati) {
+	public boolean onOptionsItemSelected(MenuItem item){
+		if(item == menuPechati){
 			showPechati();
 			return true;
 		}
-		if (item == menuVzaimoraschety) {
+		if(item == menuVzaimoraschety){
 			showVzaimoraschety();
 			return true;
 		}
@@ -121,11 +121,11 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 			showChekList();
 			return true;
 		}*/
-		if (item == menuObnoIstoria) {
+		if(item == menuObnoIstoria){
 			doObnoIstoria();
 			return true;
 		}
-		if (item == menuOtchety) {
+		if(item == menuOtchety){
 			Intent intent = new Intent();
 			intent.setClass(Activity_BidsContractsEtc_2.this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
 			startActivity(intent);
@@ -138,7 +138,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 			startActivity(intent);
 			return true;
 		}*/
-		if (item == menuShoMap) {
+		if(item == menuShoMap){
 			Intent intent = new Intent();
 			//intent.setClass(this, sweetlife.horeca.supervisor.ActivityGPSMap.class);
 			intent.setClass(this, sweetlife.android10.supervisor.ActivityYandexMapKontragent.class);
@@ -146,7 +146,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 			this.startActivityForResult(intent, 0);
 			return true;
 		}
-		if (item == menuDostavkaKarta) {
+		if(item == menuDostavkaKarta){
 			startCarMap();
             /*
             Intent intent = new Intent();
@@ -164,39 +164,39 @@ public class Activity_BidsContractsEtc_2 extends Activity {
             promptRequestMailList(this, new Vector<String>());
             return true;
         }*/
-		if (item == menuSklad) {
+		if(item == menuSklad){
 			doRequestSklad();
 			return true;
 		}
 
-		if (item == menuSendLimit) {
+		if(item == menuSendLimit){
 			promptLimit();
 			return true;
 		}
-		if (item == menuClearFixPrice) {
+		if(item == menuClearFixPrice){
 			promptDeleteFixPrices();
 			return true;
 		}
-		if (item == menuKlientPeople) {
+		if(item == menuKlientPeople){
 			promptKlientPeople();
 			return true;
 		}
-		if (item == menuVislatNakladnieNaPochtu) {
+		if(item == menuVislatNakladnieNaPochtu){
 			promptVislatNakladnieNaPochtu();
 			return true;
 		}
-		if (item == menuKlienta) {
+		if(item == menuKlienta){
 			Intent intent = new Intent();
 			intent.setClass(this, sweetlife.android10.ui.ActivityMenuKlienta.class);
 			//intent.putExtra("client_id", mAppInstance.getClientInfo().getID());
 			this.startActivityForResult(intent, 0);
 			return true;
 		}
-		if (item == menuAktSverki) {
+		if(item == menuAktSverki){
 			promptAktSverki();
 			return true;
 		}
-		if (item == menuRassylkaSchetovNaOplatu) {
+		if(item == menuRassylkaSchetovNaOplatu){
 			promptRassylkaSchetovNaOplatu();
 			return true;
 		}
@@ -246,53 +246,53 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 				}
 			}).status.is("Подождите...").start(this);
 		}*/
-	void sendRassylkaSchetovNaOplatu(final String email) {
+	void sendRassylkaSchetovNaOplatu(final String email){
 		final Note result = new Note();
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/CreateClientMailScore/"
 						+ ApplicationHoreca.getInstance().getClientInfo().getKod()
 						+ "/" + email;
-				try {
+				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					result.value(new String(b, "UTF-8"));
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					result.value(t.getMessage());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(result.value(), Activity_BidsContractsEtc_2.this);
 			}
 		}).status.is("Подождите...").start(this);
 	}
 
-	void promptRassylkaSchetovNaOplatuNew() {
+	void promptRassylkaSchetovNaOplatuNew(){
 		final Note newEmail = new Note();
-		Auxiliary.pickString(this, "", newEmail, "Добавить e-mail в рассылку", new Task() {
+		Auxiliary.pickString(this, "", newEmail, "Добавить e-mail в рассылку", new Task(){
 			@Override
-			public void doTask() {
-				if (newEmail.value().contains("@")) {
+			public void doTask(){
+				if(newEmail.value().contains("@")){
 					sendRassylkaSchetovNaOplatu(newEmail.value());
-				} else {
+				}else{
 					Auxiliary.warn("Введите e-mail", Activity_BidsContractsEtc_2.this);
 				}
 			}
 		});
 	}
 
-	void promptRassylkaSchetovNaOplatuDelete(final String email) {
-		Auxiliary.pickConfirm(Activity_BidsContractsEtc_2.this, "Удалить e-mail из рассылки", "Удалить", new Task() {
+	void promptRassylkaSchetovNaOplatuDelete(final String email){
+		Auxiliary.pickConfirm(Activity_BidsContractsEtc_2.this, "Удалить e-mail из рассылки", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				final Note result = new Note();
-				new Expect().task.is(new Task() {
+				new Expect().task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 									+ "/hs/Planshet/DeleteClientMailScore/"
 									+ ApplicationHoreca.getInstance().getClientInfo().getKod()
@@ -300,14 +300,14 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							result.value(new String(bytes, "UTF-8"));
-						} catch (Exception e) {
+						}catch(Exception e){
 							e.printStackTrace();
 							result.value(e.getMessage());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.inform(result.value(), Activity_BidsContractsEtc_2.this);
 					}
 				}).status.is("Удаление...").start(Activity_BidsContractsEtc_2.this);
@@ -315,10 +315,10 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 		});
 	}
 
-	void promptRassylkaSchetovNaOplatuList(final Vector<Bough> data) {
+	void promptRassylkaSchetovNaOplatuList(final Vector<Bough> data){
 
 		String[] listItems = new String[data.size()];
-		for (int i = 0; i < data.size(); i++) {
+		for(int i = 0; i < data.size(); i++){
 
 			String one = data.get(i).child("Mail").value.property.value();
 			System.out.println(one);
@@ -326,79 +326,79 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 		}
 		final Numeric defaultSelection = new Numeric();
 		String title = "Рассылка счетов на оплату";
-		Task afterSelect = new Task() {
+		Task afterSelect = new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				promptRassylkaSchetovNaOplatuDelete(data.get(defaultSelection.value().intValue()).child("Mail").value.property.value());
 			}
 		};
 		String positiveButtonTitle = "Добавить";
-		Task callbackPositiveBtn = new Task() {
+		Task callbackPositiveBtn = new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				promptRassylkaSchetovNaOplatuNew();
 			}
 		};
 		Auxiliary.pickSingleChoice(this, listItems, defaultSelection, title, afterSelect, positiveButtonTitle, callbackPositiveBtn, null, null);
 	}
 
-	void promptRassylkaSchetovNaOplatu() {
+	void promptRassylkaSchetovNaOplatu(){
 		final Vector<Bough> items = new Vector<Bough>();
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/GetClientMailScore/" + ApplicationHoreca.getInstance().getClientInfo().getKod();//88319
-				try {
+				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String txt = "{item:" + new String(b, "UTF-8") + "}";
 					//System.out.println(txt);
 					Bough data = Bough.parseJSON(txt);
 					Vector<Bough> allitems = data.children("item");
-					for (int i = 0; i < allitems.size(); i++) {
+					for(int i = 0; i < allitems.size(); i++){
 						items.add(allitems.get(i));
 					}
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				promptRassylkaSchetovNaOplatuList(items);
 			}
 		}).status.is("Подождите...").start(this);
 	}
 
-	void promptAktSverki() {
+	void promptAktSverki(){
 		final Vector<Bough> items = new Vector<Bough>();
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/GetClientMail/" + ApplicationHoreca.getInstance().getClientInfo().getKod();//88319
-				try {
+				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String txt = "{item:" + new String(b, "UTF-8") + "}";
 					Bough data = Bough.parseJSON(txt);
 					//System.out.println(data.dumpXML());
 					Vector<Bough> allitems = data.children("item");
-					for (int i = 0; i < allitems.size(); i++) {
+					for(int i = 0; i < allitems.size(); i++){
 						items.add(allitems.get(i));
 					}
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				prompAktSverkiList(items);
 			}
 		}).status.is("Подождите...").start(this);
 	}
 
-	void prompAktSverkiList(final Vector<Bough> data) {
+	void prompAktSverkiList(final Vector<Bough> data){
 		String[] listItems = new String[data.size()];
-		for (int i = 0; i < data.size(); i++) {
+		for(int i = 0; i < data.size(); i++){
 
 			String one = data.get(i).child("Mail").value.property.value() + ", " + Auxiliary.tryReFormatDate(data.get(i).child("Data").value.property.value(), "yyyyMMdd", "dd.MM.yyyy");
 			System.out.println(one);
@@ -406,46 +406,46 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 		}
 		final Numeric defaultSelection = new Numeric();
 		String title = "Рассылка актов сверки";
-		Task afterSelect = new Task() {
+		Task afterSelect = new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				prompAktSverkiDelete(data.get(defaultSelection.value().intValue()).child("Mail").value.property.value());
 			}
 		};
 		String positiveButtonTitle = "Добавить";
-		Task callbackPositiveBtn = new Task() {
+		Task callbackPositiveBtn = new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				prompAktSverkiNew();
 			}
 		};
 		Auxiliary.pickSingleChoice(this, listItems, defaultSelection, title, afterSelect, positiveButtonTitle, callbackPositiveBtn, null, null);
 	}
 
-	void prompAktSverkiDelete(final String Mail) {
+	void prompAktSverkiDelete(final String Mail){
 		//System.out.println("- " + KodKlienta + "/" + Mail);
-		Auxiliary.pickConfirm(Activity_BidsContractsEtc_2.this, "Удалить e-mail из рассылки", "Удалить", new Task() {
+		Auxiliary.pickConfirm(Activity_BidsContractsEtc_2.this, "Удалить e-mail из рассылки", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				final Note result = new Note();
-				new Expect().task.is(new Task() {
+				new Expect().task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 									+ "/hs/Planshet/DeleteClientMail/" + ApplicationHoreca.getInstance().getClientInfo().getKod()
 									+ "/" + Mail.trim();
 
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							result.value(new String(bytes, "UTF-8"));
-						} catch (Exception e) {
+						}catch(Exception e){
 							e.printStackTrace();
 							result.value(e.getMessage());
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						Auxiliary.inform(result.value(), Activity_BidsContractsEtc_2.this);
 					}
 				}).status.is("Удаление...").start(Activity_BidsContractsEtc_2.this);
@@ -453,7 +453,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 		});
 	}
 
-	void prompAktSverkiNew() {
+	void prompAktSverkiNew(){
 		final Note email = new Note();
 		final Numeric date = new Numeric();
 		Auxiliary.pick(this, "Настройка отправки актов сверки"//
@@ -480,14 +480,14 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 								.height().is(Auxiliary.tapSize * 1))//
 						.width().is(Auxiliary.tapSize * 9)//
 						.height().is(Auxiliary.tapSize * 4.5)//
-				, "Добавить", new Task() {
+				, "Добавить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						final Note result = new Note();
-						new Expect().task.is(new Task() {
+						new Expect().task.is(new Task(){
 							@Override
-							public void doTask() {
-								try {
+							public void doTask(){
+								try{
 									Calendar c1 = Calendar.getInstance();
 									c1.setTimeInMillis(date.value().longValue());
 									String dt = Auxiliary.short1cDate.format(c1.getTime());
@@ -498,14 +498,14 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 											+ "/" + dt;//88319
 									byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 									result.value(new String(bytes, "UTF-8"));
-								} catch (Exception e) {
+								}catch(Exception e){
 									e.printStackTrace();
 									result.value(e.getMessage());
 								}
 							}
-						}).afterDone.is(new Task() {
+						}).afterDone.is(new Task(){
 							@Override
-							public void doTask() {
+							public void doTask(){
 								Auxiliary.inform(result.value(), Activity_BidsContractsEtc_2.this);
 							}
 						}).status.is("Отправка...").start(Activity_BidsContractsEtc_2.this);
@@ -513,7 +513,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 				}, null, null, null, null);
 	}
 
-	void openCarMap(String title, String key) {
+	void openCarMap(String title, String key){
 		Intent intent = new Intent();
 		intent.putExtra("carGPSid", key);
 		intent.putExtra("title", title);
@@ -521,7 +521,7 @@ public class Activity_BidsContractsEtc_2 extends Activity {
 		this.startActivity(intent);
 	}
 
-	void startCarMap() {
+	void startCarMap(){
 /*
 {
     "Данные": [
@@ -547,12 +547,12 @@ I/System.out: </>
 		final Note title = new Note();
 		final Note key = new Note();
 
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ObnovlenieInfo/%D0%9F%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C%D0%A2%D0%B5%D0%BA%D1%83%D1%89%D0%B8%D0%B9%D0%90%D0%B2%D1%82%D0%BE%D0%BC%D0%BE%D0%B1%D0%B8%D0%BB%D1%8C/" + ApplicationHoreca.getInstance().getClientInfo().getKod();//88319
 				//String url = "https://service.swlife.ru/hrc120107/hs/ObnovlenieInfo/%D0%9F%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C%D0%A2%D0%B5%D0%BA%D1%83%D1%89%D0%B8%D0%B9%D0%90%D0%B2%D1%82%D0%BE%D0%BC%D0%BE%D0%B1%D0%B8%D0%BB%D1%8C/" + ApplicationHoreca.getInstance().getClientInfo().getKod();//88319
-				try {
+				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String txt = new String(b, "UTF-8");
 					Bough data = Bough.parseJSON(txt);
@@ -563,34 +563,34 @@ I/System.out: </>
 									+ ", " + data.child("Данные").child("Водитель").value.property.value()
 									+ ", гос.номер " + data.child("Данные").child("ГосНомер").value.property.value()
 					);
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
-				if (key.value().length() > 1) {
+			public void doTask(){
+				if(key.value().length() > 1){
 					openCarMap(title.value(), key.value());
-				} else {
+				}else{
 					Auxiliary.warn("Нет доставки на данный момент", Activity_BidsContractsEtc_2.this);
 				}
 			}
 		}).status.is("Подождите...").start(this);
 	}
 
-	void promptVislatNakladnieNaPochtu() {
+	void promptVislatNakladnieNaPochtu(){
 		System.out.println("promptVislatNakladnieNaPochtu");
-		if (Settings.startVislatNakladnieNaPochtu.value() <= 0) {
+		if(Settings.startVislatNakladnieNaPochtu.value() <= 0){
 			Calendar c1 = Calendar.getInstance();
 			c1.set(Calendar.DAY_OF_MONTH, 1);
 			//String d1 = Auxiliary.short1cDate.format(c1.getTime());
-			Settings.startVislatNakladnieNaPochtu.value((double) c1.getTimeInMillis());
+			Settings.startVislatNakladnieNaPochtu.value((double)c1.getTimeInMillis());
 		}
-		if (Settings.endVislatNakladnieNaPochtu.value() <= 0) {
+		if(Settings.endVislatNakladnieNaPochtu.value() <= 0){
 			Calendar c2 = Calendar.getInstance();
 			//String d2 = Auxiliary.short1cDate.format(c2.getTime());
-			Settings.endVislatNakladnieNaPochtu.value((double) c2.getTimeInMillis());
+			Settings.endVislatNakladnieNaPochtu.value((double)c2.getTimeInMillis());
 		}
 		Auxiliary.pick(this, "Выслать накладные"//
 				, new SubLayoutless(this)//
@@ -628,9 +628,9 @@ I/System.out: </>
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
 						.height().is(Auxiliary.tapSize * 8)//
-				, "Отправить", new Task() {
+				, "Отправить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						String from = Auxiliary.short1cDate.format(new Date(Settings.startVislatNakladnieNaPochtu.value().longValue()));
 						String to = Auxiliary.short1cDate.format(new Date(Settings.endVislatNakladnieNaPochtu.value().longValue()));
 
@@ -646,20 +646,20 @@ I/System.out: </>
 
 						System.out.println(url);
 						final Note result = new Note();
-						new Expect().task.is(new Task() {
+						new Expect().task.is(new Task(){
 							@Override
-							public void doTask() {
-								try {
+							public void doTask(){
+								try{
 									byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 									result.value(new String(bytes, "UTF-8"));
-								} catch (Exception e) {
+								}catch(Exception e){
 									e.printStackTrace();
 									result.value(e.getMessage());
 								}
 							}
-						}).afterDone.is(new Task() {
+						}).afterDone.is(new Task(){
 							@Override
-							public void doTask() {
+							public void doTask(){
 								Auxiliary.warn("Результат: " + result.value(), Activity_BidsContractsEtc_2.this);
 							}
 						}).status.is("Отправка...").start(Activity_BidsContractsEtc_2.this);
@@ -667,13 +667,13 @@ I/System.out: </>
 				}, null, null, null, null);
 	}
 
-	void promptLimit() {
+	void promptLimit(){
 		Intent intent = new Intent();
 		intent.setClass(this, ActivityLimitList.class);
 		this.startActivityForResult(intent, 0);
 	}
 
-	void ___testPromptLimit() {
+	void ___testPromptLimit(){
 		//Report_Base.startPing();
 		//final String url="http://89.109.7.162/shatov/hs/UvelLimita/"+Cfg.currentHRC()+"/";
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/UvelLimita/" + Cfg.whoCheckListOwner() + "/";
@@ -685,31 +685,31 @@ I/System.out: </>
 		final String post = "{\"Лимит\":\"" + limit + "\",\"Отсрочка\":\"" + delay + "\",\"КодКлиента\":\"" + ApplicationHoreca.getInstance().getClientInfo().getKod() + "\",\"Комментарий\":\"" + rem + "\"}";
 		System.out.println(url);
 		System.out.println(post);
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					//Bough b = Auxiliary.loadTextFromPublicPOST(url, post, 99, "UTF-8");
 					Bough b = Auxiliary.loadTextFromPrivatePOST(url, post.getBytes("UTF-8"), 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
 					System.out.println(b.dumpXML());
-				} catch (Exception e) {
+				}catch(Exception e){
 					e.printStackTrace();
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				//
 			}
 		}).status.is("Отправка заявки").start(this);
 	}
 
-	public void resetTitle() {
+	public void resetTitle(){
 		setTitle(ApplicationHoreca.getInstance().getClientInfo().getName() + " (долги по накладным: " + ApplicationHoreca.getInstance().getClientInfo().dolgMessage + ")");
 	}
 
-	void doRequestSklad() {
-		if (Cfg.userLevel(Cfg.DBHRC()) > 0) {
+	void doRequestSklad(){
+		if(Cfg.userLevel(Cfg.DBHRC()) > 0){
 			ApplicationHoreca a = ApplicationHoreca.getInstance();
 			ClientInfo ci = a.getClientInfo();
 			String kod = ci.getKod();
@@ -720,48 +720,48 @@ I/System.out: </>
 					+ "/hs/Kontragenti/" + poluchitBazuOtgruzki + "/" //
 					+ kod.trim();
 			final Note sklad = new Note();
-			new Expect().task.is(new Task() {
+			new Expect().task.is(new Task(){
 				@Override
-				public void doTask() {
-					try {
+				public void doTask(){
+					try{
 						byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 						String s = new String(b, "utf-8");
 						//System.out.println("result " + s);
 						String[] a = s.split(":");
-						if (a[0].equals("ОК")) {
+						if(a[0].equals("ОК")){
 							String skladNum = a[1];
 							sklad.value(skladNum);
 						}
-					} catch (Exception e) {
+					}catch(Exception e){
 						e.printStackTrace();
 					}
 				}
-			}).afterDone.is(new Task() {
+			}).afterDone.is(new Task(){
 				@Override
-				public void doTask() {
-					if (!sklad.value().equals("")) {
+				public void doTask(){
+					if(!sklad.value().equals("")){
 						promptSklad(sklad.value());
 					}
 				}
 			}).status.is("Получение данных").start(this);
-		} else {
+		}else{
 			Auxiliary.warn("Только для супервайзеров", this);
 		}
 	}
 
-	void promptSklad(String skladNum) {
+	void promptSklad(String skladNum){
 		final Numeric sel = new Numeric();
-		if (skladNum.equals("000000009")) {
+		if(skladNum.equals("000000009")){
 			sel.value(1);
 		}
 		Auxiliary.pickSingleChoice(this, new String[]{"Только 8 склад", "8 и 17 склад"}, sel//
 				, "Склады отгрузок"//
-				, new Task() {
+				, new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//System.out.println(sel.value());
 						String sklad = "000000007";
-						if (sel.value() > 0) {
+						if(sel.value() > 0){
 							sklad = "000000009";
 						}
 						sendSklad(sklad);
@@ -773,7 +773,7 @@ I/System.out: </>
 				, null);
 	}
 
-	void sendSklad(String sklad) {
+	void sendSklad(String sklad){
 		ApplicationHoreca a = ApplicationHoreca.getInstance();
 		ClientInfo ci = a.getClientInfo();
 		String kod = ci.getKod();
@@ -784,29 +784,29 @@ I/System.out: </>
 				+ "/hs/Kontragenti/" + izmenitBazuOtgruzki + "/" //
 				+ kod.trim() + "/" + sklad;
 		final Note res = new Note();
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String s = new String(b, "utf-8");
 					//System.out.println("result " + s);
 					res.value(s);
-				} catch (Exception e) {
+				}catch(Exception e){
 					e.printStackTrace();
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn(res.value(), Activity_BidsContractsEtc_2.this);
 			}
 		}).status.is("Отправка данных").start(this);
 	}
 
-	public static void promptRequestMailList(final Activity a, final Vector<String> artikul) {
+	public static void promptRequestMailList(final Activity a, final Vector<String> artikul){
 		System.out.println("promptRequestMailList: " + artikul.size());
-		for (int i = 0; i < artikul.size(); i++) {
+		for(int i = 0; i < artikul.size(); i++){
 			System.out.println(i + ": " + artikul.get(i));
 		}
 		Auxiliary.pick(a, "Выслать шаблон заказа"//
@@ -838,9 +838,9 @@ I/System.out: </>
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
 						.height().is(Auxiliary.tapSize * 7)//
-				, "Отправить", new Task() {
+				, "Отправить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendRequestMailList(a, artikul, Settings.emailToSend.value(), ApplicationHoreca.getInstance().getClientInfo().getKod());
 					}
 				}, null, null, null, null);
@@ -858,7 +858,7 @@ I/System.out: </>
 			});
 		}
 	*/
-	public static void sendRequestMailList(final Activity a, final Vector<String> artikul, String email, String kodKlient) {
+	public static void sendRequestMailList(final Activity a, final Vector<String> artikul, String email, String kodKlient){
 		//String url=Settings.getInstance().getBaseURL()+"/hrc120107/hs/ZakazNaShablon/121162/20190101/20190301/surikov@swlife.nnov.ru";
 		//Принята заявка на отправку шаблона для заказа
 		String da = "%D0%B4%D0%B0";
@@ -890,13 +890,13 @@ I/System.out: </>
 
 		System.out.println(url);
 		final Note result = new Note();
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					String artLine = "";
 					String artDelimiter = "";
-					for (int i = 0; i < artikul.size(); i++) {
+					for(int i = 0; i < artikul.size(); i++){
 						artLine = artLine + artDelimiter + artikul.get(i);
 						artDelimiter = ",";
 					}
@@ -910,20 +910,20 @@ I/System.out: </>
 					result.value(resp.child("message").value.property.value()
 							+ ": " + resp.child("raw").value.property.value()
 					);
-				} catch (Exception e) {
+				}catch(Exception e){
 					e.printStackTrace();
 					result.value(e.getMessage());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn("Результат: " + result.value(), a);
 			}
 		}).status.is("Отправка...").start(a);
 	}
 
-	private void readExtras() {
+	private void readExtras(){
 		Bundle extras = getIntent().getExtras();
 		ApplicationHoreca.getInstance().setClientInfo(new ClientInfo(ApplicationHoreca.getInstance().getDataBase(), extras.getString("client_id")));
 		mChosedDay = Calendar.getInstance();
@@ -933,23 +933,23 @@ I/System.out: </>
 				== 0
 				? true
 				: false;
-		if (mIsEditable) {
-			if (Requests.IsSyncronizationDateLater(-5)) {
+		if(mIsEditable){
+			if(Requests.IsSyncronizationDateLater(-5)){
 				//LogHelper.debug("Requests.IsSyncronizationDateLater( -5 ) true");
 				//findViewById(R.id.layout_add).setVisibility(View.GONE);
 				//findViewById(R.id.secondtab).setVisibility(View.GONE);
 				//CreateErrorDialog(R.string.msg_sync_date_later5).show();
 				Auxiliary.warn("Последняя сихронизация была 5 дней назад. Создание заказов невозможно.", Activity_BidsContractsEtc_2.this);
 				mIsEditable = false;
-			} else {
+			}else{
 				//LogHelper.debug("Requests.IsSyncronizationDateLater( -5 ) false");
 			}
-		} else {
+		}else{
 			UIHelper.quickWarning("Заявки на " + DateTimeHelper.UIDateString(mChosedDay.getTime()), this);
 		}
 	}
 
-	void doObnoIstoria() {//http://89.109.7.162/GolovaNew/hs/ObnovlenieInfo/Istoriya?klient=82496
+	void doObnoIstoria(){//http://89.109.7.162/GolovaNew/hs/ObnovlenieInfo/Istoriya?klient=82496
 		ApplicationHoreca a = ApplicationHoreca.getInstance();
 		ClientInfo ci = a.getClientInfo();
 		String kod = ci.getKod();
@@ -959,16 +959,16 @@ I/System.out: </>
 		//final String url = Settings.getInstance().getBaseURL() + "GolovaNew/hs/ObnovlenieInfo/DannyeMarshruta?hrc=" + mAppInstance.getCurrentAgent().getAgentName().trim();
 		System.out.println(url);
 		final Numeric cntr = new Numeric();
-		new Expect().task.is(new Task() {
+		new Expect().task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String s = new String(b, "utf-8");
 					String[] commands = s.split("\n");
-					for (int i = 0; i < commands.length; i++) {
+					for(int i = 0; i < commands.length; i++){
 						String sql = commands[i].trim();
-						if (sql.length() > 1) {
+						if(sql.length() > 1){
 							//System.out.println(i + ": " + sql);
 							ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 							//Activity_BidsContractsEtc_2.this.mDB.execSQL(sql);
@@ -977,13 +977,13 @@ I/System.out: </>
 					}
 					//UpdateTask.refreshProdazhi_last(Activity_BidsContractsEtc_2.this.mDB);
 					UpdateTask.refreshProdazhi_last(ApplicationHoreca.getInstance().getDataBase());
-				} catch (Exception e) {
+				}catch(Exception e){
 					e.printStackTrace();
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn("Реализаций обновлено " + cntr.value().intValue(), Activity_BidsContractsEtc_2.this);
 			}
 		}).status.is("Обновление БД").start(this);
@@ -1033,24 +1033,24 @@ I/System.out: </>
 		startActivity(intent);
 	}*/
 
-	void showPechati() {
+	void showPechati(){
 		//System.out.println("showPechati");
 		Intent intent = new Intent();
 		intent.setClass(this, Activity_Pechati.class);
 		startActivity(intent);
 	}
 
-	void showVzaimoraschety() {
+	void showVzaimoraschety(){
 		String curKod = ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
 		//System.out.println("showVzaimoraschety "+curKod);
 		//ActivityWebServicesReports.goLastPageTempName = "who";
 		int nn = 0;
 		Bough kk = Cfg.kontragentyForSelectedMarshrut();
-		for (int ii = 0; ii < kk.children.size(); ii++) {
+		for(int ii = 0; ii < kk.children.size(); ii++){
 			Bough row = kk.children.get(ii);
 			String rowKod = row.child("kod").value.property.value().trim();
 			//System.out.println("check "+curKod);
-			if (rowKod.equals(curKod)) {
+			if(rowKod.equals(curKod)){
 				nn = ii;
 				//System.out.println(row.dumpXML());
 				break;
@@ -1066,7 +1066,7 @@ I/System.out: </>
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		//System.out.println("onCreate");
 		layoutless = new Layoutless(this);
@@ -1080,9 +1080,9 @@ I/System.out: </>
 		dataGrid = new DataGrid(this).center.is(true)//
 				.headerHeight.is(0.5 * Auxiliary.tapSize).pageSize.is(gridPageSize)//
 				.dataOffset.is(gridOffset)//
-				.beforeFlip.is(new Task() {
+				.beforeFlip.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//requeryGridData();
 						//flipGrid();
 					}
@@ -1095,9 +1095,9 @@ I/System.out: </>
 				.height().is(1)//
 		);
 		knobZakazy = new Knob(this);
-		layoutless.child(knobZakazy.afterTap.is(new Task() {
+		layoutless.child(knobZakazy.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						switchPage(0);
 					}
 				})//
@@ -1107,9 +1107,9 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		knobFixCena = new Knob(this);
-		layoutless.child(knobFixCena.afterTap.is(new Task() {
+		layoutless.child(knobFixCena.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						switchPage(1);
 					}
 				})//
@@ -1120,9 +1120,9 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		knobVozvrat = new Knob(this);
-		layoutless.child(knobVozvrat.afterTap.is(new Task() {
+		layoutless.child(knobVozvrat.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						switchPage(2);
 					}
 				})//
@@ -1132,9 +1132,9 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		knobSpec = new Knob(this);
-		layoutless.child(knobSpec.afterTap.is(new Task() {
+		layoutless.child(knobSpec.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						switchPage(3);
 					}
 				})//
@@ -1144,9 +1144,9 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		knobDegustacia = new Knob(this);
-		layoutless.child(knobDegustacia.afterTap.is(new Task() {
+		layoutless.child(knobDegustacia.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						switchPage(4);
 					}
 				})//
@@ -1166,10 +1166,11 @@ I/System.out: </>
 				.width().is(layoutless.width().property)//
 				.height().is(layoutless.height().property.minus(2 * Auxiliary.tapSize))//
 		);
-		layoutless.child(new Knob(this).afterTap.is(new Task() {
+		layoutless.child(new Knob(this).afterTap.is(new Task(){
 					@Override
-					public void doTask() {
-						if (gpsTimeExists30()) beginVizitButtonClick();
+					public void doTask(){
+						if(gpsTimeExists30())
+							beginVizitButtonClick();
 					}
 				})//
 						.labelText.is("Начало визита").left().is(0)//
@@ -1177,10 +1178,10 @@ I/System.out: </>
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
 		);
-		layoutless.child(new Knob(this).afterTap.is(new Task() {
+		layoutless.child(new Knob(this).afterTap.is(new Task(){
 					@Override
-					public void doTask() {
-						if (mojnoZakrytVizit()) {
+					public void doTask(){
+						if(mojnoZakrytVizit()){
 							endVizitCasePrompt();
 						}
 					}
@@ -1190,9 +1191,9 @@ I/System.out: </>
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
 		);
-		layoutless.child(new Knob(this).afterTap.is(new Task() {
+		layoutless.child(new Knob(this).afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						promptKlientPeople();
 					}
 				})//
@@ -1202,9 +1203,9 @@ I/System.out: </>
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
 		);
-		layoutless.child(new Knob(this).afterTap.is(new Task() {
+		layoutless.child(new Knob(this).afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						zametkiClick();
 					}
 				})//
@@ -1214,21 +1215,22 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		newZakaz = new Knob(this);
-		layoutless.child(newZakaz.afterTap.is(new Task() {
+		layoutless.child(newZakaz.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						addButtonClick();
 					}
 				})//
-						.labelText.is("Новый заказ").left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
+						.labelText.is("Новый заказ")
+						.left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		newFixCena = new Knob(this);
-		layoutless.child(newFixCena.afterTap.is(new Task() {
+		layoutless.child(newFixCena.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						StartFixedPricesActivity(true, null);
 					}
 				})//
@@ -1238,9 +1240,9 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		newVozvrat = new Knob(this);
-		layoutless.child(newVozvrat.afterTap.is(new Task() {
+		layoutless.child(newVozvrat.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						StartReturnsActivity(true, null);
 					}
 				})//
@@ -1250,9 +1252,9 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		newSpecificacia = new Knob(this);
-		layoutless.child(newSpecificacia.afterTap.is(new Task() {
+		layoutless.child(newSpecificacia.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						dobavitSpecificaciu();
 					}
 				})//
@@ -1262,9 +1264,9 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		newDegustas = new Knob(this);
-		layoutless.child(newDegustas.afterTap.is(new Task() {
+		layoutless.child(newDegustas.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						dobavitDegustaciu();
 					}
 				})//
@@ -1278,21 +1280,21 @@ I/System.out: </>
 		switchPage(0);
 	}
 
-	void flipGrid() {
+	void flipGrid(){
 	}
 
-	void requeryGridData() {
+	void requeryGridData(){
 	}
 
-	void zametkiClick() {
+	void zametkiClick(){
 		final Note note = new Note();
 		Auxiliary.pickString(this, "Новая заметка", note
-				, "Добавить", new Task() {
-					public void doTask() {
+				, "Добавить", new Task(){
+					public void doTask(){
 						Activity_Zametki.addNew(note.value());
 					}
-				}, "Все заметки", new Task() {
-					public void doTask() {
+				}, "Все заметки", new Task(){
+					public void doTask(){
 						zametkiOpen();
 					}
 				}, null, null
@@ -1300,46 +1302,46 @@ I/System.out: </>
 
 	}
 
-	void zametkiOpen() {
+	void zametkiOpen(){
 		Intent intent = new Intent();
 		intent.setClass(this, sweetlife.android10.ui.Activity_Zametki.class);
 		this.startActivity(intent);
 
 	}
 
-	void addButtonClick() {
+	void addButtonClick(){
 		int ORDER_UPDATE = 5;
 		StartBidsActivity(ORDER_UPDATE, null);
 	}
 
 	@Override
-	protected void onResume() {
+	protected void onResume(){
 		super.onResume();
 		Activity_Bid.unLockCreateNewOrder();
 		refreshGrid();
 	}
 
-	void refreshGrid() {
+	void refreshGrid(){
 		dataGrid.clearColumns();
-		if (!knobZakazy.isEnabled()) {
+		if(!knobZakazy.isEnabled()){
 			readOrders();
 		}
-		if (!knobFixCena.isEnabled()) {
+		if(!knobFixCena.isEnabled()){
 			readFixPrice();
 		}
-		if (!knobVozvrat.isEnabled()) {
+		if(!knobVozvrat.isEnabled()){
 			readReturns();
 		}
-		if (!knobSpec.isEnabled()) {
+		if(!knobSpec.isEnabled()){
 			readSpecificacia();
 		}
-		if (!knobDegustacia.isEnabled()) {
+		if(!knobDegustacia.isEnabled()){
 			readDegustacia();
 		}
 		dataGrid.refresh();
 	}
 
-	void readReturns() {
+	void readReturns(){
 		final ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		String sql = "select"//
 				+ "\n 		v._id as _id"//
@@ -1361,14 +1363,14 @@ I/System.out: </>
 		//System.out.println(sql);
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		gridData = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-		for (int i = 0; i < gridData.children.size(); i++) {
+		for(int i = 0; i < gridData.children.size(); i++){
 			final Bough row = gridData.children.get(i);
-			Task tapTask = new Task() {
-				public void doTask() {
-					try {
+			Task tapTask = new Task(){
+				public void doTask(){
+					try{
 						ZayavkaNaVozvrat bid //
 								= new ZayavkaNaVozvrat(//
-								(int) Numeric.string2double(row.child("_id").value.property.value())//
+								(int)Numeric.string2double(row.child("_id").value.property.value())//
 								, "x'" + row.child("_idrref").value.property.value() + "'"//
 								, Auxiliary.sqliteDate.parse(row.child("data").value.property.value())//
 								, row.child("nomer").value.property.value()//
@@ -1381,14 +1383,14 @@ I/System.out: </>
 								, false, row.child("_Version").value.property.value()//
 						);
 						StartReturnsActivity(!row.child("vygruzhen").value.property.value().equals("01"), bid);
-					} catch (Throwable t) {
+					}catch(Throwable t){
 						t.printStackTrace();
 					}
 				}
 			};
 			int bg = 0x00ff0000;
 			String vigrugen = "не выгружена";
-			if (!row.child("proveden").value.property.value().equals("00")) {
+			if(!row.child("proveden").value.property.value().equals("00")){
 				vigrugen = "выгружена";
 				bg = 0x3300ff00;
 			}
@@ -1402,7 +1404,7 @@ I/System.out: </>
 		}
 	}
 
-	void readDegustacia() {
+	void readDegustacia(){
 		final ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		String sql = "select _id,otgruzka,comment,kontragent,status"//
 				+ " from ZayavkaNaDegustaciu "//
@@ -1413,17 +1415,17 @@ I/System.out: </>
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		gridData = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		//System.out.println(gridData.dumpXML());
-		for (int i = 0; i < gridData.children.size(); i++) {
+		for(int i = 0; i < gridData.children.size(); i++){
 			final Bough row = gridData.children.get(i);
 			final String _id = row.child("_id").value.property.value();
-			Task tapTask = new Task() {
-				public void doTask() {
+			Task tapTask = new Task(){
+				public void doTask(){
 					doEditDegustaciu(_id);
 				}
 			};
 			int bg = 0x00ff0000;
 			String vigrugen = "не выгружена";
-			if (!row.child("status").value.property.value().equals("0")) {
+			if(!row.child("status").value.property.value().equals("0")){
 				vigrugen = "выгружена";
 				bg = 0x3300ff00;
 			}
@@ -1435,7 +1437,7 @@ I/System.out: </>
 		}
 	}
 
-	void readSpecificacia() {
+	void readSpecificacia(){
 		final ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		String sql = "select _id,createDate,fromDate,toDate,comment,hrc,kod,status"//
 				+ " from ZayavkaNaSpecifikasia"//
@@ -1446,17 +1448,17 @@ I/System.out: </>
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		gridData = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		//System.out.println(gridData.dumpXML());
-		for (int i = 0; i < gridData.children.size(); i++) {
+		for(int i = 0; i < gridData.children.size(); i++){
 			final Bough row = gridData.children.get(i);
 			final String _id = row.child("_id").value.property.value();
-			Task tapTask = new Task() {
-				public void doTask() {
+			Task tapTask = new Task(){
+				public void doTask(){
 					doEditSpecificacia(_id);
 				}
 			};
 			int bg = 0x00ff0000;
 			String vigrugen = "не выгружена";
-			if (!row.child("status").value.property.value().equals("0")) {
+			if(!row.child("status").value.property.value().equals("0")){
 				vigrugen = "выгружена";
 				bg = 0x3300ff00;
 			}
@@ -1471,14 +1473,14 @@ I/System.out: </>
 
 			String comment = row.child("comment").value.property.value();
 			String parts[] = comment.split("~");
-			if (parts.length > 1) {
+			if(parts.length > 1){
 				comment = parts[1];
 			}
 			columnComment.cell(comment, bg, tapTask, "");
 		}
 	}
 
-	void readFixPrice() {
+	void readFixPrice(){
 		final ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		String sql = "select"//
 				+ "\n 		    z._id as _id"//
@@ -1497,14 +1499,14 @@ I/System.out: </>
 		//System.out.println(sql);
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		gridData = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-		for (int i = 0; i < gridData.children.size(); i++) {
+		for(int i = 0; i < gridData.children.size(); i++){
 			final Bough row = gridData.children.get(i);
-			Task tapTask = new Task() {
-				public void doTask() {
-					try {
+			Task tapTask = new Task(){
+				public void doTask(){
+					try{
 						ZayavkaNaSkidki bid //
 								= new ZayavkaNaSkidki(//
-								(int) Numeric.string2double(row.child("_id").value.property.value())//
+								(int)Numeric.string2double(row.child("_id").value.property.value())//
 								, "x'" + row.child("_IDRRef").value.property.value() + "'"//
 								, Auxiliary.sqliteDate.parse(row.child("dateCreate").value.property.value())//
 								, row.child("nomer").value.property.value()//
@@ -1517,14 +1519,14 @@ I/System.out: </>
 								, row.child("vygruzhen").value.property.value().equals("01")//
 								, false);
 						StartFixedPricesActivity(!row.child("vygruzhen").value.property.value().equals("01"), bid);
-					} catch (Throwable t) {
+					}catch(Throwable t){
 						t.printStackTrace();
 					}
 				}
 			};
 			int bg = 0x00ff0000;
 			String vigrugen = "не выгружена";
-			if (!row.child("vygruzhen").value.property.value().equals("00")) {
+			if(!row.child("vygruzhen").value.property.value().equals("00")){
 				vigrugen = "выгружена";
 				bg = 0x3300ff00;
 			}
@@ -1540,7 +1542,7 @@ I/System.out: </>
 		}
 	}
 
-	void readOrders() {
+	void readOrders(){
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		String sql = "select"//
 				+ "\n 		zp._id as _id"//
@@ -1573,11 +1575,11 @@ I/System.out: </>
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		gridData = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		//System.out.println(gridData.dumpXML());
-		for (int i = 0; i < gridData.children.size(); i++) {
+		for(int i = 0; i < gridData.children.size(); i++){
 			Bough row = gridData.children.get(i);
 			//System.out.println(row.dumpXML());
 			final ZayavkaPokupatelya bid = new ZayavkaPokupatelya(//
-					(int) Numeric.string2double(row.child("_id").value.property.value())//
+					(int)Numeric.string2double(row.child("_id").value.property.value())//
 					, "x'" + row.child("_idrref").value.property.value() + "'"//
 					, DateTimeHelper.SQLDateToDate(row.child("data").value.property.value())//
 					, row.child("nomer").value.property.value()//
@@ -1590,27 +1592,27 @@ I/System.out: </>
 					, row.child("kontragentNaimenovanie").value.property.value()//
 					, Numeric.string2double(row.child("summaDokumenta").value.property.value())//
 					, "x'" + row.child("tipOplaty").value.property.value() + "'"//
-					, (int) Numeric.string2double(row.child("poryadok").value.property.value())//
+					, (int)Numeric.string2double(row.child("poryadok").value.property.value())//
 					, Numeric.string2double(row.child("sebestoimost").value.property.value())//
 					, false);
-			Task tapTask = new Task() {
-				public void doTask() {
+			Task tapTask = new Task(){
+				public void doTask(){
 					int ORDER_UPDATE = 5;
 					StartBidsActivity(ORDER_UPDATE, bid);
 				}
 			};
 			int bg = 0x00ff0000;
 			String vigrugen = "не выгружен";//+row.child("data").value.property.value();
-			if (!row.child("proveden").value.property.value().equals("00")) {
+			if(!row.child("proveden").value.property.value().equals("00")){
 				vigrugen = "выгружен";
 				bg = 0x3300ff00;
 			}
 			String otgruzka = Auxiliary.tryReFormatDate(row.child("dataOtgruzki").value.property.value(), "yyyy-MM-dd", "dd.MM.yy");
 			String tipOpl = "Наличная";
-			if (row.child("poryadok").value.property.value().equals("1")) {
+			if(row.child("poryadok").value.property.value().equals("1")){
 				tipOpl = "Безналичная";
 			}
-			if (row.child("poryadok").value.property.value().equals("2")) {
+			if(row.child("poryadok").value.property.value().equals("2")){
 				tipOpl = "Товарный чек";
 			}
 			columnDate.cell(otgruzka, bg, tapTask, vigrugen);
@@ -1619,20 +1621,20 @@ I/System.out: </>
 		}
 	}
 
-	private void StartFixedPricesActivity(boolean isEditable, ZayavkaNaSkidki bid) {
+	private void StartFixedPricesActivity(boolean isEditable, ZayavkaNaSkidki bid){
 		int FIXED_PRICES_ADD = 8;
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		Intent intent = new Intent();
 		intent.setClass(Activity_BidsContractsEtc_2.this, Activity_FixedPrices.class);
 		intent.putExtra("client_id", mAppInstance.getClientInfo().getID());
 		intent.putExtra("is_editable", isEditable);
-		if (bid != null) {
+		if(bid != null){
 			intent.putExtra("ZayavkaNaSkidki", bid);
 		}
 		startActivityForResult(intent, FIXED_PRICES_ADD);
 	}
 
-	void promptKlientPeople() {
+	void promptKlientPeople(){
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		Intent intent = new Intent();
 		intent.setClass(Activity_BidsContractsEtc_2.this, ActivityKlientPeople.class);
@@ -1640,10 +1642,10 @@ I/System.out: </>
 		startActivity(intent);
 	}
 
-	void promptDeleteFixPrices() {
-		Auxiliary.pickConfirm(this, "Удаление заявок на фикс.цены", "Удалить", new Task() {
+	void promptDeleteFixPrices(){
+		Auxiliary.pickConfirm(this, "Удаление заявок на фикс.цены", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				String idrrf = ApplicationHoreca.getInstance().getClientInfo().getID();
 				String sql = "delete from ZayavkaNaSkidki_TovaryPhiksCen where _ZayavkaNaSkidki_IDRRef in (select _idrref from ZayavkaNaSkidki where kontragent=" + idrrf + ");";
 				//System.out.println(sql);
@@ -1658,21 +1660,21 @@ I/System.out: </>
 	}
 
 
-	void StartBidsActivity(int requestCode, ZayavkaPokupatelya bid) {
+	void StartBidsActivity(int requestCode, ZayavkaPokupatelya bid){
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		Intent intent = new Intent();
 		intent.setClass(Activity_BidsContractsEtc_2.this, Activity_Bid.class);
 		intent.putExtra("client_id", mAppInstance.getClientInfo().getID());
-		if (bid != null) {
+		if(bid != null){
 			//intent.putExtra("newDoc", false);
 			intent.putExtra("ZayavkaPokupatelya", bid);
 			//ApplicationHoreca.lastZayavkaPokupatelya=bid;
 
-			if (!mIsEditable || bid.isProveden()) {
+			if(!mIsEditable || bid.isProveden()){
 				intent.putExtra("is_editable", false);
 			}
 			//intent.putExtra("doc", "exists");
-		} else {
+		}else{
 			Activity_Bid.unLockCreateNewOrder();
 			//intent.putExtra("doc", "new");
 			//ApplicationHoreca.lastZayavkaPokupatelya=null;
@@ -1680,14 +1682,14 @@ I/System.out: </>
 		startActivityForResult(intent, requestCode);
 	}
 
-	private void StartReturnsActivity(final boolean isEditable, ZayavkaNaVozvrat bid) {
+	private void StartReturnsActivity(final boolean isEditable, ZayavkaNaVozvrat bid){
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
-		if (bid == null) {
+		if(bid == null){
 			final Numeric defaultSelection = new Numeric();
-			Auxiliary.pickSingleChoice(this, ZayavkaNaVozvrat_Tovary.ReasonsTypes, defaultSelection, "Причина", new Task() {
+			Auxiliary.pickSingleChoice(this, ZayavkaNaVozvrat_Tovary.ZayavkaNaVozvratPrichina, defaultSelection, "Причина", new Task(){
 				@Override
-				public void doTask() {
-					if (defaultSelection.value() > 0) {
+				public void doTask(){
+					if(defaultSelection.value() > 0){
 						ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 						Intent intent = new Intent();
 						intent.setClass(Activity_BidsContractsEtc_2.this, Activity_Returns.class);
@@ -1698,7 +1700,7 @@ I/System.out: </>
 					}
 				}
 			}, null, null, null, null);
-		} else {
+		}else{
 			Intent intent = new Intent();
 			intent.setClass(Activity_BidsContractsEtc_2.this, Activity_Returns.class);
 			intent.putExtra("client_id", mAppInstance.getClientInfo().getID());
@@ -1708,35 +1710,35 @@ I/System.out: </>
 		}
 	}
 
-	void doEditSpecificacia(String _id) {
+	void doEditSpecificacia(String _id){
 		Intent intent = new Intent();
 		intent.putExtra("_id", _id);
 		intent.setClass(this, Activity_BidSpecificaciya.class);
 		startActivity(intent);
 	}
 
-	void doEditDegustaciu(String _id) {
+	void doEditDegustaciu(String _id){
 		Intent intent = new Intent();
 		intent.putExtra("_id", _id);
 		intent.setClass(this, Activity_BidDegustacia.class);
 		startActivity(intent);
 	}
 
-	void dobavitDegustaciu() {
+	void dobavitDegustaciu(){
 		Intent intent = new Intent();
 		//intent.putExtra("_id", _id);
 		intent.setClass(this, Activity_BidDegustacia.class);
 		startActivity(intent);
 	}
 
-	void dobavitSpecificaciu() {
+	void dobavitSpecificaciu(){
 		//System.out.println("new Specificacia");
 		Intent intent = new Intent();
 		intent.setClass(this, Activity_BidSpecificaciya.class);
 		startActivity(intent);
 	}
 
-	void beginVizit() {
+	void beginVizit(){
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		GPSInfo mGPSInfo = GPS.getGPSInfo();
 		String timeString = Auxiliary.tryReFormatDate3(mGPSInfo.getVizitTimeString(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss");
@@ -1745,47 +1747,50 @@ I/System.out: </>
 		Auxiliary.warn("Начало визита" + ": " + timeString, Activity_BidsContractsEtc_2.this);
 	}
 
-	void promptRepeatVizit(String lastVizitTime) {
-		Auxiliary.pickConfirm(this, "Уже имеется открытый визит с временем начала " + lastVizitTime + ". Изменить открытый визит?", "Начать", new Task() {
+	void promptRepeatVizit(String lastVizitTime){
+		Auxiliary.pickConfirm(this, "Уже имеется открытый визит с временем начала " + lastVizitTime + ". Изменить открытый визит?", "Начать", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				beginVizit();
 			}
 		});
 	}
 
-	void beginVizitButtonClick() {
+	void beginVizitButtonClick(){
 		LogHelper.debug("mBtnBeginVizit");
 		final ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		final GPSInfo mGPSInfo = GPS.getGPSInfo();
 		//if (!mGPSInfo.estDalnieVizity(mAppInstance.getClientInfo())) {
-		long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
-		if (distanceToClient == GPSInfo.GPS_NOT_AVAILABLE) {
+		long distanceToClient = GPSInfo.isTPNearClient(
+				mAppInstance.getClientInfo().getLat()
+				, mAppInstance.getClientInfo().getLon()
+		);
+		if(distanceToClient == GPSInfo.GPS_NOT_AVAILABLE){
 			Auxiliary.warn("GPS данные недоступны. Невозможно начать визит.", this);
-		} else {
-			if (distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
+		}else{
+			if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
 				String warning = "Удаление от контрагента " + distanceToClient + " метров. Начать визит?";
-				if (mAppInstance.getClientInfo().getLat() == 0) {
+				if(mAppInstance.getClientInfo().getLat() == 0){
 					warning = "У клиента не зафиксированы координаты. Начать визит?";
 				}
-				Auxiliary.pickConfirm(this, warning, "Начать", new Task() {
+				Auxiliary.pickConfirm(this, warning, "Начать", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//if (!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
 						String beginTime = mGPSInfo.findPreVizitTimeDaily(mAppInstance.getClientInfo().getKod());
-						if (beginTime != null) {
+						if(beginTime != null){
 							promptRepeatVizit(beginTime);
-						} else {
+						}else{
 							beginVizit();
 						}
 					}
 				});
-			} else {
+			}else{
 				//if (!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
 				String beginTime = mGPSInfo.findPreVizitTimeDaily(mAppInstance.getClientInfo().getKod());
-				if (beginTime != null) {
+				if(beginTime != null){
 					promptRepeatVizit(beginTime);
-				} else {
+				}else{
 					beginVizit();
 				}
 			}
@@ -1795,16 +1800,19 @@ I/System.out: </>
 		//}
 	}
 
-	boolean gpsTimeExists30() {
-		if ((new Date().getTime()) - Session.getGPSTime() > 30 * 1000) {
+	boolean gpsTimeExists30(){
+		//if(1==1)return true;
+
+		//if ((new Date().getTime()) - Session.getGPSTime() > 30 * 1000) {
+		if((new Date().getTime()) - GPSInfo.lastDateTime() > 30 * 1000){
 			Auxiliary.warn("Нет координат за последние 30с. Проверьте GPS и настройки даты/времени.", Activity_BidsContractsEtc_2.this);
 			return false;
-		} else {
+		}else{
 			return true;
 		}
 	}
 
-	boolean mojnoZakrytVizit() {
+	boolean mojnoZakrytVizit(){
 
 
 		//System.out.println("////////");
@@ -1819,12 +1827,15 @@ I/System.out: </>
 		}*/
 
 
-		if (!gpsTimeExists30()) return false;
+		if(!gpsTimeExists30())
+			return false;
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		long duration = 0;
-		int coarse = 0;
-		String sql = "select BeginTime as BeginTime from Vizits where EndTime is null and Client = " + mAppInstance.getClientInfo().getKod();
+		int coarse = -1;
+		//String sql = "select BeginTime as BeginTime from Vizits where ((EndTime is null) or (length(EndTime)<4) or(EndTime=BeginTime)) and Client = " + mAppInstance.getClientInfo().getKod().trim();
+		String sql = "select BeginTime as BeginTime from Vizits where EndTime is null and Client = " + mAppInstance.getClientInfo().getKod().trim();
+		System.out.println("mojnoZakrytVizit " + sql);
 		//mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod());
 		//Cursor cursor = mDB.rawQuery(sql, null);
 		Bough b = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
@@ -1833,10 +1844,10 @@ I/System.out: </>
 		//mDateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 		//userTime.setTimeZone(TimeZone.getTimeZone("GMT+03:00"));
 		java.util.Date now = new java.util.Date();
-		if (b.children.size() > 0) {
+		if(b.children.size() > 0){
 			//DateFormat df;
 
-			try {
+			try{
 				//java.util.Date beginDate = mDateTimeFormat.parse(cursor.getString(0));
 				SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 				mDateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -1846,13 +1857,16 @@ I/System.out: </>
 				//System.out.println(beginDate);
 				//System.out.println(now);
 				//System.out.println(duration);
-			} catch (Throwable t) {
+			}catch(Throwable t){
 				t.printStackTrace();
 			}
+		}else{
+			Auxiliary.warn("Не найдено незакрытых визитов для контрагента " + mAppInstance.getClientInfo().getKod().trim(), Activity_BidsContractsEtc_2.this);
+			return false;
 		}
 		//cursor.close();
 		//if (duration < 1000 * 60 * 15) {
-		if (duration < 1000 * 60 * 5) {
+		if(duration < 1000 * 60 * 5){
 			coarse = (int)Math.round(duration / (1000.0 * 60));
 
 			Auxiliary.warn("Визит должен длиться не меньше 5 мин.,\nс "
@@ -1863,30 +1877,32 @@ I/System.out: </>
 			return false;
 		}
 		long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
-		if (distanceToClient == GPSInfo.GPS_NOT_AVAILABLE) {
+		if(distanceToClient == GPSInfo.GPS_NOT_AVAILABLE){
 			Auxiliary.warn("GPS данные недоступны.", Activity_BidsContractsEtc_2.this);
 			return false;
 		}
-		if (distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
-			Auxiliary.warn("Удаление от контрагента " + distanceToClient + " метров.", Activity_BidsContractsEtc_2.this);
+
+		if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+			Auxiliary.warn("Удаление от контрагента " + distanceToClient + " метров."
+					, Activity_BidsContractsEtc_2.this);
 			return false;
 		}
 		return true;
 	}
 
-	void endVizitCasePrompt() {
+	void endVizitCasePrompt(){
 		String sql = "select [Naimenovanie] as Naimenovanie from RezultatVizita order by [Kod]";
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		final Bough b = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		String[] items = new String[b.children.size()];
-		for (int i = 0; i < b.children.size(); i++) {
+		for(int i = 0; i < b.children.size(); i++){
 			items[i] = b.children.get(i).child("Naimenovanie").value.property.value();
 		}
 		final Numeric selection = new Numeric();
-		Auxiliary.pickSingleChoice(this, items, selection, "Результат визита", new Task() {
+		Auxiliary.pickSingleChoice(this, items, selection, "Результат визита", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				//System.out.println(selection.value());
 				GPSInfo mGPSInfo = GPS.getGPSInfo();
 				ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
@@ -1897,7 +1913,7 @@ I/System.out: </>
 		}, null, null, null, null);
 	}
 
-	void switchPage(int nn) {
+	void switchPage(int nn){
 		//System.out.println("switchPage " + nn);
 		knobZakazy.setEnabled(nn != 0);
 		newZakaz.hidden().is(nn != 0);

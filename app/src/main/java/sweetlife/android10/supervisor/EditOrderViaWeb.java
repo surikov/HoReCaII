@@ -30,7 +30,9 @@ import sweetlife.android10.data.common.NomenclatureBasedDocument;
 import sweetlife.android10.data.fixedprices.FixedPricesNomenclatureData;
 import sweetlife.android10.data.fixedprices.ZayavkaNaSkidki;
 import sweetlife.android10.ui.Activity_Bid;
+import sweetlife.android10.ui.Activity_Disposals;
 import sweetlife.android10.ui.Activity_FixedPrices;
+import sweetlife.android10.ui.Dialog_EditDisposal;
 import tee.binding.Bough;
 import tee.binding.it.Note;
 import tee.binding.it.Numeric;
@@ -51,10 +53,10 @@ public class EditOrderViaWeb {
 
 	void start() {
 		final RawSOAP r = new RawSOAP();
-		new Expect().status.is("Выполнение...").task.is(new Task() {
+		new Expect().status.is("Выполнение..." ).task.is(new Task() {
 			@Override
 			public void doTask() {
-				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws")//
+				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws" )//
 						.xml.is("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"//
 						+ "\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
 						+ "\n	<S:Body>"//
@@ -68,18 +70,18 @@ public class EditOrderViaWeb {
 				Report_Base.startPing();
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				System.out.println("r.data " + r.data.dumpXML());
-				Vector<Bough> items = r.data.child("soap:Body")//
-						.child("m:GatResponse")//
-						.child("m:return")//
-						.child("m:Table")//
+				Vector<Bough> items = r.data.child("soap:Body" )//
+						.child("m:GatResponse" )//
+						.child("m:return" )//
+						.child("m:Table" )//
 						.children;
 				for (int i = 0; i < items.size(); i++) {
 					OrderItemInfo info = new OrderItemInfo();
-					info.artikul = items.get(i).child("Article").value.property.value();
-					info.cena = Numeric.string2double(items.get(i).child("m:Cena").value.property.value());
-					info.min = Numeric.string2double(items.get(i).child("m:Min").value.property.value());
-					info.max = Numeric.string2double(items.get(i).child("m:Max").value.property.value());
-					info.kolichestvo = Numeric.string2double(items.get(i).child("KolVo").value.property.value());
+					info.artikul = items.get(i).child("Article" ).value.property.value();
+					info.cena = Numeric.string2double(items.get(i).child("m:Cena" ).value.property.value());
+					info.min = Numeric.string2double(items.get(i).child("m:Min" ).value.property.value());
+					info.max = Numeric.string2double(items.get(i).child("m:Max" ).value.property.value());
+					info.kolichestvo = Numeric.string2double(items.get(i).child("KolVo" ).value.property.value());
 					info.naimenovanie = nomenklaturaNaimenovanieByArtikul(info.artikul);
 					orderItems.add(info);
 
@@ -91,24 +93,24 @@ public class EditOrderViaWeb {
 							+ "\n		join Kontragenty kk on kk._idrref=dog.vladelec and kk.kod='" + currentKlientKod + "'"
 							+ "\n	limit 1;";
 					Bough bough = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-					info.poslednyaya = bough.child("row").child("poslednyaa").value.property.value();
+					info.poslednyaya = bough.child("row" ).child("poslednyaa" ).value.property.value();
 					String sql2 = "select nn.skladEdIzm || ' по ' || nn.skladEdVes || 'кг' as [EdinicyIzmereniyaNaimenovanie], nn.kvant as MinNorma, nn.otchEdKoef as [Koephphicient]"
 							+ "\n	from Nomenklatura_sorted nn"
 							+ "\n	where nn.artikul='" + info.artikul + "'"
 							+ "\n	limit 1;";
 					Bough bough2 = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql2, null));
 					//System.out.println(sql2);
-					info.edizm = bough2.child("row").child("EdinicyIzmereniyaNaimenovanie").value.property.value();
-					info.minNorma = bough2.child("row").child("MinNorma").value.property.value();
-					info.koephphicient = bough2.child("row").child("Koephphicient").value.property.value();
+					info.edizm = bough2.child("row" ).child("EdinicyIzmereniyaNaimenovanie" ).value.property.value();
+					info.minNorma = bough2.child("row" ).child("MinNorma" ).value.property.value();
+					info.koephphicient = bough2.child("row" ).child("Koephphicient" ).value.property.value();
 
 
 				}
-				comment = r.data.child("soap:Body")//
-						.child("m:GatResponse")//
-						.child("m:return")//
-						.child("m:Head")//
-						.child("Comment").value.property;
+				comment = r.data.child("soap:Body" )//
+						.child("m:GatResponse" )//
+						.child("m:return" )//
+						.child("m:Head" )//
+						.child("Comment" ).value.property;
 			}
 		}).afterDone.is(new Task() {
 			@Override
@@ -125,7 +127,7 @@ public class EditOrderViaWeb {
 
 	void promptChangeDate() {
 		Calendar c = Calendar.getInstance();
-		final DateFormat from = new SimpleDateFormat("dd.MM.yyyy");
+		final DateFormat from = new SimpleDateFormat("dd.MM.yyyy" );
 		try {
 			Date d = from.parse(shipDate);
 			c.setTime(d);
@@ -137,7 +139,7 @@ public class EditOrderViaWeb {
 					newCalendar.set(Calendar.MONTH, monthOfYear);
 					newCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 					shipDate = from.format(newCalendar.getTime());
-					requestChangeOrderState("5");
+					requestChangeOrderState("5" );
 				}
 			}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)//
 			).show();
@@ -150,11 +152,19 @@ public class EditOrderViaWeb {
 		Auxiliary.pickConfirm(context, "Пометить на удаление", "Удалить", new Task() {
 			@Override
 			public void doTask() {
-				requestChangeOrderState("2");
+				requestChangeOrderState("2" );
 			}
 		});
 	}
-
+void promptRasporyajenieNaOtgruzku(){
+	Intent intent = new Intent();
+	intent.setClass(context, Dialog_EditDisposal.class);
+	intent.putExtra("is_editable", true);
+	String sql="select _idrref as _idrref from kontragenty where kod="+currentKlientKod;
+	String hexKlient="x'"+Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null)).child("row").child("_idrref").value.property.value()+"'";
+	intent.putExtra("hexKlient",hexKlient);
+	context.startActivity(intent);
+}
 	void promptForceApprove() {
 		Auxiliary.pickConfirm(context, "Провести без ограничений на наценку", "Провести", new Task() {
 			@Override
@@ -165,10 +175,10 @@ public class EditOrderViaWeb {
 	}
 
 	void sendForceApprove() {
-		final Note result = new Note().value("Проведение заказа:");
+		final Note result = new Note().value("Проведение заказа:" );
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 				+ "/hs/ZakaziPokupatelya/ProvestiPoNacenke/" + documentNumber
-				+ "/" + Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyMMdd")
+				+ "/" + Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyMMdd" )
 				+ "/" + Cfg.whoCheckListOwner();
 		System.out.println("sendForceApprove " + url);
 		Task sendTask = new Task() {
@@ -176,7 +186,7 @@ public class EditOrderViaWeb {
 			public void doTask() {
 				try {
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					String msg = new String(bytes, "UTF-8");
+					String msg = new String(bytes, "UTF-8" );
 					//String txt = Auxiliary.parseChildOrRaw(msg, "Message");
 					result.value(result.value() + "\n" + msg);
 					me.preReport.writeCurrentPage();
@@ -193,7 +203,7 @@ public class EditOrderViaWeb {
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		};
-		Expect expect = new Expect().status.is("Подождите").task.is(sendTask).afterDone.is(afterSend);
+		Expect expect = new Expect().status.is("Подождите" ).task.is(sendTask).afterDone.is(afterSend);
 		expect.start(context);
 	}
 
@@ -209,7 +219,7 @@ public class EditOrderViaWeb {
 		Auxiliary.pickSingleChoice(context, new String[]{//
 						"Провести"//
 						, "Пометить заказ на удаление"//
-						,"Изменить заказ"//, "Изменить номенклатуру"//
+						, "Изменить заказ"//, "Изменить номенклатуру"//
 						, "Перенести дату"//
 						, "Счёт на оплату"//
 						//, "Заявка на фикс.цену"//
@@ -220,6 +230,7 @@ public class EditOrderViaWeb {
 						, "Сменить контрагента в заказе"//
 						, "Удаление мелких заказов"//
 						, "Провести (для РД)"//
+						, "Распоряжение на отгрузку"//
 				}, nn//
 				, hrc + ": №" + documentNumber //+ "/" + documentDate
 						+ ", отгрузка " + shipDate//
@@ -227,7 +238,7 @@ public class EditOrderViaWeb {
 					@Override
 					public void doTask() {
 						if (nn.value().intValue() == 0) {
-							requestChangeOrderState("1");
+							requestChangeOrderState("1" );
 						}
 						if (nn.value().intValue() == 1) {
 							promptSendDelete();
@@ -266,7 +277,9 @@ public class EditOrderViaWeb {
 						if (nn.value().intValue() == 10) {
 							promptForceApprove();
 						}
-
+						if (nn.value().intValue() == 11) {
+							promptRasporyajenieNaOtgruzku();
+						}
 
 					}
 				}, null, null, null, null);
@@ -276,11 +289,11 @@ public class EditOrderViaWeb {
 		Bough bough = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(//
 				"select Naimenovanie from nomenklatura where artikul='" + artikul + "' limit 1;"//
 				, null));
-		return bough.child("row").child("Naimenovanie").value.property.value();
+		return bough.child("row" ).child("Naimenovanie" ).value.property.value();
 	}
 
 	void sendUdalenieMelkihZakazov() {
-		final Note result = new Note().value("Удаление мелких заказов:");
+		final Note result = new Note().value("Удаление мелких заказов:" );
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/ApproveSmallOrders/" + documentNumber;
 		System.out.println("sendUdalenieMelkihZakazov " + url);
 		Task sendTask = new Task() {
@@ -288,7 +301,7 @@ public class EditOrderViaWeb {
 			public void doTask() {
 				try {
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					String msg = new String(bytes, "UTF-8");
+					String msg = new String(bytes, "UTF-8" );
 					/*System.out.println(msg);
 					String txt = msg;
 					Bough bb = Bough.parseJSON(msg);
@@ -297,7 +310,7 @@ public class EditOrderViaWeb {
 						txt = mm;
 					}
 					*/
-					String txt = Auxiliary.parseChildOrRaw(msg, "Message");
+					String txt = Auxiliary.parseChildOrRaw(msg, "Message" );
 					result.value(result.value() + "\n" + txt);
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
@@ -313,7 +326,7 @@ public class EditOrderViaWeb {
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		};
-		Expect expect = new Expect().status.is("Подождите").task.is(sendTask).afterDone.is(afterSend);
+		Expect expect = new Expect().status.is("Подождите" ).task.is(sendTask).afterDone.is(afterSend);
 		expect.start(context);
 	}
 
@@ -335,7 +348,7 @@ public class EditOrderViaWeb {
 		final Bough kk = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		final String[] items = new String[kk.children.size()];
 		for (int i = 0; i < kk.children.size(); i++) {
-			items[i] = kk.children.get(i).child("kod").value.property.value() + ": " + kk.children.get(i).child("naimenovanie").value.property.value();
+			items[i] = kk.children.get(i).child("kod" ).value.property.value() + ": " + kk.children.get(i).child("naimenovanie" ).value.property.value();
 		}
 		final Numeric defaultSelection = new Numeric();
 		Auxiliary.pickFilteredChoice(context, items, defaultSelection, new Task() {
@@ -345,27 +358,27 @@ public class EditOrderViaWeb {
 				final String url = //"https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/IzmenitKontragenta/"
 						Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZakaziPokupatelya/IzmenitKontragenta/"
 								+ documentNumber
-								+ "/" + kk.children.get(defaultSelection.value().intValue()).child("kod").value.property.value()
+								+ "/" + kk.children.get(defaultSelection.value().intValue()).child("kod" ).value.property.value()
 								+ "/" + Cfg.whoCheckListOwner().trim();
 				System.out.println(url);
-				Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+				Expect expect = new Expect().status.is("Подождите" ).task.is(new Task() {
 					@Override
 					public void doTask() {
 						try {
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-							String msg = new String(bytes, "UTF-8");
+							String msg = new String(bytes, "UTF-8" );
 							System.out.println(msg);
-							b.child("result").value.is(msg);
+							b.child("result" ).value.is(msg);
 							me.preReport.writeCurrentPage();
 						} catch (Throwable t) {
 							t.printStackTrace();
-							b.child("result").value.is(t.toString());
+							b.child("result" ).value.is(t.toString());
 						}
 					}
 				}).afterDone.is(new Task() {
 					@Override
 					public void doTask() {
-						Auxiliary.warn(b.child("result").value.property.value(), context);
+						Auxiliary.warn(b.child("result" ).value.property.value(), context);
 						me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 					}
 				});
@@ -382,11 +395,11 @@ public class EditOrderViaWeb {
 		//String sql = "select hex(_idrref) as id from kontragenty where trim(naimenovanie)='" + currentKlientName + "';";
 		String sql = "select hex(_idrref) as id from kontragenty where kod=" + currentKlientKod.trim() + ";";
 		Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-		if (bb.child("row").child("id").value.property.value().trim().length() < 7) {
+		if (bb.child("row" ).child("id" ).value.property.value().trim().length() < 7) {
 			Auxiliary.warn("Не найден контрагент " + currentKlientKod, context);
 			return;
 		}
-		String clientID = "x'" + bb.child("row").child("id").value.property.value() + "'";
+		String clientID = "x'" + bb.child("row" ).child("id" ).value.property.value() + "'";
 		sql = "select "
 				+ "	case when (dgvr.Podrazdelenie = x'00000000000000000000000000000000' or dgvr.Podrazdelenie = x'00') then 0 else 1 end podrazdelenie"
 				+ "	,ifnull(dgvr.ProcentPredoplaty,0) as procent"
@@ -404,38 +417,38 @@ public class EditOrderViaWeb {
 		final Vector<String> tips = new Vector<String>();
 		for (int i = 0; i < bb.children.size(); i++) {
 			Bough row = bb.children.get(i);
-			String kod = row.child("kod").value.property.value();
-			String name = row.child("name").value.property.value();
-			double podrazdelenie = Numeric.string2double(row.child("podrazdelenie").value.property.value());
-			double procent = Numeric.string2double(row.child("procent").value.property.value());
+			String kod = row.child("kod" ).value.property.value();
+			String name = row.child("name" ).value.property.value();
+			double podrazdelenie = Numeric.string2double(row.child("podrazdelenie" ).value.property.value());
+			double procent = Numeric.string2double(row.child("procent" ).value.property.value());
 			if ((podrazdelenie == 0) && (procent == 0)) {
-				System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " нал");
-				System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " товчек");
-				labels.add(name + ", нал.");
+				System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " нал" );
+				System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " товчек" );
+				labels.add(name + ", нал." );
 				kods.add(kod);
-				tips.add("0");
-				labels.add(name + ", тов.чек");
+				tips.add("0" );
+				labels.add(name + ", тов.чек" );
 				kods.add(kod);
-				tips.add("2");
+				tips.add("2" );
 			} else {
 				if ((podrazdelenie == 0) && (procent == 100)) {
-					System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " нал");
-					System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " безнал");
-					labels.add(name + ", нал.");
+					System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " нал" );
+					System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " безнал" );
+					labels.add(name + ", нал." );
 					kods.add(kod);
-					tips.add("0");
-					labels.add(name + ", безнал.");
+					tips.add("0" );
+					labels.add(name + ", безнал." );
 					kods.add(kod);
-					tips.add("1");
+					tips.add("1" );
 				} else {
 					//System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " нал");
-					System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " безнал");
+					System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " безнал" );
 					//labels.add(name + ", нал.");
 					//kods.add(kod);
 					//tips.add("0");
-					labels.add(name + ", безнал.");
+					labels.add(name + ", безнал." );
 					kods.add(kod);
-					tips.add("1");
+					tips.add("1" );
 				}
 			}
 		}
@@ -448,7 +461,7 @@ public class EditOrderViaWeb {
 				public void doTask() {
 					System.out.println(list[idx.value().intValue()]);
 					sendDogovorTipOplaty(documentNumber
-							, Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyyMMdd")
+							, Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyyMMdd" )
 
 							, tips.get(idx.value().intValue())
 							, kods.get(idx.value().intValue())
@@ -463,33 +476,33 @@ public class EditOrderViaWeb {
 
 	void sendDogovorTipOplaty(final String nomerZakaza, final String dataZakaza, final String nomerFormiOplaty, final String kodDogovora) {
 		final Bough b = new Bough();
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите" ).task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
 					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 							+ "/hs/ZakaziPokupatelya/IzmenitFormuIDogovor"
-							+ "/" + URLEncoder.encode(nomerZakaza.trim(), "utf-8")
-							+ "/" + URLEncoder.encode(dataZakaza.trim(), "utf-8")
-							+ "/" + URLEncoder.encode(nomerFormiOplaty.trim(), "utf-8")
-							+ "/" + URLEncoder.encode(kodDogovora.trim(), "utf-8")
-							+ "/" + URLEncoder.encode(Cfg.whoCheckListOwner().trim(), "utf-8");
+							+ "/" + URLEncoder.encode(nomerZakaza.trim(), "utf-8" )
+							+ "/" + URLEncoder.encode(dataZakaza.trim(), "utf-8" )
+							+ "/" + URLEncoder.encode(nomerFormiOplaty.trim(), "utf-8" )
+							+ "/" + URLEncoder.encode(kodDogovora.trim(), "utf-8" )
+							+ "/" + URLEncoder.encode(Cfg.whoCheckListOwner().trim(), "utf-8" );
 					Report_Base.startPing();
 					System.out.println(url);
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					String msg = new String(bytes, "UTF-8");
+					String msg = new String(bytes, "UTF-8" );
 					System.out.println(msg);
-					b.child("result").value.is(msg);
+					b.child("result" ).value.is(msg);
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
 					t.printStackTrace();
-					b.child("result").value.is(t.toString());
+					b.child("result" ).value.is(t.toString());
 				}
 			}
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				Auxiliary.warn(b.child("result").value.property.value(), context);
+				Auxiliary.warn(b.child("result" ).value.property.value(), context);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		});
@@ -526,7 +539,7 @@ public class EditOrderViaWeb {
 
 	void promptRecalculate() {
 		final Bough b = new Bough();
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите" ).task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
@@ -538,19 +551,19 @@ public class EditOrderViaWeb {
 					//Report_Base.startPing();
 					System.out.println(url + ": " + text);
 					Bough result;
-					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
-					b.child("result").value.is(result.child("message").value.property.value());
+					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8" ), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					b.child("result" ).value.is(result.child("message" ).value.property.value());
 					System.out.println(result.dumpXML());
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
 					t.printStackTrace();
-					b.child("result").value.is(t.toString());
+					b.child("result" ).value.is(t.toString());
 				}
 			}
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				Auxiliary.warn(b.child("result").value.property.value(), context);
+				Auxiliary.warn(b.child("result" ).value.property.value(), context);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		});
@@ -558,8 +571,9 @@ public class EditOrderViaWeb {
 	}
 
 	void requestItemsChangeNew() {
-		final Bough b = new Bough();
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		final Bough bb = new Bough();
+
+		Expect expect = new Expect().status.is("Подождите" ).task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
@@ -568,63 +582,83 @@ public class EditOrderViaWeb {
 							Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 									+ "/hs/ZakaziPokupatelya/PoluchitSostavZakazov/" + Cfg.whoCheckListOwner();
 					String text = "[{\"НомерДокумента\":\"" + documentNumber + "\", \"ДатаДокумента\":\"" + ActivityWebServicesReports.reformatDate3(documentDate) + "\"}]";
-					Bough result;
-					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
-					b.child("result").value.is(result.child("message").value.property.value());
-					String rawText = result.child("raw").value.property.value();
-					Bough raw = Bough.parseJSON(rawText);
-					//System.out.println("requestItemsChange\n"+url+"\n"+text+"\n"+raw.dumpXML());
-					b.child("raw").children = raw.children;
-					//me.preReport.writeCurrentPage();
+					Bough result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
 
-				} catch (Throwable t) {
-					t.printStackTrace();
-					b.child("result").value.is(t.toString());
+					//url = "https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/PoluchitSostavZakazov/hrc703";
+					//text = "[{\"НомерДокумента\":\"12-2059882\", \"ДатаДокумента\":\"2023-10-13\"}]";
+					//Bough result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8" ), 12000, "bot28", "Molgav1024", true);
+
+					bb.child("result" ).value.is(result.child("message" ).value.property.value());
+					String rawText = result.child("raw" ).value.property.value();
+					Bough raw = Bough.parseJSON(rawText);
+					System.out.println("requestItemsChange\n" + url + "\n" + text + "\nrawText[" + rawText + "]" );
+					bb.child("raw" ).children = raw.children;
+					//me.preReport.writeCurrentPage();
+					if (rawText.trim().length() < 1) {
+						bb.child("raw" ).child("Сообщение" ).value.property.value(bb.child("raw" ).child("Сообщение" ).value.property.value() + "\nнет данных " + rawText);
+					}
+				} catch (Throwable tt) {
+					tt.printStackTrace();
+					bb.child("raw" ).child("Сообщение" ).value.property.value(bb.child("raw" ).child("Сообщение" ).value.property.value() + "\n" + tt.toString());
 				}
 			}
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				//createUpdatableOrder(b.child("raw"));
-				String client_id = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(
-						"select \"x'\" || hex(_idrref) || \"'\" as id from Kontragenty where trim(kod)='"
-								+ b.child("raw").child("Данные").child("КодКонтрагента").value.property.value().trim() + "';"
-						, null)).child("row").child("id").value.property.value();
-				String oplatanum = Cfg.tip_nalichnie;//"Наличная";
-				if (b.child("raw").child("Данные").child("ТипОплаты").value.property.value().equals("Безналичная")) {
-					oplatanum = Cfg.tip_beznal;
-				}
-				if (b.child("raw").child("Данные").child("ТипОплаты").value.property.value().equals("Товарный чек")) {
-					oplatanum = Cfg.tip_tovcheck;
-				}
-				String dogovor_idrref = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(
-						"select \"x'\" || hex(_idrref) || \"'\" as id from DogovoryKontragentov where trim(kod)='"
-								+ b.child("raw").child("Данные").child("КодДоговора").value.property.value().trim() + "';"
-						, null)).child("row").child("id").value.property.value();
-				try {
-					Date tt = Auxiliary.mssqlTime.parse(b.child("raw").child("Данные").child("ДатаОтгрузки").value.property.value());
-					Numeric dateShip = new Numeric().value((double) tt.getTime());
-					//Auxiliary.tryReFormatDate(b.child("raw").child("Данные").child("ДатаОтгрузки").value.property.value(),"yyyy-MM-ddThh:mm:ss",""));
-					//System.out.println("client_id " + client_id);
-					//System.out.println("oplatanum " + oplatanum);
-					//System.out.println("dogovor_idrref " + dogovor_idrref);
-					//System.out.println("dateShip " + dateShip);
-					//System.out.println("requestItemsChangeNew " + b.child("raw").dumpXML());
+				if (bb.child("raw" ).child("Сообщение" ).value.property.value().trim().length() > 0) {
+					Auxiliary.warn(bb.child("raw" ).child("Сообщение" ).value.property.value(), me);
+				} else {
+					//createUpdatableOrder(b.child("raw"));
+					String client_id = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(
+							"select \"x'\" || hex(_idrref) || \"'\" as id from Kontragenty where trim(kod)='"
+									+ bb.child("raw" ).child("Данные" ).child("КодКонтрагента" ).value.property.value().trim() + "';"
+							, null)).child("row" ).child("id" ).value.property.value();
+					String oplatanum = Cfg.tip_nalichnie;//"Наличная";
+					if (bb.child("raw" ).child("Данные" ).child("ТипОплаты" ).value.property.value().equals("Безналичная" )) {
+						oplatanum = Cfg.tip_beznal;
+					}
+					if (bb.child("raw" ).child("Данные" ).child("ТипОплаты" ).value.property.value().equals("Товарный чек" )) {
+						oplatanum = Cfg.tip_tovcheck;
+					}
+					String dogovor_idrref = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(
+							"select \"x'\" || hex(_idrref) || \"'\" as id from DogovoryKontragentov where trim(kod)='"
+									+ bb.child("raw" ).child("Данные" ).child("КодДоговора" ).value.property.value().trim() + "';"
+							, null)).child("row" ).child("id" ).value.property.value();
+					if (client_id.trim().length() < 1) {
+						Auxiliary.warn("Не найден клиент " + bb.child("raw" ).child("Данные" ).child("КодКонтрагента" ).value.property.value().trim(), me);
+						return;
+					}
+					if (dogovor_idrref.trim().length() < 1) {
+						Auxiliary.warn("Не найден договор " + bb.child("raw" ).child("Данные" ).child("КодДоговора" ).value.property.value().trim(), me);
+						return;
+					}
+					try {
+						Date tt = Auxiliary.mssqlTime.parse(bb.child("raw" ).child("Данные" ).child("ДатаОтгрузки" ).value.property.value());
+						Numeric dateShip = new Numeric().value((double) tt.getTime());
+						//Auxiliary.tryReFormatDate(b.child("raw").child("Данные").child("ДатаОтгрузки").value.property.value(),"yyyy-MM-ddThh:mm:ss",""));
+						//System.out.println("client_id " + client_id);
+						//System.out.println("oplatanum " + oplatanum);
+						//System.out.println("dogovor_idrref " + dogovor_idrref);
+						//System.out.println("dateShip " + dateShip);
+						//System.out.println("requestItemsChangeNew " + b.child("raw").dumpXML());
 
-					Intent intent = new Intent();
-					intent.setClass(context, Activity_Bid.class);
-					intent.putExtra("client_id", client_id);
-					intent.putExtra("dogovor_idrref", dogovor_idrref);
-					intent.putExtra("oplatanum", oplatanum);
-					intent.putExtra("dateShip", "" + dateShip.value());
-					intent.putExtra("nomerDokumenta1C", b.child("raw").child("Данные").child("НомерДокумента").value.property.value().trim());
-					String raw = b.child("raw").dumpXML();
-					intent.putExtra("raw_data", "" + raw);
-					Activity_Bid.unLockCreateNewOrder();
-					me.needRefresh=true;
-					context.startActivity(intent);
-				}catch (Throwable ttt){
-					ttt.printStackTrace();
+						Intent intent = new Intent();
+						intent.setClass(context, Activity_Bid.class);
+						intent.putExtra("client_id", client_id);
+						intent.putExtra("no_assortiment", true);
+						intent.putExtra("dogovor_idrref", dogovor_idrref);
+						intent.putExtra("oplatanum", oplatanum);
+						intent.putExtra("dateShip", "" + dateShip.value());
+						intent.putExtra("nomerDokumenta1C", bb.child("raw" ).child("Данные" ).child("НомерДокумента" ).value.property.value().trim());
+						intent.putExtra("nomerDokumentaTablet", bb.child("raw" ).child("Данные" ).child("ВнешнийНомер" ).value.property.value().trim());
+						String raw = bb.child("raw" ).dumpXML();
+						intent.putExtra("raw_data", "" + raw);
+						Activity_Bid.unLockCreateNewOrder();
+						me.needRefresh = true;
+						context.startActivity(intent);
+					} catch (Throwable ttt) {
+						ttt.printStackTrace();
+					}
 				}
 			}
 		});
@@ -633,7 +667,7 @@ public class EditOrderViaWeb {
 
 	void promptCloneOrder() {
 		final Bough b = new Bough();
-		Expect expect = new Expect().status.is("Подождите").task.is(new Task() {
+		Expect expect = new Expect().status.is("Подождите" ).task.is(new Task() {
 			@Override
 			public void doTask() {
 				try {
@@ -644,17 +678,17 @@ public class EditOrderViaWeb {
 					String text = "[{\"НомерДокумента\":\"" + documentNumber + "\", \"ДатаДокумента\":\"" + ActivityWebServicesReports.reformatDate3(documentDate) + "\"}]";
 					//System.out.println(url + ": " + text);
 					Bough result;
-					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
-					b.child("result").value.is(result.child("message").value.property.value());
-					String rawText = result.child("raw").value.property.value();
+					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8" ), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					b.child("result" ).value.is(result.child("message" ).value.property.value());
+					String rawText = result.child("raw" ).value.property.value();
 					//System.out.println(rawText);
 					Bough raw = Bough.parseJSON(rawText);
 					//System.out.println("promptCloneOrder\n"+url+"\n"+text+"\n"+raw.dumpXML());
-					b.child("raw").children = raw.children;
+					b.child("raw" ).children = raw.children;
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
 					t.printStackTrace();
-					b.child("result").value.is(t.toString());
+					b.child("result" ).value.is(t.toString());
 				}
 			}
 		}).afterDone.is(new Task() {
@@ -672,16 +706,16 @@ public class EditOrderViaWeb {
 	void createUpdatableOrder(final Bough data) {
 		System.out.println("createUpdatableOrder " + data.dumpXML());
 
-		currentKlientKod = data.child("Данные").child("КодКонтрагента").value.property.value();
+		currentKlientKod = data.child("Данные" ).child("КодКонтрагента" ).value.property.value();
 		System.out.println("currentKlientKod " + currentKlientKod);
 		SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
 		String sql = "select hex(_idrref) as id from kontragenty where kod=" + currentKlientKod.trim() + ";";
 		Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-		if (bb.child("row").child("id").value.property.value().trim().length() < 7) {
+		if (bb.child("row" ).child("id" ).value.property.value().trim().length() < 7) {
 			Auxiliary.warn("Не найден контрагент " + currentKlientKod, context);
 			return;
 		}
-		String client_id = "x'" + bb.child("row").child("id").value.property.value() + "'";
+		String client_id = "x'" + bb.child("row" ).child("id" ).value.property.value() + "'";
 		System.out.println("client_id " + client_id);
 
 
@@ -713,11 +747,11 @@ public class EditOrderViaWeb {
 		//String sql = "select hex(_idrref) as id from kontragenty where trim(naimenovanie)='" + currentKlientName + "';";
 		String sql = "select hex(_idrref) as id from kontragenty where kod=" + currentKlientKod.trim() + ";";
 		Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-		if (bb.child("row").child("id").value.property.value().trim().length() < 7) {
+		if (bb.child("row" ).child("id" ).value.property.value().trim().length() < 7) {
 			Auxiliary.warn("Не найден контрагент " + currentKlientKod, context);
 			return;
 		}
-		final String clientID = "x'" + bb.child("row").child("id").value.property.value() + "'";
+		final String clientID = "x'" + bb.child("row" ).child("id" ).value.property.value() + "'";
 		sql = "select "
 				+ "	case when (dgvr.Podrazdelenie = x'00000000000000000000000000000000' or dgvr.Podrazdelenie = x'00') then 0 else 1 end podrazdelenie"
 				+ "	,ifnull(dgvr.ProcentPredoplaty,0) as procent"
@@ -734,30 +768,30 @@ public class EditOrderViaWeb {
 		final Vector<String> tips = new Vector<String>();
 		for (int i = 0; i < bb.children.size(); i++) {
 			Bough row = bb.children.get(i);
-			String dogovor_idrref = "x'" + row.child("_idrref").value.property.value() + "'";
-			String name = row.child("name").value.property.value();
-			double podrazdelenie = Numeric.string2double(row.child("podrazdelenie").value.property.value());
-			double procent = Numeric.string2double(row.child("procent").value.property.value());
+			String dogovor_idrref = "x'" + row.child("_idrref" ).value.property.value() + "'";
+			String name = row.child("name" ).value.property.value();
+			double podrazdelenie = Numeric.string2double(row.child("podrazdelenie" ).value.property.value());
+			double procent = Numeric.string2double(row.child("procent" ).value.property.value());
 			if ((podrazdelenie == 0) && (procent == 0)) {
-				labels.add(name + ", Наличная");
+				labels.add(name + ", Наличная" );
 				dogovor_idrrefs.add(dogovor_idrref);
 				tips.add(Cfg.tip_nalichnie);
-				labels.add(name + ", Товарный чек");
+				labels.add(name + ", Товарный чек" );
 				dogovor_idrrefs.add(dogovor_idrref);
 				tips.add(Cfg.tip_tovcheck);
 			} else {
 				if ((podrazdelenie == 0) && (procent == 100)) {
-					labels.add(name + ", Наличная");
+					labels.add(name + ", Наличная" );
 					dogovor_idrrefs.add(dogovor_idrref);
 					tips.add(Cfg.tip_nalichnie);
-					labels.add(name + ", Безналичная");
+					labels.add(name + ", Безналичная" );
 					dogovor_idrrefs.add(dogovor_idrref);
 					tips.add(Cfg.tip_beznal);
 				} else {
 					//labels.add(name + ", Наличная");
 					//dogovor_idrrefs.add(dogovor_idrref);
 					//tips.add(Cfg.tip_nalichnie);
-					labels.add(name + ", Безналичная");
+					labels.add(name + ", Безналичная" );
 					dogovor_idrrefs.add(dogovor_idrref);
 					tips.add(Cfg.tip_beznal);
 				}
@@ -773,15 +807,15 @@ public class EditOrderViaWeb {
 		//System.out.println("today " + today);
 		//System.out.println("data " + data.dumpXML());
 		SubLayoutless subLayoutless = new SubLayoutless(context);
-		subLayoutless.child(new Decor(context).labelText.is("Доставка").labelAlignRightCenter().labelStyleMediumNormal()//
+		subLayoutless.child(new Decor(context).labelText.is("Доставка" ).labelAlignRightCenter().labelStyleMediumNormal()//
 				.left().is(margin).top().is(margin)//
 				.width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize)//
 		);
-		subLayoutless.child(new RedactDate(context).date.is(dateShip).format.is("dd.MM.yyyy")//
+		subLayoutless.child(new RedactDate(context).date.is(dateShip).format.is("dd.MM.yyyy" )//
 				.left().is(Auxiliary.tapSize * 3.5 + margin).top().is(margin)//
 				.width().is(Auxiliary.tapSize * 5).height().is(Auxiliary.tapSize * 0.8)//
 		);
-		subLayoutless.child(new Decor(context).labelText.is("Договор и оплата").labelAlignRightCenter().labelStyleMediumNormal()//
+		subLayoutless.child(new Decor(context).labelText.is("Договор и оплата" ).labelAlignRightCenter().labelStyleMediumNormal()//
 				.left().is(margin).top().is(margin + Auxiliary.tapSize * 1)//
 				.width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize)//
 		);
@@ -807,7 +841,7 @@ public class EditOrderViaWeb {
 				intent.putExtra("dogovor_idrref", dogovor_idrrefs.get(idx.value().intValue()));
 				intent.putExtra("oplatanum", tips.get(idx.value().intValue()));
 				intent.putExtra("dateShip", "" + dateShip.value());
-				String raw = data.child("raw").dumpXML();
+				String raw = data.child("raw" ).dumpXML();
 				intent.putExtra("raw_data", "" + raw);
 
 				Activity_Bid.unLockCreateNewOrder();
@@ -851,7 +885,7 @@ public class EditOrderViaWeb {
 			if (orderItems.get(i).min > 0 && orderItems.get(i).max > 0) {
 				labels[i] = labels[i] + ", от " + orderItems.get(i).min + " до " + orderItems.get(i).max + "р.";
 			}
-			if (orderItems.get(i).poslednyaya.trim().length() > 0 && (!orderItems.get(i).poslednyaya.trim().equals("0"))) {
+			if (orderItems.get(i).poslednyaya.trim().length() > 0 && (!orderItems.get(i).poslednyaya.trim().equals("0" ))) {
 				labels[i] = labels[i] + ", история " + orderItems.get(i).poslednyaya + "р.";
 			}
 		}
@@ -971,16 +1005,16 @@ public class EditOrderViaWeb {
 				//String sql = "select hex(_idrref) as id from kontragenty where trim(naimenovanie)='" + currentKlientName + "';";
 				String sql = "select hex(_idrref) as id from kontragenty where kod=" + currentKlientKod.trim() + ";";
 				Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-				if (bb.child("row").child("id").value.property.value().trim().length() < 7) {
+				if (bb.child("row" ).child("id" ).value.property.value().trim().length() < 7) {
 					Auxiliary.warn("Не найден контрагент " + currentKlientKod, context);
 					return;
 				}
-				String clientID = "x'" + bb.child("row").child("id").value.property.value() + "'";
+				String clientID = "x'" + bb.child("row" ).child("id" ).value.property.value() + "'";
 				sql = "select hex(_idrref) as id,naimenovanie as name from nomenklatura where artikul='" + inf.artikul + "';";
 				bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-				String nomenklaturaID = "x'" + bb.child("row").child("id").value.property.value() + "'";
+				String nomenklaturaID = "x'" + bb.child("row" ).child("id" ).value.property.value() + "'";
 				String artikul = inf.artikul;
-				String nname = bb.child("row").child("name").value.property.value();
+				String nname = bb.child("row" ).child("name" ).value.property.value();
 				ZayavkaNaSkidki mZayavka = new ZayavkaNaSkidki(clientID, mDB);
 				FixedPricesNomenclatureData mFixedPricesNomenclatureData = new FixedPricesNomenclatureData(mDB, mZayavka);
 				//mFixedPricesNomenclatureData.newFixedPriceNomenclature(mFoodstaff.getNomenklaturaID(), mFoodstaff.getArtikul(), mFoodstaff.getNomenklaturaNaimenovanie());
@@ -1016,7 +1050,7 @@ public class EditOrderViaWeb {
 
 	void requestSaveOrder() {
 		final RawSOAP r = new RawSOAP();
-		new Expect().status.is("Выполнение...").task.is(new Task() {
+		new Expect().status.is("Выполнение..." ).task.is(new Task() {
 			@Override
 			public void doTask() {
 				String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"//
@@ -1043,7 +1077,7 @@ public class EditOrderViaWeb {
 						+ "\n		</Change>"//
 						+ "\n	</S:Body>"//
 						+ "\n</S:Envelope>";
-				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws")//
+				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws" )//
 						.xml.is(xml//
 				);
 				Report_Base.startPing();
@@ -1058,9 +1092,9 @@ public class EditOrderViaWeb {
 				} else {
 					if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
 						Auxiliary.warn("Результат: " //
-								+ r.data.child("soap:Body")//
-								.child("m:ChangeResponse")//
-								.child("m:return")//
+								+ r.data.child("soap:Body" )//
+								.child("m:ChangeResponse" )//
+								.child("m:return" )//
 								.value.property.value(), context);
 					} else {
 						Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), context);
@@ -1078,10 +1112,10 @@ public class EditOrderViaWeb {
 
 	void requestChangeOrderState(final String thatDone) {
 		final RawSOAP r = new RawSOAP();
-		new Expect().status.is("Выполнение...").task.is(new Task() {
+		new Expect().status.is("Выполнение..." ).task.is(new Task() {
 			@Override
 			public void doTask() {
-				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws")//
+				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws" )//
 						.xml.is("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"//
 						+ "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
 						+ "	<S:Body>"//
@@ -1109,9 +1143,9 @@ public class EditOrderViaWeb {
 				} else {
 					if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
 						Auxiliary.warn("Результат: " //
-								+ r.data.child("soap:Body")//
-								.child("m:ChangeResponse")//
-								.child("m:return")//
+								+ r.data.child("soap:Body" )//
+								.child("m:ChangeResponse" )//
+								.child("m:return" )//
 								.value.property.value(), context);
 					} else {
 						Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), context);

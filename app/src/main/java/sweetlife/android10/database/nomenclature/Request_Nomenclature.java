@@ -20,7 +20,7 @@ public class Request_Nomenclature extends Request_NomenclatureBase {
 				, 1//
 				, false//
 				, true//
-				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(),200,0,false,false,degustacia,null,null);
+				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(),200,0,false,false,degustacia,null,null,false);
 	}
 	protected void SetRequestString_() {
 		/*

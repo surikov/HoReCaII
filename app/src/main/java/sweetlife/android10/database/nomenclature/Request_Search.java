@@ -37,7 +37,7 @@ public class Request_Search extends Request_Nomenclature implements ISearchBy {
 				, mSearchBy//
 				, false//
 				, false//
-				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(),200,0,false,false,degustacia,null,null);
+				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(),200,0,false,false,degustacia,null,null,false);
 		//System.out.println(mStrQuery);
 		/*
 		if (1==1)return ;
@@ -82,7 +82,7 @@ public class Request_Search extends Request_Nomenclature implements ISearchBy {
 				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya(),500,0,false,false
 		,_kuhnya,_tochka,false,degustacia
 				//, _receptID
-				,null,null,null
+				,null,null,null,false
 		);
 	}
 	/*protected String getSearchString() {
