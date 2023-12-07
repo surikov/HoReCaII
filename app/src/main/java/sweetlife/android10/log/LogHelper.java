@@ -61,8 +61,9 @@ public class LogHelper {
 	}
 
 	public static Calendar getLastSuccessfulUpdate() {
-
-		ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog where _id>=2494 and _id<=2498");
+		//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog;");
+		//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog where _id>=2494 and _id<=2498");
+		//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog where _id=2862");
 
 
 		String sqlLog = "select endTime from SyncLog order by endTime desc limit 1;";

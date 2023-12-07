@@ -16,8 +16,8 @@
         }
       ],
       "properties": [],
-      "versionCode": 1021,
-      "versionName": "3.10.21",
+      "versionCode": 1144,
+      "versionName": "3.11.44",
       "enabled": true,
       "outputFile": "app-armeabi-v7a-release.apk"
     }

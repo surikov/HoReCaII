@@ -137,6 +137,13 @@ public class DatabaseHelper {
 				+ ",[Zapret] blob null"//
 				+ ");"//
 		);
+		try {
+			mDB.execSQL("alter table CenyNomenklaturyPoPodrazdeleniu add column sklad text;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
+
+		
 		LogHelper.debug("recept tables");
 		mDB.execSQL("create table if not exists Receptii ("//
 				+ "_id integer primary key asc"//

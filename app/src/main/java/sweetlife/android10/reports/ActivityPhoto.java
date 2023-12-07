@@ -138,13 +138,29 @@ public class ActivityPhoto extends Activity{
 						.left().is(layoutless.width().property.divide(2))//
 						.top().is(Auxiliary.tapSize * 0.5)//
 				);
+				/*
 				String comment = "Описание:\n" + kommentariy
 						+ "\n\nСостав:\n" + Nabor
 						+ "\n\nСрок годности: " + SrokGodnosti + " сут."
 						+ "\n\nКвант: " + EdinicyIzmereniyaNaimenovanie
 						+ "\n\nПроизводитель: " + proizvoditel;
-				layoutless.child(new Decor(ActivityPhoto.this)//.background.is(0xffccff99)//
+				*/
+				/*layoutless.child(new Decor(ActivityPhoto.this)//.background.is(0xffccff99)//
 						.labelText.is(comment)//
+						.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 1.5))//
+						.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 2))//
+						.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize / 2))//
+						.top().is(Auxiliary.tapSize)//
+				);*/
+				String description="";
+				description=description+"<p><i>Производитель:</i> <b>"+proizvoditel+"</b></p>";
+				description=description+"<p><i>Срок годности:</i> "+SrokGodnosti+"</p>";
+				description=description+"<p><i>Квант:</i> "+EdinicyIzmereniyaNaimenovanie+"</p>";
+				description=description+"<p><i>Состав:</i> "+Nabor+"</p>";
+				description=description+"<p><i>Описание:</i> "+kommentariy.replace("\n","<br/>")+"</p>";
+
+				layoutless.child(new HTMLBox(ActivityPhoto.this)//.background.is(0xffccff99)//
+						.htmlText.is(description)//
 						.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 1.5))//
 						.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 2))//
 						.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize / 2))//
