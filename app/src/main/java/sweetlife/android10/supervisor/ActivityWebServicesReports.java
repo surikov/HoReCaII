@@ -398,6 +398,14 @@ public class ActivityWebServicesReports extends Activity{
 		if(key.equals(ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta.folderKey())){
 			report = new ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta(this);
 		}
+
+
+
+		if(key.equals(ReportPoiskKontragentaPoKluchevimPolyam.folderKey())){
+			report = new ReportPoiskKontragentaPoKluchevimPolyam(this);
+		}
+
+
 		if(key.equals(ReportStatisticaPodpisannihDS.folderKey())){
 			report = new ReportStatisticaPodpisannihDS(this);
 		}
@@ -730,6 +738,7 @@ public class ActivityWebServicesReports extends Activity{
 		addReportMenu2(ReportObjedineniaKlientov.folderKey(), ReportObjedineniaKlientov.menuLabel());
 		//addReportMenu2(ReportOtchetPoKassamDlyaTP.folderKey(), ReportOtchetPoKassamDlyaTP.menuLabel());
 		addReportMenu2(ReportPechatSchetaNaOplatu.folderKey(), ReportPechatSchetaNaOplatu.menuLabel());
+		addReportMenu2(ReportPoiskKontragentaPoKluchevimPolyam.folderKey(), ReportPoiskKontragentaPoKluchevimPolyam.menuLabel());
 		addReportMenu2(ReportProcentZapolneniyaChekListov.folderKey(), ReportProcentZapolneniyaChekListov.menuLabel());
 
 		addReportMenu2(ReportTovarnieVozvrati.folderKey(), ReportTovarnieVozvrati.menuLabel());
@@ -1504,6 +1513,10 @@ public class ActivityWebServicesReports extends Activity{
 							}else{
 								if(nn == 6){
 									promptPoKontragentu(num);
+								}else{
+									if(nn == 7){
+										promptFixPriceNumber(num, art);
+									}
 								}
 							}
 						}
@@ -1514,13 +1527,16 @@ public class ActivityWebServicesReports extends Activity{
 	}
 
 	void doHOOKApproveFix(final String art, final String num, final String row){
-		String[] titles = new String[]{"Удалить всю заявку №" + num
+		String[] titles = new String[]{
+				"Удалить всю заявку №" + num
 				, "Удалить арт." + art + " из заявки №" + num
 				, "Утвердить всю заявку №" + num
 				, "Отказать всей заявке №" + num
 				, "Комментировать заявку №" + num
 				, "Утвердить всё найденное"
-				, "Утвердить всё с таким же контрагентом"};
+				, "Утвердить всё с таким же контрагентом"
+				, "Указать цену"
+		};
 		final Numeric nn = new Numeric();
 		Auxiliary.pickSingleChoice(this, titles, nn, null, new Task(){
 			public void doTask(){
@@ -1541,6 +1557,50 @@ public class ActivityWebServicesReports extends Activity{
 						sendFixPriceAnswer(num, art, comment.value());
 					}
 				});
+	}
+
+	void promptFixPriceNumber(final String num, final String art){
+		final Numeric price = new Numeric();
+		Auxiliary.pickNumber(ActivityWebServicesReports.this//
+				, "Заявка " + num + ", арт. " + art //
+				, price//
+				, "Отправить", new Task(){
+					@Override
+					public void doTask(){
+						sendNewFixPrice(num, art, price.value());
+					}
+				},null,null);
+	}
+	void sendNewFixPrice(final String num, final String art, final double price){
+		final Bough b = new Bough();
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					String url = //"http://10.10.5.2/lednev_hrc/"
+							Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkiNaFiksCeny/IzmZenuSpec/"
+									+ URLEncoder.encode(num, "utf-8")//
+									+ "/" + URLEncoder.encode(art, "utf-8")//
+									+ "/" + URLEncoder.encode(""+price, "utf-8")//
+							;
+					Report_Base.startPing();
+					Bough result = new Bough();
+					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					b.child("result").value.is(new String(bytes, "UTF-8"));
+					preReport.writeCurrentPage();
+				}catch(Throwable t){
+					t.printStackTrace();
+					b.child("result").value.is(t.toString());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
+				tapInstance2(preReport.getFolderKey(), preKey);
+			}
+		});
+		expect.start(ActivityWebServicesReports.this);
 	}
 
 	void allFixApprove(){

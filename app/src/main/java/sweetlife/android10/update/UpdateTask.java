@@ -797,6 +797,9 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_zakryt on DogovoryKontragentov_strip(zakryt);	");
 		mDB.execSQL("	CREATE INDEX IX_DogovoryKontragentov_strip_GruppaDogovorov on DogovoryKontragentov_strip(GruppaDogovorov);	");
 		*/
+
+
+		/*
 		if(upd != null){
 			upd.logAndPublishProcess("Анализ БД - Цены номенклатуры склада" );
 		}
@@ -833,6 +836,12 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Nomenklatura on CenyNomenklaturySklada_last(Nomenklatura);	" );
 		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Period on CenyNomenklaturySklada_last(Period);	" );
 		mDB.execSQL("	CREATE INDEX IX_CenyNomenklaturySklada_last_Cena on CenyNomenklaturySklada_last(Cena);	" );
+*/
+
+
+
+
+
 		/*if (upd != null) {
 			upd.logAndPublishProcess("Анализ БД - Единицы измерения");
 		}

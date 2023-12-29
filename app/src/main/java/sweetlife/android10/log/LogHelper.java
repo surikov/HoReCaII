@@ -64,7 +64,7 @@ public class LogHelper {
 		//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog;");
 		//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog where _id>=2494 and _id<=2498");
 		//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog where _id=2862");
-
+		//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from synclog where endtime>date('2023-12-21');");
 
 		String sqlLog = "select endTime from SyncLog order by endTime desc limit 1;";
 		Cursor cursor = null;

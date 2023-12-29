@@ -248,6 +248,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 				String nomer = zakazy.get(ff).child("Номер").value.property.value();
 				String zakazSoobshenie = zakazy.get(ff).child("Сообщение").value.property.value().trim();
 				msg = msg + "№" + nomer + ": " + zakazSoobshenie + "\n";
+
 				Vector<Bough> nepodtverjdenniePosisii = zakazy.get(ff).children("НеПодтвержденныеПозиции");
 				for(int nn = 0; nn < nepodtverjdenniePosisii.size(); nn++){
 					Bough one = nepodtverjdenniePosisii.get(nn);
@@ -256,11 +257,16 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 					String name = one.child("Номенклатура").value.property.value();
 					String kolZakazano = one.child("КоличествоЗаказано").value.property.value();
 					String kolPodtverjseno = one.child("КоличествоПодтверждено").value.property.value();
+					String dataPostuplenia = one.child("ДатаПоступления").value.property.value().trim();
+					if(dataPostuplenia.length()>0){
+						dataPostuplenia="поступление " +Auxiliary.tryReFormatDate(dataPostuplenia,"yyyyMMdd","dd.MM.yy");
+					}
+
 					String txt = one.child("Текст").value.property.value();
 					if(nomenklatura.length > 0){
 						name = nomenklatura[1];
 					}
-					msg = msg + "не подтвержден " + " арт." + art + " " + name + ", " + kolPodtverjseno + " из " + kolZakazano + " " + txt + "\n";
+					msg = msg + "не подтвержден " + " арт." + art + " " + name+" " +dataPostuplenia+ ", " + kolPodtverjseno + " из " + kolZakazano + " " + txt + "\n";
 					zakazyNomenklatura.cell(name, 0x11000000, "арт." + art + ": заказано " + kolZakazano + " подверждено " + kolPodtverjseno + ", цена " + 12.34 + "р.");
 					kolichestvo.cell("", 0x11000000, "");
 					gridCounter++;
@@ -269,6 +275,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 						Bough analog = analogi.get(aa);
 						final String anart = analog.child("Артикул").value.property.value();
 						final String ananame = analog.child("Наименование").value.property.value();
+						final String datewait = analog.child("Наименование").value.property.value();
 						final int rowNum = dataRowCounter;
 						final int gridNum = gridCounter;
 						Task tap = new Task(){
@@ -381,7 +388,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 							}
 						};
 						zakazyNomenklatura.cell("&nbsp;↳&nbsp;" + ananame
-								, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "арт." + anart + ", цена " + 222.333
+								, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "арт." + anart //+ ", цена " + 222.333
 						);
 						kolichestvo.cell("0.0", tap, "");
 						dataRowCounter++;

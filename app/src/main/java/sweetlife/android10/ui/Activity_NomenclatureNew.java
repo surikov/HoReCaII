@@ -31,6 +31,9 @@ import tee.binding.it.*;
 
 
 public class Activity_NomenclatureNew extends Activity{
+
+	private boolean stopBackgroundActions=true;
+
 	public static String lastSelectedArtikul = null;
 	static Numeric gridOffset = new Numeric();
 	static Numeric searchMode = new Numeric().value(3);
@@ -103,6 +106,9 @@ public class Activity_NomenclatureNew extends Activity{
 	Task doRefreshData = new Task(){
 		public void doTask(){
 			System.out.println("doRefreshData mode " + mode.value());
+			if(Activity_NomenclatureNew.this.stopBackgroundActions){
+				System.out.println("doRefreshData stopBackgroundActions "+Activity_NomenclatureNew.this.stopBackgroundActions);
+			}
 			if(mode.value() == ShowViewNomenklatura){
 				refreshCategotyGrid();
 			}else{
@@ -128,6 +134,7 @@ public class Activity_NomenclatureNew extends Activity{
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		Activity_NomenclatureNew.this.stopBackgroundActions=false;
 		buildUI();
 		doRefreshData.start();
 	}
@@ -1025,6 +1032,7 @@ public class Activity_NomenclatureNew extends Activity{
 	@Override
 	protected void onPause(){
 		super.onPause();
+		Activity_NomenclatureNew.this.stopBackgroundActions=true;
 		me = null;
 		double newOffset = Math.floor(gridOffset.value() + this.gridItems.scrollView.getScrollY() / Auxiliary.tapSize);
 		if(newOffset < 0){
@@ -1039,6 +1047,7 @@ public class Activity_NomenclatureNew extends Activity{
 	@Override
 	protected void onResume(){
 		super.onResume();
+		Activity_NomenclatureNew.this.stopBackgroundActions=false;
 		me = this;
 		//doRefreshData.start();
 	}

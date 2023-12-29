@@ -55,7 +55,23 @@ public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems 
 		while (cursorReturnsNomenclature.moveToNext());
 
 	}
+	public void newFixedPriceNomenclatureWithPrice(String nomenklaturaID,
+										  String artikul,
+										  String nomenklaturaNaimenovanie
+	,double price
+	) {
 
+		mNomenclaureList.add(new ZayavkaNaSkidki_TovaryPhiksCen(0,
+				++mNomenclatureNumber,
+				nomenklaturaID,
+				artikul,
+				nomenklaturaNaimenovanie,
+				price,
+				0,
+				mZayavka.getIDRRef(),
+				true//,"",""
+		));
+	}
 	public void newFixedPriceNomenclature(String nomenklaturaID,
 										  String artikul,
 										  String nomenklaturaNaimenovanie) {

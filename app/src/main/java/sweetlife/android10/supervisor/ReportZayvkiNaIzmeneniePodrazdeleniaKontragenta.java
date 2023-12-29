@@ -21,6 +21,7 @@ import android.content.Context;
 public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base{
 	Numeric dateCreateFrom = new Numeric();
 	Numeric dateCreateTo = new Numeric();
+	Numeric territory = new Numeric();
 
 	public ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta(ActivityWebServicesReports p){
 		super(p);
@@ -59,7 +60,18 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 
 	@Override
 	public String getOtherDescription(String key){
-		return "";
+		Bough b = null;
+		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
+		try {
+			b = Bough.parseXML(xml);
+			int i = (int) Numeric.string2double(b.child("territory").value.property.value());
+			String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
+			return  s;
+		}
+		catch (Throwable t) {
+			//
+		}
+		return "?";
 	}
 
 	@Override
@@ -79,7 +91,7 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 
 		dateCreateFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
 		dateCreateTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
-
+		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
 	}
 
 	@Override
@@ -88,6 +100,7 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 
 		b.child("docFrom").value.is("" + dateCreateFrom.value());
 		b.child("docTo").value.is("" + dateCreateTo.value());
+		b.child("territory").value.is("" + territory.value());
 
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		//System.out.println("writeForm " + xml);
@@ -101,6 +114,7 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 
 		b.child("docFrom").value.is("" + (d - 0 * 24 * 60 * 60 * 1000.0));
 		b.child("docTo").value.is("" + (d + 0 * 24 * 60 * 60 * 1000.0));
+		b.child("territory").value.is("0");
 
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
@@ -109,6 +123,8 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 	@Override
 	public String composeGetQuery(int queryKind){
 		String serviceName = "ЗаявкиНаИзменениеПодразделенияКонтрагента";
+		int i = territory.value().intValue();
+		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
 		String p = "{\"ДатаНачала\":\"" + Cfg.formatMills(dateCreateFrom.value(), "yyyyMMdd") + "\""
 				+ ",\"ДатаОкончания\":\"" + Cfg.formatMills(dateCreateTo.value(), "yyyyMMdd") + "\""
 				+ "}";
@@ -116,7 +132,7 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 				//+ "GolovaNew"//
 				+ Settings.selectedBase1C()//
 				+ "/hs/Report/"//
-				+ serviceName + "/" + Cfg.whoCheckListOwner()//
+				+ serviceName + "/" + hrc //Cfg.whoCheckListOwner()//
 				+ "?param=" + p//
 				;
 		q = q + tagForFormat(queryKind);
@@ -134,12 +150,20 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 	public SubLayoutless getParametersView(Context context){
 		if(propertiesForm == null){
 
+			RedactSingleChoice terr = new RedactSingleChoice(context);
+			terr.selection.is(territory);
+			for (int i = 0; i < Cfg.territory().children.size(); i++) {
+				String s = Cfg.territory().children.get(i).child("territory").value.property.value()//
+						+ " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
+				terr.item(s);
+			}
 
 			propertiesForm = new SubLayoutless(context);
 			propertiesForm//
 					.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 19)//
 					.input(context, 1, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(dateCreateFrom).format.is("dd.MM.yyyy"))//
 					.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
+					.input(context, 3, Auxiliary.tapSize * 0.3, "Территория", terr)//
 			;
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("Добавить заявку")//
@@ -150,7 +174,7 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 0 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 0 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 3)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -163,7 +187,7 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 1 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 1 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 3)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -178,7 +202,7 @@ public class ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta extends Report_Base
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 2 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 2 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 3)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);

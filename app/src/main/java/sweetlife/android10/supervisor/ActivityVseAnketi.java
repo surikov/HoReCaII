@@ -196,7 +196,7 @@ public class ActivityVseAnketi extends Activity {
 					tap(_id);
 				}
 			};
-			vigruz.cell(row.child("vigruzhen").value.property.value().equals("0") ? "нет" : "да", tap);
+			vigruz.cell(row.child("vigruzhen").value.property.value().length()<5 ? "нет" : "да", tap);
 			terr.cell(row.child("Podrazdelenie").value.property.value(), tap);
 			name.cell(row.child("Naimenovanie").value.property.value(), tap);
 		}

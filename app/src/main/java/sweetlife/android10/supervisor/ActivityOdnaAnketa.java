@@ -8,6 +8,7 @@ import android.content.*;
 import android.text.InputType;
 import android.net.*;
 
+import java.io.*;
 import java.util.*;
 
 import android.database.sqlite.*;
@@ -26,13 +27,16 @@ import tee.binding.*;
 
 import java.text.*;
 
-public class ActivityOdnaAnketa extends Activity {
+public class ActivityOdnaAnketa extends Activity{
 	String _id = null;
-	Numeric vigruzhen = new Numeric();
+	Note num1c = new Note();
+	final int FILE_SELECT_RESULT = 111222;
+	//Numeric vigruzhen = new Numeric();
 	MenuItem menuSave;
 	MenuItem menuDelete;
 	MenuItem menuContact;
 	MenuItem menuVigruzit;
+	MenuItem menuAddFile;
 	Layoutless layoutless;
 	Numeric Podrazdelenie = new Numeric();
 	Numeric Komissioner = new Numeric();
@@ -69,6 +73,7 @@ public class ActivityOdnaAnketa extends Activity {
 	Note AdresDostavki = new Note();
 	Note AdresLoc = new Note();
 	Numeric Bolshegruz = new Numeric();
+
 
 	Note KolichestvoMest = new Note();
 	Note VidKuhni = new Note();
@@ -109,21 +114,21 @@ public class ActivityOdnaAnketa extends Activity {
 	Numeric gridOffset = new Numeric();
 	DataGrid dataGrid;
 	//String[] allVidKuhni=new String[]{"Восточная", "Европейская", "Итальянская", "Японская", "Русская"};
-	String[] allVidKuhni = new String[]{"Кавказская", "Европейская", "Итальянская", "Японская", "Русская", "Американская"};
+	String[] allVidKuhni = new String[]{"Кавказская" , "Европейская" , "Итальянская" , "Японская" , "Русская" , "Американская"};
 	//String[] allFormaN=new String[]{"СетьЛокальная", "СетьФедеральная", "ОтдельностоящееЗаведение"};
-	String[] allFormaN = new String[]{"СетьЛокальная", "СетьФедеральная", "ОтдельностоящееЗаведение"};
-	String[] allFormaT = new String[]{"Сеть локальная", "Сеть федеральная", "Отдельностоящее заведение"};
+	String[] allFormaN = new String[]{"СетьЛокальная" , "СетьФедеральная" , "ОтдельностоящееЗаведение"};
+	String[] allFormaT = new String[]{"Сеть локальная" , "Сеть федеральная" , "Отдельностоящее заведение"};
 	Numeric allFormaS = new Numeric();
 	SimpleDateFormat timeFormat;// = new SimpleDateFormat("HH:mm");
 	Bough vseKontragenty;// = Cfg.vseKontragenty();
-	Task fillFromINN = new Task() {
-		public void doTask() {
+	Task fillFromINN = new Task(){
+		public void doTask(){
 			//System.out.println(INN.value());
 			final Bough bb = new Bough();
-			new Expect().status.is("Поиск по " + INN.value()).task.is(new Task() {
+			new Expect().status.is("Поиск по " + INN.value()).task.is(new Task(){
 				@Override
-				public void doTask() {
-					try {
+				public void doTask(){
+					try{
 						//String url = "https://testservice.swlife.ru/simutkin_hrc/en_US/hs/NewClient/New/" + INN.value().trim();
 						//String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/NewClient/New/" + INN.value().trim();
 						//String url = "https://testservice.swlife.ru/simutkin_hrc/en_US/hs/NewClient/INN/7702211710";
@@ -132,47 +137,47 @@ public class ActivityOdnaAnketa extends Activity {
 						String txt = new String(bytes);
 						bb.children.add(bb.parseJSON(txt).name.is("data"));
 
-					} catch (Throwable t) {
+					}catch(Throwable t){
 						t.printStackTrace();
 					}
 				}
-			}).afterDone.is(new Task() {
+			}).afterDone.is(new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					System.out.println(bb.dumpXML());
 					Vector<Bough> children = bb.child("data").children;
-					if (children.size() > 0) {
+					if(children.size() > 0){
 						String[] items = new String[bb.child("data").children.size()];
-						for (int i = 0; i < children.size(); i++) {
+						for(int i = 0; i < children.size(); i++){
 							System.out.println("" + i + ": " + children.get(i).dumpXML());
 							items[i] = children.get(i).child("НаименованиеЮрЛица").value.property.value();
 						}
 						final Numeric selection = new Numeric();
-						Auxiliary.pickSingleChoice(ActivityOdnaAnketa.this, items, selection, null, new Task() {
+						Auxiliary.pickSingleChoice(ActivityOdnaAnketa.this, items, selection, null, new Task(){
 							@Override
-							public void doTask() {
+							public void doTask(){
 								Bough selected = bb.child("data").children.get(selection.value().intValue());
 								System.out.println("tap " + selected.dumpXML());
 								UrAdres.value(selected.child("ЮрАдрес").value.property.value());
 								Naimenovanie.value(selected.child("НаименованиеЮрЛица").value.property.value());
-								if (selected.child("НаименованиеПолное").value.property.value().length() > 5) {
+								if(selected.child("НаименованиеПолное").value.property.value().length() > 5){
 									Naimenovanie.value(selected.child("НаименованиеПолное").value.property.value());
 								}
 								FaktAdres.value(selected.child("ФактАдрес").value.property.value());
 								String gkod = bb.children.get(0).child("ГоловнойКонтрагент").value.property.value();
 								GolovnoyKontragent.value(0);
 								Bough kon = Cfg.vseKontragenty();
-								for (int i = 0; i < kon.children.size(); i++) {
-									if (kon.children.get(i).child("kod").value.property.value().equals(gkod)) {
+								for(int i = 0; i < kon.children.size(); i++){
+									if(kon.children.get(i).child("kod").value.property.value().equals(gkod)){
 										GolovnoyKontragent.value(1 + i);
 										break;
 									}
 								}
-								if (selected.child("КПП").value.property.value().length() == 9) {
+								if(selected.child("КПП").value.property.value().length() == 9){
 									KPP.value(selected.child("КПП").value.property.value());
 								}
-								if (INN.value().trim().length() == 12) {
-									Auxiliary.inform("По ИП необходимо указать полный адрес прописки", ActivityOdnaAnketa.this);
+								if(INN.value().trim().length() == 12){
+									Auxiliary.inform("По ИП необходимо указать полный адрес прописки" , ActivityOdnaAnketa.this);
 								}
 							}
 						}, null, null, null, null);
@@ -211,118 +216,213 @@ public class ActivityOdnaAnketa extends Activity {
 	};
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		menuContact = menu.add("Добавить контакт");
 		menuSave = menu.add("Сохранить");
 		menuVigruzit = menu.add("Выгрузить");
 		menuDelete = menu.add("Удалить");
+		menuAddFile = menu.add("Отправить файл для заявки");
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item){
 		super.onOptionsItemSelected(item);
-		if (vigruzhen.value() > 0) {
-			Auxiliary.pickConfirm(this, "Анкета уже выгружена", "Разрешить изменение", new Task() {
+		if(item == menuAddFile){
+			if(num1c.value().length() < 5){
+				Auxiliary.warn("Анкета ещё не выгружена" , this);
+				return super.onOptionsItemSelected(item);
+			}
+			promptFile();
+			return true;
+		}
+
+
+
+
+
+		if(num1c.value().length() > 5){
+			Auxiliary.pickConfirm(this, "Анкета уже выгружена" , "Разрешить изменение" , new Task(){
 				@Override
-				public void doTask() {
-					vigruzhen.value(0);
+				public void doTask(){
+					num1c.value("");
 				}
 			});
 			return true;
 		}
 
-		if (item == menuSave) {
-			if (vigruzhen.value() > 0) {
-				Auxiliary.warn("Анкета уже выгружена", this);
+		if(item == menuSave){
+			if(num1c.value().length() > 5){
+				Auxiliary.warn("Анкета уже выгружена" , this);
 				return super.onOptionsItemSelected(item);
 			}
 			save();
 			finish();
 			return true;
 		}
-		if (item == menuVigruzit) {
+		if(item == menuVigruzit){
 			//vigruzhen.value(0);
-			if (vigruzhen.value() > 0) {
-				Auxiliary.warn("Анкета уже выгружена", this);
+			if(num1c.value().length() > 5){
+				Auxiliary.warn("Анкета уже выгружена" , this);
 				return super.onOptionsItemSelected(item);
 			}
 			upload();
 			return true;
 		}
-		if (item == menuDelete) {
-			if (vigruzhen.value() > 0) {
-				Auxiliary.warn("Анкета уже выгружена", this);
+		if(item == menuDelete){
+			if(num1c.value().length() > 5){
+				Auxiliary.warn("Анкета уже выгружена" , this);
 				return super.onOptionsItemSelected(item);
 			}
-			Auxiliary.pickConfirm(this, "Удаление заявки", "Удалить", new Task() {
+			Auxiliary.pickConfirm(this, "Удаление заявки" , "Удалить" , new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					delete();
 					finish();
 				}
 			});
 			return true;
 		}
-		if (item == menuContact) {
-			if (vigruzhen.value() > 0) {
-				Auxiliary.warn("Анкета уже выгружена", this);
+		if(item == menuContact){
+			if(num1c.value().length() > 5){
+				Auxiliary.warn("Анкета уже выгружена" , this);
 				return super.onOptionsItemSelected(item);
 			}
 			save();
 			Intent intent = new Intent();
 			intent.setClass(this, ActivityOdnaAnketaContact.class);
-			intent.putExtra("anketaId", "" + _id);
+			intent.putExtra("anketaId" , "" + _id);
 			this.startActivityForResult(intent, 0);
 			return true;
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
-	boolean check() {
-		if(this.PKorNew.value()==1){
+	void promptFile(){
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("*/*");
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		try {
+			Intent chooser = Intent.createChooser(intent, "Выбрать файл");
+			startActivityForResult(chooser, FILE_SELECT_RESULT);
+		} catch (Throwable ex) {
+			ex.printStackTrace();
+		}
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		//System.out.println("onActivityResult is " + requestCode);
+		if(_id != null){
+			select();
+		}
+		switch (requestCode) {
+			case FILE_SELECT_RESULT: {
+				if (resultCode == RESULT_OK) {
+					Uri uri = intent.getData();
+					String path = Auxiliary.pathForMediaURI(this, uri);
+					if (path != null && path.length() > 5) {
+						sendFile(path);
+					} else {
+						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
+					}
+				}
+				break;
+			}
+		}
+		super.onActivityResult(requestCode, resultCode, intent);
+	}
+	void sendFile(final String filePath) {
+		System.out.println(filePath);
+		String[] spl = filePath.split("\\.");
+		String rash = spl[spl.length - 1];
+		//http://89.109.7.162/hrc120107/hs/FileUvelLimita/000000001
+		//https://testservice.swlife.ru/velinsky_hrc/hs/FileZayavkaNaKlienta/042291570?rash="JPG"
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() //
+				+ "/hs/FileZayavkaNaKlienta" + this.num1c.value() + "/?rash=" + rash;
+		//final String url = "http://89.109.7.162/shatov/hs/FileUvelLimita/" + this.kod1C + "/?rash="+rash;
+		System.out.println(url);
+		final Bough result = new Bough();
+		try {
+			File iofile = new File(filePath);
+			int length = (int) iofile.length();
+			final byte[] bytes = new byte[length];
+			FileInputStream fileInputStream = new FileInputStream(iofile);
+			DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+			dataInputStream.readFully(bytes);
+			dataInputStream.close();
+			System.out.println(bytes.length);
+			final Bough raw = new Bough();
+			new Expect().task.is(new Task() {
+				@Override
+				public void doTask() {
+					try {
+						Bough b = Auxiliary.loadTextFromPrivatePOST(url, bytes, 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), false);
+						//Bough b = Auxiliary.loadTextFromPrivatePOST(url, bytes, 33000, "bot28", "Molgav1024", false);
+						System.out.println(b.dumpXML());
+						result.child("raw").value.is(b.child("raw").value.property.value());
+						result.child("message").value.is(b.child("message").value.property.value());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}).afterDone.is(new Task() {
+				@Override
+				public void doTask() {
+					/*if (result.child("raw").value.property.value().equals("Всё ОК")) {
+						saveFile(filePath);
+					}*/
+					Auxiliary.warn(result.child("message").value.property.value() + ": " + result.child("raw").value.property.value(), ActivityOdnaAnketa.this);
+				}
+			}).status.is("Отправка файла").start(this);
+		} catch (Throwable t) {
+			Auxiliary.warn(t.getMessage(), this);
+		}
+	}
+	boolean check(){
+		if(this.PKorNew.value() == 1){
 			Bough contacts = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select * from AnketaKlientaContacts where anketaId=" + _id, null));
-			if(contacts.children.size()<1){
-				Auxiliary.warn("Клиент не ПК, добавьте контактные лица", this);
+			if(contacts.children.size() < 1){
+				Auxiliary.warn("Клиент не ПК, добавьте контактные лица" , this);
 				return false;
 			}
 		}
-		if (Naimenovanie.value().trim().length() < 2) {
-			Auxiliary.warn("Заполните наименование", this);
+		if(Naimenovanie.value().trim().length() < 2){
+			Auxiliary.warn("Заполните наименование" , this);
 			return false;
 		}
 		/*if ((BIK.value().trim().length()) != 9 && (PotencialniyKlient.value() > 0)) {//ne pk
 			Auxiliary.warn("БИК должен быть из 9 цифр", this);
 			return false;
 		}*/
-		if ((KPP.value().trim().length() != 9) && (PotencialniyKlient.value() > 0) && (UrFizLico.value() < 5)) {//ne pk
-			Auxiliary.warn("КПП должен быть из 9 цифр", this);
+		if((KPP.value().trim().length() != 9) && (PotencialniyKlient.value() > 0) && (UrFizLico.value() < 5)){//ne pk
+			Auxiliary.warn("КПП должен быть из 9 цифр" , this);
 			return false;
 		}
-		if (Viveska.value().trim().length() < 2) {
-			Auxiliary.warn("Заполните поле \"вывеска\"", this);
+		if(Viveska.value().trim().length() < 2){
+			Auxiliary.warn("Заполните поле \"вывеска\"" , this);
 			return false;
 		}
-		if (FaktAdres.value().trim().length() < 10) {
-			Auxiliary.warn("Заполните факт. адрес", this);
+		if(FaktAdres.value().trim().length() < 10){
+			Auxiliary.warn("Заполните факт. адрес" , this);
 			return false;
 		}
-		if (AdresLoc.value().trim().length() < 5) {
-			Auxiliary.warn("Заполните адрес локализации", this);
+		if(AdresLoc.value().trim().length() < 5){
+			Auxiliary.warn("Заполните адрес локализации" , this);
 			return false;
 		}
-		if (UrAdres.value().trim().length() < 5) {
-			Auxiliary.warn("Заполните юр. адрес", this);
+		if(UrAdres.value().trim().length() < 5){
+			Auxiliary.warn("Заполните юр. адрес" , this);
 			return false;
 		}
-		if(PKorNew.value()==0){
-			if(INN.value().trim().length()>0){
-				Auxiliary.warn("Для ПК нужен пустой ИНН", this);
+		if(PKorNew.value() == 0){
+			if(INN.value().trim().length() > 0){
+				Auxiliary.warn("Для ПК нужен пустой ИНН" , this);
 				return false;
 			}
 		}else{
-			if (NomerScheta.value().length() != 20) {//ne pk
-				Auxiliary.warn("Для нового ИНН Расчётный счёт должен быть из 20 цифр", this);
+			if(NomerScheta.value().length() != 20){//ne pk
+				Auxiliary.warn("Для нового ИНН Расчётный счёт должен быть из 20 цифр" , this);
 				return false;
 			}
 		}
@@ -332,30 +432,30 @@ public class ActivityOdnaAnketa extends Activity {
 			Auxiliary.warn("Заполните время приёма товара", this);
 			return false;
 		}*/
-		if(PKorNew.value()!=0) {
-			if (PotencialniyKlient.value() != 0) {
-				if (UrFizLico.value() > 4) {//== 5) {
-					if ((INN.value().length() != 12) && (PotencialniyKlient.value() > 0)) {//ne pk
-						Auxiliary.warn("ИНН для физ. лица должен быть из 12 цифр", this);
+		if(PKorNew.value() != 0){
+			if(PotencialniyKlient.value() != 0){
+				if(UrFizLico.value() > 4){//== 5) {
+					if((INN.value().length() != 12) && (PotencialniyKlient.value() > 0)){//ne pk
+						Auxiliary.warn("ИНН для физ. лица должен быть из 12 цифр" , this);
 						return false;
 					}
-				} else {
-					if ((INN.value().length() != 10) && (PotencialniyKlient.value() > 0)) {//ne pk
-						Auxiliary.warn("ИНН для юр. лица должен быть из 10 цифр", this);
+				}else{
+					if((INN.value().length() != 10) && (PotencialniyKlient.value() > 0)){//ne pk
+						Auxiliary.warn("ИНН для юр. лица должен быть из 10 цифр" , this);
 						return false;
 					}
 				}
 			}
 		}
 		int kn = PotencialniyKlient.value().intValue();
-		if (kn > 1) {
+		if(kn > 1){
 			/*for (int i = 0; i < PotencialniyKlientChoice.items.size(); i++) {
 				System.out.println(i + ": " + PotencialniyKlientChoice.items.get(i));
 			}*/
 			String n = PotencialniyKlientChoice.items.get(kn);
 			//if (!n.trim().startsWith("ПК")) {
-			if (n.indexOf("ПК ") < 0) {
-				Auxiliary.warn("Контрагент (" + n + ") не ПК", this);
+			if(n.indexOf("ПК ") < 0){
+				Auxiliary.warn("Контрагент (" + n + ") не ПК" , this);
 				return false;
 			}
 		}
@@ -365,8 +465,8 @@ public class ActivityOdnaAnketa extends Activity {
 		}*/
 
 		//NomerScheta
-		if ((NomerScheta.value().length() != 20) && (PotencialniyKlient.value() > 0)) {//ne pk
-			Auxiliary.warn("Расчётный счёт должен быть из 20 цифр", this);
+		if((NomerScheta.value().length() != 20) && (PotencialniyKlient.value() > 0)){//ne pk
+			Auxiliary.warn("Расчётный счёт должен быть из 20 цифр" , this);
 			return false;
 		}
 		/*
@@ -382,11 +482,10 @@ public class ActivityOdnaAnketa extends Activity {
 		}*/
 
 
-
 		return true;
 	}
 
-	void select() {
+	void select(){
 		//System.out.println("" + this.getClass() + " select");
 		String sql = "select "
 				+ "vigruzhen"
@@ -423,12 +522,14 @@ public class ActivityOdnaAnketa extends Activity {
 				;
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		System.out.println(data.dumpXML());
-		vigruzhen.value(Numeric.string2double(data.child("row").child("vigruzhen").value.property.value()));
+		//vigruzhen.value(Numeric.string2double(data.child("row").child("vigruzhen").value.property.value()));
+		num1c.value(data.child("row").child("vigruzhen").value.property.value());
+
 
 		String podrName = data.child("row").child("Podrazdelenie").value.property.value();
-		for (int i = 0; i < Cfg.territory().children.size(); i++) {
+		for(int i = 0; i < Cfg.territory().children.size(); i++){
 			String pkod = Cfg.territory().children.get(i).child("kod").value.property.value();
-			if (pkod.equals(podrName)) {
+			if(pkod.equals(podrName)){
 				Podrazdelenie.value(i);
 			}
 		}
@@ -445,9 +546,9 @@ public class ActivityOdnaAnketa extends Activity {
 		String[] kmntr = data.child("row").child("komentariy").value.property.value().split("~");
 		Komentariy.value("");
 		osobennostiKlienta.value("");
-		if (kmntr.length > 0) {
+		if(kmntr.length > 0){
 			Komentariy.value(kmntr[0]);
-			if (kmntr.length > 1) {
+			if(kmntr.length > 1){
 				osobennostiKlienta.value(kmntr[1]);
 			}
 		}
@@ -455,9 +556,9 @@ public class ActivityOdnaAnketa extends Activity {
 		GolovnoyKontragent.value(0);
 		String o = data.child("row").child("OsnovnoiKlientTT").value.property.value();
 		System.out.println("kod='" + o + "'");
-		for (int i = 0; i < kon.children.size(); i++) {
+		for(int i = 0; i < kon.children.size(); i++){
 			//System.out.println("check '"+kon.child("kod").value.property.value()+"'");
-			if (kon.children.get(i).child("kod").value.property.value().equals(o)) {
+			if(kon.children.get(i).child("kod").value.property.value().equals(o)){
 				GolovnoyKontragent.value(i + 1);
 				//System.out.println("found GolovnoyKontragent " + i);
 				break;
@@ -466,8 +567,8 @@ public class ActivityOdnaAnketa extends Activity {
 
 		PredokNum.value(0);
 		o = data.child("row").child("predok").value.property.value();
-		for (int i = 0; i < vseKontragenty.children.size(); i++) {
-			if (vseKontragenty.children.get(i).child("kod").value.property.value().equals(o)) {
+		for(int i = 0; i < vseKontragenty.children.size(); i++){
+			if(vseKontragenty.children.get(i).child("kod").value.property.value().equals(o)){
 				PredokNum.value(i + 1);
 				break;
 			}
@@ -481,16 +582,16 @@ public class ActivityOdnaAnketa extends Activity {
 		//PotencialniyKlient.value(Numeric.string2double(data.child("row").child("PotencialniyKlient").value.property.value()));
 		String p = data.child("row").child("PotencialniyKlient").value.property.value();
 		System.out.println("PotencialniyKlient " + p);
-		if (p.equals("ПК")) {
+		if(p.equals("ПК")){
 			PotencialniyKlient.value(0);
 			PKorNew.value(0);
-		} else {
+		}else{
 			PKorNew.value(1);
 			PotencialniyKlient.value(0);
 			//System.out.println("kod='"+o+"'");
-			for (int i = 0; i < vseKontragenty.children.size(); i++) {
+			for(int i = 0; i < vseKontragenty.children.size(); i++){
 				//System.out.println("check '"+kon.child("kod").value.property.value()+"'");
-				if (vseKontragenty.children.get(i).child("kod").value.property.value().equals(p)) {
+				if(vseKontragenty.children.get(i).child("kod").value.property.value().equals(p)){
 					PotencialniyKlient.value(i + 1);
 					//System.out.println("found "+i);
 					break;
@@ -537,24 +638,24 @@ public class ActivityOdnaAnketa extends Activity {
 		//fullVremyaRaboti.value(data.child("row").child("VremyaRaboti").value.property.value());
 		this.setStartEndVremyaRaboti(data.child("row").child("VremyaRaboti").value.property.value());
 		dataGrid.clearColumns();
-		if (_id != null) {
+		if(_id != null){
 			Bough contacts = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select * from AnketaKlientaContacts where anketaId=" + _id, null));
 			//System.out.println(contacts.dumpXML());
-			for (int i = 0; i < contacts.children.size(); i++) {
+			for(int i = 0; i < contacts.children.size(); i++){
 				Bough row = contacts.children.get(i);
 				final String _id = row.child("_id").value.property.value();
 				Task tap;
-				if (vigruzhen.value() > 0) {
+				if(num1c.value().length() > 5){
 					tap = null;
-				} else {
-					tap = new Task() {
+				}else{
+					tap = new Task(){
 						@Override
-						public void doTask() {
+						public void doTask(){
 							save();
 							Intent intent = new Intent();
 							intent.setClass(ActivityOdnaAnketa.this, ActivityOdnaAnketaContact.class);
-							intent.putExtra("anketaId", "" + ActivityOdnaAnketa.this._id);
-							intent.putExtra("_id", "" + _id);
+							intent.putExtra("anketaId" , "" + ActivityOdnaAnketa.this._id);
+							intent.putExtra("_id" , "" + _id);
 							ActivityOdnaAnketa.this.startActivityForResult(intent, 0);
 						}
 					};
@@ -568,20 +669,20 @@ public class ActivityOdnaAnketa extends Activity {
 		dataGrid.refresh();
 	}
 
-	int timeDay(int nn, String days[]) {
-		if (days.length > nn) {
-			try {
+	int timeDay(int nn, String days[]){
+		if(days.length > nn){
+			try{
 
-				int t0 = (int) (timeFormat.parse(days[nn].trim().replace('.', ':')).getTime());
+				int t0 = (int)(timeFormat.parse(days[nn].trim().replace('.', ':')).getTime());
 				return t0;
-			} catch (Throwable t) {
+			}catch(Throwable t){
 				t.printStackTrace();
 			}
 		}
 		return 0;
 	}
 
-	void setStartEndVremyaRaboti(String txt) {
+	void setStartEndVremyaRaboti(String txt){
 		String days[] = txt.split("~");
 		den01.value(timeDay(0, days));
 		den02.value(timeDay(1, days));
@@ -619,7 +720,7 @@ public class ActivityOdnaAnketa extends Activity {
 */
 	}
 
-	String composeVremyaRaboti() {
+	String composeVremyaRaboti(){
 		//String txt = timeFormat.format(new Date(VremyaRabotiStart.value().longValue()))
 		//		+ " - " + timeFormat.format(new Date(VremyaRabotiEnd.value().longValue()));
 		String txt = timeFormat.format(new Date(den01.value().longValue()))
@@ -641,53 +742,54 @@ public class ActivityOdnaAnketa extends Activity {
 		return txt;
 	}
 
-	void save() {
-		if (_id == null) {
+	void save(){
+		if(_id == null){
 			insert();
-		} else {
+		}else{
 			update();
 		}
+		resetTtitle();
 	}
 
-	String composeNuzhenPropusk() {
+	String composeNuzhenPropusk(){
 		String np = "";
-		if (NuzhenPropusk.value()) {
-			if (SmenaUrLicaSrazu.value()) {
+		if(NuzhenPropusk.value()){
+			if(SmenaUrLicaSrazu.value()){
 				np = "3";
-			} else {
+			}else{
 				np = "1";
 			}
-		} else {
-			if (SmenaUrLicaSrazu.value()) {
+		}else{
+			if(SmenaUrLicaSrazu.value()){
 				np = "2";
-			} else {
+			}else{
 				np = "0";
 			}
 		}
 		return np;
 	}
 
-	void parseNuzhenPropusk(String np) {
+	void parseNuzhenPropusk(String np){
 		NuzhenPropusk.value(false);
 		SmenaUrLicaSrazu.value(false);
-		if (np.equals("1")) {
+		if(np.equals("1")){
 			NuzhenPropusk.value(true);
 			SmenaUrLicaSrazu.value(false);
 		}
-		if (np.equals("2")) {
+		if(np.equals("2")){
 			NuzhenPropusk.value(false);
 			SmenaUrLicaSrazu.value(true);
 		}
-		if (np.equals("3")) {
+		if(np.equals("3")){
 			NuzhenPropusk.value(true);
 			SmenaUrLicaSrazu.value(true);
 		}
 	}
 
-	void update() {
+	void update(){
 
 		String sql = "update AnketaKlienta set"
-				+ "\n vigruzhen=" + vigruzhen.value().longValue()//
+				+ "\n vigruzhen='" + num1c.value() + "'"//
 				+ ", Podrazdelenie= " + "'" + Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue()) + "'"
 				+ ", UrFizLico= " + getUrFiz() //
 				+ ", FizOther= " + " '" + FizOther.value().replace('\'', '`') + "'"
@@ -731,31 +833,31 @@ public class ActivityOdnaAnketa extends Activity {
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
 
-	void delete() {
-		if (_id != null) {
+	void delete(){
+		if(_id != null){
 			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from AnketaKlientaContacts where anketaId=" + _id);
 			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from AnketaKlienta where _id=" + _id);
 		}
 	}
 
-	String getUrFiz() {
+	String getUrFiz(){
 		String urFiz = "6";
-		if (UrFizLico.value() == 0) {
+		if(UrFizLico.value() == 0){
 			urFiz = "0";
 		}
-		if (UrFizLico.value() == 1) {
+		if(UrFizLico.value() == 1){
 			urFiz = "1";
 		}
-		if (UrFizLico.value() == 2) {
+		if(UrFizLico.value() == 2){
 			urFiz = "2";
 		}
-		if (UrFizLico.value() == 3) {
+		if(UrFizLico.value() == 3){
 			urFiz = "3";
 		}
-		if (UrFizLico.value() == 4) {
+		if(UrFizLico.value() == 4){
 			urFiz = "4";
 		}
-		if (UrFizLico.value() == 5) {
+		if(UrFizLico.value() == 5){
 			urFiz = "5";
 		}
 		return urFiz;
@@ -772,10 +874,10 @@ public class ActivityOdnaAnketa extends Activity {
 	}
 */
 
-	String getPredok() {
+	String getPredok(){
 		String oklient = "";
 		String kod = Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue());
-		if (PredokNum.value() > 0) {
+		if(PredokNum.value() > 0){
 			//oklient = Cfg.kodKontragenta(PredokNum.value().intValue() - 1, kod);
 			oklient = kodByIndex(PredokNum.value().intValue() - 1);
 
@@ -784,24 +886,24 @@ public class ActivityOdnaAnketa extends Activity {
 		return oklient;
 	}
 
-	String kodByIndex(int nn) {
+	String kodByIndex(int nn){
 		//Bough bb=Cfg.vseKontragenty();
-		if (nn >= 0 && nn < vseKontragenty.children.size()) {
+		if(nn >= 0 && nn < vseKontragenty.children.size()){
 			String kod = vseKontragenty.children.get(nn).child("kod").value.property.value();
 			return kod;
-		} else {
+		}else{
 			return "";
 		}
 	}
 
-	String getPotencialniyKlient() {
+	String getPotencialniyKlient(){
 		String pklient = "";
 		//if (PotencialniyKlient.value() == 0) {
 		System.out.println("getPotencialniyKlient/" + PKorNew.value() + "/" + PotencialniyKlient.value());
-		if (PKorNew.value() == 0) {
+		if(PKorNew.value() == 0){
 			pklient = "ПК";
-		} else {
-			if (PotencialniyKlient.value() > 1) {
+		}else{
+			if(PotencialniyKlient.value() > 1){
 				//pklient = Cfg.kontragenty(kod).children.get(PotencialniyKlient.value().intValue() - 2).child("kod").value.property.value();
 				//pklient = Cfg.kodKontragenta(PotencialniyKlient.value().intValue() - 1, Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue()));
 				//pklient = Cfg.vseKontragenty(PotencialniyKlient.value().intValue() - 1, Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue()));
@@ -811,7 +913,7 @@ public class ActivityOdnaAnketa extends Activity {
 		return pklient;
 	}
 
-	void insert() {
+	void insert(){
 		//String kod = Cfg.territory().children.get(Podrazdelenie.value().intValue()).child("kod").value.property.value();
 		//String tt = tiptt.items.get(TipTT.value().intValue());
 		//TipTT
@@ -847,7 +949,7 @@ public class ActivityOdnaAnketa extends Activity {
 				+ ", komentariy"
 				+ ", NuzhenPropusk"
 				+ "\n) values ("
-				+ "\n" + vigruzhen.value()//
+				+ "\n'" + num1c.value() + "'"//
 				+ ", '" + Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue()) + "'"
 				+ ", " + getUrFiz() //
 				+ ", '" + FizOther.value().replace('\'', '`') + "'"
@@ -898,63 +1000,63 @@ public class ActivityOdnaAnketa extends Activity {
 		//this.finish();
 	}
 
-	String findCurTTKod() {
+	String findCurTTKod(){
 		String sql = "select naimenovanie as naimenovanie,kod as kod from TipyTorgovihTochek where deletionMark=x'00' order by naimenovanie;";
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		return data.children.get(TipTT.value().intValue()).child("kod").value.property.value();
 	}
 
-	String quoteSafe(String txt) {
-		return txt.trim().replace("\"", "\\\"");
+	String quoteSafe(String txt){
+		return txt.trim().replace("\"" , "\\\"");
 	}
 
-	String composeJSONbody() {
+	String composeJSONbody(){
 		String kod = Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue());
 		String tip = "ИП";
 		String urFiz = "1";
-		if (UrFizLico.value() == 0) {
+		if(UrFizLico.value() == 0){
 			tip = "ООО";
 			urFiz = "0";
 		}
-		if (UrFizLico.value() == 1) {
+		if(UrFizLico.value() == 1){
 			tip = "ЗАО";
 			urFiz = "0";
 		}
-		if (UrFizLico.value() == 2) {
+		if(UrFizLico.value() == 2){
 			tip = "ОАО";
 			urFiz = "0";
 		}
-		if (UrFizLico.value() == 3) {
+		if(UrFizLico.value() == 3){
 			tip = "ПО";
 			urFiz = "0";
 		}
-		if (UrFizLico.value() == 4) {
+		if(UrFizLico.value() == 4){
 			tip = FizOther.value();
 			urFiz = "0";
 		}
-		if (UrFizLico.value() == 5) {
+		if(UrFizLico.value() == 5){
 			tip = "ИП";
 			urFiz = "1";
 		}
-		if (UrFizLico.value() == 6) {
+		if(UrFizLico.value() == 6){
 			tip = "СЗ";
 			urFiz = "1";
 		}
 		String oklient = "";
-		if (GolovnoyKontragent.value() > 0) {
+		if(GolovnoyKontragent.value() > 0){
 			oklient = Cfg.vseKontragenty().children.get(GolovnoyKontragent.value().intValue() - 1).child("kod").value.property.value();
 		}
 		String predok = "";
-		if (PredokNum.value() > 0) {
+		if(PredokNum.value() > 0){
 			predok = vseKontragenty.children.get(PredokNum.value().intValue() - 1).child("kod").value.property.value();
 		}
 		String pklient = "";
-		if (PotencialniyKlient.value() > 1) {
+		if(PotencialniyKlient.value() > 1){
 			//pklient = Cfg.kontragentyByKod(kod).children.get(PotencialniyKlient.value().intValue() - 1).child("kod").value.property.value();
 			pklient = vseKontragenty.children.get(PotencialniyKlient.value().intValue() - 1).child("kod").value.property.value();
 		}
 		String pk = "false";
-		if (PKorNew.value() == 0) {
+		if(PKorNew.value() == 0){
 			pk = "true";
 		}
 		Bough contacts = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select * from AnketaKlientaContacts where anketaId=" + _id, null));
@@ -981,9 +1083,9 @@ public class ActivityOdnaAnketa extends Activity {
 				+ "\n					,\"KolichestvoMest\":\"" + KolichestvoMest.value() + "\""
 				+ "\n					,\"UrFizLico\":" + urFiz + ""
 				+ "\n					,\"Kommentarii\":\"" + quoteSafe(Komentariy.value()) + "\"";
-		if (contacts.children.size() > 0) {
+		if(contacts.children.size() > 0){
 			jsontext = jsontext + "\n					,\"KL\":[";
-			for (int i = 0; i < contacts.children.size(); i++) {
+			for(int i = 0; i < contacts.children.size(); i++){
 				Bough row = contacts.children.get(i);
 				jsontext = jsontext + "\n					" + (i > 0 ? "," : "") + "{"
 						+ "\n						\"FIO\":\"" + quoteSafe(row.child("FIO").value.property.value()) + "\""
@@ -1028,12 +1130,12 @@ public class ActivityOdnaAnketa extends Activity {
 		return jsontext;
 	}
 
-	void upload() {
-		if (vigruzhen.value() > 0) {
-			Auxiliary.warn("Анкета уже выгружена", this);
+	void upload(){
+		if(num1c.value().length() > 5){
+			Auxiliary.warn("Анкета уже выгружена" , this);
 			return;
 		}
-		if (check()) {
+		if(check()){
 
 			final String json = composeJSONbody();
 			final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkaNaKlienta";
@@ -1041,15 +1143,16 @@ public class ActivityOdnaAnketa extends Activity {
 			final Note msg = new Note();
 			final Note status = new Note();
 			final Note ok = new Note();
+			//final Note num1c = new Note();
 			System.out.println(json);
 			/*System.out.println(url);
 			System.out.println(Cfg.whoCheckListOwner());
 			System.out.println(Cfg.hrcPersonalPassword());*/
-			Expect expect = new Expect().status.is("Отправка").task.is(new Task() {
+			Expect expect = new Expect().status.is("Отправка").task.is(new Task(){
 				@Override
-				public void doTask() {
-					try {
-						Bough result = Auxiliary.loadTextFromPrivatePOST(url, json, 21000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+				public void doTask(){
+					try{
+						Bough result = Auxiliary.loadTextFromPrivatePOST(url, json, 21000, "UTF-8" , Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 						System.out.println("result: " + result.dumpXML());
 						String raw = result.child("raw").value.property.value();
 						Bough data = Bough.parseJSON(raw);
@@ -1057,29 +1160,30 @@ public class ActivityOdnaAnketa extends Activity {
 						status.value(data.child("Статус").value.property.value());
 						msg.value(result.child("message").value.property.value() + " " + data.child("Сообщение").value.property.value());
 						ok.value(result.child("message").value.property.value());
-					} catch (Throwable t) {
+						num1c.value("/"+data.child("НомерЗаявки").value.property.value());
+					}catch(Throwable t){
 						msg.value(t.getMessage());
 					}
 				}
-			}).afterDone.is(new Task() {
+			}).afterDone.is(new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					String warning = "";
 					System.out.println("ok.value(): '" + ok.value() + "'");
 					//if (status.value().equals("0")) {
-					if (ok.value().equals("OK")) {
+					if(ok.value().equals("OK")){
 						long ms = new Date().getTime();
-						System.out.println("date ms: '" + ms + "'/'" + ((int) ms) + "'/'" + ((long) ms) + "'");
-						vigruzhen.value((double) ms);
+						System.out.println("date ms: '" + ms + "'/'" + ((int)ms) + "'/'" + ((long)ms) + "'");
+						//vigruzhen.value((double) ms);
 						warning = "Заявка отправлена";
-					} else {
+					}else{
 						warning = msg.value();
 					}
 					//Auxiliary.inform("Результат " + msg.value(), ActivityOdnaAnketa.this);
 
 					save();
-					vigruzhen.value(0);
-					Auxiliary.warn("Результат " + msg.value(), ActivityOdnaAnketa.this);
+					//vigruzhen.value(0);
+					Auxiliary.warn("Результат " + msg.value()+"\n№"+num1c.value(), ActivityOdnaAnketa.this);
 					//finish();
 					/*
 					{
@@ -1280,7 +1384,7 @@ public class ActivityOdnaAnketa extends Activity {
 		}
 	}
 */
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		//this.setTitle("Анкета нового клиента");
 		timeFormat = new SimpleDateFormat("HH:mm");
@@ -1300,12 +1404,12 @@ public class ActivityOdnaAnketa extends Activity {
 		GolovnoyKontragentChoice = new RedactFilteredSingleChoice(this);//.filter.is(INN);
 		PredokChoise = new RedactFilteredSingleChoice(this);
 		RedactSingleChoice PodrazdelenieChoice = new RedactSingleChoice(this);
-		for (int i = 0; i < Cfg.territory().children.size(); i++) {
+		for(int i = 0; i < Cfg.territory().children.size(); i++){
 			PodrazdelenieChoice.item(Cfg.territory().children.get(i).child("territory").value.property.value());
 		}
-		Podrazdelenie.afterChange(new Task() {
+		Podrazdelenie.afterChange(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				//String kod = Cfg.territory().children.get(Podrazdelenie.value().intValue()).child("kod").value.property.value();
 				//String kod = Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue());
 				//Bough k = Cfg.kontragentyByKod(kod);
@@ -1318,7 +1422,7 @@ public class ActivityOdnaAnketa extends Activity {
 				PotencialniyKlientChoice.item("[нет]");
 				GolovnoyKontragentChoice.item("[нет]");
 				PredokChoise.item("[нет]");
-				for (int i = 0; i < vseKontragenty.children.size(); i++) {
+				for(int i = 0; i < vseKontragenty.children.size(); i++){
 					//if (k.children.get(i).child("naimenovanie").value.property.value().startsWith("ПК")) {
 					PotencialniyKlientChoice.item(vseKontragenty.children.get(i).child("kod").value.property.value() + ": " + vseKontragenty.children.get(i).child("naimenovanie").value.property.value());
 					//}
@@ -1328,7 +1432,7 @@ public class ActivityOdnaAnketa extends Activity {
 				}
 			}
 		});
-		layoutless.field(this, 0, "Подразделение", PodrazdelenieChoice.selection.is(Podrazdelenie), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 0, "Подразделение" , PodrazdelenieChoice.selection.is(Podrazdelenie), 10 * Auxiliary.tapSize);
 		layoutless.child(new Decor(this).labelText.is("Координаты")//
 				.labelAlignRightCenter()//
 				.left().is(layoutless.shiftX.property)//
@@ -1348,9 +1452,9 @@ public class ActivityOdnaAnketa extends Activity {
 				.width().is(3 * Auxiliary.tapSize)//
 				.height().is(0.8 * Auxiliary.tapSize)//
 		);
-		layoutless.child(new Knob(this).labelText.is("текущие").afterTap.is(new Task() {
+		layoutless.child(new Knob(this).labelText.is("текущие").afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//shirota.value(Session.getLatitude());
 						shirota.value(GPSInfo.lastLatitude());
 						//dolgota.value(Session.getLongitude());
@@ -1362,9 +1466,9 @@ public class ActivityOdnaAnketa extends Activity {
 						.width().is(2 * Auxiliary.tapSize)//
 						.height().is(0.8 * Auxiliary.tapSize)//
 		);
-		layoutless.child(new Knob(this).labelText.is("карта").afterTap.is(new Task() {
+		layoutless.child(new Knob(this).labelText.is("карта").afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						String url = "https://maps.google.ru/maps?ll=" + shirota.value() + "," + dolgota.value() + "&z=17";
 						//System.out.println(url);
 						Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -1378,7 +1482,7 @@ public class ActivityOdnaAnketa extends Activity {
 		);
 		//layoutless.field(this, 2, "Головной контрагент", OsnovnoiKlientTTChoice.selection.is(OsnovnoiKlientTT), 10 * Auxiliary.tapSize);
 		//layoutless.field(this, 5, "КПП", new RedactText(this).text.is(KPP));
-		layoutless.field(this, 2, "Тип", new RedactSingleChoice(this).selection.is(UrFizLico)//
+		layoutless.field(this, 2, "Тип" , new RedactSingleChoice(this).selection.is(UrFizLico)//
 						.item("Юр. лицо (ООО)")//
 						.item("Юр. лицо (ЗАО)")//
 						.item("Юр. лицо (ОАО)")//
@@ -1414,30 +1518,30 @@ public class ActivityOdnaAnketa extends Activity {
 		layoutless.field(this, 4, new Note().value("Фамилия, инициалы ИП").when(UrFizLico.more(4)//.equals(5)
 				).otherwise("Наименование ЮЛ")//
 				, new RedactText(this).text.is(Naimenovanie), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 5, "Комментарий", new RedactText(this).text.is(Komentariy), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 5, "Комментарий" , new RedactText(this).text.is(Komentariy), 10 * Auxiliary.tapSize);
 		RedactText bik = new RedactText(this).text.is(BIK);
 		bik.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layoutless.field(this, 6, "БИК банка", bik);
+		layoutless.field(this, 6, "БИК банка" , bik);
 		RedactText rs = new RedactText(this).text.is(NomerScheta);
 		rs.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layoutless.field(this, 7, "Расчётный счёт", rs);
-		layoutless.field(this, 8, "Комиссионер", new RedactSingleChoice(this).item("ООО Свит Лайф Фудсервис").item("ИП Гусев А.П.").selection.is(Komissioner));
-		layoutless.field(this, 9, "Вывеска", new RedactText(this).text.is(Viveska));
+		layoutless.field(this, 7, "Расчётный счёт" , rs);
+		layoutless.field(this, 8, "Комиссионер" , new RedactSingleChoice(this).item("ООО Свит Лайф Фудсервис").item("ИП Гусев А.П.").selection.is(Komissioner));
+		layoutless.field(this, 9, "Вывеска" , new RedactText(this).text.is(Viveska));
 		/*layoutless.child(new RedactToggle(this).yes.is(this.BezPechati).labelText.is("без печати")//
 				.left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 9 * Auxiliary.tapSize))//
 				.width().is(5 * Auxiliary.tapSize)//
 				.height().is(0.8 * Auxiliary.tapSize)//
 		);*/
-		layoutless.field(this, 10, "Факт. адрес", new RedactText(this).text.is(FaktAdres), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 11, "Адрес доставки", new RedactText(this).text.is(AdresDostavki), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 12, "Адрес локализации", new RedactText(this).text.is(AdresLoc), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 13, "Подъезд большегруза", new RedactSingleChoice(this).item("да").item("нет").selection.is(Bolshegruz));
+		layoutless.field(this, 10, "Факт. адрес" , new RedactText(this).text.is(FaktAdres), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 11, "Адрес доставки" , new RedactText(this).text.is(AdresDostavki), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 12, "Адрес локализации" , new RedactText(this).text.is(AdresLoc), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 13, "Подъезд большегруза" , new RedactSingleChoice(this).item("да").item("нет").selection.is(Bolshegruz));
 
 
 		RedactText km = new RedactText(this).text.is(KolichestvoMest);
 		km.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layoutless.field(this, 14, "Количество посад. мест", km);
+		layoutless.field(this, 14, "Количество посад. мест" , km);
 		choiceVidKuhni = new RedactSingleChoice(this).selection.is(selVidKuhni)//
 				.item(allVidKuhni[0])//
 				.item(allVidKuhni[1])//
@@ -1447,17 +1551,17 @@ public class ActivityOdnaAnketa extends Activity {
 				.item(allVidKuhni[5])//
 		;
 		//layoutless.field(this, 14, "Вид кухни", new RedactText(this).text.is(VidKuhni));
-		layoutless.field(this, 15, "Вид кухни", choiceVidKuhni);
+		layoutless.field(this, 15, "Вид кухни" , choiceVidKuhni);
 
 		tiptt = new RedactSingleChoice(this).selection.is(TipTT);
 		String sql = "select naimenovanie as naimenovanie,kod as kod from TipyTorgovihTochek where deletionMark=x'00' order by naimenovanie;";
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		//System.out.println(sql+": "+data.dumpXML());
-		for (int i = 0; i < data.children.size(); i++) {
+		for(int i = 0; i < data.children.size(); i++){
 			tiptt.item(data.children.get(i).child("naimenovanie").value.property.value());
 			//System.out.println(i+": "+data.children.get(i).child("naimenovanie").value.property.value());
 		}
-		layoutless.field(this, 16, "Тип торговой точки", tiptt);
+		layoutless.field(this, 16, "Тип торговой точки" , tiptt);
 		//choiceForma = new RedactSingleChoice(this).selection.is(TipTT);
 		layoutless.child(new RedactSingleChoice(this).selection.is(allFormaS)//
 				.item(allFormaT[0])//
@@ -1473,11 +1577,11 @@ public class ActivityOdnaAnketa extends Activity {
 		//layoutless.field(this, 13, "Тип торговой точки", new RedactText(this).text.is(TipTT));
 		//allFormaT
 
-		layoutless.field(this, 17, "Контрагент", PKNew.selection.is(PKorNew), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 18, "На этого ПК", PotencialniyKlientChoice.selection.is(PotencialniyKlient), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 17, "Контрагент" , PKNew.selection.is(PKorNew), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 18, "На этого ПК" , PotencialniyKlientChoice.selection.is(PotencialniyKlient), 10 * Auxiliary.tapSize);
 		RedactText inn = new RedactText(this);
 		inn.setInputType(InputType.TYPE_CLASS_NUMBER);
-		layoutless.field(this, 3, "ИНН", inn.text.is(INN));
+		layoutless.field(this, 3, "ИНН" , inn.text.is(INN));
 		layoutless.child(new Knob(this).labelText.is("Заполнить по ИНН").afterTap.is(this.fillFromINN)
 				.width().is(Auxiliary.tapSize * 4)
 				.height().is(Auxiliary.tapSize * 0.8)
@@ -1486,37 +1590,37 @@ public class ActivityOdnaAnketa extends Activity {
 		);
 
 
-		layoutless.field(this, 19, "Головной контрагент", GolovnoyKontragentChoice.selection.is(GolovnoyKontragent), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 20, "Юр. адрес", new RedactText(this).text.is(UrAdres), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 19, "Головной контрагент" , GolovnoyKontragentChoice.selection.is(GolovnoyKontragent), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 20, "Юр. адрес" , new RedactText(this).text.is(UrAdres), 10 * Auxiliary.tapSize);
 		//layoutless.field(this, 20, "Время приёма товара", new RedactText(this).text.is(VremyaRaboti) );
 
 
-		layoutless.field(this, 21, "Время работы", new RedactTime(this).time.is(den01));
+		layoutless.field(this, 21, "Время работы" , new RedactTime(this).time.is(den01));
 		layoutless.child(new RedactTime(this).time.is(den02).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 21 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
-		layoutless.field(this, 22, "пн", new RedactTime(this).time.is(den11));
+		layoutless.field(this, 22, "пн" , new RedactTime(this).time.is(den11));
 		layoutless.child(new RedactTime(this).time.is(den12).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 22 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
-		layoutless.field(this, 23, "вт", new RedactTime(this).time.is(den21));
+		layoutless.field(this, 23, "вт" , new RedactTime(this).time.is(den21));
 		layoutless.child(new RedactTime(this).time.is(den22).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 23 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
-		layoutless.field(this, 24, "ср", new RedactTime(this).time.is(den31));
+		layoutless.field(this, 24, "ср" , new RedactTime(this).time.is(den31));
 		layoutless.child(new RedactTime(this).time.is(den32).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 24 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
-		layoutless.field(this, 25, "чт", new RedactTime(this).time.is(den41));
+		layoutless.field(this, 25, "чт" , new RedactTime(this).time.is(den41));
 		layoutless.child(new RedactTime(this).time.is(den42).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 25 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
-		layoutless.field(this, 26, "пт", new RedactTime(this).time.is(den51));
+		layoutless.field(this, 26, "пт" , new RedactTime(this).time.is(den51));
 		layoutless.child(new RedactTime(this).time.is(den52).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 26 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
-		layoutless.field(this, 27, "сб", new RedactTime(this).time.is(den61));
+		layoutless.field(this, 27, "сб" , new RedactTime(this).time.is(den61));
 		layoutless.child(new RedactTime(this).time.is(den62).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 27 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
-		layoutless.field(this, 28, "вс", new RedactTime(this).time.is(den71));
+		layoutless.field(this, 28, "вс" , new RedactTime(this).time.is(den71));
 		layoutless.child(new RedactTime(this).time.is(den72).left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 28 * Auxiliary.tapSize)).width().is(5 * Auxiliary.tapSize).height().is(0.8 * Auxiliary.tapSize));
 
-		layoutless.field(this, 29, "Смена юр.лица", PredokChoise.selection.is(PredokNum), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 29, "Смена юр.лица" , PredokChoise.selection.is(PredokNum), 10 * Auxiliary.tapSize);
 		layoutless.child(new RedactToggle(this).yes.is(SmenaUrLicaSrazu).labelText.is("сразу")//
 				.left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(10.1 * Auxiliary.tapSize)))//
 				.top().is(layoutless.shiftY.property.plus(0.2 * Auxiliary.tapSize).plus(0.8 * 29 * Auxiliary.tapSize))//
@@ -1525,9 +1629,9 @@ public class ActivityOdnaAnketa extends Activity {
 		);
 
 
-		layoutless.field(this, 30, "Особенности клиента", new RedactText(this).text.is(osobennostiKlienta), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 31, "Комментарии к пропуску", new RedactText(this).text.is(KommentariiPropusk), 10 * Auxiliary.tapSize);
-		layoutless.field(this, 32, "Особенности режима работы", new RedactText(this).text.is(osobennostiRejimaRaboty), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 30, "Особенности клиента" , new RedactText(this).text.is(osobennostiKlienta), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 31, "Комментарии к пропуску" , new RedactText(this).text.is(KommentariiPropusk), 10 * Auxiliary.tapSize);
+		layoutless.field(this, 32, "Особенности режима работы" , new RedactText(this).text.is(osobennostiRejimaRaboty), 10 * Auxiliary.tapSize);
 
 		layoutless.child(new RedactToggle(this).yes.is(NuzhenPropusk).labelText.is("нужен пропуск")//
 				.left().is(layoutless.shiftX.property.plus(layoutless.width().property.multiply(0.3).plus(10.1 * Auxiliary.tapSize)))//
@@ -1555,23 +1659,28 @@ public class ActivityOdnaAnketa extends Activity {
 		//setData();
 		Bundle bundle = getIntent().getExtras();
 
-		if (bundle != null) {
-			System.out.println("vigruzhen.value() " + vigruzhen.value());
+		if(bundle != null){
+			//System.out.println("vigruzhen.value() " + vigruzhen.value());
 			String s = bundle.getString("_id");
-			if (s != null) {
+			if(s != null){
 				_id = s;
-				this.setTitle("Анкета: " + _id);//+" "+((vigruzhen.value() > 0)?"выгружена":"не выгружена"));
 				select();
-			} else {
+				//this.setTitle("Анкета: " + _id+ "№"+num1c.value());//+" "+((vigruzhen.value() > 0)?"выгружена":"не выгружена"));
+				resetTtitle();
+			}else{
 				this.setTitle("Новая анкета");
 			}
 		}
 	}
 
+	void resetTtitle(){
+		this.setTitle("Анкета " + _id + " " + num1c.value());
+	}
+/*
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (_id != null) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		if(_id != null){
 			select();
 		}
-	}
+	}*/
 }

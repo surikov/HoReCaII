@@ -20,7 +20,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.*;
 
-public abstract class Request_NomenclatureBase implements ITableColumnsNames {
+public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 	protected static final int ORDER_ASCEND = 0;
 	protected static final int ORDER_DESCEND = 1;
 	protected int mOrderDirection = ORDER_DESCEND;
@@ -33,15 +33,15 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 	final static int ZapretOtgruzokOtvetsvennogoExclude = 2;
 	static String mastListKey = null;//"X'00000000000000000000000000000000'";
 
-	protected Request_NomenclatureBase(boolean degustacia) {
+	protected Request_NomenclatureBase(boolean degustacia){
 		SetRequestString(degustacia);
 	}
 
-	public String getStrQueryCR() {
+	public String getStrQueryCR(){
 		return mStrQuery;
 	}
 
-	public static String uslovieSkladaPodrazdeleniaNeTraphik(Date dataOtgruzki, String skladPodrazdelenia) {
+	public static String uslovieSkladaPodrazdeleniaNeTraphik(Date dataOtgruzki, String skladPodrazdelenia){
 		//if(1==1)return "";
 		boolean letuchka = DateTimeHelper.SQLDateString(dataOtgruzki).equals(DateTimeHelper.SQLDateString(new Date()));
 		skladPodrazdelenia = skladPodrazdelenia.toUpperCase();
@@ -50,7 +50,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			traphikCondition = " and Traphik=x'00'";
 		}*/
 		//skladPodrazdelenia = ISklady.HORECA_ID.toUpperCase();
-		if (skladPodrazdelenia.equals(ISklady.HORECA_ID.toUpperCase())) {
+		if(skladPodrazdelenia.equals(ISklady.HORECA_ID.toUpperCase())){
 			return "\n	on (select sklad from AdresaPoSkladam_last horeca where horeca.nomenklatura=n._idrref and horeca.period"//
 					+ "\n		=(select max(period) from AdresaPoSkladam_last where nomenklatura=n._idrref"//
 					+ "\n			and baza=" + ISklady.HORECA_ID + " and Traphik=x'00') "//
@@ -64,15 +64,15 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n			and baza=" + ISklady.HORECA_ID + " and Traphik=x'00') "//
 					+ "\n		)=" + ISklady.HORECA_sklad_12//
 					+ "\n";
-		} else {
-			if (skladPodrazdelenia.equals(ISklady.KAZAN_ID.toUpperCase())) {
-				if (letuchka) {
+		}else{
+			if(skladPodrazdelenia.equals(ISklady.KAZAN_ID.toUpperCase())){
+				if(letuchka){
 					return "\n	on (select sklad from AdresaPoSkladam_last kazan where kazan.nomenklatura=n._idrref and kazan.period"//
 							+ "\n		=(select max(period) from AdresaPoSkladam_last where nomenklatura=n._idrref"//
 							+ "\n			and baza=" + ISklady.KAZAN_ID + " and Traphik=x'00') "//
 							+ "\n		)=" + ISklady.KAZAN_sklad_14//
 							+ "\n";
-				} else {
+				}else{
 					return "\n	on (select sklad from AdresaPoSkladam_last horeca where horeca.nomenklatura=n._idrref and horeca.period"//
 							+ "\n		=(select max(period) from AdresaPoSkladam_last where nomenklatura=n._idrref"//
 							+ "\n			and baza=" + ISklady.HORECA_ID + " and Traphik=x'00') "//
@@ -91,7 +91,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 							+ "\n		)=" + ISklady.KAZAN_sklad_14//
 							+ "\n";
 				}
-			} else {
+			}else{
 				//LogHelper.debug("uslovieSkladaPodrazdeleniaNeTraphik: Unknown skladPodrazdelenia for " + skladPodrazdelenia);
 				return "";
 			}
@@ -102,12 +102,12 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 	static String uchetnayaCenaKontragentID = null;
 	static boolean uchetnayaCenaKontragentTyp = false;
 
-	public static boolean uchetnayaCena(String kontragentID) {
+	public static boolean uchetnayaCena(String kontragentID){
 		//System.out.println("uchetnayaCena----------------------------------------------------------------------");
-		if (kontragentID.equals(uchetnayaCenaKontragentID)) {
+		if(kontragentID.equals(uchetnayaCenaKontragentID)){
 			//System.out.println("cached " + uchetnayaCenaKontragentTyp);
 			return uchetnayaCenaKontragentTyp;
-		} else {
+		}else{
 			uchetnayaCenaKontragentID = kontragentID;
 			sweetlife.android10.update.UpdateTask.refreshProdazhi_CR(ApplicationHoreca.getInstance().getDataBase(), uchetnayaCenaKontragentID);
 			String sql = "select typ.naimenovanie"//
@@ -118,9 +118,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n and typ.naimenovanie='Учетная цена'"//
 					+ "\n limit 1;";
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-			if (b.children.size() > 0) {
+			if(b.children.size() > 0){
 				uchetnayaCenaKontragentTyp = true;
-			} else {
+			}else{
 				uchetnayaCenaKontragentTyp = false;
 			}
 			//System.out.println("found " + uchetnayaCenaKontragentTyp);
@@ -130,10 +130,10 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 
 	static String kontragentZapretOtgruzokOtvetsvennogo = null;
 
-	public static int getZapretOtgruzokOtvetsvennogo(String kontragent, String polzovatel) {
+	public static int getZapretOtgruzokOtvetsvennogo(String kontragent, String polzovatel){
 		//System.out.println("getZapretOtgruzokOtvetsvennogo " + kontragent + ", " + polzovatel);
-		if (polzovatel.trim().length() > 1) {
-			if (!kontragent.equals(kontragentZapretOtgruzokOtvetsvennogo)) {
+		if(polzovatel.trim().length() > 1){
+			if(!kontragent.equals(kontragentZapretOtgruzokOtvetsvennogo)){
 				kontragentZapretOtgruzokOtvetsvennogo = kontragent;
 				String refreshZOO = "drop table if exists ZapretOtgruzokOtvetsvennogo_strip;";
 				ApplicationHoreca.getInstance().getDataBase().execSQL(refreshZOO);
@@ -158,26 +158,30 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n	from ZapretOtgruzokOtvetsvennogo_strip"//
 					+ "\n	limit 1";
 			Cursor c = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
-			if (!c.moveToNext()) {
-				if (c != null) c.close();
+			if(!c.moveToNext()){
+				if(c != null)
+					c.close();
 				return ZapretOtgruzokOtvetsvennogoNone;
-			} else {
-				if (c != null) c.close();
+			}else{
+				if(c != null)
+					c.close();
 
 				sql = "select _id"//
 						+ "\n	from ZapretOtgruzokOtvetsvennogo_strip"//
 						+ "\n	where Otvetstvenniy=" + polzovatel//X'AB7418A90562E07411E34AADBCA4F16C'"
 						+ "\n	limit 1";
 				c = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
-				if (c.moveToNext()) {
-					if (c != null) c.close();
+				if(c.moveToNext()){
+					if(c != null)
+						c.close();
 					return ZapretOtgruzokOtvetsvennogoInclude;
-				} else {
-					if (c != null) c.close();
+				}else{
+					if(c != null)
+						c.close();
 					return ZapretOtgruzokOtvetsvennogoExclude;
 				}
 			}
-		} else {
+		}else{
 			//if(c!=null) c.close();
 			return ZapretOtgruzokOtvetsvennogoNone;
 		}
@@ -185,8 +189,8 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		//return ZapretOtgruzokOtvetsvennogoNone;
 	}
 
-	static String findMustListKey(String polzovatel) {
-		if (mastListKey == null) {
+	static String findMustListKey(String polzovatel){
+		if(mastListKey == null){
 			String sql = "select p1.naimenovanie,p2.naimenovanie,p3.naimenovanie"//
 					+ "\n		,must1.object as o1,must2.object as o2,must3.object as o3"//
 					+ "\n	from Polzovateli p"//
@@ -204,15 +208,15 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			String o3 = b.child("row").child("o3").value.property.value();
 			//System.out.println(sql);
 			//System.out.println(b.dumpXML());
-			if (o1.length() > 5) {
+			if(o1.length() > 5){
 				mastListKey = "x'" + o1 + "'";
-			} else {
-				if (o2.length() > 5) {
+			}else{
+				if(o2.length() > 5){
 					mastListKey = "x'" + o2 + "'";
-				} else {
-					if (o3.length() > 5) {
+				}else{
+					if(o3.length() > 5){
 						mastListKey = "x'" + o3 + "'";
-					} else {
+					}else{
 						mastListKey = "X'00000000000000000000000000000000'";
 					}
 				}
@@ -221,7 +225,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return mastListKey;
 	}
 
-	static String mastListFilter(String polzovatel) {
+	static String mastListFilter(String polzovatel){
 		//return "cross join KategoryObjectov kobj on kobj.Nomenklatura=n._idrref and kobj.kategorya =x'A69818A90562E07011E4A5333644C864'";
 		return "cross join tovaryDlyaDozakaza tovaryDlyaDozakazaFilter on tovaryDlyaDozakazaFilter.nomenklatura=n._idrref and tovaryDlyaDozakazaFilter.object=" + findMustListKey(polzovatel)//
 				//+"\n		and ("//
@@ -238,9 +242,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 	static String cachedPolzovatelID = "";
 	static String cachedFirstDay = "";
 
-	public static void cacheTop20(String polzovatelID, String firstDay) {
+	public static void cacheTop20(String polzovatelID, String firstDay){
 		//System.out.println("cacheTop20 "+polzovatelID+", firstDay"+" - "+cachedPolzovatelID+", "+cachedFirstDay);
-		if ((!polzovatelID.equals(cachedPolzovatelID)) || (!firstDay.equals(cachedFirstDay))) {
+		if((!polzovatelID.equals(cachedPolzovatelID)) || (!firstDay.equals(cachedFirstDay))){
 			cachedPolzovatelID = polzovatelID;
 			cachedFirstDay = firstDay;
 			String sql = "drop table if exists dopmotivaciya_cache;";
@@ -288,11 +292,11 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			, boolean DEGUSTACIA_POISK
 									//, String receptID
 			, String ingredientIdrref, String ingredientKluch
-									,boolean no_assortiment
-	) {
+			, boolean no_assortiment
+	){
 		return composeSQLall(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
 				, poiskovoeSlovo, tipPoiska, etoTrafik, history, skladPodrazdelenia, limit//
-				, offset, isMustList, isTop, null, null, false, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch, null,no_assortiment);
+				, offset, isMustList, isTop, null, null, false, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch, null, no_assortiment);
 	}
 
 	public static String composeSQLall(//
@@ -319,8 +323,8 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 
 			, boolean DEGUSTACIA_POISK//
 			, String ingredientIdrref, String ingredientKluch, String flagmanTovarSegmentKod
-									   ,boolean no_assortiment
-	) {
+			, boolean no_assortiment
+	){
         /*if (Cfg.useNewSkidkaCalculation) {
             return composeSQLall_NewSkidka(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
                     , poiskovoeSlovo, tipPoiska, etoTrafik, history, skladPodrazdelenia, limit//
@@ -329,17 +333,17 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return composeSQLall_Old(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
 				, poiskovoeSlovo, tipPoiska, etoTrafik, history, skladPodrazdelenia, limit//
 				, offset, isMustList, isTop, kuhnya, tochkaIdrref, individualcena, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch
-				, flagmanTovarSegmentKod,false,false,false,false,no_assortiment);
+				, flagmanTovarSegmentKod, false, false, false, false, no_assortiment);
 		// }
 	}
 
 	public static boolean _podrazdeleniya_NeIspolzovatCR = false;
 	public static String polzovatelID_podrazdeleniya_NeIspolzovatCR = "?";
 
-	public static boolean podrazdeleniya_NeIspolzovatCR(String polzovatelID) {
-		if (polzovatelID_podrazdeleniya_NeIspolzovatCR == polzovatelID) {
+	public static boolean podrazdeleniya_NeIspolzovatCR(String polzovatelID){
+		if(polzovatelID_podrazdeleniya_NeIspolzovatCR == polzovatelID){
 			//
-		} else {
+		}else{
 			polzovatelID_podrazdeleniya_NeIspolzovatCR = polzovatelID;
 			String sql = "select p1.naimenovanie as f1, hex(p1.NeIspolzovatCR) as nocr1"
 					+ "\n		,p2.naimenovanie as f2, hex(p2.NeIspolzovatCR) as nocr2"
@@ -355,14 +359,14 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n	where Polzovateli._idrref=" + polzovatelID_podrazdeleniya_NeIspolzovatCR;
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			_podrazdeleniya_NeIspolzovatCR = false;
-			if (
+			if(
 					b.child("row").child("nocr1").value.property.value().equals("01")
 							|| b.child("row").child("nocr2").value.property.value().equals("01")
 							|| b.child("row").child("nocr3").value.property.value().equals("01")
 							|| b.child("row").child("nocr4").value.property.value().equals("01")
 							|| b.child("row").child("nocr5").value.property.value().equals("01")
 
-			) {
+			){
 				_podrazdeleniya_NeIspolzovatCR = true;
 			}
 		}
@@ -372,9 +376,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 	public static String useNewDefaultPriceUserID = "";
 	public static boolean useNewDefaultPriceState = false;
 
-	public static boolean useNewDefaultPrice(String polzovatelID) {
+	public static boolean useNewDefaultPrice(String polzovatelID){
 		//if(1==1)return true;
-		if (!useNewDefaultPriceUserID.equals(polzovatelID)) {
+		if(!useNewDefaultPriceUserID.equals(polzovatelID)){
 			useNewDefaultPriceUserID = polzovatelID;
 			String sql = "select p1.EdinicaPlanirovaniya as f1,p2.EdinicaPlanirovaniya as f2,p3.EdinicaPlanirovaniya as f3,p4.EdinicaPlanirovaniya as f4,p5.EdinicaPlanirovaniya as f5"
 					+ "\n from Polzovateli "
@@ -386,20 +390,20 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 	where Polzovateli._idrref=" + polzovatelID;
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			//System.out.println(sql + ": " + b.dumpXML());
-			if (
+			if(
 					b.child("row").child("f1").value.property.value().equals("01")
 							|| b.child("row").child("f2").value.property.value().equals("01")
 							|| b.child("row").child("f3").value.property.value().equals("01")
 							|| b.child("row").child("f4").value.property.value().equals("01")
 							|| b.child("row").child("f5").value.property.value().equals("01")
 
-			) {
+			){
 				useNewDefaultPriceState = true;
 				return useNewDefaultPriceState;
 			}
 			useNewDefaultPriceState = false;
 			return useNewDefaultPriceState;
-		} else {
+		}else{
 			return useNewDefaultPriceState;
 		}
 	}
@@ -426,45 +430,47 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			, String ingredientIdrref
 			, String ingredientKluch
 			, String flagmanTovarSegmentKod
-			,boolean stmOnly
-			,boolean starsOnly
-			,boolean recomendaciaOnly
-			,boolean korzinaOnly
-			,boolean no_assortiment
-	) {
+			, boolean stmOnly
+			, boolean starsOnly
+			, boolean recomendaciaOnly
+			, boolean korzinaOnly
+			, boolean no_assortiment
+	){
 
-		refreshTovariGeroiDay(dataOtgruzki);
-		UpdateTask.refreshProdazhi_last(ApplicationHoreca.getInstance().getDataBase(),kontragentID);
-
+		//refreshTovariGeroiDay(dataOtgruzki);
 
 
 		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
-		if (Cfg.selectedOrDbHRC().equals("hrc00")) {
+		if(Cfg.selectedOrDbHRC().equals("hrc00")){
 			polzovatelID = "x'00'";
 		}
 		//if (ApplicationHoreca.getInstance().currentHRCmarshrut.length() > 0) {
-		if (Cfg.isChangedHRC()) {
+		if(Cfg.isChangedHRC()){
 			//polzovatelID = "x'" + ApplicationHoreca.getInstance().currentIDmarshrut + "'";
 			polzovatelID = "x'" + Cfg.selectedHRC_idrref() + "'";
 		}
+
+		refreshPointData(dataOtgruzki, kontragentID, polzovatelID);
+		UpdateTask.refreshProdazhi_last(ApplicationHoreca.getInstance().getDataBase(), kontragentID);
+
 		int zapretOtgruzokOtvetsvennogo = getZapretOtgruzokOtvetsvennogo(kontragentID, polzovatelID);
 		boolean letuchka = dataOtgruzki.equals(DateTimeHelper.SQLDateString(new Date()));
 		String defaultSklad = "";
-		if (skladPodrazdelenia.trim().toUpperCase().equals(ISklady.HORECA_ID.trim().toUpperCase())) {
+		if(skladPodrazdelenia.trim().toUpperCase().equals(ISklady.HORECA_ID.trim().toUpperCase())){
 			defaultSklad = " and baza=" + ISklady.HORECA_ID;
-		} else {
-			if (skladPodrazdelenia.trim().toUpperCase().equals(ISklady.KAZAN_ID.trim().toUpperCase())) {
-				if (letuchka) {
+		}else{
+			if(skladPodrazdelenia.trim().toUpperCase().equals(ISklady.KAZAN_ID.trim().toUpperCase())){
+				if(letuchka){
 					defaultSklad = " and baza=" + ISklady.KAZAN_ID;
-				} else {
+				}else{
 					//
 				}
-			} else {
-				if (skladPodrazdelenia.trim().toUpperCase().equals(ISklady.MOSKVA_ID.trim().toUpperCase())) {
-					if (letuchka) {
+			}else{
+				if(skladPodrazdelenia.trim().toUpperCase().equals(ISklady.MOSKVA_ID.trim().toUpperCase())){
+					if(letuchka){
 						defaultSklad = " and baza=" + ISklady.MOSKVA_ID;
 					}
-				} else {
+				}else{
 					//LogHelper.debug("Unknown skladPodrazdelenia " + skladPodrazdelenia);
 				}
 			}
@@ -472,15 +478,15 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		String sql = " select n._id "//
 				+ "\n 	,n.[_IDRRef] "//
 				+ "\n 	,n.[Artikul] ";
-		if (DEGUSTACIA_POISK) {
+		if(DEGUSTACIA_POISK){
 			sql = sql + "\n 	, n.[Naimenovanie] ";
-		} else {
+		}else{
 			//sql = sql + "\n 	,case curAssortiment.Trafic when x'01' then 'под заказ ' else '' end || n.[Naimenovanie] ";
 			sql = sql + "\n					  	,case curAssortiment.Trafic"
 					+ "\n			when x'01' then 'под заказ '"
 					+ "\n			else ''"
 					+ "\n			end"
-			+"\n					  	 || case brand.stm"
+					+ "\n					  	 || case brand.stm"
 					+ "\n			when x'01' then 'СТМ: '"
 					+ "\n			else ''"
 					+ "\n			end"
@@ -529,12 +535,12 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n 	,n.[OsnovnoyProizvoditel] "//
 				+ "\n 	,przv.Naimenovanie as ProizvoditelNaimenovanie "//
 		;
-		if (uchetnayaCena(kontragentID)) {
+		if(uchetnayaCena(kontragentID)){
 			sql = sql + "\n 	,TekuschieCenyOstatkovPartiy.Cena*(100+ifnull(nk1.procent,ifnull(nk2.procent,0)))/100 as Cena ";
-		} else {
-			sql = sql + "\n 	,(select c.Cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as Cena ";
+		}else{
+			sql = sql + "\n 	,(select c.Cena from CenyNomenklaturySklada_last c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as Cena ";
 		}
-		if (useNewDefaultPrice(polzovatelID)) {
+		if(useNewDefaultPrice(polzovatelID)){
 			sql = sql
 					+ "\n 	,case when ifnull(newSkidki.price,0)=0 "
 					+ "\n 	    then "
@@ -574,7 +580,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n        end "
 					+ "\n 	 as VidSkidki "
 			;
-		} else {
+		}else{
 			/*sql = sql + "\n 	,ifnull(newSkidki.price,0) as Skidka "
 					+ "\n 	,ifnull(newSkidki.price,0) as CenaSoSkidkoy "//
 					+ "\n 	,ifnull(newSkidki.comment,'') as VidSkidki "
@@ -593,9 +599,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 				+ "\n  	,x'00' as [EdinicyIzmereniyaID] "//
 				+ "\n  	,n.Roditel as Roditel "//
 		;
-		if (uchetnayaCena(kontragentID) || podrazdeleniya_NeIspolzovatCR(polzovatelID)) {
+		if(uchetnayaCena(kontragentID) || podrazdeleniya_NeIspolzovatCR(polzovatelID)){
 			sql = sql + "\n 	,0 as MinCena ";
-		} else {
+		}else{
 			sql = sql + "\n 	,case when ifnull(newSkidki.price,0)>0 and (newSkidki.comment='Индивидуальная' or newSkidki.comment='Фикс.цена') ";
 			sql = sql + "\n 	        then 0 "//
 
@@ -632,17 +638,17 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			;
 		}
 		//sql = sql + "\n 	,(select 1.1*c.Cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as MaxCena "//
-		sql = sql + "\n 	,(select 1.2*c.Cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as MaxCena "//
+		sql = sql + "\n 	,(select 1.2*c.Cena from CenyNomenklaturySklada_last c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as MaxCena "//
 				+ "\n 	,TekuschieCenyOstatkovPartiy.cena as BasePrice "//
 				+ "\n 	,round(100*Prodazhi.Stoimost/Prodazhi.kolichestvo)/100.00 as LastPrice "
 		;
 
-		if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
+		if(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")){
 			sql = sql + "\n 	,0 as Nacenka ";
-		} else {
-			if (uchetnayaCena(kontragentID)) {
+		}else{
+			if(uchetnayaCena(kontragentID)){
 				sql = sql + "\n 	,ifnull(nk1.Procent,nk2.Procent) as Nacenka ";
-			} else {
+			}else{
 				sql = sql + "\n 	,ifnull(nk1.ProcentSkidkiNacenki,nk2.ProcentSkidkiNacenki) as Nacenka ";
 			}
 		}
@@ -663,7 +669,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n 	,Prodazhi.period as LastSell "//
 				+ "\n	,n.skladEdVes as vesedizm"//
 		;
-		if (zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoInclude) {
+		if(zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoInclude){
 			sql = sql + "\n  		,(select 1 from ZapretOtgruzokOtvetsvennogo_strip"//
 					+ "\n				where Otvetstvenniy=parameters.polzovatel"//
 					+ "\n				and proizvoditel=n._idrref"//
@@ -684,8 +690,8 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n				and proizvoditel=n.[OsnovnoyProizvoditel]"//
 					+ "\n				limit 1) as zooProizvoditel"//
 			;
-		} else {
-			if (zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoExclude) {
+		}else{
+			if(zapretOtgruzokOtvetsvennogo == ZapretOtgruzokOtvetsvennogoExclude){
 				sql = sql + "\n  		,(select 1 from ZapretOtgruzokOtvetsvennogo_strip"//
 						+ "\n				where proizvoditel=n._idrref"//
 						+ "\n				limit 1) as zooSelf"//
@@ -708,7 +714,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		sql = sql + "\n 	,x'00' as skladHoreca ";
 		sql = sql + "\n 	,x'00' as skladMoskva ";
 		sql = sql + "\n						,top20._id as mustListId";
-		sql = sql + "\n						,(select  (c.Cena - TekuschieCenyOstatkovPartiy.cena) / TekuschieCenyOstatkovPartiy.cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as rPrice";
+		sql = sql + "\n						,(select  (c.Cena - TekuschieCenyOstatkovPartiy.cena) / TekuschieCenyOstatkovPartiy.cena from CenyNomenklaturySklada_last c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as rPrice";
 		sql = sql + "\n  	,n1.minCena as n1minCena ";
 		sql = sql + "\n  	,n2.minCena as n2minCena ";
 		sql = sql + "\n  	,n3.minCena as n3minCena ";
@@ -730,7 +736,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 				+ "\n 			," + polzovatelID + " as polzovatel "//
 				+ "\n 		) parameters "//
 		;
-		if (individualcena) {
+		if(individualcena){
 			sql = sql + "\n 	cross join IndividualnieSkidki iskid on iskid.nomenklatura=n._idrref and iskid.kontragent=parameters.kontragent and parameters.dataOtgruzki >=iskid.period and parameters.dataOtgruzki <=iskid.DataOkonchaniya  ";
 		}
 		sql = sql + "\n 	cross join Polzovateli on Polzovateli._idrref=parameters.polzovatel "//
@@ -738,10 +744,10 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		;
 		sql = sql + "\n 	cross join kontragenty on kontragenty._idrref=parameters.kontragent ";
 
-		if (flagmanTovarSegmentKod != null) {
+		if(flagmanTovarSegmentKod != null){
 			sql = sql + "\n 	cross join FlagmanTovar on  FlagmanTovar.Articul=n.Artikul and FlagmanTovar.SegmentKod='" + flagmanTovarSegmentKod + "'  ";
 		}
-		if (history) {
+		if(history){
 			/*
 			sql = sql//
 					+ "\n 	cross join Prodazhi_last Prodazhi"
@@ -749,7 +755,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
 			*/
 			sql = sql + "\n 	cross join Prodazhi_last Prodazhi on Prodazhi.nomenklatura=n.[_IDRRef] ";
-		} else {
+		}else{
 			/*
 			if (flagmanTovarSegmentKod != null) {
 				//Calendar c = Calendar.getInstance();
@@ -786,7 +792,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 
 		sql = sql + "\n 	left join RecommendationAndBasket1221 recKorz on recKorz.Kontragent=parameters.kontragent and recKorz.nomenklatura=n._idrref";
 
-		if (uchetnayaCena(kontragentID)) {
+		if(uchetnayaCena(kontragentID)){
 			sql = sql + "\n 	left join NacenkaKUchetnoiCene nk1 on nk1.klient=parameters.kontragent "//
 					+ "\n 			and nk1.Period=(select max(Period) from NacenkaKUchetnoiCene "//
 					+ "\n 				where klient=parameters.kontragent "//
@@ -803,7 +809,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 					)"//
 					+ "\n 			limit 1"//
 					+ "\n 		) nk2";
-		} else {
+		}else{
 			sql = sql + "\n 	left join NacenkiKontr nk1 on nk1.PoluchatelSkidki=parameters.kontragent "//
 					+ "\n 			and nk1.Period=(select max(Period) from NacenkiKontr "//
 					+ "\n 				where PoluchatelSkidki=parameters.kontragent "//
@@ -850,7 +856,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 				+ "\n		left join TovariGeroiDay hero5 on (hero5.podrazdelenie=X'00000000000000000000000000000000' or hero5.podrazdelenie=X'00')=p5._idrref and hero5.Nomenklatura=n._idrref and date(hero5.DataNachala)<=date(parameters.dataOtgruzki) and date(hero5.DataOkonchaniya)>=date(parameters.dataOtgruzki)"
 		;
 		sql = sql + "\n 	left join Proizvoditel przv on n.[OsnovnoyProizvoditel] = przv._IDRRef ";
-		if (uchetnayaCena(kontragentID)) {
+		if(uchetnayaCena(kontragentID)){
 			sql = sql + "\n 	left join FiksirovannyeCenyUchet fx1 on fx1.DataOkonchaniya=( "//
 					+ "\n 					select max(DataOkonchaniya) from FiksirovannyeCenyUchet "//
 					+ "\n 						where PoluchatelSkidki=parameters.kontragent "//
@@ -868,7 +874,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 				) and fx2.PoluchatelSkidki=kontragenty.GolovnoyKontragent "//
 					+ "\n 				and fx2.Nomenklatura=n.[_IDRRef] "//
 			;
-		} else {
+		}else{
 			sql = sql + "\n 	left join FiksirovannyeCeny_actual fx1 on fx1.DataOkonchaniya=( "//
 					+ "\n 					select max(DataOkonchaniya) from FiksirovannyeCeny_actual "//
 					+ "\n 						where PoluchatelSkidki=parameters.kontragent "//
@@ -887,46 +893,47 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 					+ "\n 				and fx2.Nomenklatura=n.[_IDRRef] "//
 			;
 		}
-		if (zapretOtgruzokOtvetsvennogo != ZapretOtgruzokOtvetsvennogoNone) {
+		if(zapretOtgruzokOtvetsvennogo != ZapretOtgruzokOtvetsvennogoNone){
 			sql = sql + "\n  		left join Nomenklatura parent on n.roditel=parent._idrref";
 		}
-		if (ingredientIdrref != null) {
+		if(ingredientIdrref != null){
 			sql = sql + "\n  		left join ReceptiiProducty reprod on n.product=reprod.product and reprod.Kluch='" + ingredientKluch + "' and reprod._idrref=X'" + ingredientIdrref + "'";
 		}
 		sql = sql + "\n  		left join atricle_count on atricle_count.artikul=n.artikul";
 		sql = sql + "\n  		left join stars on stars.artikul=n.artikul";
 		sql = sql + "\n  		left join brand on brand._idrref=n.brand";
 		String poisk = "";
-		if (poiskovoeSlovo == null) poiskovoeSlovo = "";
-		if (poiskovoeSlovo.trim().length() > 0) {
+		if(poiskovoeSlovo == null)
+			poiskovoeSlovo = "";
+		if(poiskovoeSlovo.trim().length() > 0){
 			/*if (tipPoiska == ISearchBy.SEARCH_NAME) {
 				poisk = " ( n.[UpperName] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%') ";
 			} else {*/
-				if (tipPoiska == ISearchBy.SEARCH_NAME) {
-					poisk = " ( n.[tegi] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%' or n.[UpperName] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%') ";
-				} else {
-					if (tipPoiska == ISearchBy.SEARCH_ARTICLE) {
-						poisk = " ( n.[Artikul] = '" + poiskovoeSlovo.trim().toUpperCase() + "') ";
-					} else {
-						if (tipPoiska == ISearchBy.SEARCH_VENDOR) {
-							poisk = " ( ProizvoditelNaimenovanie like '%" + poiskovoeSlovo.trim().toUpperCase() + "%') ";
-						} else {
-							if (tipPoiska == ISearchBy.SEARCH_CHILDREN) {
-								//poisk = " ( n.Roditel=" + poiskovoeSlovo.trim().toUpperCase() + ") ";
-								poisk = " ( n.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ " or category1.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ " or category2.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ " or category3.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ " or category4.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
-										+ ") ";
-							} else {
-								if (tipPoiska == ISearchBy.SEARCH_IDRREF) {
-									poisk = " ( n.[_IDRRef] = " + poiskovoeSlovo.trim().toUpperCase() + ") ";
-								} else {
-									if (tipPoiska == ISearchBy.SEARCH_CUSTOM) {
-										poisk = " ( " + poiskovoeSlovo + ") ";
-									} else {
-										if (tipPoiska == ISearchBy.SEARCH_HERO) {
+			if(tipPoiska == ISearchBy.SEARCH_NAME){
+				poisk = " ( n.[tegi] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%' or n.[UpperName] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%') ";
+			}else{
+				if(tipPoiska == ISearchBy.SEARCH_ARTICLE){
+					poisk = " ( n.[Artikul] = '" + poiskovoeSlovo.trim().toUpperCase() + "') ";
+				}else{
+					if(tipPoiska == ISearchBy.SEARCH_VENDOR){
+						poisk = " ( ProizvoditelNaimenovanie like '%" + poiskovoeSlovo.trim().toUpperCase() + "%') ";
+					}else{
+						if(tipPoiska == ISearchBy.SEARCH_CHILDREN){
+							//poisk = " ( n.Roditel=" + poiskovoeSlovo.trim().toUpperCase() + ") ";
+							poisk = " ( n.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+									+ " or category1.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+									+ " or category2.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+									+ " or category3.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+									+ " or category4.Roditel=" + poiskovoeSlovo.trim().toUpperCase()
+									+ ") ";
+						}else{
+							if(tipPoiska == ISearchBy.SEARCH_IDRREF){
+								poisk = " ( n.[_IDRRef] = " + poiskovoeSlovo.trim().toUpperCase() + ") ";
+							}else{
+								if(tipPoiska == ISearchBy.SEARCH_CUSTOM){
+									poisk = " ( " + poiskovoeSlovo + ") ";
+								}else{
+									if(tipPoiska == ISearchBy.SEARCH_HERO){
 										/*poisk = " ( n.[UpperName] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%' and (ifnull(n1.minCena,0)>0"
 												+" or ifnull(n2.minCena,0)>0"
 												+" or ifnull(n3.minCena,0)>0"
@@ -934,22 +941,22 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 												+" or ifnull(n5.minCena,0)>0"
 												+")) ";
 										*/
-											poisk = " ( n.[UpperName] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%' and (ifnull(hero1.Cena,0)>0"
-													+ " or ifnull(hero2.Cena,0)>0"
-													+ " or ifnull(hero3.Cena,0)>0"
-													+ " or ifnull(hero4.Cena,0)>0"
-													+ " or ifnull(hero5.Cena,0)>0"
-													+ ")) ";
-										}
+										poisk = " ( n.[UpperName] like '%" + poiskovoeSlovo.trim().toUpperCase() + "%' and (ifnull(hero1.Cena,0)>0"
+												+ " or ifnull(hero2.Cena,0)>0"
+												+ " or ifnull(hero3.Cena,0)>0"
+												+ " or ifnull(hero4.Cena,0)>0"
+												+ " or ifnull(hero5.Cena,0)>0"
+												+ ")) ";
 									}
 								}
 							}
 						}
 					}
 				}
+			}
 			//}
-		} else {
-			if (tipPoiska == ISearchBy.SEARCH_HERO) {
+		}else{
+			if(tipPoiska == ISearchBy.SEARCH_HERO){
 				/*poisk = " (ifnull(n1.minCena,0)>0"
 						+" or ifnull(n2.minCena,0)>0"
 						+" or ifnull(n3.minCena,0)>0"
@@ -974,27 +981,27 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			}
 		}
 
-		if (poisk.length() > 0) {
+		if(poisk.length() > 0){
 			sql = sql + "\n and " + poisk;
 		}
 		//stmOnly=true;
 		if(stmOnly){
-			sql = sql + "\n and brand.stm=x'01'" ;
+			sql = sql + "\n and brand.stm=x'01'";
 		}
-		if (isMustList == true) {
+		if(isMustList == true){
 			sql = sql + "\n and top20._id>0";
-		} else {
-			if (isTop == true) {
+		}else{
+			if(isTop == true){
 				sql = sql + "\n and rPrice>0.2499";
 			}
 		}
-		if (kuhnya != null) {
+		if(kuhnya != null){
 			sql = sql + "\n and exists (select _idrref from nomenklaturaVidyKuhon kuhnya where kuhnya._idrref=n._idrref and kuhnya.vidkuhni='" + kuhnya + "' limit 1)";
 		}
-		if (tochkaIdrref != null) {
+		if(tochkaIdrref != null){
 			sql = sql + "\n and exists (select _idrref from nomenklaturaTipyTorgTochek tchk where tchk._idrref=n._idrref and tchk.TipTorgTochki=X'" + tochkaIdrref + "' limit 1)";
 		}
-		if (ingredientIdrref != null) {
+		if(ingredientIdrref != null){
 			sql = sql + "\n and reprod.product is not null";
 		}
 		//if(Activity_NomenclatureNew.filterByStar.value()){
@@ -1019,13 +1026,21 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 	}
 
 	static String dataOtgruzkiTovariGeroiDay = "";
+	static String kontragentIDcurrent = "";
+	static String polzovatelIDcurrent = "";
 
-	static void refreshTovariGeroiDay(String dataOtgruzki) {
+	static void refreshPointData(String dataOtgruzki, String kontragentID, String polzovatelID){
+		//static void refreshTovariGeroiDay(String dataOtgruzki) {
 		//System.out.println("refreshTovariGeroiDay "+dataOtgruzki);
-		if (dataOtgruzki.equals(dataOtgruzkiTovariGeroiDay)) {
+		if(dataOtgruzki.equals(dataOtgruzkiTovariGeroiDay)
+				&& kontragentID.equals(kontragentIDcurrent)
+				&& polzovatelID.equals(polzovatelIDcurrent)
+		){
 			//
-		} else {
+		}else{
 			dataOtgruzkiTovariGeroiDay = dataOtgruzki;
+			kontragentIDcurrent = kontragentID;
+			polzovatelIDcurrent = polzovatelID;
 			String sql = ""
 					+ "\n		create table if not exists TovariGeroiDay  ("
 					+ "\n                _id integer primary key asc autoincrement"
@@ -1067,11 +1082,112 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			sql = "create index if not exists IX_TovariGeroiDay_Nomenklatura on TovariGeroiDay(Nomenklatura);";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
+
+			//////////////
+/*
+			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE TABLE if not exists CenyNomenklaturySklada_last (	"//
+					+ "\n	_id integer primary key asc autoincrement,[Period] date null,[Registrator] blob null,[NomerStroki] numeric null,[Aktivnost] blob null	"//
+					+ "\n	,[TipCen] blob null,[Nomenklatura] blob null,[Sklad] blob null,[Valyuta] blob null,[Cena] numeric null,[EdinicaIzmereniya] blob null	"//
+					+ "\n	,[ProcentSkidkiNacenki] numeric null	"//
+					+ "\n	);	" );
+			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from CenyNomenklaturySklada_last;	" );
+			ApplicationHoreca.getInstance().getDataBase().execSQL("insert into CenyNomenklaturySklada_last (	"//
+					+ "\n	Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki	"//
+					+ "\n	)	"//
+					+ "\n	select 	"//
+					+ "\n	Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki	"//
+					+ "\n	from CenyNomenklaturySklada c1	"//
+					+ "\n	join Nomenklatura_sorted on Nomenklatura_sorted._idrref=c1.nomenklatura	"//
+					+ "\n	where c1.Period=(select max(c2.Period) from CenyNomenklaturySklada c2 where c1.nomenklatura=c2.nomenklatura)	"//
+					+ "\n	group by nomenklatura	"//
+					+ "\n	;	" );
+
+			ApplicationHoreca.getInstance().getDataBase().execSQL("	CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Nomenklatura on CenyNomenklaturySklada_last(Nomenklatura);	" );
+			ApplicationHoreca.getInstance().getDataBase().execSQL("	CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Period on CenyNomenklaturySklada_last(Period);	" );
+			ApplicationHoreca.getInstance().getDataBase().execSQL("	CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Cena on CenyNomenklaturySklada_last(Cena);	" );
+			*/
+			System.out.println("CenyNomenklaturySklada_last " + dataOtgruzki);
+			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE TABLE if not exists CenyNomenklaturySklada_last (	"
+					+ "		_id integer primary key asc autoincrement,[Period] date null,[Registrator] blob null,[NomerStroki] numeric null,[Aktivnost] blob null	"
+					+ "		,[TipCen] blob null,[Nomenklatura] blob null,[Sklad] blob null,[Valyuta] blob null,[Cena] numeric null,[EdinicaIzmereniya] blob null	"
+					+ "		,[ProcentSkidkiNacenki] numeric null	"
+					+ "		);");
+			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Nomenklatura on CenyNomenklaturySklada_last(Nomenklatura);");
+			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Period on CenyNomenklaturySklada_last(Period);");
+			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Cena on CenyNomenklaturySklada_last(Cena);");
+			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from CenyNomenklaturySklada_last;");
+
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
+					+ "	select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
+					+ "	from CenyNomenklaturyPoPodrazdeleniu cc"
+					+ "	join Kontragenty kk on kk.VidDostavki=cc.sklad and kk._idrref=" + kontragentID + " and cc.period<='" + dataOtgruzki + "'; ";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
+					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
+					+ "		from Polzovateli po"
+					+ "			join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie and po._idrref=" + polzovatelID
+					+ "			join CenyNomenklaturyPoPodrazdeleniu cc on cc.podrazdelenie=p1._idrref "
+					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
+					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
+					+ "		from Polzovateli po"
+					+ "			join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie and po._idrref=" + polzovatelID
+					+ "			join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "			join CenyNomenklaturyPoPodrazdeleniu cc on cc.podrazdelenie=p2._idrref "
+					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
+					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
+					+ "		from Polzovateli po"
+					+ "			join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie and po._idrref=" + polzovatelID
+					+ "			join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "			join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "			join CenyNomenklaturyPoPodrazdeleniu cc on cc.podrazdelenie=p3._idrref "
+					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
+					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
+					+ "		from Polzovateli po"
+					+ "			join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie and po._idrref=" + polzovatelID
+					+ "			join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "			join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "			join Podrazdeleniya p4 on p4._idrref=p3.roditel"
+					+ "			join CenyNomenklaturyPoPodrazdeleniu cc on cc.podrazdelenie=p4._idrref "
+					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
+					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
+					+ "		from CenyNomenklaturyPoPodrazdeleniu cc"
+					+ "		where cc.podrazdelenie=x'00' and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			sql = "delete from CenyNomenklaturySklada_last where not (cena>0);";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			sql = "insert into CenyNomenklaturySklada_last (Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki)	"
+					+ "		select 	"
+					+ "			Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki	"
+					+ "		from CenyNomenklaturySklada c1	"
+					+ "			join Nomenklatura_sorted on Nomenklatura_sorted._idrref=c1.nomenklatura	"
+					+ "		where c1.Period=(select max(c2.Period) from CenyNomenklaturySklada c2 where c1.nomenklatura=c2.nomenklatura and c2.period<='" + dataOtgruzki + "') "
+					+ "				and c1.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last)"
+					+ "		group by nomenklatura	;";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			System.out.println(sql);
+			System.out.println("CenyNomenklaturySklada_last" + new Date());
+
 		}
 
 	}
 
-	public Cursor Request(SQLiteDatabase db, String orderBy, boolean degustacia) {
+	public Cursor Request(SQLiteDatabase db, String orderBy, boolean degustacia){
 		//String sql = mStrQuery + " group by n.[_idrref] " + AddOrderBy(orderBy) + " limit 100;";
 		//System.out.println(this.getClass().getCanonicalName() + " Request "//
 		//+ "\n" + sql//
@@ -1096,11 +1212,11 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 
 	protected abstract void SetRequestString(boolean degustacia);
 
-	protected String AddOrderBy(String orderBy) {
-		if (orderBy != null && orderBy.length() != 0) {
-			if (mOrderField == orderBy) {
+	protected String AddOrderBy(String orderBy){
+		if(orderBy != null && orderBy.length() != 0){
+			if(mOrderField == orderBy){
 				mOrderDirection = 1 - mOrderDirection;
-			} else {
+			}else{
 				mOrderDirection = ORDER_ASCEND;
 			}
 			mOrderField = orderBy;
@@ -1109,41 +1225,41 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return "";
 	}
 
-	public static int get_id(Cursor cursor) {
+	public static int get_id(Cursor cursor){
 		return cursor.getInt(cursor.getColumnIndex(ID));
 	}
 
-	public static String getIDRRef(Cursor cursor) {
+	public static String getIDRRef(Cursor cursor){
 		return Hex.encodeHex(cursor.getBlob(cursor.getColumnIndex(IDRREF)));
 	}
 
-	public static String getArtikul(Cursor cursor) {
+	public static String getArtikul(Cursor cursor){
 		//System.out.println("ARTIKUL "+cursor.getColumnIndex(ARTIKUL)+": "+cursor.getString(cursor.getColumnIndex(ARTIKUL)));
 		//return cursor.getString(cursor.getColumnIndex(ARTIKUL));
 		String artikul = "?";
-		try {
+		try{
 			artikul = cursor.getString(cursor.getColumnIndex(ARTIKUL));
 
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return artikul;
 	}
 
-	public static String getNaimenovanie(Cursor cursor) {
+	public static String getNaimenovanie(Cursor cursor){
 		//System.out.println("NAIMENOVANIE "+cursor.getColumnIndex(NAIMENOVANIE)+": "+cursor.getString(cursor.getColumnIndex(NAIMENOVANIE)));
 		return cursor.getString(cursor.getColumnIndex(NAIMENOVANIE));
 	}
 
-	public static String getProizvoditelID(Cursor cursor) {
+	public static String getProizvoditelID(Cursor cursor){
 		return Hex.encodeHex(cursor.getBlob(cursor.getColumnIndex(OSNOVNOY_PROIZVODITEL)));
 	}
 
-	public static String getProizvoditelNaimenovanie(Cursor cursor) {
+	public static String getProizvoditelNaimenovanie(Cursor cursor){
 		return cursor.getString(cursor.getColumnIndex(PROIZVODITEL_NAIMENOVANIE));
 	}
 
-	public static String getCena(Cursor cursor) {
+	public static String getCena(Cursor cursor){
 		//System.out.println("CENA "+cursor.getColumnIndex(CENA)+": "+cursor.getString(cursor.getColumnIndex(CENA)));
 		/*double cena = 0.0;
 		try {
@@ -1156,72 +1272,72 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		//return DecimalFormatHelper.format(cena);
 	}
 
-	public static String calculateMinCena(double cursorMinCena) {
+	public static String calculateMinCena(double cursorMinCena){
 		String r = "0.0";
-		try {
+		try{
 			//double price = cursor.getDouble(cursor.getColumnIndex(MIN_CENA));
 			double price = cursorMinCena;
 			r = DecimalFormatHelper.format(price);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return r;
 	}
 
-	public static String getMinCena(Cursor cursor) {
+	public static String getMinCena(Cursor cursor){
 		String r = "0.0";
-		try {
+		try{
 			//double price = cursor.getDouble(cursor.getColumnIndex(MIN_CENA));
 			//r = DecimalFormatHelper.format(price);
 			r = calculateMinCena(cursor.getDouble(cursor.getColumnIndex(MIN_CENA)));
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return r;
 	}
 
-	public static String getMaxCena(Cursor cursor) {
-		Double price = (Double) cursor.getDouble(cursor.getColumnIndex(MAX_CENA));
-		if (price == null || price == 0) {
+	public static String getMaxCena(Cursor cursor){
+		Double price = (Double)cursor.getDouble(cursor.getColumnIndex(MAX_CENA));
+		if(price == null || price == 0){
 			return getCena(cursor);
 		}
 		return DecimalFormatHelper.format(price);
 	}
 
-	public static String getEdinicyIzmereniyaNaimenovanie(Cursor cursor) {
+	public static String getEdinicyIzmereniyaNaimenovanie(Cursor cursor){
 		String r = "?";
-		try {
+		try{
 			r = cursor.getString(cursor.getColumnIndex(EDINICY_IZMERENIYA_NAIMENOVANIE));
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return r;
 	}
 
-	public static String getKoephphicient(Cursor cursor) {
+	public static String getKoephphicient(Cursor cursor){
 		//return ((Double) cursor.getDouble(cursor.getColumnIndex(KOEPHICIENT))).toString();
 		String r = "?";
-		try {
-			r = ((Double) cursor.getDouble(cursor.getColumnIndex(KOEPHICIENT))).toString();
-		} catch (Throwable t) {
+		try{
+			r = ((Double)cursor.getDouble(cursor.getColumnIndex(KOEPHICIENT))).toString();
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return r;
 	}
 
-	public static String getMinNorma(Cursor cursor) {
+	public static String getMinNorma(Cursor cursor){
 		String r = "1";
-		try {
-			r = ((Double) cursor.getDouble(cursor.getColumnIndex(MIN_NORMA))).toString();
-		} catch (Throwable t) {
+		try{
+			r = ((Double)cursor.getDouble(cursor.getColumnIndex(MIN_NORMA))).toString();
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return r;
 	}
 
-	public static String getEdinicyIzmereniyaID(Cursor cursor) {
+	public static String getEdinicyIzmereniyaID(Cursor cursor){
 		String r = "x'00'";
-		try {
+		try{
 			int idx = cursor.getColumnIndex(EDINICY_IZMERENIYA_ID);
 			//System.out.println(idx);
 			byte[] blb = cursor.getBlob(idx);
@@ -1231,25 +1347,25 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			//System.out.println(blb);
 			r = Hex.encodeHex(blb);
 			//System.out.println(r);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return r;
 	}
 
-	public static String getSkidka(Cursor cursor) {
-		try {
+	public static String getSkidka(Cursor cursor){
+		try{
 			String s = cursor.getString(cursor.getColumnIndex("Skidka"));
-			if (("" + s).trim().length() > 0) {
+			if(("" + s).trim().length() > 0){
 				return s;
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			//System.out.println("Request_NomenclatureBase getSkidka: " + t.getMessage());
 		}
 		return "" + 0.0;
 	}
 
-	public static String getSkidka_old(Cursor cursor) {
+	public static String getSkidka_old(Cursor cursor){
 		//System.out.println("getSkidka" );
 		/*Double sale = (Double) cursor.getDouble(cursor.getColumnIndex(SKIDKA));
 		if (sale == null || sale == 0) {
@@ -1258,24 +1374,24 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return sale.toString();*/
 		//double nacenka = cursor.getDouble(cursor.getColumnIndex("Nacenka"));
 		//return "-";
-		try {
+		try{
 			String ZapretSkidokTovNokopitelnye = cursor.getString(cursor.getColumnIndex("ZapretSkidokTovNokopitelnye"));
 			String ZapretSkidokProizvNacenki = cursor.getString(cursor.getColumnIndex("ZapretSkidokProizvNacenki"));
 			double FiksirovannyeCeny = cursor.getDouble(cursor.getColumnIndex("FiksirovannyeCeny"));
-			if (FiksirovannyeCeny > 0) {
+			if(FiksirovannyeCeny > 0){
 				return "" + 0.0;
 			}
 			double SkidkaPartneraKarta = cursor.getDouble(cursor.getColumnIndex("SkidkaPartneraKarta"));
-			if (SkidkaPartneraKarta > 0) {
+			if(SkidkaPartneraKarta > 0){
 				return "" + 0.0;
 			}
 			double NakopitelnyeSkidki = cursor.getDouble(cursor.getColumnIndex("NakopitelnyeSkidki"));
-			if (!ZapretSkidokTovNokopitelnye.equals("true")) {
-				if (NakopitelnyeSkidki > 0) {
+			if(!ZapretSkidokTovNokopitelnye.equals("true")){
+				if(NakopitelnyeSkidki > 0){
 					return "" + NakopitelnyeSkidki;
 				}
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			//System.out.println("Request_NomenclatureBase getSkidka: " + t.getMessage());
 		}
 		return "" + 0.0;
@@ -1287,10 +1403,10 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 			, String cursorVidSkidki
 			, double cursorMinCena
 			, double cursorNacenka
-	) {
+	){
 		double cena = cursorCena;
 		double skidka = cursorSkidka;
-		if (skidka > 0) {
+		if(skidka > 0){
 			cena = skidka;
 		}
 		//String vidSkidki = Request_NomenclatureBase.getVidSkidki(cursor);
@@ -1298,8 +1414,8 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		//double mincen = Double.parseDouble(getMinCena(cursor));
 		double mincen = Double.parseDouble(calculateMinCena(cursorMinCena));
 		//System.out.println("getCenaSoSkidkoy: " + vidSkidki + ", " + cena + ", " + mincen);
-		if (vidSkidki.trim().toUpperCase().equals(Sales.CR_NAME.trim().toUpperCase())) {
-			if (cena < mincen) {
+		if(vidSkidki.trim().toUpperCase().equals(Sales.CR_NAME.trim().toUpperCase())){
+			if(cena < mincen){
 				//cena = cursor.getDouble(cursor.getColumnIndex(CENA));
 				cena = cursorCena;
 				//System.out.println("change getCenaSoSkidkoy: " + vidSkidki + ", " + cena + ", " + mincen);
@@ -1308,7 +1424,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return cena;
 	}
 
-	public static String getCenaSoSkidkoy(Cursor cursor) {
+	public static String getCenaSoSkidkoy(Cursor cursor){
 		/*
 		double cena = cursor.getDouble(cursor.getColumnIndex(CENA));
 		double skidka = cursor.getDouble(cursor.getColumnIndex(SKIDKA));
@@ -1336,7 +1452,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		));
 	}
 
-	public static String getCenaSoSkidkoy_old(Cursor cursor) {
+	public static String getCenaSoSkidkoy_old(Cursor cursor){
 		/*Double priceWithSale = (Double) cursor.getDouble(cursor.getColumnIndex(CENA_SO_SKIDKOY));
 		if (priceWithSale == null) {
 			return null;
@@ -1345,49 +1461,49 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		double cena = cursor.getDouble(cursor.getColumnIndex(CENA));
 		String ZapretSkidokTovNokopitelnye = cursor.getString(cursor.getColumnIndex("ZapretSkidokTovNokopitelnye"));
 		String ZapretSkidokProizvNacenki = cursor.getString(cursor.getColumnIndex("ZapretSkidokProizvNacenki"));
-		try {
+		try{
 			double Nacenka = cursor.getDouble(cursor.getColumnIndex("Nacenka"));
 			//if (Nacenka == 0) {
 			//	Nacenka = 1.0;
 			//}
 			cena = cena * (100 + Nacenka) / 100;
 			double FiksirovannyeCeny = cursor.getDouble(cursor.getColumnIndex("FiksirovannyeCeny"));
-			if (FiksirovannyeCeny > 0) {
+			if(FiksirovannyeCeny > 0){
 				return DecimalFormatHelper.format(FiksirovannyeCeny);
 			}
 			double SkidkaPartneraKarta = cursor.getDouble(cursor.getColumnIndex("SkidkaPartneraKarta"));
-			if (SkidkaPartneraKarta > 0) {
+			if(SkidkaPartneraKarta > 0){
 				return DecimalFormatHelper.format(SkidkaPartneraKarta);
 			}
 			double NakopitelnyeSkidki = cursor.getDouble(cursor.getColumnIndex("NakopitelnyeSkidki"));
-			if (!ZapretSkidokTovNokopitelnye.equals("true")) {
-				if (NakopitelnyeSkidki > 0) {
+			if(!ZapretSkidokTovNokopitelnye.equals("true")){
+				if(NakopitelnyeSkidki > 0){
 					//cena = cena * Nacenka;
 					cena = cena * ((100.0 - NakopitelnyeSkidki) / 100);
 					return DecimalFormatHelper.format(cena);
 				}
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			//System.out.println("Request_NomenclatureBase getCenaSoSkidkoy: " + t.getMessage());
 		}
 		return DecimalFormatHelper.format(cena);
 	}
 
-	public static String getCenaCR(Cursor cursor) {
-		Double priceWithSale = (Double) cursor.getDouble(cursor.getColumnIndex(CENA_SO_SKIDKOY));
-		if (priceWithSale == null || priceWithSale == 0) {
+	public static String getCenaCR(Cursor cursor){
+		Double priceWithSale = (Double)cursor.getDouble(cursor.getColumnIndex(CENA_SO_SKIDKOY));
+		if(priceWithSale == null || priceWithSale == 0){
 			return DecimalFormatHelper.format(cursor.getDouble(cursor.getColumnIndex(CENA)));
 		}
 		return DecimalFormatHelper.format(priceWithSale);
 	}
 
-	public static String calculateVidSkidki(double cursorNacenka, String cursorVidSkidki) {
+	public static String calculateVidSkidki(double cursorNacenka, String cursorVidSkidki){
 		String nacenka = calculateWithNacenka(cursorNacenka);
 		String skidka = calculateWithSkidki(cursorVidSkidki);
 		return skidka + " " + nacenka;
 	}
 
-	public static String getVidSkidki(Cursor cursor) {
+	public static String getVidSkidki(Cursor cursor){
 		//System.out.println("getVidSkidki");
 		/*String nacenka = withNacenka(cursor);
 		String skidka = withSkidki(cursor);
@@ -1395,58 +1511,58 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return calculateVidSkidki(cursor.getDouble(cursor.getColumnIndex("Nacenka")), cursor.getString(cursor.getColumnIndex("VidSkidki")));
 	}
 
-	public static boolean isOlderThen2week(Cursor cursor) {
-		try {
+	public static boolean isOlderThen2week(Cursor cursor){
+		try{
 			String LastSell = cursor.getString(cursor.getColumnIndex("LastSell"));
-			if (LastSell == null) {
+			if(LastSell == null){
 				return false;
 			}
-			if (LastSell.length() < 1) {
+			if(LastSell.length() < 1){
 				return false;
 			}
 			java.util.Date d = DateTimeHelper.SQLDateToDate(LastSell);
 			java.util.Calendar now = Calendar.getInstance();
 			now.roll(Calendar.DAY_OF_YEAR, -14);
 			//String LastSell = cursor.getString(cursor.getColumnIndex("LastSell"));
-			if (d.before(now.getTime())) {
+			if(d.before(now.getTime())){
 				return true;
 				//0xffff6666;
-			} else {
+			}else{
 				return false;
 				//0xffe3e3e3;
 			}
 			//String LastSell = cursor.getString(cursor.getColumnIndex("LastSell"));
 			//return LastSell;
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			return false;
 		}
 	}
 
-	public static boolean nacenkaBolshe25(Cursor cursor) {
-		try {
+	public static boolean nacenkaBolshe25(Cursor cursor){
+		try{
 			double CenyNomenklaturySklada = cursor.getDouble(cursor.getColumnIndex("Cena"));
 			double TekuschieCenyOstatkovPartiy = cursor.getDouble(cursor.getColumnIndex("BasePrice"));
-			int procent = (int) (100.0 * (CenyNomenklaturySklada - TekuschieCenyOstatkovPartiy) / TekuschieCenyOstatkovPartiy);
+			int procent = (int)(100.0 * (CenyNomenklaturySklada - TekuschieCenyOstatkovPartiy) / TekuschieCenyOstatkovPartiy);
 			//System.out.println("100.0 * (" + CenyNomenklaturySklada + " - " + TekuschieCenyOstatkovPartiy + ") / " + TekuschieCenyOstatkovPartiy + ")=" + procent);
-			if (procent >= 25) {
+			if(procent >= 25){
 				return true;
-			} else {
+			}else{
 				return false;
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			return false;
 		}
 	}
 
-	public static String calculateWithNacenka(double nacenka) {
-		if (nacenka > 0) {
+	public static String calculateWithNacenka(double nacenka){
+		if(nacenka > 0){
 			return "+наценка " + nacenka + "%";
-		} else {
+		}else{
 			return "";
 		}
 	}
 
-	public static String withNacenka(Cursor cursor) {
+	public static String withNacenka(Cursor cursor){
 		/*double nacenka = cursor.getDouble(cursor.getColumnIndex("Nacenka"));
 		if (nacenka > 0) {
 			return "+наценка " + nacenka + "%";
@@ -1456,17 +1572,17 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return calculateWithNacenka(cursor.getDouble(cursor.getColumnIndex("Nacenka")));
 	}
 
-	public static String calculateWithSkidki(String cursorVidSkidki) {
+	public static String calculateWithSkidki(String cursorVidSkidki){
 		String textSkidka = "";
-		try {
+		try{
 			textSkidka = "" + cursorVidSkidki;
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			textSkidka = "?";
 		}
 		return textSkidka;
 	}
 
-	public static String withSkidki(Cursor cursor) {
+	public static String withSkidki(Cursor cursor){
 		/*String textSkidka = "";
 		try {
 			textSkidka = "" + cursor.getString(cursor.getColumnIndex("VidSkidki"));
@@ -1477,37 +1593,37 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return calculateWithSkidki(cursor.getString(cursor.getColumnIndex("VidSkidki")));
 	}
 
-	public static String withSkidki_old(Cursor cursor) {
+	public static String withSkidki_old(Cursor cursor){
 		//if (cursor.isNull(cursor.getColumnIndex(VID_SKIDKI))) {
 		//	return "";
 		//}
 		//return Sales.GetSaleName(Hex.encodeHex(cursor.getBlob(cursor.getColumnIndex(VID_SKIDKI))));
-		try {
+		try{
 			String ZapretSkidokTovNokopitelnye = cursor.getString(cursor.getColumnIndex("ZapretSkidokTovNokopitelnye"));
 			String ZapretSkidokProizvNacenki = cursor.getString(cursor.getColumnIndex("ZapretSkidokProizvNacenki"));
 			double FiksirovannyeCeny = cursor.getDouble(cursor.getColumnIndex("FiksirovannyeCeny"));
 			//System.out.println("FiksirovannyeCeny" + FiksirovannyeCeny + "/" + cursor.getString(cursor.getColumnIndex(ARTIKUL)));
-			if (FiksirovannyeCeny > 0) {
+			if(FiksirovannyeCeny > 0){
 				return "Фикс.цена";
 			}
 			double SkidkaPartneraKarta = cursor.getDouble(cursor.getColumnIndex("SkidkaPartneraKarta"));
-			if (SkidkaPartneraKarta > 0) {
+			if(SkidkaPartneraKarta > 0){
 				return "Партнёр";
 			}
-			if (!ZapretSkidokTovNokopitelnye.equals("true")) {
+			if(!ZapretSkidokTovNokopitelnye.equals("true")){
 				double NakopitelnyeSkidki = cursor.getDouble(cursor.getColumnIndex("NakopitelnyeSkidki"));
-				if (NakopitelnyeSkidki > 0) {
+				if(NakopitelnyeSkidki > 0){
 					return "Накоп.";
 				}
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			//System.out.println("Request_NomenclatureBase withSkidki: " + t.getMessage());
 		}
 		return "";
 	}
 
-	public static String _getVidSkidkiID(Cursor cursor) {
-		if (cursor.isNull(cursor.getColumnIndex(VID_SKIDKI))) {
+	public static String _getVidSkidkiID(Cursor cursor){
+		if(cursor.isNull(cursor.getColumnIndex(VID_SKIDKI))){
 			return "x'00'";
 		}
 		return Hex.encodeHex(cursor.getBlob(cursor.getColumnIndex(VID_SKIDKI)));
@@ -1526,11 +1642,11 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames {
 		return "";*/
 	}
 
-	public static double getBasePrice(Cursor cursor) {
+	public static double getBasePrice(Cursor cursor){
 		return cursor.getDouble(cursor.getColumnIndex(BASE_PRICE));
 	}
 
-	public static double getLastPrice(Cursor cursor) {
+	public static double getLastPrice(Cursor cursor){
 		return cursor.getDouble(cursor.getColumnIndex(LAST_PRICE));
 	}
 }
