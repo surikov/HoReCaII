@@ -43,6 +43,7 @@ public class Cfg {
 	public static String skidkaId_x_Targetnie = "a0c42e5e2beab7e74a98e440d5099464".toUpperCase();//' – таргетные – не считать
 	public static String skidkaId_Heroy = "11111111111111111111111111111111".toUpperCase();//' – Герой
 	public static String skidkaId_TGCR = "22222222222222222222222222222222".toUpperCase();//' – Герой+ЦР
+	public static String skidkaId_Rasprodaja = "a869e5d02faf61e3498c93c59670b2ae".toUpperCase();//' – Распродажа
 
 	public static final String workFolder = "/sdcard/horeca/";
 
@@ -1039,6 +1040,7 @@ public class Cfg {
 					+ "\n				when VidSkidki=X'" + skidkaIdRazovaya + "' then 'Разовая' "//
 					+ "\n				when VidSkidki=X'" + skidkaIdFixirovannaya + "' then 'Фикс.цена' "//over
 					+ "\n				when VidSkidki=X'" + skidkaIdCenovoyeReagirovanie + "' then 'ЦР'"//
+					+ "\n				when VidSkidki=X'" + skidkaId_Rasprodaja + "' then 'Распродажа'"//
 					//+ "\n				when VidSkidki=X'b6642d98b55a8d5e48c45c1c3731b72e' then 'Скидка по ответственному'"// no
 					+ "\n				when VidSkidki=X'" + skidkaId_x_Promokod + "' then 'Промокод' "// no
 					+ "\n				when VidSkidki=X'" + skidkaId_x_Targetnie + "' then 'Таргетные' "// no

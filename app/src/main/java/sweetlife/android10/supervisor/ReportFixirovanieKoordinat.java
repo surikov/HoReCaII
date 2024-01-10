@@ -215,7 +215,7 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 			String line = strings[i];
 			if (i - 2 > -1 && i + 1 < strings.length - 1) {
 				String num = extract(line, '№', '<');
-				if (num.length() > 2) {
+				if (num.length() > 0) {
 					int start = line.indexOf('№');
 					int end = line.indexOf("<", start + 1);
 					line = line.substring(0, start)//

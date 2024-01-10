@@ -278,14 +278,14 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		}
 		return false;
 	}
-
+/*
 	public boolean hasSale() {
 		//if (mSkidka == 0 && mVidSkidki.compareTo(Sales.FIX_PRICE_ID) != 0) {
 		if (mSkidka == 0 && mVidSkidki.compareTo("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdFixirovannaya + "'") != 0) {
 			return false;
 		}
 		return true;
-	}
+	}*/
 
 	public Double getSummaSoSkidkoy() {
 		return mSummaSoSkidkoy;
