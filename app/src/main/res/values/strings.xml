@@ -469,9 +469,9 @@
 	<string name="bid_uploaded_successful">Заявка номер %s успешно выгружена.</string>
 	<string name="disposal_uploaded_successful">Распоряжение номер %s успешно выгружено.</string>
 	<string name="disposal_not_uploaded">Распоряжение номер %s не выгружено.</string>
-	<string name="fixed_prices_upload">Выгрузка заявок на фиксированные цены</string>
+	<string name="fixed_prices_upload22222">Выгрузка заявок на фиксированные цены</string>
 	<string name="returns_upload">Выгрузка возвратов</string>
-	<string name="documents_not_selected">Не выбраны документы на выгрузку.</string>
+	<string name="documents_not_selected223333">Не выбраны документы на выгрузку.</string>
 	<string name="disposals_upload_points">Выгрузка распоряжения…</string>
 	<string name="fixed_prices_upload_points">Выгрузка заявок на фиксированные цены…</string>
 	<string name="returns_upload_points">Выгрузка возвратов…</string>

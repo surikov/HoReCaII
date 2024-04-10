@@ -179,6 +179,7 @@ public class ActivityZayavkaIzmenenieNakladnoy extends Activity{
 				.item("Ошибка в форме оплаты")
 				.item("Сменить контрагента")
 				.item("Разделение накладной")
+				.item("Пересчет индивидуальной скидки")
 				.selection.is(numPrichina)
 				.top().is(0.5 * Auxiliary.tapSize)
 				.left().is(8 * Auxiliary.tapSize)

@@ -55,6 +55,9 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 	MenuItem menuSendLimit;
 	MenuItem menuClearFixPrice;
 
+	MenuItem menuZayavakaRazdelenieNakladnih;
+
+
 	MenuItem menuVislatNakladnieNaPochtu;
 	//MenuItem menuZayavkaNaPerevodVdosudebnye;
 	MenuItem menuKlienta;
@@ -95,6 +98,8 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 		//menuSklad = menu.add("Установить склад");
 
 		menuSendLimit = menu.add("Заявка на увеличение лимита");
+		menuZayavakaRazdelenieNakladnih = menu.add("Заявки на разделение накладной");
+
 		menuClearFixPrice = menu.add("Удалить заявки на фикс.цены");
 		menuKlientPeople = menu.add("Контактные лица клиента");
 		menuVislatNakladnieNaPochtu = menu.add("Выслать накладные на почту");
@@ -173,6 +178,11 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 			promptLimit();
 			return true;
 		}
+		if(item == menuZayavakaRazdelenieNakladnih){
+			promptZayavkaRazdelenieNakladnih();
+			return true;
+		}
+
 		if(item == menuClearFixPrice){
 			promptDeleteFixPrices();
 			return true;
@@ -665,6 +675,49 @@ I/System.out: </>
 						}).status.is("Отправка...").start(Activity_BidsContractsEtc_2.this);
 					}
 				}, null, null, null, null);
+	}
+
+	void promptZayavkaRazdelenieNakladnih(){
+		final Calendar current = Calendar.getInstance();
+		final Numeric result = new Numeric();
+		Auxiliary.pickDate(this, current, result, new Task(){
+			public void doTask(){
+				String date = Auxiliary.short1cDate.format(new Date(result.value().longValue()));
+				//System.out.println("result " + date + ", " + ApplicationHoreca.getInstance().getClientInfo().getKod() + ", " + ApplicationHoreca.getInstance().getClientInfo().getName());
+				String message = "Отправить заявку на разделение накладных на "
+						+ Auxiliary.rusDate.format(new Date(result.value().longValue()))
+						+ " для клиента " + ApplicationHoreca.getInstance().getClientInfo().getName();
+				Auxiliary.pickConfirm(Activity_BidsContractsEtc_2.this, message, "Отправить", new Task(){
+					public void doTask(){
+						sendZayavkaRazdelenieNakladnih("" + ApplicationHoreca.getInstance().getClientInfo().getKod(), date);
+					}
+				});
+			}
+		});
+	}
+
+	void sendZayavkaRazdelenieNakladnih(String kod, String data){
+		//https://service.swlife.ru/hrc120107/hs/RazdelenieNakladnih/104717/20230104
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/RazdelenieNakladnih/" + kod + "/" + data;
+		//System.out.println(url);
+		final Note res = new Note();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String s = new String(b, "utf-8");
+					res.value(s);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Auxiliary.warn(res.value(), Activity_BidsContractsEtc_2.this);
+			}
+		}).status.is("Отправка данных").start(this);
 	}
 
 	void promptLimit(){

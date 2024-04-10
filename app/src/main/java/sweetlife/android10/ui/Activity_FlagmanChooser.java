@@ -20,7 +20,7 @@ import tee.binding.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
 
-public class Activity_FlagmanChooser extends Activity_Base implements ITableColumnsNames {
+public class Activity_FlagmanChooser extends Activity_Base implements ITableColumnsNames{
 	Layoutless layoutless;
 	DataGrid segmentGrid;
 	DataGrid productGrid;
@@ -51,7 +51,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 	boolean mIsCRAvailable = true;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		this.setTitle("Флагманские позиции");
 		Preferences.init(this);
@@ -68,7 +68,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 	}
 
 
-	void createGUI() {
+	void createGUI(){
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		segmentGrid = new DataGrid(this);
@@ -110,9 +110,9 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				})//
 				.pageSize.is(productPageSize)//
 				.dataOffset.is(productOffset)//
-				.beforeFlip.is(new Task() {
+				.beforeFlip.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						nextProductData();
 					}
 				})
@@ -122,9 +122,9 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 		);
 		layoutless.child(new Knob(this).labelText.is("Искать")
-				.afterTap.is(new Task() {
+				.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						requerySegments();
 					}
 				})
@@ -134,16 +134,16 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 		);
 	}
 
-	void addFlagman(Bough row) {
+	void addFlagman(Bough row){
 		final String sel_id = row.child("kod").value.property.value();
 		int bg = 0x00000000;
-		if (sel_id.equals(selectedSegmentKod)) {
+		if(sel_id.equals(selectedSegmentKod)){
 			bg = 0x22000000;
 		}
 
-		Task tap = new Task() {
+		Task tap = new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				selectedSegmentKod = sel_id;
 				//selectedIngredientIdrref = null;
 				//selectedIngredientKluch = null;
@@ -152,7 +152,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 			}
 		};
 		String fakt = "0";
-		if (row.child("whart").value.property.value().length() > 0) {
+		if(row.child("whart").value.property.value().length() > 0){
 			fakt = row.child("artcnt").value.property.value();
 		}
 		columnSegment.cell("" + row.child("name").value.property.value(), bg, tap
@@ -213,7 +213,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 			//System.out.println(iid+" - " +selectedIngredientId+" / "+(selectedIngredientId==iid));
 		}
 	*/
-	public void requerySegments() {
+	public void requerySegments(){
 		int nn = segmentGrid.scrollView.getScrollY();
 
 		segmentGrid.clearColumns();
@@ -267,7 +267,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				+ "\n       ) ff on ff.segmentkod=PlanSegmentov.SegmentKod"
 				//+ "\n     where Polzovateli.Kod='" + ApplicationHoreca.getInstance().hrcSelectedRoute() + "' ";
 				+ "\n     where Polzovateli.Kod='" + sweetlife.android10.supervisor.Cfg.selectedOrDbHRC() + "' ";
-		if (this.filterSegment.value().length() > 0) {
+		if(this.filterSegment.value().length() > 0){
 			sql = sql + "\n    and PlanSegmentov.SegmentName like '%" + this.filterSegment.value() + "%'";
 		}
 		sql = sql + "\n     group by PlanSegmentov.SegmentKod,PlanSegmentov.plan,PlanSegmentov.SegmentName";
@@ -276,7 +276,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 		Bough segmentData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		//System.out.println(segmentData.dumpXML());
 		String _id = "";
-		for (int i = 0; i < segmentData.children.size(); i++) {
+		for(int i = 0; i < segmentData.children.size(); i++){
 			Bough row = segmentData.children.get(i);
 			//System.out.println(""+i+": "+row.dumpXML());
             /*if (_id.equals(row.child("recid").value.property.value())) {
@@ -291,19 +291,19 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 		}
 		segmentGrid.refresh();
 		segmentGrid.scrollView.scrollTo(0, nn);
-		if (selectedSegmentKod != null) {
+		if(selectedSegmentKod != null){
 			productOffset.value(0);
 			nextProductData();
 			productGrid.refresh();
 		}
 	}
 
-	public void nextProductData() {
+	public void nextProductData(){
 		productGrid.clearColumns();
 
 		String slovo = "1=1";
 		int tipPoiska = ISearchBy.SEARCH_CUSTOM;
-		if (this.filterProduct.value().length() > 0) {
+		if(this.filterProduct.value().length() > 0){
 			slovo = this.filterProduct.value();
 			tipPoiska = ISearchBy.SEARCH_NAME;
 		}
@@ -325,7 +325,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				, false
 				, null, null, false
 				, false
-				, null, null, this.selectedSegmentKod,false
+				, null, null, this.selectedSegmentKod, false
 		);
 		System.out.println("nextProductData " + sql);
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -334,40 +334,41 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 		lostedLimit.setDate(1);
 		lostedLimit.setHours(0);
 		lostedLimit.setMinutes(1);
-		for (int i = 0; i < data.children.size(); i++) {
+		for(int i = 0; i < data.children.size(); i++){
 			Bough row = data.children.get(i);
 			//System.out.println(row.dumpXML());
 			final String art = row.child("Artikul").value.property.value();
-			Task tap3 = new Task() {
+			Task tap3 = new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 
 
 					selectArtikul(art);
 				}
 			};
-			int bg = 0x00000000;
+			int bg = 0x00000000;//white
 			/*if (Numeric.string2double(row.child("LastPrice").value.property.value()) > 0) {
 				bg = 0xffdddddd;
 			}*/
 			String compArt = art;
-			if (row.child("LastSell").value.property.value().trim().length() > 0) {
-				bg = 0xffdddddd;
-				SimpleDateFormat sdf = new SimpleDateFormat(("yyyy-MM-dd"));
-				Date val = new Date();
-				try {
-					val = sdf.parse(row.child("LastSell").value.property.value());
-				} catch (Throwable tt) {
-					tt.printStackTrace();
+			if(row.child("artCount").value.property.value().length() > 0){
+				bg = 0xffddffdd;//green
+			}else{
+				if(row.child("LastSell").value.property.value().trim().length() > 0){
+					bg = 0xffdddddd;//grey
+					SimpleDateFormat sdf = new SimpleDateFormat(("yyyy-MM-dd"));
+					Date val = new Date();
+					try{
+						val = sdf.parse(row.child("LastSell").value.property.value());
+					}catch(Throwable tt){
+						tt.printStackTrace();
+					}
+					if(val.before(lostedLimit)){
+						bg = 0xffff6699;//pink
+					}
+					//compArt = art + " " + row.child("LastSell").value.property.value();
 				}
-				if (val.before(lostedLimit)) {
-					bg = 0xffff6699;
-				}
-				//compArt = art + " " + row.child("LastSell").value.property.value();
-			} else {
-				if (row.child("artCount").value.property.value().length() > 0) {
-					bg = 0xffddffdd;
-				}
+
 			}
             /*columnProduct.cell(
                     row.child("Artikul").value.property.value() + ": " + row.child("Naimenovanie").value.property.value()
@@ -386,7 +387,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 
 	}
 
-	void selectArtikul(String art) {
+	void selectArtikul(String art){
 		System.out.println("tap " + art);
         /*String sql = Request_NomenclatureBase.composeSQL(//
                 dataOtgruzki//
@@ -427,34 +428,34 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				, false
 				, null
 				, null
-				, this.selectedSegmentKod,false
+				, this.selectedSegmentKod, false
 		);
 		Cursor cursor = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
-		if (cursor.moveToFirst()) {
+		if(cursor.moveToFirst()){
 			Intent resultIntent = new Intent();
 			String vidSkidki = Request_NomenclatureBase.getVidSkidki(cursor);
-			if (Request_NomenclatureBase.getMinCena(cursor) == null || !mIsCRAvailable) {
+			if(Request_NomenclatureBase.getMinCena(cursor) == null || !mIsCRAvailable){
 				//System.out.println(": 1");
 				resultIntent.putExtra(MIN_CENA, 0.00D);
 				resultIntent.putExtra(MAX_CENA, 0.00D);
-				if (vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
-				) {
+				if(vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
+				){
 					//System.out.println(": 2");
 					resultIntent.putExtra(VID_SKIDKI, Request_NomenclatureBase.getVidSkidki(cursor));
 					resultIntent.putExtra(CENA_SO_SKIDKOY, Double.parseDouble(Request_NomenclatureBase.getCenaSoSkidkoy(cursor)));
-				} else {
+				}else{
 					System.out.println(": 3");
 					resultIntent.putExtra(VID_SKIDKI, "x'00'");
 					resultIntent.putExtra(CENA_SO_SKIDKOY, 0.00D);
 				}
-			} else {
+			}else{
 				//System.out.println(": 4");
-				if (vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
-				) {
+				if(vidSkidki.length() > 0 //&& Sales.GetSaleName(vidSkidki).length() != 0
+				){
 					//System.out.println(": 5");
 					resultIntent.putExtra(VID_SKIDKI, Request_NomenclatureBase.getVidSkidki(cursor));
 					resultIntent.putExtra(CENA_SO_SKIDKOY, Double.parseDouble(Request_NomenclatureBase.getCenaSoSkidkoy(cursor)));
-				} else {
+				}else{
 					//System.out.println(": 6");
 					resultIntent.putExtra(VID_SKIDKI, "x'00'");
 					resultIntent.putExtra(CENA_SO_SKIDKOY, Double.parseDouble(Request_NomenclatureBase.getCena(cursor)));
@@ -464,15 +465,15 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 			}
 			String sale = Request_NomenclatureBase.getSkidka(cursor);
 			//System.out.println(": 7");
-			if (sale != null) {
+			if(sale != null){
 				//System.out.println(": 8");
-				try {
+				try{
 					resultIntent.putExtra(SKIDKA, Double.parseDouble(sale));
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					System.out.println(t.getMessage());
 					resultIntent.putExtra(SKIDKA, 0.00D);
 				}
-			} else {
+			}else{
 				resultIntent.putExtra(SKIDKA, 0.00D);
 			}
 			resultIntent.putExtra(CENA, Double.parseDouble(Request_NomenclatureBase.getCena(cursor)));

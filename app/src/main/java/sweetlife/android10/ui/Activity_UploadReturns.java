@@ -122,7 +122,7 @@ public class Activity_UploadReturns extends Activity_BasePeriod implements Image
 
 			if (!documentsSelected) {
 
-				CreateErrorDialog(R.string.documents_not_selected).show();
+				CreateErrorDialog("Не выбраны документы на выгрузку.").show();
 				return;
 			}
 

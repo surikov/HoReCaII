@@ -142,11 +142,11 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames{
 						+ "/hs/Planshet/GetBannerForTablet/"//
 						//+ ApplicationHoreca.getInstance().hrcSelectedRoute();
 						+ Cfg.selectedOrDbHRC();
-				System.out.println(url);
+				System.out.println("Activity_Listovka "+url);
 				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String s = new String(b, "utf-8" );
-					//System.out.println("GetBannerForTablet "+s);
+					System.out.println("GetBannerForTablet "+s);
 					Bough d = Bough.parseJSON("{row:" + s + "}" );
 					//System.out.println(d.dumpXML());
 					catData.children = d.children;

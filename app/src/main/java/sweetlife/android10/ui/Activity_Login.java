@@ -39,9 +39,10 @@ import tee.binding.task.Task;
 
 public class Activity_Login extends Activity{
 	Layoutless layoutless;
-	Note loginHRC = new Note().value("" );
-	Note password = new Note().value("" );
+	Note loginHRC = new Note().value("");
+	Note password = new Note().value("");
 	Toggle showPassword = new Toggle().value(false);
+	Toggle requireChangePassword = new Toggle();
 	//Toggle mainProxy = new Toggle().value(true);
 	Toggle stopUpdate = new Toggle();
 	Toggle downloadDB = new Toggle();
@@ -75,11 +76,11 @@ public class Activity_Login extends Activity{
 
 
 	void adjustVipTerritoryParent(){
-		if(Cfg.whoCheckListOwner().toLowerCase().trim().equals("supervip_hrc" )){
+		if(Cfg.whoCheckListOwner().toLowerCase().trim().equals("supervip_hrc")){
 			String sql = "update Podrazdeleniya set roditel=x'A003002264FA89D811E08BB0690A5B4A' where kod='х0067';";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		}else{
-			if(Cfg.whoCheckListOwner().toLowerCase().trim().equals("region_c" )){
+			if(Cfg.whoCheckListOwner().toLowerCase().trim().equals("region_c")){
 				String sql = "update Podrazdeleniya set roditel=x'BBAF20677C60FED011EA1749382D4BBE' where kod='х0084';";
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
@@ -87,7 +88,7 @@ public class Activity_Login extends Activity{
 	}
 
 	void startPermissions(){
-		Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:sweetlife.android10" ));
+		Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:sweetlife.android10"));
 		startActivityForResult(intent, ResultFromPermission);
 	}
 
@@ -107,8 +108,8 @@ public class Activity_Login extends Activity{
 
 	void promptPermissions(){
 		new AlertDialog.Builder(this)
-				.setTitle("Подтверждение доступа" )
-				.setMessage("Нажмите ОК и в списке приложений включите перключатель для HoReCa v3" )
+				.setTitle("Подтверждение доступа")
+				.setMessage("Нажмите ОК и в списке приложений включите перключатель для HoReCa v3")
 				//.setIcon(android.R.drawable.ic_dialog_alert)
 				.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
 
@@ -170,7 +171,7 @@ public class Activity_Login extends Activity{
 	}
 
 	void _____reinstall(Activity activity) throws Exception{
-		System.out.println("reinstall" );
+		System.out.println("reinstall");
 
 		String path = "/sdcard/horeca/Horeca3.apk";
 		File file = new File(path);
@@ -200,7 +201,7 @@ public class Activity_Login extends Activity{
 		}
 		//System.out.println("read " + cntr);
 
-		System.out.println("sync" );
+		System.out.println("sync");
 		session.fsync(sessionOutputStream);
 
 
@@ -209,7 +210,7 @@ public class Activity_Login extends Activity{
 		session.close();
 		//bufferedOutputStream.close();
 		//sessionOutputStream.close();
-		System.out.println("start apk" );
+		System.out.println("start apk");
 		session = packageInstaller.openSession(sessionId);
 		IntentSender statusReceiver = null;
 		//Intent intent = new Intent(activity, activity.getClass());
@@ -221,10 +222,10 @@ public class Activity_Login extends Activity{
 		int flags = 0;
 		PendingIntent pendingIntent = PendingIntent.getService(activity, requestCode, intent, flags);
 		IntentSender intentSender = pendingIntent.getIntentSender();
-		System.out.println("commit" );
+		System.out.println("commit");
 		session.commit(intentSender);
 		session.close();
-		System.out.println("done" );
+		System.out.println("done");
 	}
 
 	void appLogin(){
@@ -246,13 +247,8 @@ public class Activity_Login extends Activity{
 		//if (!mainProxy.value()) Settings.getInstance().setSecondaryURL();
 		//Cfg.currentIMEI(this, user.getName().trim());
 		Cfg.hrcPersonalPasswordCached = password.value();
-		System.out.println("---" );
-		SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(hrcpasswordName, password.value());
-		editor.commit();
-		//Cfg.requeryFirebaseToken();
-		System.out.println("saved password " + password.value());
+		System.out.println("---");
+		this.cachePassword(password.value());
 
 
 		if(downloadDB.value()){
@@ -312,26 +308,83 @@ public class Activity_Login extends Activity{
 						doDownloadReplaceDBCancel();
 					}
 				})//
-						.status.is("Ждите..." )//
+						.status.is("Ждите...")//
 						.start(Activity_Login.this);
 			}
 		});
 		return;
 	}
 
-
-	public void startCheckAccess(){
-		System.out.println("startCheckAccess" );
-		Note result = new Note().value("!" );
-		new Expect().status.is("Проверка доступа" ).task.is(new Task(){
+	void promptNewPassword(){
+		this.requireChangePassword.value(true);
+		final Note newPass = new Note();
+		Auxiliary.pickString(this, "Необходимо создать новый пароль", newPass, "Сохранить", new Task(){
 			public void doTask(){
-				String access = Settings.check_1C_access();
-				result.value(access);
+				sendNewPass(newPass.value().trim());
+			}
+		});
+	}
+
+	void sendNewPass(String newPass){
+		if(newPass.length() < 1){
+			Auxiliary.warn("Пустой пароль", this);
+			return;
+		}
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/СменитьПароль";
+		final String body = "{\"Пароль\":\"" + newPass + "\", \"ОбновитьПарольАД\":true}";
+		Bough result = new Bough();
+		new Expect().status.is("Проверка доступа").task.is(new Task(){
+			public void doTask(){
+				result.children=Auxiliary.loadTextFromPrivatePOST(url, body, 300000, "UTF-8", Cfg.whoCheckListOwner(),Cfg.hrcPersonalPassword()).children;
 			}
 		}).afterDone.is(new Task(){
 			public void doTask(){
-				if(result.value().length() > 0){
-					Auxiliary.warn("Неверный пароль или нет доступа, просмотр отчётов и выгрузка документов недоступны:\n\n" + result.value(), Activity_Login.this);
+				System.out.println("sendNewPass: "+result.dumpXML());
+				String raw=result.child("raw").value.property.value();//Пароль успешно установлен
+				Auxiliary.warn(raw
+						+"\n\nПерезайдите в приложение"
+						,Activity_Login.this);
+				if(raw.equals("Пароль успешно установлен")){
+					cachePassword(newPass);
+				}
+			}
+		}).start(this);
+	}
+void cachePassword(String newPass){
+	SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, MODE_PRIVATE);
+	SharedPreferences.Editor editor = settings.edit();
+	editor.putString(hrcpasswordName, newPass);
+	editor.commit();
+	//Cfg.requeryFirebaseToken();
+	//System.out.println("saved password " + password.value());
+}
+	public void startCheckAccess(){
+		System.out.println("startCheckAccess");
+		Bough result = new Bough();
+		new Expect().status.is("Проверка доступа").task.is(new Task(){
+			public void doTask(){
+				//String access = Settings.check_1C_access();
+				//result.value(access);
+				result.children = Settings.check_1C_access().children;
+			}
+		}).afterDone.is(new Task(){
+			public void doTask(){
+				Bough data = Bough.parseJSON(result.child("data").value.property.value());
+				System.out.println(data.dumpXML());
+				//<ПотребоватьСменуПароля>false</ПотребоватьСменуПароля>
+				//<ПотребоватьСменуПароля>true</ПотребоватьСменуПароля>
+				if(!result.child("status").value.property.value().equals("200")){
+					Auxiliary.warn("Неверный пароль или нет доступа, просмотр отчётов и выгрузка документов недоступны:\n\n"
+									+ result.child("data").value.property.value()
+									+ "\n"
+									+ result.child("status").value.property.value()
+									+ "\n"
+									+ result.child("error").value.property.value()
+							, Activity_Login.this);
+				}else{
+					if(data.child("ПотребоватьСменуПароля").value.property.value().equals("true")){
+						promptNewPassword();
+					}
 				}
 			}
 		}).start(this);
@@ -391,9 +444,9 @@ public class Activity_Login extends Activity{
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		//SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, 0);
-		String apkReinstallStatus = Auxiliary.activityExatras(this).child("apkReinstallStatus" ).value.property.value();
+		String apkReinstallStatus = Auxiliary.activityExatras(this).child("apkReinstallStatus").value.property.value();
 		if(apkReinstallStatus.length() > 0){
-			if(apkReinstallStatus.equals("0" )){
+			if(apkReinstallStatus.equals("0")){
 				Auxiliary.warn("Установлена новая версия приложения", this);
 			}else{
 				Auxiliary.warn("Ощибка установки: " + apkReinstallStatus, this);
@@ -404,7 +457,7 @@ public class Activity_Login extends Activity{
 		//setTitleWithVersionOwner();
 
 		SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, 0);
-		password.value(settings.getString(hrcpasswordName, "" ));
+		password.value(settings.getString(hrcpasswordName, ""));
 
 		layoutless
 				/*
@@ -420,17 +473,17 @@ public class Activity_Login extends Activity{
 								.height().is(1 * Auxiliary.tapSize)
 						)*/
 
-				.child(new RedactToggle(this).labelText.is("Запретить обновление" ).yes.is(stopUpdate)
+				.child(new RedactToggle(this).labelText.is("Запретить обновление").yes.is(stopUpdate)
 						.top().is(2 * Auxiliary.tapSize)
 						.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 						.width().is(5 * Auxiliary.tapSize)
 						.height().is(1 * Auxiliary.tapSize)
-				).child(new RedactToggle(this).labelText.is("Скачать новую базу" ).yes.is(downloadDB)
+				).child(new RedactToggle(this).labelText.is("Скачать новую базу").yes.is(downloadDB)
 				.top().is(2.5 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
 				.height().is(1 * Auxiliary.tapSize)
-		).child(new RedactToggle(this).labelText.is("Запретить сжатие" ).yes.is(stopVacuum)
+		).child(new RedactToggle(this).labelText.is("Запретить сжатие").yes.is(stopVacuum)
 				.top().is(3 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
@@ -843,13 +896,13 @@ supernn_hrc - JRA61P
 
 
         ) {*/
-		layoutless.child(new Decor(this).labelText.is("Пароль" )
+		layoutless.child(new Decor(this).labelText.is("Пароль")
 				.top().is(4 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
 				.height().is(1 * Auxiliary.tapSize)
 		);
-		layoutless.child(new Knob(this).labelText.is("Показать пароль" ).afterTap.is(new Task(){
+		layoutless.child(new Knob(this).labelText.is("Показать пароль").afterTap.is(new Task(){
 					public void doTask(){
 						showPassword.value(true);
 					}
@@ -870,6 +923,7 @@ supernn_hrc - JRA61P
 				.height().is(1 * Auxiliary.tapSize)
 		);
 		layoutless.child(new Knob(this).labelText.is(loginHRC).afterTap.is(taskPersonalLogin)
+				.locked().is(requireChangePassword)
 				.top().is(5.5 * Auxiliary.tapSize)
 				.left().is(layoutless.width().property.divide(2).minus(2.5 * Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
@@ -903,37 +957,38 @@ supernn_hrc - JRA61P
 		startCheckAccess();
 		//access_token1221();
 	}
-/*
-	void access_token1221start(){
-		String url = "https://horeka-prod-api.1221systems.ru/horeca/auth";
-		String login = "sweetlife";
-		String password = "horeca";
-		String data = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
-		System.out.println("test1221start " + data);
-		System.out.println("url " + url);
-		Bough rr = Auxiliary.loadTextFromPublicPOST(url, data, 2 * 60 * 1000, "UTF-8", "application/json", "application/json" );
-		System.out.println(rr.dumpXML());
-		String raw = rr.child("raw" ).value.property.value();
-		Bough json = Bough.parseJSON(raw);
-		String access_token = json.child("access_token" ).value.property.value();
-		System.out.println("access_token " + access_token);
-		Session.access_token_1221 = access_token;
-	}
 
-	void access_token1221(){
-		if(Session.access_token_1221.trim().length() < 1){
-			new Expect().status.is("test" ).task.is(new Task(){
-				public void doTask(){
-					access_token1221start();
-				}
-			}).afterDone.is(new Task(){
-				public void doTask(){
-
-				}
-			}).start(this);
+	/*
+		void access_token1221start(){
+			String url = "https://horeka-prod-api.1221systems.ru/horeca/auth";
+			String login = "sweetlife";
+			String password = "horeca";
+			String data = "{\"username\":\"" + login + "\",\"password\":\"" + password + "\"}";
+			System.out.println("test1221start " + data);
+			System.out.println("url " + url);
+			Bough rr = Auxiliary.loadTextFromPublicPOST(url, data, 2 * 60 * 1000, "UTF-8", "application/json", "application/json" );
+			System.out.println(rr.dumpXML());
+			String raw = rr.child("raw" ).value.property.value();
+			Bough json = Bough.parseJSON(raw);
+			String access_token = json.child("access_token" ).value.property.value();
+			System.out.println("access_token " + access_token);
+			Session.access_token_1221 = access_token;
 		}
-	}
-*/
+
+		void access_token1221(){
+			if(Session.access_token_1221.trim().length() < 1){
+				new Expect().status.is("test" ).task.is(new Task(){
+					public void doTask(){
+						access_token1221start();
+					}
+				}).afterDone.is(new Task(){
+					public void doTask(){
+
+					}
+				}).start(this);
+			}
+		}
+	*/
 	void setTitleWithVersionOwner(){
 		try{
 			String chOwner = sweetlife.android10.supervisor.Cfg.whoCheckListOwner();
@@ -943,7 +998,7 @@ supernn_hrc - JRA61P
 								"select l.naimenovanie as name from PhizLicaPolzovatelya f join Polzovateli p on p._idrref=f.polzovatel join PhizicheskieLica l on l._idrref=f.phizlico where trim(p.kod)='"
 										+ chOwner + "' order by f.period desc;"
 								, null));
-				chOwner = chOwner + "/" + data.child("row" ).child("name" ).value.property.value();
+				chOwner = chOwner + "/" + data.child("row").child("name").value.property.value();
 			}
 			packageVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 			setTitle(chOwner
@@ -969,8 +1024,8 @@ supernn_hrc - JRA61P
 			boolean noCRAvailable = Requests.IsSyncronizationDateLater(0);
 			if(noCRAvailable){
 				Calendar syncCalendar = LogHelper.getLastSuccessfulUpdate();
-				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy" );
-				updateWarning.value("Последнее успешное обновление " + sdf.format(syncCalendar.getTime()) + ".\nНеобходимо обновить данные." );
+				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+				updateWarning.value("Последнее успешное обновление " + sdf.format(syncCalendar.getTime()) + ".\nНеобходимо обновить данные.");
 			}
 		}catch(Throwable e){
 			setTitle(e.getMessage());
@@ -979,28 +1034,28 @@ supernn_hrc - JRA61P
 	}
 
 	void doDownloadReplaceDB() throws Exception{
-		System.out.println("doDownloadReplaceDB" );
+		System.out.println("doDownloadReplaceDB");
 		String url = "swlife_database.zip";
 		System.out.println("url " + url);
 		ftpClient.downloadFile(Settings.getInstance().getTABLET_WORKING_DIR(), url);
-		System.out.println("doDownloadReplaceDB downloaded" );
-		Bough rez = new Bough().name.is("config" );
+		System.out.println("doDownloadReplaceDB downloaded");
+		Bough rez = new Bough().name.is("config");
 		//System.out.println("'" + ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim() + "'");
 		//System.out.println("'" + ApplicationHoreca.getInstance().getCurrentAgent().updateKod+ "'");
 		ApplicationHoreca.getInstance().getDataBase().close();
-		System.out.println("doDownloadReplaceDB db closed" );
-		rez.child("userKey" ).value.is(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim());
-		rez.child("updateKey" ).value.is(ApplicationHoreca.getInstance().getCurrentAgent().updateKod);
-		System.out.println("doDownloadReplaceDB user infa catched" );
-		Auxiliary.writeTextToFile(new File("/sdcard/horeca/Horeca2.xml" ), "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + rez.dumpXML());
-		System.out.println("doDownloadReplaceDB config writed" );
+		System.out.println("doDownloadReplaceDB db closed");
+		rez.child("userKey").value.is(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim());
+		rez.child("updateKey").value.is(ApplicationHoreca.getInstance().getCurrentAgent().updateKod);
+		System.out.println("doDownloadReplaceDB user infa catched");
+		Auxiliary.writeTextToFile(new File("/sdcard/horeca/Horeca2.xml"), "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + rez.dumpXML());
+		System.out.println("doDownloadReplaceDB config writed");
 		Decompress decompressor = new Decompress();
-		decompressor.unzip(Settings.getInstance().getTABLET_WORKING_DIR(), Settings.getInstance().getTABLET_WORKING_DIR() + "swlife_database.zip" );
-		System.out.println("doDownloadReplaceDB done" );
+		decompressor.unzip(Settings.getInstance().getTABLET_WORKING_DIR(), Settings.getInstance().getTABLET_WORKING_DIR() + "swlife_database.zip");
+		System.out.println("doDownloadReplaceDB done");
 	}
 
 	void doDownloadReplaceDBOk(){
-		System.out.println("doDownloadReplaceDBOk" );
+		System.out.println("doDownloadReplaceDBOk");
 		Auxiliary.pickConfirm(Activity_Login.this, "Перзайдите в приложение и обновите базу", "Закрыть", new Task(){
 			@Override
 			public void doTask(){
@@ -1010,7 +1065,7 @@ supernn_hrc - JRA61P
 	}
 
 	void doDownloadReplaceDBCancel(){
-		System.out.println("doDownloadReplaceDBCancel" );
+		System.out.println("doDownloadReplaceDBCancel");
 		Auxiliary.pickConfirm(Activity_Login.this, "Ошибка замены базы: " + coarse, "Закрыть", new Task(){
 			@Override
 			public void doTask(){

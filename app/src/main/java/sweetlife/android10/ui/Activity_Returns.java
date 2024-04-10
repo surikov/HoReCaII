@@ -1,9 +1,11 @@
 package sweetlife.android10.ui;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Calendar;
+import java.util.regex.*;
 
-import reactive.ui.Auxiliary;
+import reactive.ui.*;
+import sweetlife.android10.*;
 import sweetlife.android10.consts.ITableColumnsNames;
 import sweetlife.android10.data.common.ClientInfo;
 import sweetlife.android10.data.common.NomenclatureBasedItem;
@@ -13,7 +15,8 @@ import sweetlife.android10.data.returns.ZayavkaNaVozvrat;
 import sweetlife.android10.data.returns.ZayavkaNaVozvrat_Tovary;
 import sweetlife.android10.data.returns.ReturnNomenclatureListAdapter.IRemoveItem;
 import sweetlife.android10.log.LogHelper;
-import sweetlife.android10.utils.CameraCaptureHelper;
+import sweetlife.android10.supervisor.*;
+import sweetlife.android10.utils.*;
 import sweetlife.android10.widgets.BetterPopupWindow.OnCloseListener;
 
 import android.app.AlertDialog;
@@ -23,6 +26,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.*;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,13 +37,19 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import sweetlife.android10.R;
-import tee.binding.task.Task;
+import tee.binding.*;
+import tee.binding.it.*;
+import tee.binding.task.*;
 
-public class Activity_Returns extends Activity_Base implements ITableColumnsNames, IRemoveItem {
+public class Activity_Returns extends Activity_Base implements ITableColumnsNames, IRemoveItem{
 
 	//private EditText mEditShippingDate;
 	MenuItem menuDelete;
+	//MenuItem menuUploadDocument;
+	//MenuItem menuAddFile;
+	//MenuItem menuDoFoto;
+	String uploadedDocId = "";
+
 	int prichinaNum = 0;
 	private ListView mReturnsList;
 	private EditText mEditAktPretenziyPath;
@@ -53,42 +63,71 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	private Calendar mShippingDate;
 	private ReturnsNomenclatureData mReturnsNomenclatureData;
 	private CameraCaptureHelper mCameraHelper;
-	private OnCloseListener mOnPopupClose = new OnCloseListener() {
+	private OnCloseListener mOnPopupClose = new OnCloseListener(){
 		@Override
-		public void onClose(int param) {
+		public void onClose(int param){
 			System.out.println("mOnPopupClose.onClose");
 			mReturnNomenclatureListAdapter.notifyDataSetChanged();
 			mHasChanges = true;
 		}
 	};
-	private OnClickListener mNomenclatureClick = new OnClickListener() {
+	private OnClickListener mUploadDoc = new OnClickListener(){
 		@Override
-		public void onClick(View arg0) {
+		public void onClick(View arg0){
+			//System.out.println("mUploadDoc");
+			//SoglasovanieVozvrata/Создать/hrc22
+			if(mReturnsNomenclatureData.getCount() == 0){
+				showDialog(IDD_EMPTY_FIELDS);
+				return;
+			}
+			if(!mReturnsNomenclatureData.IsAllDataFilled()){
+				showDialog(IDD_EMPTY_FIELDS);
+				return;
+			}
+			Auxiliary.pickConfirm(Activity_Returns.this, "Отправить заявку на возврат", "Отправить", new Task(){
+				public void doTask(){
+					saveToDB();
+					uploadDocument();
+				}
+			});
+		}
+	};
+	private OnClickListener mNomenclatureClick = new OnClickListener(){
+		@Override
+		public void onClick(View arg0){
 			Intent intent = new Intent();
 			intent.setClass(Activity_Returns.this, Activity_NomenclatureSimple.class);
 			startActivityForResult(intent, ADD_NOMENCATURE);
 		}
 	};
-	private OnClickListener mSaveClick = new OnClickListener() {
+	private OnClickListener mSaveClick = new OnClickListener(){
 		@Override
-		public void onClick(View arg0) {
+		public void onClick(View arg0){
 			SaveChangesAndExit();
 		}
 	};
-	private OnClickListener mCameraClick = new OnClickListener() {
+	private OnClickListener mCameraClick = new OnClickListener(){
 		@Override
-		public void onClick(View arg0) {
+		public void onClick(View arg0){
+			if(uploadedDocId.length()<1){
+				Auxiliary.warn("Выгрузите заявку для добавления файла." , Activity_Returns.this);
+				return;
+			}
 			startCameraTakePicture();
 		}
 	};
-	private OnClickListener mGalleryClick = new OnClickListener() {
+	private OnClickListener mGalleryClick = new OnClickListener(){
 		@Override
-		public void onClick(View arg0) {
+		public void onClick(View arg0){
+			if(uploadedDocId.length()<1){
+				Auxiliary.warn("Выгрузите заявку для добавления файла." , Activity_Returns.this);
+				return;
+			}
 			startMediaGallery();
 		}
 	};
 
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		setContentView(R.layout.act_returns);
 		super.onCreate(savedInstanceState);
 		ReadExtras();
@@ -98,24 +137,138 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		menuDelete = menu.add("Удалить заявку на возврат");
+		//menuUploadDocument = menu.add("Выгрузить заявку");
+		//menuAddFile = menu.add("Добавить файл");
+		//menuDoFoto = menu.add("Добавить фото");
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item == menuDelete) {
+	public boolean onOptionsItemSelected(MenuItem item){
+		if(item == menuDelete){
 			promptDelete();
 			return true;
 		}
+		/*if(item == menuUploadDocument){
+			promptUploadDocument();
+			return true;
+		}
+		if(item == menuAddFile){
+			promptFile();
+			return true;
+		}
+		if(item == menuDoFoto){
+			promptCamera();
+			return true;
+		}*/
 		return false;
 	}
 
-	void promptDelete() {
-		Auxiliary.pickConfirm(this, "Удаление заявки на возврат", "Удалить", new Task() {
+	void uploadDocument(){
+		final Bough result = new Bough();
+		//final Note response = new Note();
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/SoglasovanieVozvrata/Создать/"
+				+ Cfg.whoCheckListOwner();
+		String txt = "{"
+				+ "\n	\"NumberDoc\": \"" + this.mZayavka.getNomer() + "\""
+				+ "\n	,\"CodClient\": \"" + this.mZayavka.getClientKod() + "\""
+				+ "\n	,\"Comment\": \"" + this.mZayavka.getComment().replace('\"', '\'') + "\""
+				+ "\n	,\"Товары\":[";
+		String delmtr = "";
+		for(int ii = 0; ii < mReturnsNomenclatureData.getCount(); ii++){
+			ZayavkaNaVozvrat_Tovary tovar=mReturnsNomenclatureData.getNomenclature(ii);
+			txt = txt + "\n		"+delmtr+"{"
+					+ "\n		\"Article\": \""+tovar.getArtikul()+"\""
+					+ "\n		,\"Quantity\": "+tovar.getKolichestvo()+""
+					+ "\n		,\"Prim\": "+tovar.getPrichina()+""
+					+ "\n		,\"NumberNac\": \""+tovar.getNomerNakladnoy()+"\""
+					+ "\n		,\"DateNac\": \""+Auxiliary.short1cDate.format(tovar.getDataNakladnoy().getTime())+"\""
+					+ "\n		,\"TovarnyVid\": \""+tovar.getPrichina()+"\""
+					+ "\n		}";
+			delmtr = ",";
+		}
+		txt = txt+ "\n	]"
+				+ "\n}";
+		System.out.println(url);
+		System.out.println(txt);
+		final String txtdata=txt;
+		new Expect().status.is("Отправка").task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
+				result.children = Auxiliary.loadTextFromPrivatePOST(url, txtdata, 21000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()).children;
+				System.out.println(result.dumpXML());
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				String raw = result.child("raw").value.property.value();
+				Bough data = Bough.parseJSON(raw);
+				String soobchenie = data.child("Сообщение").value.property.value();
+				String status = data.child("Статус").value.property.value();
+				try{
+					Pattern pattern = Pattern.compile("\\d*-\\d*");
+					Matcher matcher = pattern.matcher(soobchenie);
+					if(matcher.find()){
+						uploadedDocId = matcher.group(0);
+					}
+				}catch(Throwable tt){
+					tt.printStackTrace();
+				}
+				Auxiliary.warn("Отправка: " + soobchenie, Activity_Returns.this);
+				if(uploadedDocId.length()>1 && status.equals("0")){
+					lockDocument();
+				}
+			}
+		}).start(this);
+	}
+
+	void lockDocument(){
+		if(uploadedDocId.length() > 1){
+			System.out.println("lock " + uploadedDocId);
+
+			mIsEditable = false;
+			mEditAktPretenziyPath = (EditText)findViewById(R.id.edit_bill_file);
+			mEditAktPretenziyPath.setEnabled(mIsEditable);
+
+			mEditVersion = (EditText)findViewById(R.id.edit_comment);
+			mEditVersion.setEnabled(mIsEditable);
+
+			Button btnUpload = (Button)findViewById(R.id.btn_upload_vozvrat);
+			btnUpload.setEnabled(mIsEditable);
+
+			Button btnNomenclature = (Button)findViewById(R.id.btn_nomeclature);
+			btnNomenclature.setEnabled(mIsEditable);
+
+			Button btnSave = (Button)findViewById(R.id.btn_save);
+			btnSave.setEnabled(mIsEditable);
+
+			//ImageButton btnCamera = (ImageButton)findViewById(R.id.btn_camera);
+			//btnCamera.setEnabled(!mIsEditable);
+
+			//ImageButton btnGallery = (ImageButton)findViewById(R.id.btn_gallery);
+			//btnGallery.setEnabled(!mIsEditable);
+
+			mZayavka.mNomer = uploadedDocId;
+			mZayavka.mProveden = true;
+			saveToDB();
+		}
+	}
+/*
+	void promptFile(){
+
+	}
+
+	void promptCamera(){
+
+	}*/
+
+	void promptDelete(){
+		Auxiliary.pickConfirm(this, "Удаление заявки на возврат", "Удалить", new Task(){
+			@Override
+			public void doTask(){
 				mDB.execSQL("delete from ZayavkaNaVozvrat where _IDRRef=" + mZayavka.getIDRRef() + ";");
 				mDB.execSQL("delete from ZayavkaNaVozvrat_Tovary where _ZayavkaNaVozvrat_IDRRef=" + mZayavka.getIDRRef() + ";");
 				Activity_Returns.this.finish();
@@ -123,14 +276,20 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		});
 	}
 
-	private void ReadExtras() {
+	private void ReadExtras(){
 		Bundle extras = getIntent().getExtras();
 		mIsEditable = extras.getBoolean(IS_EDITABLE);
 		mClient = new ClientInfo(mDB, extras.getString(CLIENT_ID));
 		mZayavka = extras.getParcelable(RETURNS_BID);
+		if(mZayavka!=null){
+			if(mZayavka.mProveden){
+				uploadedDocId = mZayavka.mNomer;
+				mIsEditable=false;
+			}
+		}
 		int p = extras.getInt("prichina");
 		prichinaNum = 0;
-		switch (p) {
+		switch(p){
 		/*case 1:
 			prichinaNum = ZayavkaNaVozvrat_Tovary.REASON_BRAK;
 			break;*/
@@ -151,7 +310,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 				break;
 		}
 		//System.out.println("prichinaNum "+prichinaNum);
-		if (mZayavka == null) {
+		if(mZayavka == null){
 			mClient = new ClientInfo(mDB, extras.getString(CLIENT_ID));
 			mZayavka = new ZayavkaNaVozvrat(mClient.getID(), mDB);
 		}
@@ -159,14 +318,18 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		mShippingDate.setTime(mZayavka.getDataOtgruzki());
 	}
 
-	private void InitializeListView() {
+	private void InitializeListView(){
 		mReturnsNomenclatureData = new ReturnsNomenclatureData(mDB, mZayavka);
 		mReturnNomenclatureListAdapter = new ReturnNomenclatureListAdapter(mReturnsNomenclatureData, mOnPopupClose, mIsEditable, this);
-		mReturnsList = (ListView) findViewById(R.id.list_returns);
+		mReturnsList = (ListView)findViewById(R.id.list_returns);
 		mReturnsList.setAdapter(mReturnNomenclatureListAdapter);
 	}
 
-	private void InitializeControls() {
+	private void InitializeControls(){
+		/*if(this.mZayavka.mProveden){
+			mIsEditable=false;
+			uploadedDocId=this.mZayavka.getNomer();
+		}*/
 		InitializeListView();
 		//mEditShippingDate = (EditText) findViewById(R.id.edit_returns_date);
 		//mEditShippingDate.setOnClickListener(mShippingDateClick);
@@ -174,24 +337,27 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		//Button btnShippingDate = (Button) findViewById(R.id.btn_returns_date);
 		//btnShippingDate.setEnabled(mIsEditable);
 		//btnShippingDate.setOnClickListener(mShippingDateClick);
-		mEditAktPretenziyPath = (EditText) findViewById(R.id.edit_bill_file);
+		mEditAktPretenziyPath = (EditText)findViewById(R.id.edit_bill_file);
 		mEditAktPretenziyPath.setEnabled(mIsEditable);
 
-		mEditVersion = (EditText) findViewById(R.id.edit_comment);
+		mEditVersion = (EditText)findViewById(R.id.edit_comment);
 		mEditVersion.setEnabled(mIsEditable);
 
+		Button btnUpload = (Button)findViewById(R.id.btn_upload_vozvrat);
+		btnUpload.setEnabled(mIsEditable);
+		btnUpload.setOnClickListener(mUploadDoc);
 
-		Button btnNomenclature = (Button) findViewById(R.id.btn_nomeclature);
+		Button btnNomenclature = (Button)findViewById(R.id.btn_nomeclature);
 		btnNomenclature.setEnabled(mIsEditable);
 		btnNomenclature.setOnClickListener(mNomenclatureClick);
-		Button btnSave = (Button) findViewById(R.id.btn_save);
+		Button btnSave = (Button)findViewById(R.id.btn_save);
 		btnSave.setEnabled(mIsEditable);
 		btnSave.setOnClickListener(mSaveClick);
-		ImageButton btnCamera = (ImageButton) findViewById(R.id.btn_camera);
-		btnCamera.setEnabled(mIsEditable);
+		ImageButton btnCamera = (ImageButton)findViewById(R.id.btn_camera);
+		//btnCamera.setEnabled(!mIsEditable);
 		btnCamera.setOnClickListener(mCameraClick);
-		ImageButton btnGallery = (ImageButton) findViewById(R.id.btn_gallery);
-		btnGallery.setEnabled(mIsEditable);
+		ImageButton btnGallery = (ImageButton)findViewById(R.id.btn_gallery);
+		//btnGallery.setEnabled(!mIsEditable);
 		btnGallery.setOnClickListener(mGalleryClick);
 		UpdateControls();
 	}
@@ -211,7 +377,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 					mShippingDate.get(Calendar.DAY_OF_MONTH)).show();
 		}
 	};*/
-	private void UpdateControls() {
+	private void UpdateControls(){
 		//mEditShippingDate.setText(DateTimeHelper.UIDateString(mShippingDate.getTime()));
 		mEditAktPretenziyPath.setText(mZayavka.getAktPretenziyPath());
 		mEditVersion.setText(mZayavka.getVersion());
@@ -219,31 +385,31 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void OnRemove(ZayavkaNaVozvrat_Tovary tovar) {
+	public void OnRemove(ZayavkaNaVozvrat_Tovary tovar){
 		mListItemForDelete = tovar;
 		showDialog(IDD_DELETE);
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + data);
 
 		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == RESULT_OK) {
-			switch (requestCode) {
+		if(resultCode == RESULT_OK){
+			switch(requestCode){
 				case ADD_NOMENCATURE:
-					if (mReturnsNomenclatureData.IsNomenclatureAlreadyInList(data.getStringExtra(NOMENCLATURE_ID))) {
+					if(mReturnsNomenclatureData.IsNomenclatureAlreadyInList(data.getStringExtra(NOMENCLATURE_ID))){
 						CreateErrorDialog(R.string.msg_already_in_list).show();
 						return;
 					}
 					int prichina = 0;
-					if (prichinaNum > 0) {
+					if(prichinaNum > 0){
 						prichina = prichinaNum;
-					} else {
-						for (int i = 0; i < mReturnsNomenclatureData.mNomenclaureList.size(); i++) {
+					}else{
+						for(int i = 0; i < mReturnsNomenclatureData.mNomenclaureList.size(); i++){
 							NomenclatureBasedItem nomenclatureBasedItem = mReturnsNomenclatureData.mNomenclaureList.get(i);
-							ZayavkaNaVozvrat_Tovary zayavkaNaVozvrat_Tovary = (ZayavkaNaVozvrat_Tovary) nomenclatureBasedItem;
+							ZayavkaNaVozvrat_Tovary zayavkaNaVozvrat_Tovary = (ZayavkaNaVozvrat_Tovary)nomenclatureBasedItem;
 							prichina = zayavkaNaVozvrat_Tovary.getPrichina();
 							break;
 						}
@@ -267,64 +433,101 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 					Uri uri = data.getData();
 					filePath = Auxiliary.pathForMediaURI(this, uri);
 
-					if (filePath == null) {
+					if(filePath == null){
 						showDialog(IDD_BAD_FILE_PATH);
 						return;
 					}
 					mZayavka.setAktPretenziyPath(filePath);
 					mEditAktPretenziyPath.setText(filePath);
+					sendFile(filePath);
 					break;
 				case GET_CAMERA_PICTURE:
 					mCameraHelper.galleryAddPic(this);
 					mZayavka.setAktPretenziyPath(mCameraHelper.getCurrentPhotoPath());
 					mEditAktPretenziyPath.setText(mCameraHelper.getCurrentPhotoPath());
+					sendFile(mCameraHelper.getCurrentPhotoPath());
 					break;
 			}
 		}
 	}
 
+	void sendFile(final String filePath){
+		System.out.println("sendFile " + filePath);
+		String[] spl = filePath.split("\\.");
+		String rash = spl[spl.length - 1];
+		String encodedFile = Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), Base64.NO_WRAP);
+		final String txt = "{"
+				+ "\n	\"NumberDoc\": \"" + this.uploadedDocId + "\""
+				+ "\n	,\"File\": \"" + encodedFile + "\""
+				//+ "\n	,\"DateDoc\": \"20240405\""
+				+ "\n	,\"rassh\": \"" + rash + "\""
+				+ "\n	}";
+
+		System.out.println("txt " + txt);
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/SoglasovanieVozvrata/tpFile/"
+				+ Cfg.whoCheckListOwner();
+		System.out.println("url " + url);
+
+		final Bough result = new Bough();
+		new Expect().status.is("Отправка").task.is(new Task(){
+			@Override
+			public void doTask(){
+				result.children = Auxiliary.loadTextFromPrivatePOST(url, txt, 21000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()).children;
+				System.out.println(result.dumpXML());
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				String raw = result.child("raw").value.property.value();
+				Bough data = Bough.parseJSON(raw);
+				Auxiliary.warn("Отправка: " + data.child("Сообщение").value.property.value(), Activity_Returns.this);
+			}
+		}).start(this);
+	}
+
 	@SuppressWarnings("deprecation")
 	@Override
-	protected Dialog onCreateDialog(int id) {
+	protected Dialog onCreateDialog(int id){
 		LogHelper.debug(this.getClass().getCanonicalName() + ".onCreateDialog: " + id);
-		switch (id) {
-			case IDD_DELETE: {
+		switch(id){
+			case IDD_DELETE:{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.confirm);
 				builder.setMessage(R.string.quest_delete);
-				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+				builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
 					@Override
-					public void onClick(DialogInterface dialog, int arg1) {
+					public void onClick(DialogInterface dialog, int arg1){
 						mReturnsNomenclatureData.Remove(mListItemForDelete);
 						mReturnNomenclatureListAdapter.notifyDataSetChanged();
 						mHasChanges = true;
 					}
 				});
-				builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+				builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener(){
 					@Override
-					public void onClick(DialogInterface dialog, int arg1) {
+					public void onClick(DialogInterface dialog, int arg1){
 						dialog.dismiss();
 					}
 				});
 				return builder.create();
 			}
-			case IDD_SAVE_CHANGES: {
+			case IDD_SAVE_CHANGES:{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.confirm);
 				builder.setMessage(R.string.quest_save_changes);
-				builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+				builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener(){
 					@Override
-					public void onClick(DialogInterface dialog, int arg1) {
-						if (mReturnsNomenclatureData.getCount() != 0) {
+					public void onClick(DialogInterface dialog, int arg1){
+						if(mReturnsNomenclatureData.getCount() != 0){
 							SaveChangesAndExit();
-						} else {
+						}else{
 							showDialog(IDD_IS_EMPTY);
 						}
 					}
 				});
-				builder.setNegativeButton(R.string.not_save, new DialogInterface.OnClickListener() {
+				builder.setNegativeButton(R.string.not_save, new DialogInterface.OnClickListener(){
 					@Override
-					public void onClick(DialogInterface dialog, int arg1) {
+					public void onClick(DialogInterface dialog, int arg1){
 						setResult(RESULT_CANCELED, null);
 						finish();
 					}
@@ -349,8 +552,8 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK & mHasChanges & mReturnsNomenclatureData.getCount() != 0) {
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		if(keyCode == KeyEvent.KEYCODE_BACK & mHasChanges & mReturnsNomenclatureData.getCount() != 0){
 			showDialog(IDD_SAVE_CHANGES);
 			return true;
 		}
@@ -358,25 +561,29 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	}
 
 	@SuppressWarnings("deprecation")
-	private void SaveChangesAndExit() {
-		if (mReturnsNomenclatureData.getCount() == 0) {
+	private void SaveChangesAndExit(){
+		if(mReturnsNomenclatureData.getCount() == 0){
 			finish();
 			return;
 		}
-		if (!mReturnsNomenclatureData.IsAllDataFilled()) {
+		if(!mReturnsNomenclatureData.IsAllDataFilled()){
 			showDialog(IDD_EMPTY_FIELDS);
 			return;
 		}
+		saveToDB();
+		setResult(RESULT_OK);
+		finish();
+	}
+
+	void saveToDB(){
 		mReturnsNomenclatureData.WriteToDataBase(mDB);
 		mZayavka.setDataOtgruzki(mShippingDate.getTime());
 		mZayavka.setAktPretenziyPath(mEditAktPretenziyPath.getText().toString());
 		mZayavka.setVersion(mEditVersion.getText().toString());
 		mZayavka.writeToDataBase(mDB);
-		setResult(RESULT_OK);
-		finish();
 	}
 
-	public void startMediaGallery() {
+	public void startMediaGallery(){
 		LogHelper.debug(this.getClass().getCanonicalName() + " startMediaGallery");
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		//.ACTION_VIEW,Uri.parse("file:///sdcard/"));
@@ -390,10 +597,10 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		//intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI//
 		//		, MediaStore.Images.Media.CONTENT_TYPE);
 		//startActivityForResult(intent, GET_GALLERY_PICTURE);
-		try {
+		try{
 			Intent ch = Intent.createChooser(intent, "Выбор");
 			startActivityForResult(ch, GET_GALLERY_PICTURE);
-		} catch (android.content.ActivityNotFoundException ex) {
+		}catch(android.content.ActivityNotFoundException ex){
 			LogHelper.debug(this.getClass().getCanonicalName() + " " + ex.getMessage());
 			// Potentially direct the user to the Market with a Dialog
 			//Toast.makeText(this, "Please install a File Manager.",                     Toast.LENGTH_SHORT).show();
@@ -401,11 +608,11 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	}
 
 	@SuppressWarnings("deprecation")
-	private void startCameraTakePicture() {
+	private void startCameraTakePicture(){
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		try {
+		try{
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCameraHelper.createImageFile()));
-		} catch (IOException e) {
+		}catch(IOException e){
 			showDialog(IDD_WORKING_WITH_CAMERA_ERROR);
 			return;
 		}

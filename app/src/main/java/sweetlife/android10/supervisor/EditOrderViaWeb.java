@@ -139,6 +139,7 @@ public class EditOrderViaWeb {
 					newCalendar.set(Calendar.MONTH, monthOfYear);
 					newCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 					shipDate = from.format(newCalendar.getTime());
+
 					requestChangeOrderState("5" );
 				}
 			}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)//

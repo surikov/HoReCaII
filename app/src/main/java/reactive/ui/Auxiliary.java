@@ -987,11 +987,13 @@ public class Auxiliary{
 	}
 
 
-	public static String checkPrivateURL(String pathurl, String login, String password) throws Exception{
+	public static Bough checkPrivateURL(String pathurl, String login, String password) throws Exception{
 		String errorText = "";
 		String responseText = "";
+		String exception="";
 		int responseStatus = 0;
-		String result = "";
+		//String result = "";
+		Bough result=new Bough();
 		HttpURLConnection connection = null;
 		URL url = new URL(pathurl);
 		connection = (HttpURLConnection)url.openConnection();
@@ -1014,7 +1016,8 @@ public class Auxiliary{
 			responseText = new String(output.toByteArray(), "UTF-8" );
 			//System.out.println("checkPrivateURL responseText " + responseText);
 		}catch(Throwable t){
-			//t.printStackTrace();
+			t.printStackTrace();
+			exception=exception+"\n"+t.getMessage();
 		}
 		try{
 			byte data[] = new byte[1024];
@@ -1030,11 +1033,16 @@ public class Auxiliary{
 				//System.out.println("checkPrivateURL errorText " + errorText);
 			}
 		}catch(Throwable t){
-			//t.printStackTrace();
+			t.printStackTrace();
+			exception=exception+"\n"+t.getMessage();
 		}
-		if(connection.getResponseCode() != HttpURLConnection.HTTP_OK){
-			result = "" + responseStatus + "\n" + errorText + "\n" + responseText;
-		}
+		//if(connection.getResponseCode() != HttpURLConnection.HTTP_OK){
+		//	result = "" + responseStatus + "\n" + errorText + "\n" + responseText;
+		//}
+		result.child("status").value.is(""+responseStatus);
+		result.child("error").value.is(errorText);
+		result.child("data").value.is(responseText);
+		result.child("exception").value.is(exception);
 		return result;
 	}
 

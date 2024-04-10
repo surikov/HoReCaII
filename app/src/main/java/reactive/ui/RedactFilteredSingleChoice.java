@@ -85,6 +85,7 @@ public class RedactFilteredSingleChoice extends EditText implements Rake {
 	AlertDialog pick(String[] strings) {
 		stringsRows = strings;
 		grid = new DataGrid(RedactFilteredSingleChoice.this.getContext());
+		grid.pageSize.is(55);
 		lines = new ColumnDescription();
 		AlertDialog d = Auxiliary.pick(RedactFilteredSingleChoice.this.getContext(), "", new SubLayoutless(RedactFilteredSingleChoice.this.getContext())//
 						.child(new RedactText(RedactFilteredSingleChoice.this.getContext()).text.is(filter.property)

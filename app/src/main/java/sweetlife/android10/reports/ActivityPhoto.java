@@ -11,6 +11,7 @@ import sweetlife.android10.Settings;
 
 //import reactive.ui.OrderItemInfo;
 
+import sweetlife.android10.supervisor.*;
 import tee.binding.task.*;
 import tee.binding.*;
 
@@ -25,6 +26,7 @@ public class ActivityPhoto extends Activity{
 	String SrokGodnosti = "";
 	String EdinicyIzmereniyaNaimenovanie = "";
 	String proizvoditel = "";
+	Bough managers = null;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -54,37 +56,93 @@ public class ActivityPhoto extends Activity{
 		Nabor = b.child("row").child("Nabor").value.property.value();
 		SrokGodnosti = b.child("row").child("SrokGodnosti").value.property.value();
 		EdinicyIzmereniyaNaimenovanie = b.child("row").child("EdinicyIzmereniyaNaimenovanie").value.property.value();
-		proizvoditel= b.child("row").child("proizvoditel").value.property.value();
+		proizvoditel = b.child("row").child("proizvoditel").value.property.value();
 		//String txt= b.child("row").child("k").value.property.value();
 		//txt=txt.replace("Состав: ","\nСостав:\n");
 		//txt=txt+"\n"+"---";
 		//return txt;
 	}
 
+	void showInfoPhoto(){
+		if(bm != null){
+			layoutless.child(new Decor(ActivityPhoto.this).bitmap.is(bm)//
+					.width().is(bm.getWidth()).height().is(bm.getHeight())
+					.left().is(Auxiliary.tapSize / 2).top().is(Auxiliary.tapSize / 2)//
+			);
+		}else{
+			int l = (int)((layoutless.width().property.value() / 2 - 200) / 2);
+			int t = (int)((layoutless.height().property.value() - 200) / 2);
+			layoutless.child(new Decor(ActivityPhoto.this).labelText.is("Нет фотографии")//
+					.width().is(200).height().is(200).left().is(l).top().is(t)//
+			);
+		}
+		layoutless.child(new Decor(ActivityPhoto.this).background.is(0xffeeeeee)//
+				.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize / 2))//
+				.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
+				.left().is(layoutless.width().property.divide(2))//
+				.top().is(Auxiliary.tapSize * 0.5)//
+		);
+		String description = "";
+		description = description + "<p><i>Производитель:</i> <b>" + proizvoditel + "</b></p>";
+		description = description + "<p><i>Срок годности:</i> " + SrokGodnosti + "</p>";
+		description = description + "<p><i>Квант:</i> " + EdinicyIzmereniyaNaimenovanie + "</p>";
+		description = description + "<p><i>Состав:</i> " + Nabor + "</p>";
+		description = description + "<p><i>Описание:</i> " + kommentariy.replace("\n", "<br/>") + "</p>";
+		java.util.Vector<Bough> all = managers.children("Ответственные");
+		description = description + "<p>Ответственные:</p>";
+		description = description + "<ul>";
+		for(int ii = 0; ii < all.size(); ii++){
+			description = description + "<li>" + all.get(ii).child("ФИО").value.property.value()
+					+ ", " + all.get(ii).child("Должность").value.property.value();
+			java.util.Vector<Bough> kontakts = all.get(ii).children("Контакты");
+			String delimtr = ": <i>";
+			for(int kk = 0; kk < kontakts.size(); kk++){
+				if(kontakts.get(kk).child("Контакт").value.property.value().length()>3){
+					description = description + delimtr
+							+ kontakts.get(kk).child("ВидКонтакта").value.property.value()
+							+ ": "
+							+ kontakts.get(kk).child("Контакт").value.property.value();
+					delimtr = ", ";
+				}
+			}
+			description = description + "</i></li>";
+		}
+		description = description + "</ul>";
+		layoutless.child(new HTMLBox(ActivityPhoto.this)//.background.is(0xffccff99)//
+				.htmlText.is(description)//
+				.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 1.5))//
+				.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 2))//
+				.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize / 2))//
+				.top().is(Auxiliary.tapSize)//
+		);
+	}
+
+
 	void loadPhoto(final String a){
-		new Expect().status.is("Подождите...")//
-				.task.is(new Task(){
+		new Expect().status.is("Подождите...").task.is(new Task(){
 			@Override
 			public void doTask(){
 				String artikul = a;
 				artikul = artikul.replace('/', '-');
 				artikul = artikul.replace('\\', '-');
-				//10.10.0.17
 				System.out.println(Settings.getInstance().photoURL + artikul + ".bmp");
-				bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".bmp");
+				//bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".bmp");
+				bm = Auxiliary.loadBitmapFromPublicURL(Settings.getInstance().photoURL + artikul + ".bmp");
 				if(bm == null){
-					bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".jpg");
+					//bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".jpg");
+					bm = Auxiliary.loadBitmapFromPublicURL(Settings.getInstance().photoURL + artikul + ".jpg");
 				}
 				if(bm == null){
-					bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".gif");
+					//bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".gif");
+					bm = Auxiliary.loadBitmapFromPublicURL(Settings.getInstance().photoURL + artikul + ".gif");
 				}
 				if(bm == null){
-					bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".png");
+					//bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".png");
+					bm = Auxiliary.loadBitmapFromPublicURL(Settings.getInstance().photoURL + artikul + ".png");
 				}
 				if(bm == null){
-					//System.out.println("no bitmap");
+					System.out.println("no bitmap");
 				}else{
-					//System.out.println("found " + bm.getWidth()+'x'+bm.getHeight());
 					double ww = layoutless.width().property.value() / 2 - Auxiliary.tapSize;
 					double hh = layoutless.height().property.value() - Auxiliary.tapSize;
 					double rw = ww / bm.getWidth();
@@ -95,86 +153,32 @@ public class ActivityPhoto extends Activity{
 						newW = bm.getWidth() * rw;
 						newH = bm.getHeight() * rw;
 					}
-					//System.out.println("to " + ww+'x'+hh+" : "+rw+" / " + newW+'x'+newH);
 					bm = Bitmap.createScaledBitmap(bm, (int)newW, (int)newH, true);
-					//System.out.println("now " + bm.getWidth()+'x'+bm.getHeight());
-					/*if(bm.getHeight()>layoutless.height().property.value()){
-						double r=0.7*layoutless.height().property.value()/bm.getHeight();
-						bm=Bitmap.createScaledBitmap(bm, (int)(bm.getWidth()*r), (int)(bm.getHeight()*r), true);
-					}*/
 				}
-			}
-		})//
-				.afterDone.is(new Task(){
-			@Override
-			public void doTask(){
-				//System.out.println("ok " + bm);
-				if(bm != null){
-					/*
-					int w = bm.getWidth();
-					int h = bm.getHeight();
-					int l = (int) ((layoutless.width().property.value() - w) / 2);
-					int t = (int) ((layoutless.height().property.value() - h) / 2);
-					//System.out.println("ok: "+ w+"x"+h+": "+ bm);
-					layoutless.child(new Decor(ActivityPhoto.this).bitmap.is(bm)//
-							.width().is(w).height().is(h).left().is(l).top().is(t)//
-							);
-					*/
-					layoutless.child(new Decor(ActivityPhoto.this).bitmap.is(bm)//
-							.width().is(bm.getWidth()).height().is(bm.getHeight())
-							.left().is(Auxiliary.tapSize / 2).top().is(Auxiliary.tapSize / 2)//
-					);
-				}else{
-					//ActivityPhoto.this.finish();
-					int l = (int)((layoutless.width().property.value() / 2 - 200) / 2);
-					int t = (int)((layoutless.height().property.value() - 200) / 2);
-					layoutless.child(new Decor(ActivityPhoto.this).labelText.is("Нет фотографии")//
-							.width().is(200).height().is(200).left().is(l).top().is(t)//
-					);
-				}
-				layoutless.child(new Decor(ActivityPhoto.this).background.is(0xffeeeeee)//
-						.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize / 2))//
-						.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
-						.left().is(layoutless.width().property.divide(2))//
-						.top().is(Auxiliary.tapSize * 0.5)//
-				);
-				/*
-				String comment = "Описание:\n" + kommentariy
-						+ "\n\nСостав:\n" + Nabor
-						+ "\n\nСрок годности: " + SrokGodnosti + " сут."
-						+ "\n\nКвант: " + EdinicyIzmereniyaNaimenovanie
-						+ "\n\nПроизводитель: " + proizvoditel;
-				*/
-				/*layoutless.child(new Decor(ActivityPhoto.this)//.background.is(0xffccff99)//
-						.labelText.is(comment)//
-						.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 1.5))//
-						.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 2))//
-						.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize / 2))//
-						.top().is(Auxiliary.tapSize)//
-				);*/
-				String description="";
-				description=description+"<p><i>Производитель:</i> <b>"+proizvoditel+"</b></p>";
-				description=description+"<p><i>Срок годности:</i> "+SrokGodnosti+"</p>";
-				description=description+"<p><i>Квант:</i> "+EdinicyIzmereniyaNaimenovanie+"</p>";
-				description=description+"<p><i>Состав:</i> "+Nabor+"</p>";
-				description=description+"<p><i>Описание:</i> "+kommentariy.replace("\n","<br/>")+"</p>";
 
-				layoutless.child(new HTMLBox(ActivityPhoto.this)//.background.is(0xffccff99)//
-						.htmlText.is(description)//
-						.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 1.5))//
-						.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 2))//
-						.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize / 2))//
-						.top().is(Auxiliary.tapSize)//
-				);
+				try{
+					String infoUrl = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Otvetstvenie/GetFIO/" + artikul;
+					//System.out.println("infoUrl "+infoUrl);
+					byte[] raw = Auxiliary.loadFileFromPrivateURL(infoUrl, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), "UTF-8");
+					String info = new String(raw, "UTF-8");
+					managers = Bough.parseJSON(info);
+					System.out.println(managers.dumpXML());
+				}catch(Throwable ttt){
+					ttt.printStackTrace();
+					managers = new Bough();
+					managers.value.is(ttt.getMessage());
+				}
 			}
-		})//
-				.afterCancel.is(new Task(){
+		}).afterDone.is(new Task(){
 			@Override
 			public void doTask(){
-				//System.out.println("cancel");
+				showInfoPhoto();
+			}
+		}).afterCancel.is(new Task(){
+			@Override
+			public void doTask(){
 				ActivityPhoto.this.finish();
 			}
-		})//
-				.start(this);
+		}).start(this);
 	}
 }

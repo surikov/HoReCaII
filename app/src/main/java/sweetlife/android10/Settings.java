@@ -43,7 +43,7 @@ public class Settings {
 	//private static String _primaryURL = "https://testservice.swlife.ru";
 
 	//private static String _secondaryURL = "https://95.79.111.216";//"http://89.109.7.162";
-	private static String _secondaryURL = "http://95.79.111.216";//"http://89.109.7.162";
+	//private static String _secondaryURL = "http://95.79.111.216";//"http://89.109.7.162";lo
 	private static String _primaryFileStoreURL = "https://androbmen.swlife.ru/";//android/Update2.xml";
 	//private static String _secondaryFileStoreURL = "https://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
 	//private static String _secondaryFileStoreURL = "http://95.79.111.216/";//"http://89.109.7.162/";//androbmen/android/Update2.xml";
@@ -112,18 +112,19 @@ public class Settings {
 		loadConfig();
 	}
 
-	public static String check_1C_access() {
-		String result = "";
+	public static Bough check_1C_access() {
+		Bough result = new Bough();
 		try {
-			String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/surikovimei/" + Cfg.device_id();
+			//String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/surikovimei/" + Cfg.device_id();
+			String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/ПроверкаНеобходимостиСменыПароля";
 			System.out.println("check_1C_access " + url);
 			result  = Auxiliary.checkPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-
-			System.out.println("check_1C_access " + result);
-
+			//result  = Auxiliary.checkPrivateURL(url.trim(), "bot28", "Molgav1024");
+			System.out.println("ПроверкаНеобходимостиСменыПароля " + result.dumpXML());
 		} catch (Throwable t) {
 			t.printStackTrace();
-			result=t.getMessage();
+			//result=t.getMessage();
+			result.child("exception2").value.is(t.getMessage());
 		}
 		return result;
 	}
@@ -134,7 +135,7 @@ public class Settings {
 			//URL mainURL = new URL("http://" + Settings._primaryURL + ":80");
 			//URL secondURL = new URL("http://" + Settings._secondaryURL + ":80");
 			URL mainURL = new URL("" + Settings._primaryURL + ":80");
-			URL secondURL = new URL("" + Settings._secondaryURL + ":80");
+			//URL secondURL = new URL("" + Settings._secondaryURL + ":80");
 			//time.value((double) Auxiliary.checkAccessToURL(mainURL, Activity_Login.this));
 			time = Auxiliary.checkAccessToURL(mainURL, a);
 			//System.out.println("connection delay is " + time);
@@ -222,9 +223,9 @@ public class Settings {
 			if (baseIP.child("primary").value.property.value().trim().length() > 1) {
 				_primaryURL = baseIP.child("primary").value.property.value().trim();
 			}
-			if (baseIP.child("secondary").value.property.value().trim().length() > 1) {
+			/*if (baseIP.child("secondary").value.property.value().trim().length() > 1) {
 				_secondaryURL = baseIP.child("secondary").value.property.value().trim();
-			}
+			}*/
 			if (baseIP.child("base1C").value.property.value().trim().length() > 1) {
 				_base1c = baseIP.child("base1C").value.property.value().trim();
 			}

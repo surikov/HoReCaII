@@ -57,6 +57,8 @@ public class ActivityWebServicesReports extends Activity{
 	MenuItem menuSendPDF;
 	static int reportGridScrollViewY = 0;
 
+	Note seekReport = new Note();
+
 	public static String goLastPageReportName = "startup";
 	public static boolean needRefresh = false;
 
@@ -364,6 +366,9 @@ public class ActivityWebServicesReports extends Activity{
 		if(key.equals(ReportValovayaPribil.folderKey())){
 			report = new ReportValovayaPribil(this);
 		}
+		if(key.equals(ReportValovayaIerarhia.folderKey())){
+			report = new ReportValovayaIerarhia(this);
+		}
 
 /*
 		if (key.equals(ReportLocalizasiaDlyaTP.folderKey())) {
@@ -398,7 +403,6 @@ public class ActivityWebServicesReports extends Activity{
 		if(key.equals(ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta.folderKey())){
 			report = new ReportZayvkiNaIzmeneniePodrazdeleniaKontragenta(this);
 		}
-
 
 
 		if(key.equals(ReportPoiskKontragentaPoKluchevimPolyam.folderKey())){
@@ -644,6 +648,12 @@ public class ActivityWebServicesReports extends Activity{
 	}
 
 	void addReportMenu2(final String folderKey, String menuLabel){
+		String filter = seekReport.value().trim().toUpperCase();
+		if(filter.length() > 1){
+			if(!menuLabel.toUpperCase().contains(filter)){
+				return;
+			}
+		}
 		Task tap = new Task(){
 			@Override
 			public void doTask(){
@@ -690,11 +700,13 @@ public class ActivityWebServicesReports extends Activity{
 		System.out.println("resetMenu2");
 		reportName.clear();
 		reportIcon.clear();
+
 		addReportMenu2(ReportAKBPoTP.folderKey(), ReportAKBPoTP.menuLabel());
 		addReportMenu2(ReportAcciiDlyaKlientov.folderKey(), ReportAcciiDlyaKlientov.menuLabel());
 		addReportMenu2(ReportAktSverki.folderKey(), ReportAktSverki.menuLabel());
 		addReportMenu2(ReportAssortimentFlagmanov.folderKey(), ReportAssortimentFlagmanov.menuLabel());
 		addReportMenu2(ReportValovayaPribil.folderKey(), ReportValovayaPribil.menuLabel());
+		addReportMenu2(ReportValovayaIerarhia.folderKey(), ReportValovayaIerarhia.menuLabel());
 		addReportMenu2(ReportVestnik.folderKey(), ReportVestnik.menuLabel());
 
 
@@ -778,6 +790,7 @@ public class ActivityWebServicesReports extends Activity{
 		addReportMenu2(ReportUsloviaOtgruzki.folderKey(), ReportUsloviaOtgruzki.menuLabel());
 		addReportMenu2(ReportFixirovanieKoordinat.folderKey(), ReportFixirovanieKoordinat.menuLabel());
 		addReportMenu2(ReportFixirovannieCeny.folderKey(), ReportFixirovannieCeny.menuLabel());
+
 		reportGrid.refresh();
 		waitForReportGridLayout();
 	}
@@ -995,13 +1008,13 @@ public class ActivityWebServicesReports extends Activity{
 			@Override
 			public void doTask(){
 				try{
-					String act="Ложь/Истина/";
+					String act = "Ложь/Истина/";
 					if(approve){
-						act="Истина/Ложь/";
+						act = "Истина/Ложь/";
 					}
-					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkaNaKlienta/UtvIzmPodrr/"+num+"/" + act;
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkaNaKlienta/UtvIzmPodrr/" + num + "/" + act;
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url
-							,Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
+							, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
 							//,"bot28","Molgav1024"
 					);
 					String msg = new String(bytes, "UTF-8");
@@ -1569,8 +1582,9 @@ public class ActivityWebServicesReports extends Activity{
 					public void doTask(){
 						sendNewFixPrice(num, art, price.value());
 					}
-				},null,null);
+				}, null, null);
 	}
+
 	void sendNewFixPrice(final String num, final String art, final double price){
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
@@ -1581,7 +1595,7 @@ public class ActivityWebServicesReports extends Activity{
 							Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkiNaFiksCeny/IzmZenuSpec/"
 									+ URLEncoder.encode(num, "utf-8")//
 									+ "/" + URLEncoder.encode(art, "utf-8")//
-									+ "/" + URLEncoder.encode(""+price, "utf-8")//
+									+ "/" + URLEncoder.encode("" + price, "utf-8")//
 							;
 					Report_Base.startPing();
 					Bough result = new Bough();
@@ -2023,12 +2037,45 @@ public class ActivityWebServicesReports extends Activity{
 				.width().is(layoutless.width().property)//
 				.height().is(layoutless.height().property)//
 		);
+/*
+		reportGrid
+				.noHead.is(true)
+				.columns(new Column[]{//
+								reportIcon.width.is(Auxiliary.tapSize).noHorizontalBorder.is(true).noVerticalBorder.is(true)//
+								, reportName.width.is(layoutless.width().property).noHorizontalBorder.is(true).noVerticalBorder.is(true) //
+						}
+				)
+		.width().is(5*Auxiliary.tapSize)
+		.height().is(10*Auxiliary.tapSize)
+		;
+*/
 		layoutless.child(new SplitLeftRight(this)//reports
 				.position.is(1).split.is(reportSplit)//
-				.rightSide(reportGrid.noHead.is(true).columns(new Column[]{//
-						reportIcon.width.is(Auxiliary.tapSize).noHorizontalBorder.is(true).noVerticalBorder.is(true)//
-						, reportName.width.is(layoutless.width().property).noHorizontalBorder.is(true).noVerticalBorder.is(true) //
-				}))//
+				.rightSide(
+						new SubLayoutless(this)
+								.child(new RedactText(this)
+										.text.is(seekReport.afterChange(new Task(){
+											@Override
+											public void doTask(){
+												System.out.println("seekReport " + seekReport.value());
+												resetMenu2();
+											}
+										}, true))
+										.width().is(layoutless.width().property)
+										.height().is(1 * Auxiliary.tapSize)
+								)
+								.child(reportGrid
+										.noHead.is(true)
+										.columns(new Column[]{//
+														reportIcon.width.is(Auxiliary.tapSize).noHorizontalBorder.is(true).noVerticalBorder.is(true)//
+														, reportName.width.is(layoutless.width().property).noHorizontalBorder.is(true).noVerticalBorder.is(true) //
+												}
+										)
+										.top().is(1 * Auxiliary.tapSize)
+										.width().is(layoutless.width().property)
+										.height().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))
+								)
+				)//
 				.height().is(layoutless.height().property)//
 				.width().is(layoutless.width().property)//
 		);

@@ -9,12 +9,14 @@ public class Request_FixedPriceNomenclature {
 
 	public static Cursor RequestNomenclature(SQLiteDatabase db, String zayavkaID) {
 		
-		String sqlString = "select z._id, z.[NomerStroki], z.Nomenklatura, n.Artikul, n.Naimenovanie, " +
-				"z.Cena, z.Obyazatelstva "+
+		String sqlString = "select z._id, z.[NomerStroki], z.Nomenklatura, n.Artikul, n.Naimenovanie, "
+				+" z.Cena, z.Obyazatelstva "
 
-			"from [ZayavkaNaSkidki_TovaryPhiksCen] z " +       
-			"inner join [Nomenklatura] n on z.[Nomenklatura] = n._IDRRef " +      
-			"where z.[_ZayavkaNaSkidki_IDRRef] = " + zayavkaID;
+			+" from [ZayavkaNaSkidki_TovaryPhiksCen] z "
+			+" inner join [Nomenklatura] n on z.[Nomenklatura] = n._IDRRef "
+			+" where z.[_ZayavkaNaSkidki_IDRRef] = " + zayavkaID
+				+" group by n.artikul"
+				;
 //System.out.println(sqlString);
 		Cursor cursor = db.rawQuery(sqlString, null);
 

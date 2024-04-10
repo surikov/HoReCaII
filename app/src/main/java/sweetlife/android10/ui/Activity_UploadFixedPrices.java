@@ -59,7 +59,7 @@ public class Activity_UploadFixedPrices extends Activity_BasePeriod implements I
 				}
 			}
 			if (!documentsSelected) {
-				CreateErrorDialog(R.string.documents_not_selected).show();
+				CreateErrorDialog("Не выбраны документы на выгрузку.").show();
 				return;
 			}
 			//final ArrayList<NomenclatureBasedDocument> dataRequestList = new ArrayList<NomenclatureBasedDocument>();
@@ -190,7 +190,7 @@ public class Activity_UploadFixedPrices extends Activity_BasePeriod implements I
 	public void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.act_fixedprices_upload);
 		super.onCreate(savedInstanceState);
-		setTitle(R.string.fixed_prices_upload);
+		setTitle("Выгрузка заявок на фиксированные цены");
 		InitializeControls();
 	}
 

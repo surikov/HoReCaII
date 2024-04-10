@@ -1,42 +1,62 @@
 package sweetlife.android10.supervisor;
 
-import android.content.Context;
-
 import java.io.File;
 import java.net.URLEncoder;
 import java.util.Date;
 
+import reactive.ui.Auxiliary;
+import reactive.ui.Decor;
+import reactive.ui.Knob;
+import reactive.ui.RedactDate;
 import reactive.ui.*;
-import sweetlife.android10.Settings;
-import tee.binding.Bough;
+import reactive.ui.RedactSingleChoice;
+import reactive.ui.SubLayoutless;
+import sweetlife.android10.*;
+import tee.binding.*;
 import tee.binding.it.*;
-import tee.binding.task.Task;
+import tee.binding.task.*;
 
-public class ReportDostavkaPoMarshrutam extends Report_Base{
+import android.content.*;
 
-	//Numeric dateCreateFrom = new Numeric();
-	//Numeric dateCreateTo = new Numeric();
+public class ReportValovayaIerarhia extends Report_Base{
 	Numeric territory = new Numeric();
-	Note carNum = new Note();
-
-	public ReportDostavkaPoMarshrutam(ActivityWebServicesReports p){
-		super(p);
-	}
+	Numeric dateCreateFrom = new Numeric();
+	Numeric dateCreateTo = new Numeric();
+	//Numeric whoPlus1 = new Numeric();
 
 	public static String menuLabel(){
-		return "Маршрутный лист";
+		return "Валовая прибыль по подразделениям";
 	}
 
 	public static String folderKey(){
-		return "dostavkaPoMarshrutam";
+		return "valovayaierarhy";
 	}
 
 	public String getMenuLabel(){
-		return "Маршрутный лист";
+		return "Валовая прибыль по подразделениям";
 	}
 
 	public String getFolderKey(){
-		return "dostavkaPoMarshrutam";
+		return "valovayaierarhy";
+	}
+
+	public ReportValovayaIerarhia(ActivityWebServicesReports p){
+		super(p);
+	}
+
+	@Override
+	public String getShortDescription(String key){
+		try{
+			Bough b = null;
+			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
+			b = Bough.parseXML(xml);
+			String dfrom = Cfg.formatMills(Numeric.string2double(b.child("docFrom").value.property.value()), "dd.MM.yyyy");
+			String dto = Cfg.formatMills(Numeric.string2double(b.child("docTo").value.property.value()), "dd.MM.yyyy");
+			return dfrom + " - " + dto;
+		}catch(Throwable t){
+			//
+		}
+		return "Валовая прибыль по подразделениям";
 	}
 
 	@Override
@@ -45,19 +65,7 @@ public class ReportDostavkaPoMarshrutam extends Report_Base{
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
 		try{
 			b = Bough.parseXML(xml);
-			return b.child("carNum").value.property.value();
-		}catch(Throwable t){
-			//
-		}
-		return " ";
-	}
 
-	@Override
-	public String getShortDescription(String key){
-		Bough b = null;
-		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
-		try{
-			b = Bough.parseXML(xml);
 			int i = (int)Numeric.string2double(b.child("territory").value.property.value());
 			//String s = ActivityWebServicesReports.territory.children.get(i).child("territory").value.property.value() + " (" + ActivityWebServicesReports.territory.children.get(i).child("hrc").value.property.value().trim() + ")";
 			String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
@@ -72,28 +80,27 @@ public class ReportDostavkaPoMarshrutam extends Report_Base{
 	public void readForm(String instanceKey){
 		Bough b = null;
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey))));
-		//System.out.println("readForm " + xml);
 		try{
 			b = Bough.parseXML(xml);
+			dateCreateFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
+			dateCreateTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
 		}catch(Throwable t){
 			//
 		}
 		if(b == null){
 			b = new Bough();
 		}
-		//dateCreateFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
-		//dateCreateTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
 		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
-		carNum.value(b.child("carNum").value.property.value());
+		//whoPlus1.value(Numeric.string2double(b.child("who").value.property.value()));
 	}
 
 	@Override
 	public void writeForm(String instanceKey){
 		Bough b = new Bough().name.is(getFolderKey());
-		//b.child("docFrom").value.is("" + dateCreateFrom.value());
-		//b.child("docTo").value.is("" + dateCreateTo.value());
 		b.child("territory").value.is("" + territory.value());
-		b.child("carNum").value.is(carNum.value());
+		b.child("docFrom").value.is("" + dateCreateFrom.value());
+		b.child("docTo").value.is("" + dateCreateTo.value());
+		//b.child("who").value.is("" + whoPlus1.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		//System.out.println("writeForm " + xml);
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
@@ -103,9 +110,13 @@ public class ReportDostavkaPoMarshrutam extends Report_Base{
 	public void writeDefaultForm(String instanceKey){
 		Bough b = new Bough().name.is(getFolderKey());
 		long d = new Date().getTime();
-		//b.child("docFrom").value.is("" + (d - 0 * 24 * 60 * 60 * 1000.0));
-		//b.child("docTo").value.is("" + (d + 0 * 24 * 60 * 60 * 1000.0));
+		Date mb = new Date();
+		mb.setDate(1);
+		b.child("docFrom").value.is("" + mb.getTime());
+		d = new Date().getTime();
+		b.child("docTo").value.is("" + d);
 		b.child("territory").value.is("0");
+		b.child("who").value.is("0");
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
 	}
@@ -115,12 +126,37 @@ public class ReportDostavkaPoMarshrutam extends Report_Base{
 		return null;
 	}
 
+	private String kod(int nn){
+		String r = "-123456789";
+		if(nn >= 0 && nn < Cfg.kontragenty().children.size()){
+			r = Cfg.kontragenty().children.get(nn).child("kod").value.property.value();
+		}
+		return r;
+	}
 
 	@Override
 	public String composeGetQuery(int queryKind){
+		//https://service.swlife.ru/hrc120107/hs/Report/ВаловаяПрибыль/hrc495?param={"ВариантОтчета":"ВаловаяПрибыльПланшет"}
 		int i = territory.value().intValue();
 		String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-		String serviceName = "ЗагрузкаТранспорта";
+		String p = "{"
+				+ "\"КлючВарианта\":\"894ee006-7261-46e6-9897-b8db76fab4f4\""
+				+ ",\"ДатаНачала\":\"" + Cfg.formatMills(dateCreateFrom.value(), "yyyyMMdd") + "\""
+				+ ",\"ДатаОкончания\":\"" + Cfg.formatMills(dateCreateTo.value(), "yyyyMMdd") + "\"";
+		/*if(whoPlus1.value().intValue() > 0){
+			int nn = whoPlus1.value().intValue() - 1;
+			p = p + ",\"Контрагент\":\"" + kod(nn) + "\"";
+		}*/
+
+		p = p + "}";
+		String ee = p;
+		/*try {
+			e = URLEncoder.encode(p, "UTF-8");
+		} catch(Throwable t) {
+			t.printStackTrace();
+			e = t.getMessage();
+		}*/
+		String serviceName = "ВаловаяПрибыль";
 		try{
 			serviceName = URLEncoder.encode(serviceName, "UTF-8");
 		}catch(Throwable t){
@@ -132,16 +168,12 @@ public class ReportDostavkaPoMarshrutam extends Report_Base{
 				+ Settings.selectedBase1C()//
 				+ "/hs/Report/"//
 				+ serviceName + "/" //+ Cfg.currentHRC()//
-				+ hrc
-				+ "?empty";
-		if(carNum.value().trim().length() > 0){
-			q = q + "&param={\"Авто\":\"" + carNum.value().trim() + "\"}";
-		}
+				+ hrc + "?param=" + ee//
+				;
 		q = q + tagForFormat(queryKind);
-		System.out.println("composeGetQuery " + q);
+		//System.out.println("composeGetQuery " + q);
 		return q;
 	}
-
 
 	@Override
 	public SubLayoutless getParametersView(Context context){
@@ -154,48 +186,29 @@ public class ReportDostavkaPoMarshrutam extends Report_Base{
 						+ " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
 				terr.item(s);
 			}
+			/*RedactFilteredSingleChoice kontr = new RedactFilteredSingleChoice(context);
+			kontr.selection.is(whoPlus1);
+			kontr.item("[Все контрагенты]");
+			for(int i = 0; i < Cfg.kontragenty().children.size(); i++){
+				kontr.item(Cfg.kontragenty().children.get(i).child("kod").value.property.value() + ": " + Cfg.kontragenty().children.get(i).child("naimenovanie").value.property.value());
+			}*/
 			propertiesForm//
 					.input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
-					.input(context, 1, Auxiliary.tapSize * 0.3, "Номер автомобиля", new RedactText(context).text.is(carNum))//
-					//.input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
-					.input(context, 2, Auxiliary.tapSize * 0.3, "Территория", terr)//
-			/*.input(context, 3, Auxiliary.tapSize * 0.3, "", new Knob(context).labelText.is("Обновить").afterTap.is(new Task() {
-				@Override
-				public void doTask() {
-					expectRequery.start(activityReports);
-				}
-			}), Auxiliary.tapSize * 3)*/;
-			/*propertiesForm.child(new Knob(context)//
-					.labelText.is("На сегодня")//
-					.afterTap.is(new Task() {
-						@Override
-						public void doTask() {
-							//Date mb = new Date();
-							//mb.setDate(1);
-							long d = new Date().getTime();
-							//dateFrom.value((double) d);
-							dateCreateFrom.value(d - 0 * 24 * 60 * 60 * 1000.0);
-							dateCreateTo.value((double) d);
-							//checkHolding();
-							expectRequery.start(activityReports);
-						}
-					})//
-					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4.5 + 0.5)))//
-					.width().is(Auxiliary.tapSize * 2.5)//
-					.height().is(Auxiliary.tapSize * 0.8)//
-			);*/
+					.input(context, 1, Auxiliary.tapSize * 0.3, "Территория", terr)//
+					.input(context, 2, Auxiliary.tapSize * 0.3, "Дата от", new RedactDate(context).date.is(dateCreateFrom).format.is("dd.MM.yyyy"))//
+					.input(context, 3, Auxiliary.tapSize * 0.3, "до", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
+					//.input(context, 4, Auxiliary.tapSize * 0.3, "Контрагент", kontr, Auxiliary.tapSize * 9)//
+			;
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("Обновить")//
 					.afterTap.is(new Task(){
 						@Override
 						public void doTask(){
-							//checkHolding();
 							expectRequery.start(activityReports);
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 0 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -205,48 +218,16 @@ public class ReportDostavkaPoMarshrutam extends Report_Base{
 						@Override
 						public void doTask(){
 							//expectRequery.start(activityReports);
-							activityReports.promptDeleteRepoort(ReportDostavkaPoMarshrutam.this, currentKey);
+							activityReports.promptDeleteRepoort(ReportValovayaIerarhia.this, currentKey);
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 3 + 1 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 1 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
 		}
 		return propertiesForm;
 	}
-/*
-	@Override
-	public String interceptActions(String s) {
-		//System.out.println("interceptActions\n-\n-\n-\n-\n-\n\n\n\n\n\n");
-		String[] strings = s.split("\n");
-		String startWord = "12-";
-		String endWord = "от";
-		for(int i = 0; i < strings.length; i++) {
-			String line = strings[i];
-			if(i - 2 > -1 && i + 1 < strings.length - 1) {
-				String num = extract(line, startWord, endWord);
-				num = num.replace("&nbsp;", "");
-				if(num.length() > 2) {
-					int start = line.indexOf(startWord);
-					int end = line.indexOf(endWord, start + 1);
-					//System.out.println("num "+num+" /"+start+" /"+end+"/"+line);
-					line = line.substring(0, start)//
-							+ "<a href=\"hook"//
-							+ "?kind=" + HOOKReportPoVoditelam//
-							+ "&" + FIELDDocumentNumber + "=" + num//
-							+ "\">" + num + "</a> "//
-							+ line.substring(end);
-					//System.out.println(line);
-					strings[i] = line;
-				}
-			}
-		}
-		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < strings.length; i++) {
-			sb.append(strings[i]);
-		}
-		return sb.toString();
-	}*/
+
 }

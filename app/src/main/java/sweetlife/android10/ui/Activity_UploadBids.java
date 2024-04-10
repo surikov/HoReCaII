@@ -99,8 +99,8 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		sql = "select tovar.vidSkidki as vidSkidki,tovar.cenaSoSkidkoy as cenaSoSkidkoy,  n.artikul as artikul , tovar.kolichestvo as kolichestvo from"//
 				+ "\n ZayavkaPokupatelyaIskhodyaschaya doc"//
 				+ "\n join ZayavkaPokupatelyaIskhodyaschaya_Tovary tovar on tovar._ZayavkaPokupatelyaIskhodyaschaya_IDRRef=doc._idrref"//
-				+ "\n   join nomenklatura n on n._idrref=tovar.nomenklatura"//
-				+ "\n where doc.nomer='" + key + "'";
+				+ "\n join nomenklatura n on n._idrref=tovar.nomenklatura"//
+				+ "\n where doc.nomer='" + key + "' group by n.artikul";
 		Bough tovar = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 		System.out.println("tovar " + tovar.dumpXML());
 
@@ -275,7 +275,10 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 						Bough analog = analogi.get(aa);
 						final String anart = analog.child("Артикул").value.property.value();
 						final String ananame = analog.child("Наименование").value.property.value();
-						final String datewait = analog.child("Наименование").value.property.value();
+						//final String datewait = analog.child("Наименование").value.property.value();
+						final String andostkolvo = analog.child("ДоступноеКоличество").value.property.value();
+
+
 						final int rowNum = dataRowCounter;
 						final int gridNum = gridCounter;
 						Task tap = new Task(){
@@ -390,7 +393,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 						zakazyNomenklatura.cell("&nbsp;↳&nbsp;" + ananame
 								, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "арт." + anart //+ ", цена " + 222.333
 						);
-						kolichestvo.cell("0.0", tap, "");
+						kolichestvo.cell(andostkolvo, tap, "");
 						dataRowCounter++;
 						gridCounter++;
 						newArtikuls.add(anart);
@@ -913,7 +916,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 				}
 			}
 			if(!documentsSelected){
-				CreateErrorDialog(R.string.documents_not_selected).show();
+				CreateErrorDialog("Не выбраны документы на выгрузку.").show();
 				return;
 			}
 			ArrayList<NomenclatureBasedDocument> dataRequestList = new ArrayList<NomenclatureBasedDocument>();

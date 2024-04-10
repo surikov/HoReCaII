@@ -37,7 +37,7 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 	Numeric docFrom = new Numeric();
 	Numeric docTo = new Numeric();
 	Numeric territory = new Numeric();
-
+Toggle sNarusheniami=new Toggle();
 
 	public static String menuLabel() {
 		return "Фиксирование координат";
@@ -94,6 +94,9 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
 		docFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
 		docTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
+		sNarusheniami.value(b.child("sNarusheniami").value.property.value().equals("yes"));
+
+
 	}
 
 	@Override
@@ -102,6 +105,7 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 		b.child("docFrom").value.is("" + docFrom.value());
 		b.child("docTo").value.is("" + docTo.value());
 		b.child("territory").value.is("" + territory.value());
+		b.child("sNarusheniami").value.is("" + (sNarusheniami.value()?"yes":"no"));
 		//b.child("territory").value.is("" + territory.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
@@ -129,15 +133,17 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 		Calendar to = Calendar.getInstance();
 		to.setTimeInMillis(docTo.value().longValue());
 		String hrc=Cfg.whoCheckListOwner();
-		if (territory.value() > 0) {
+		//if (territory.value() > 0) {
 			hrc= Cfg.territory().children.get(territory.value().intValue()).child("hrc").value.property.value();
-		}
+		//}
 		String q = Settings.getInstance().getBaseURL()//
 				+ Settings.selectedBase1C()//
-				+ "/hs/Planshet/OtchetKoordinat/"//
+				+ "/hs/Planshet/OtchetKoordinat"//
 				+ "/" + Cfg.formatMills(from.getTimeInMillis(), "yyyyMMdd")
 				+ "/" + Cfg.formatMills(to.getTimeInMillis(), "yyyyMMdd")
-				+ "/" + hrc;
+				+ "/" + hrc
+				+"?BezRash="+(sNarusheniami.value()?"Ложь":"Истина")
+				;
 		q = q + tagForFormat(queryKind);
 		return q;
 	}
@@ -159,6 +165,8 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 					.input(context, 1, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(docFrom).format.is("dd.MM.yyyy"))//
 					.input(context, 2, Auxiliary.tapSize * 0.3, "до", new RedactDate(context).date.is(docTo).format.is("dd.MM.yyyy"))//
 					.input(context, 3, Auxiliary.tapSize * 0.3, "Территория", terr)//
+					.input(context, 3.5, Auxiliary.tapSize * 0.3, "", new RedactToggle(context).labelText.is("с нарушениями").yes.is(sNarusheniami))//
+
 			;
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("На сегодня")//
@@ -174,7 +182,7 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 1.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -187,7 +195,7 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 1 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 1 + 1.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -200,7 +208,7 @@ public class ReportFixirovanieKoordinat extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 2 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 2 + 1.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);

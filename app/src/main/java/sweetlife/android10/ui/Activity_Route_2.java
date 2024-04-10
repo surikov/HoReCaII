@@ -100,6 +100,8 @@ public class Activity_Route_2 extends Activity{
 	MenuItem menuKontaktnayaInformacia;
 	MenuItem menuIskluchenieVizitov;
 
+
+
 	Note currentHRCName = new Note().value("[все]" );
 	Numeric zaDatu = new Numeric().value(0);
 	Numeric otgruzkaNaDatu = new Numeric();
@@ -371,7 +373,8 @@ public class Activity_Route_2 extends Activity{
 						final String code = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
 						String tpFIO = Cfg.polzovatelFIO(Cfg.whoCheckListOwner());
 						Auxiliary.pickSingleChoice(Activity_Route_2.this, new String[]{//
-								"GPS (" + tpFIO + ")", "Заявки", "Фиксированные цены", "Возвраты от покупателей"
+								"GPS (" + tpFIO + ")", "Заявки", "Фиксированные цены"
+								//, "Возвраты от покупателей"
 						}, vigruzitN, "Выгрузить", new Task(){
 							public void doTask(){
 								if(vigruzitN.value() == 0){
@@ -620,6 +623,7 @@ public class Activity_Route_2 extends Activity{
 		menuPoKassamDlyaTP = menu.add("Кассовые чеки" );
 		menuZayavkaVozmehenie = menu.add("Заявки на возмещение" );
 		menuPerebitNakladnuyu = menu.add("Заявки на изменение накладной" );
+
 		menuZayavkaNaPostavku = menu.add("Заявки на поставку" );
 		menuMarshrutDogovora = menu.add("Обновить маршрут и договоры" );
 		// menuTONacenka = menu.add("Обновить показатели");

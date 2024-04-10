@@ -4,11 +4,11 @@ import java.text.*;
 import java.util.*;
 
 import reactive.ui.*;
+import sweetlife.android10.*;
 import sweetlife.android10.consts.ITableColumnsNames;
 import sweetlife.android10.data.common.ZoomListCursorAdapter;
 import sweetlife.android10.utils.DateTimeHelper;
 
-import sweetlife.android10.R;
 import tee.binding.task.Task;
 
 import android.content.Context;
@@ -30,6 +30,7 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 	MenuItem menuOtchety;
 	MenuItem menuRefresh;
 	MenuItem menuResetUpload;
+	MenuItem menuClear;
 	int TIME_NEW = 0xff000000;
 	int TIME_MIDDLE = 0x99000000;
 	int TIME_OLD = 0x33000000;
@@ -109,6 +110,7 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 		menuRefresh = menu.add("Обновить");
 		menuOtchety = menu.add("Отчёты");
 		menuResetUpload = menu.add("Повторить выгрузку");
+		menuClear = menu.add("Удалить выгруженные координаты");
 		return true;
 	}
 
@@ -131,9 +133,23 @@ public class Activity_Doc_GPS_Points extends Activity_BasePeriod {
 			promptResetUpload();
 			return true;
 		}
+		if (item == menuClear) {
+			promptClear();
+			return true;
+		}
 		return true;
 	}
+	void promptClear() {
+		Auxiliary.pickConfirm(this, "Удалить все выгруженные координаты", "Да", new Task() {
+			@Override
+			public void doTask() {
+				String sql = "delete from GPSPoints where upload=1;";
+				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+				OnDateChanged(mFromPeriod.getTime(), mToPeriod.getTime());
+			}
 
+		});
+	}
 	void promptResetUpload() {
 		Auxiliary.pickConfirm(this, "Пометить все точки как невыгруженные", "Да", new Task() {
 

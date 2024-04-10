@@ -265,7 +265,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		layoutless.child(new Knob(this).labelText.is("Добавить контакт").afterTap.is(new Task() {
 					@Override
 					public void doTask() {
-						promptDobavit(null, false, 0, null, null, 0, null, null);
+						promptDobavit(null, false, 0, null, null, 0, null, null,null);
 					}
 				})//
 						.left().is(layoutless.width().property.minus(4 * Auxiliary.tapSize))//
@@ -691,7 +691,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		}
 	}
 
-	void promptDobavit(final String kod, boolean _main, int _rolNum, String _doljnost, final String _fio, long _datarojd, String _mobtel, String _gortel) {
+	void promptDobavit(final String kod, boolean _main, int _rolNum, String _doljnost, final String _fio, long _datarojd, String _mobtel, String _gortel,String _email) {
 
 		String firstLabel = null;
 		Task firstTask = null;
@@ -706,7 +706,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		final Numeric datarojd = new Numeric();
 		final Note mobtel = new Note();
 		final Note gortel = new Note();
-
+		final Note email = new Note();
 
 		if (kod == null) {
 			firstLabel = "Добавить";
@@ -719,7 +719,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						dastring = Auxiliary.short1cDate.format(d);
 					}
 					final String s = dastring;
-					sendAdd(fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value(), s, main.value(), mobtel.value(), gortel.value()
+					sendAdd("",fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value(), s, main.value(), mobtel.value(), gortel.value(),email.value()
 							, new Task() {
 								public void doTask() {
 									loadData();
@@ -737,10 +737,12 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 			datarojd.value((float) _datarojd);
 			mobtel.value(_mobtel);
 			gortel.value(_gortel);
+			email.value(_email);
 			firstLabel = "Изменить";
 			firstTask = new Task() {
 				@Override
 				public void doTask() {
+					/*
 					sendDelete(kod, new Task() {
 						public void doTask() {
 							String dastring = "";
@@ -749,7 +751,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 								dastring = Auxiliary.short1cDate.format(d);
 							}
 							final String s = dastring;
-							sendAdd(fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value(), s, main.value(), mobtel.value(), gortel.value()
+							sendAdd(fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value(), s, main.value(), mobtel.value(), gortel.value(),email.value()
 									, new Task() {
 										public void doTask() {
 											loadData();
@@ -757,7 +759,20 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 									});
 						}
 					});
-
+*/
+					String dastring = "";
+					if (datarojd.value().longValue() > 0) {
+						Date d = new Date(datarojd.value().longValue());
+						dastring = Auxiliary.short1cDate.format(d);
+					}
+					final String s = dastring;
+					sendAdd(kod,fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value()
+							, s, main.value(), mobtel.value(), gortel.value(),email.value()
+							, new Task() {
+								public void doTask() {
+									loadData();
+								}
+							});
 				}
 			};
 			secondLabel = "Удалить";
@@ -798,8 +813,11 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("городской тел.").labelAlignRightTop().top().is(Auxiliary.tapSize * 7.0).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactText(this).text.is(gortel).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 6.5).width().is(Auxiliary.tapSize * 5).height().is(Auxiliary.tapSize * 1))//
 
+						.child(new Decor(this).labelText.is("e-mail").labelAlignRightTop().top().is(Auxiliary.tapSize * 8.0).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(email).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 5).height().is(Auxiliary.tapSize * 1))//
+
 						.width().is(Auxiliary.tapSize * 10)//
-						.height().is(Auxiliary.tapSize * 8)//
+						.height().is(Auxiliary.tapSize * 10)//
 				, firstLabel, firstTask, secondLabel, secondTask, null, null);
 	}
 
@@ -997,13 +1015,14 @@ I/System.out: 		</ВремяРаботы>
 				final long datarojd = dms;
 				final String mobtel = row.child("МобильныйТелефон").value.property.value();
 				final String gortel = row.child("ГородскойТелефон").value.property.value();
+				final String email = row.child("Почта").value.property.value();
 
 				Task tap = new Task() {
 					@Override
 					public void doTask() {
 						//promptDelete(kod, name);
 						//promptInfo(art);
-						promptEditOrDelete(kod, main, rolNum, doljnost, fio, datarojd, mobtel, gortel);
+						promptEditOrDelete(kod, main, rolNum, doljnost, fio, datarojd, mobtel, gortel,email);
 					}
 				};//mOrder
 				String info = row.child("КонтактноеЛицо").value.property.value();
@@ -1012,6 +1031,9 @@ I/System.out: 		</ВремяРаботы>
 				}
 				if (gortel.length() > 0) {
 					info = info + ", гор.тел: " + gortel;
+				}
+				if (email.length() > 0) {
+					info = info + ", e-mail: " + email;
 				}
 				String descr = "код: " + kod;
 				if (kod.startsWith("/"))
@@ -1037,8 +1059,8 @@ I/System.out: 		</ВремяРаботы>
 		}
 	}
 
-	void promptEditOrDelete(final String kod, boolean _main, int _rolNum, String _doljnost, String _fio, long _datarojd, String _mobtel, String _gortel) {
-		promptDobavit(kod, _main, _rolNum, _doljnost, _fio, _datarojd, _mobtel, _gortel);
+	void promptEditOrDelete(final String kod, boolean _main, int _rolNum, String _doljnost, String _fio, long _datarojd, String _mobtel, String _gortel, String _email) {
+		promptDobavit(kod, _main, _rolNum, _doljnost, _fio, _datarojd, _mobtel, _gortel,_email);
 	}
 
 	void promptDelete(final String kod, String name) {
@@ -1154,7 +1176,7 @@ I/System.out: 		</ВремяРаботы>
 		sendData(json, doAfterDone);
 	}
 
-	void sendAdd(String kontaktLico, String kodRol, String doljnost, String fio, String dataRojd, boolean osnov, String mobTel, String gorTel, Task doAfterDone) {
+	void sendAdd(String kod,String kontaktLico, String kodRol, String doljnost, String fio, String dataRojd, boolean osnov, String mobTel, String gorTel, String email, Task doAfterDone) {
 		String main = "false";
 		if (osnov) {
 			main = "true";
@@ -1169,7 +1191,7 @@ I/System.out: 		</ВремяРаботы>
 		json = json + "\n ,\"ПлательщикНДС\":\"" + valNDS.value() + "\"";
 		json = json + "\n ,\"Удаленные\":[]";
 		json = json + "\n ,\"КонтактныеЛица\":[";
-		json = json + "\n  {\"КодКонтактногоЛица\": \"\""
+		json = json + "\n  {\"КодКонтактногоЛица\": \""+kod+"\""
 				+ "\n     ,\"КонтактноеЛицо\": \"" + kontaktLico + "\""
 				+ "\n     ,\"КодРоль\": \"" + kodRol + "\""
 				+ "\n     ,\"Должность\": \"" + doljnost + "\""
@@ -1178,6 +1200,7 @@ I/System.out: 		</ВремяРаботы>
 				+ "\n     ,\"Основное\": " + main + ""
 				+ "\n     ,\"МобильныйТелефон\": \"" + mobTel + "\""
 				+ "\n     ,\"ГородскойТелефон\": \"" + gorTel + "\""
+				+ "\n     ,\"Почта\": \"" + email + "\""
 				+ "\n   }";
 		json = json + "\n  ]";
 		json = json + "\n }";

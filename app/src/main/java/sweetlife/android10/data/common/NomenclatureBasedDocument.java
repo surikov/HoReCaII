@@ -24,7 +24,7 @@ public abstract class NomenclatureBasedDocument implements Parcelable {
 	protected Date mDate;
 	public String mNomer;
 	protected String mOtvetstvennyyKod;
-	protected boolean mProveden;
+	public boolean mProveden;
 	protected String mKontragentID;
 	protected String mKontragentName;
 	protected String mKontragentKod;

@@ -353,7 +353,7 @@ public class UIHelper {
 		System.out.println("bm is " + bm);
 		return bm;
 	}*/
-	public static void showPhotoByArtikul(final String artikul, final String name, final Context context) {
+	public static void ___showPhotoByArtikul(final String artikul, final String name, final Context context) {
 		//System.out.println("showPhotoByArtikul " + artikul);
 		if (lockShowPhotoByArtikul) {
 			quickWarning("Подождите", context);

@@ -7,7 +7,7 @@ import java.util.TimeZone;
 import org.acra.ErrorReporter;
 import org.apache.http.HttpStatus;
 
-import reactive.ui.RawSOAP;
+import reactive.ui.*;
 import sweetlife.android10.GPS;
 import sweetlife.android10.Settings;
 import sweetlife.android10.consts.ITableColumnsNames;
@@ -24,20 +24,78 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import sweetlife.android10.R;
+import tee.binding.*;
 
-public class UploadTask extends ManagedAsyncTask<String> implements ITableColumnsNames {
+public class UploadTask extends ManagedAsyncTask<String> implements ITableColumnsNames{
 	private int TIMEOUT = 300 * 1000;
 	private SQLiteDatabase mDB;
 	public String mResultString = null;
 	private String mDeviceID;
 
-	public UploadTask(SQLiteDatabase db, String deviceID, Context appContext) {
+	public UploadTask(SQLiteDatabase db, String deviceID, Context appContext){
 		super(appContext.getString(R.string.msg_send_gps_data), appContext);
 		mDB = db;
 		mDeviceID = deviceID;
 	}
 
-	public EParserResult UploadGPSPoints(String tpCode) {
+	public EParserResult UploadGPSPoints(String tpCode){
+		String sql = "select _id,BeginTime,latitude,longitude from GPSPoints where Upload=0 order by _id limit 100";
+		Cursor c;
+		int biggestID = 0;
+		TimeZone cuTZ = TimeZone.getDefault();
+		mResultString = "Выгрузка GPS: нет невыгруженных координат";
+		Bough raw = new Bough();
+		while(biggestID >= 0){
+			biggestID = -1;
+			c = mDB.rawQuery(sql, null);
+			String jsonBody = "[";
+			String dlmtr = "";
+			String BeginTime = "";
+			double latitude = 0;
+			double longitude = 0;
+			while(c.moveToNext()){
+				biggestID = c.getInt(0);
+				BeginTime = c.getString(1);
+				latitude = c.getDouble(2);
+				longitude = c.getDouble(3);
+				jsonBody = jsonBody + dlmtr + "\n{\"time\": \"" + Auxiliary.tryReFormatDate(BeginTime, "yyyy-MM-dd'T'HH:mm:ss", "yyyyMMddHHmmss") + "\""
+						+ ", \"Poyas\": " + Math.round(cuTZ.getOffset(new Date().getTime()) / (1000 * 60 * 60))
+						+ ", \"lat\": " + latitude
+						+ ", \"long\": " + longitude
+						+ "}";
+				dlmtr = ", ";
+			}
+			c.close();
+			jsonBody = jsonBody + "\n]";
+			if(biggestID >= 0){
+				mResultString = "";
+				logAndPublishProgress("выгрузка GPS за " + BeginTime);
+				String url = Settings.getInstance().getBaseURL() + Settings.getInstance().selectedBase1C() + "/hs/GPS/ZagruzkaGPS/" + Cfg.whoCheckListOwner() + "/" + tpCode;
+				System.out.println(url);
+				System.out.println(jsonBody);
+				byte[] bytes = {};
+				try{
+					bytes = jsonBody.getBytes("UTF-8");
+				}catch(Throwable t){
+					t.printStackTrace();
+				}
+				Bough resp = Auxiliary.loadTextFromPrivatePOST(url, bytes, 180000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+				System.out.println("resp: " + resp.dumpXML());
+				raw.children = Bough.parseJSON(resp.child("raw").value.property.value()).children;
+				System.out.println("raw: " + raw.dumpXML());
+				if(!raw.child("Статус").value.property.value().equals("0")){
+					mResultString = "Точки GPS не выгружены, повторите выгрузку\n\n(" + raw.child("Сообщение").value.property.value() + ")\n";
+					return EParserResult.EError;
+				}
+				mResultString = "Точки GPS выгружены: " + raw.child("Сообщение").value.property.value()+"\n";
+				String upd = "update GPSPoints set Upload=1 where Upload=0 and _id<=" + biggestID;
+				mDB.execSQL(upd);
+			}
+		}
+		return EParserResult.EComplete;
+	}
+
+	public EParserResult UploadGPSPointsOLD(String tpCode){
 		//mDB.execSQL("delete from GPSPoints where date(BeginTime)>date('now','+1 days');");
 		String sql = "select _id,BeginTime,latitude,longitude from GPSPoints where Upload=0 order by _id limit 100";
 		Cursor c;
@@ -45,7 +103,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 		TimeZone cuTZ = TimeZone.getDefault();
 		//cuTZ.get
 		mResultString = "Выгрузка GPS: нет невыгруженных координат";
-		while (biggestID >= 0) {
+		while(biggestID >= 0){
 			biggestID = -1;
 			c = mDB.rawQuery(sql, null);
 			String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>"//
@@ -56,7 +114,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 			String BeginTime = "";
 			double latitude = 0;
 			double longitude = 0;
-			while (c.moveToNext()) {
+			while(c.moveToNext()){
 				biggestID = c.getInt(0);
 				BeginTime = c.getString(1);
 				latitude = c.getDouble(2);
@@ -74,14 +132,14 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 			//		) + "</m:user>";
 			xml = xml + "<m:user>" + tpCode + "</m:user>";
 			xml = xml + "</m:Paket></m:Get></soap:Body></soap:Envelope>";
-			if (biggestID >= 0) {
+			if(biggestID >= 0){
 				//Auxiliary.inform(BeginTime, context);
 				mResultString = "";
 				logAndPublishProgress("выгрузка GPS за " + BeginTime);
 				//RawSOAP rawSOAP = new RawSOAP().url.is(Settings.getInstance().getBaseURL()+"wsgetdebt/wsGPSAndroid.1cws").xml.is(xml);
 				String gpsURL = Settings.getInstance().getBaseURL() + "wsgetdebt/wsGPSAndroid.1cws";
 				//if (Settings.getInstance().isPrimaryGate) {
-					gpsURL = Settings.getInstance().getBaseURL() + "wsGPSAndroid.1cws";
+				gpsURL = Settings.getInstance().getBaseURL() + "wsGPSAndroid.1cws";
 				//}
 				//RawSOAP rawSOAP = new RawSOAP().url.is(Settings.getInstance().getBaseURL() + "wsgetdebt/wsGPSAndroid.1cws").xml.is(xml);
 				RawSOAP rawSOAP = new RawSOAP().url.is(gpsURL).xml.is(xml);
@@ -89,20 +147,20 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 				System.out.println("gpsURL: " + gpsURL);
 				Report_Base.startPing();
 				rawSOAP.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-				if (rawSOAP.statusCode.property.value() >= 100 //
+				if(rawSOAP.statusCode.property.value() >= 100 //
 						&& rawSOAP.statusCode.property.value() <= 300//
 						&& rawSOAP.exception.property.value() == null//
-				) {
+				){
 					//send xml
 					String ok = rawSOAP.data.child("soap:Body").child("m:GetResponse").child("m:return").value.property.value();
-					if (ok.trim().length() < 1) {
+					if(ok.trim().length() < 1){
 						ok = rawSOAP.data.dumpXML();
 					}
 					mResultString = "Точки GPS выгружены: " + ok;
 					//System.out.println("rawSOAP.data.dumpXML(): " + rawSOAP.data.dumpXML());
 					String upd = "update GPSPoints set Upload=1 where Upload=0 and _id<=" + biggestID;
 					mDB.execSQL(upd);
-				} else {
+				}else{
 					mResultString = "Точки GPS не выгружены, повторите выгрузку\n\n(" + rawSOAP.statusCode.property.value() + ": " + rawSOAP.exception.property.value() + ")";
 					return EParserResult.EError;
 				}
@@ -161,14 +219,14 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 		return EParserResult.EComplete;
 	}*/
 
-	public EParserResult UploadVizits() {
+	public EParserResult UploadVizits(){
 		//mDB.execSQL("delete from Vizits where date(BeginTime)>date('now','+1 days');");
 
 		//System.out.println("UploadVizits start");
 		StringBuilder resultString = new StringBuilder();
 		Cursor cursor = null;
 		//TimeZone cuTZ = TimeZone.getDefault();
-		try {
+		try{
 			String mUserKod = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
 			/*String mUserKod = Requests.getTPCode(mDB
 					//, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()
@@ -191,27 +249,27 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 			String sql = "select * from Vizits where Upload = 0";
 			//String sql = "select * from Vizits where Upload = 0 or begindate='2016-03-23' or begindate='2016-03-24'";
 			cursor = mDB.rawQuery(sql, null);
-			if (!cursor.moveToFirst()) {
+			if(!cursor.moveToFirst()){
 				mResultString = mResultString + "\nВизиты: " + mResources.getString(R.string.msg_upload_visits_no_data);
 				return EParserResult.EComplete;
 			}
-			do {
+			do{
 				System.out.println("UploadVizits next -------------------------------");
-				try {
+				try{
 					String endTime = null;
 					String activity = null;
 					String endField = cursor.getString(cursor.getColumnIndex(ENDTIMEfieldName));
-					if (endField == null) {
+					if(endField == null){
 						endField = "";
 					}
-					if (
+					if(
 						//(endField != null)
 						//		&&
 							(endField.length() > 0)
-					) {
+					){
 						endTime = endField;
 						activity = cursor.getString(cursor.getColumnIndex(ACTIVITY));
-					} else {
+					}else{
 						endTime = cursor.getString(cursor.getColumnIndex(BEGIN_TIME));
 						activity = "Начало визита";
 					}
@@ -231,11 +289,11 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 					);
 					String requestString = null;
 					System.out.println("UploadVizits 1");
-					try {
+					try{
 						requestString = serializer.SerializeXML();
 						System.out.println("UploadVizits requestString " + requestString);
 						System.out.println("UploadVizits 2");
-					} catch (IOException e1) {
+					}catch(IOException e1){
 						System.out.println("UploadVizits 3");
 						e1.printStackTrace();
 						mProgressDialogMessage = mResources.getString(R.string.msg_upload_visits_fail);
@@ -243,43 +301,43 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 						return EParserResult.EError;
 					}
 					System.out.println("UploadVizits 4");
-					if (requestString != null && requestString.length() != 0) {
+					if(requestString != null && requestString.length() != 0){
 						System.out.println("UploadVizits 5");
 						HTTPRequest request = new HTTPRequest(Settings.getInstance().getSERVICE_VIZITS());
 						//HTTPRequest request = new HTTPRequest(Settings.getInstance().getBaseURL() +"wsgetdebt/visitsAndroidtest.1cws");
 						System.out.println("UploadVizits 6");
 						request.setTimeOut(TIMEOUT);
-						try {
+						try{
 							int r = request.Execute(requestString);
-							if (r != HttpStatus.SC_OK) {
+							if(r != HttpStatus.SC_OK){
 								resultString.append(mResources.getString(R.string.msg_upload_visits_fail)).append("\n");
 								mResultString = resultString.toString() + " \nHttpStatus=" + r + "\n";
 								//System.out.println(request.getResponse());
 								return EParserResult.EError;
 							}
-						} catch (Exception e) {
+						}catch(Exception e){
 							ErrorReporter.getInstance().handleSilentException(e);
 							resultString.append(mResources.getString(R.string.msg_upload_visits_fail)).append("\n");
 							mResultString = resultString.toString() + " \n" + e.getMessage() + "\n";
 							return EParserResult.EError;
 						}
 					}
-				} catch (Exception e) {
+				}catch(Exception e){
 					mProgressDialogMessage = mResources.getString(R.string.msg_upload_visits_fail);
 					mResultString = mProgressDialogMessage + " \n" + e.getMessage();
 				}
 			}
-			while (cursor.moveToNext());
+			while(cursor.moveToNext());
 			//System.out.println("UploadVizits done");
 			GPS.getGPSInfo().setUploadVisits();
-		} catch (Exception ex) {
+		}catch(Exception ex){
 			ErrorReporter.getInstance().handleSilentException(ex);
 			mProgressDialogMessage = mResources.getString(R.string.msg_upload_visits_fail);
 			mResultString = mProgressDialogMessage + " \n" + ex.getMessage() + "\n";
 			;
 			return EParserResult.EError;
-		} finally {
-			if (cursor != null && !cursor.isClosed()) {
+		}finally{
+			if(cursor != null && !cursor.isClosed()){
 				cursor.close();
 				cursor = null;
 			}
@@ -289,7 +347,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 		return EParserResult.EComplete;
 	}
 
-	public void logAndPublishProgress(String values) {
+	public void logAndPublishProgress(String values){
 		LogHelper.debug(this.getClass().getCanonicalName() + " logAndPublishProgress " + values);
 		/*try {
 			publishProgress(values);
@@ -300,10 +358,10 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 	}
 
 	@Override
-	protected String doInBackground(Object... arg0) {
+	protected String doInBackground(Object... arg0){
 		//String tpCode = Requests.getTPCode(ApplicationHoreca.getInstance().getDataBase());
 		String tpCode = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
-		if (UploadGPSPoints(tpCode) == EParserResult.EComplete) {
+		if(UploadGPSPoints(tpCode) == EParserResult.EComplete){
 			logAndPublishProgress(mResources.getString(R.string.msg_upload_visits));
 			UploadVizits();
 		}
@@ -311,7 +369,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 	}
 
 	@Override
-	protected void onPostExecute(String result) {
+	protected void onPostExecute(String result){
 		LogHelper.debug(this.getClass().getCanonicalName() + ".onPostExecute: " + result);
 		Bundle resultData = new Bundle();
 		resultData.putString(RESULT_STRING, result);

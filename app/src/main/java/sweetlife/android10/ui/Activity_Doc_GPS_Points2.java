@@ -17,9 +17,10 @@ public class Activity_Doc_GPS_Points2 extends Activity {
 	ColumnText columnTime;
 	ColumnText columnLat;
 	ColumnText columnLong;
-	MenuItem menuRefresh;
+	//MenuItem menuRefresh;
 	MenuItem menuOtchety;
 	MenuItem menuResetUpload;
+	MenuItem menuClear;
 	Numeric periodFrom = new Numeric();
 	Numeric periodTo = new Numeric();
 
@@ -33,9 +34,10 @@ public class Activity_Doc_GPS_Points2 extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menuRefresh = menu.add("Обновить");
+		//menuRefresh = menu.add("Обновить");
 		menuOtchety = menu.add("Отчёты");
 		menuResetUpload = menu.add("Повторить выгрузку");
+		menuClear = menu.add("Удалить выгруженные координаты");
 		return true;
 	}
 
@@ -47,17 +49,32 @@ public class Activity_Doc_GPS_Points2 extends Activity {
 			startActivity(intent);
 			return true;
 		}
-		if (item == menuRefresh) {
+		/*if (item == menuRefresh) {
 			//OnDateChanged(mFromPeriod.getTime(), mToPeriod.getTime());
 			return true;
-		}
+		}*/
 		if (item == menuResetUpload) {
 			promptResetUpload();
 			return true;
 		}
+		if (item == menuClear) {
+			promptClear();
+			return true;
+		}
+
 		return true;
 	}
+	void promptClear() {
+		Auxiliary.pickConfirm(this, "Удалить все выгруженные координаты", "Да", new Task() {
+			@Override
+			public void doTask() {
+				String sql = "delete from GPSPoints where upload=1;";
+				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+				finish();
+			}
 
+		});
+	}
 	void promptResetUpload() {
 		Auxiliary.pickConfirm(this, "Пометить все точки и визиты как невыгруженные", "Да", new Task() {
 			@Override

@@ -162,7 +162,7 @@ void doRefreshMap(){
 		}).start(this);
 	}
 	void promptSendPoint(final String shirota, final String dolgota, String name, final String kod, String beginTime) {
-		if (newPointBitmap != null) {
+		//if (newPointBitmap != null) {
 			System.out.println(shirota+"/"+dolgota);
 
 			String dt = Auxiliary.tryReFormatDate(beginTime, "yyyy-MM-dd'T'HH:mm:ss", "HH:mm:ss dd.MM.yy");
@@ -183,9 +183,9 @@ void doRefreshMap(){
 							sendNewPoint(shirota, dolgota, kod);
 						}
 					}, null, null, null, null);
-		}else{
-			Auxiliary.warn("Нет карты для "+shirota+"x"+dolgota,this);
-		}
+		//}else{
+		//	Auxiliary.warn("Нет карты для "+shirota+"x"+dolgota,this);
+		//}
 	}
 
 	void sendNewPoint(String shirota, String dolgota, String kod) {

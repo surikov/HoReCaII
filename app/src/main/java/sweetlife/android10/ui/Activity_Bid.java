@@ -855,6 +855,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				String raw_data = Auxiliary.activityExatras(this).child("raw_data").value.property.value();
 				raw_data = raw_data.replace("&", "-");
 				Bough raw = Bough.parseXML(raw_data);
+				System.out.println("raw " + raw.dumpXML());
 				Vector<Bough> tovari = raw.child("Данные").children("Товары");
 				mBidData.setBid(bid);
 				mBidData.setFoodStuffs(new FoodstuffsData(mDB, mBidData.getBid()));
@@ -2280,7 +2281,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 		for(int kk = 0; kk < tovari.size(); kk++){
 			Bough existed = tovari.get(kk);
-			System.out.println("cloneOrder tovari " + existed.child("Артикул").value.property.value().trim());
+			System.out.println("cloneOrder tovari " + existed.dumpXML());
 			try{
 				String sql = Request_NomenclatureBase.composeSQL(//
 						dataOtgruzki//
@@ -2298,25 +2299,29 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 						, this.no_assortiment);
 				Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 				Bough found = bb.child("row");
-				System.out.println(sql);
-				System.out.println(bb.dumpXML());
+				//System.out.println(sql);
+				//System.out.println(bb.dumpXML());
 				if(existed.child("Артикул").value.property.value().trim().equals(found.child("Artikul").value.property.value().trim())){
 					//System.out.println("found " + found.child("Artikul" ).value.property.value());
 					double CENA = Numeric.string2double(found.child("Cena").value.property.value());
 					double SKIDKA = Numeric.string2double(found.child("Skidka").value.property.value());
 					String VID_SKIDKI = found.child("VidSkidki").value.property.value();
-					System.out.println("" + kk + ": " + found.child("Naimenovanie").value.property.value() + ": " + VID_SKIDKI);
+					//System.out.println("found " + kk + ": " + found.child("Naimenovanie").value.property.value() + ": " + VID_SKIDKI);
 					double CENA_SO_SKIDKOY = SKIDKA > 0 ? SKIDKA : CENA;
-					if(SKIDKA == 0){
+					if(SKIDKA == 0 || VID_SKIDKI.toUpperCase().trim().equals("ЦР")){
 						if(existed.child("ЦР").value.property.value().equals("true")){
+							//System.out.println("ЦР 1");
 							if((Numeric.string2double(found.child("MinCena").value.property.value()) <= Numeric.string2double(existed.child("Цена").value.property.value()))
 									&& (Numeric.string2double(found.child("MinCena").value.property.value()) > 0)
 							){
+								//System.out.println("ЦР 2");
 								VID_SKIDKI = "x'" + sweetlife.android10.supervisor.Cfg.skidkaIdCenovoyeReagirovanie + "'";
 								CENA_SO_SKIDKOY = Numeric.string2double(existed.child("Цена").value.property.value());
 							}
 						}
+						//System.out.println("ЦР 3");
 					}
+
 					foodstuffData.newFoodstuff(//
 							"x'" + found.child("_IDRRef").value.property.value() + "'"//
 							, found.child("Artikul").value.property.value().trim()//
@@ -3933,9 +3938,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			historyArtikul.cell(Artikul, artikulBackground, click);
 			historyNomenklatura.cell(Naimenovanie, naimenovanieBackGround, click);
 			if(Naimenovanie.startsWith("СТМ:")){
-				historyProizvoditel.cell(Auxiliary.cursorString(historyCursor, "ProizvoditelNaimenovanie"),Settings.colorSTM);
+				historyProizvoditel.cell(Auxiliary.cursorString(historyCursor, "ProizvoditelNaimenovanie"), Settings.colorSTM);
 			}else{
-				historyProizvoditel.cell(Auxiliary.cursorString(historyCursor, "ProizvoditelNaimenovanie"),Settings.colorTransparent);
+				historyProizvoditel.cell(Auxiliary.cursorString(historyCursor, "ProizvoditelNaimenovanie"), Settings.colorTransparent);
 			}
 
 			historyMinKol.cell(Auxiliary.cursorString(historyCursor, "MinNorma"), click);

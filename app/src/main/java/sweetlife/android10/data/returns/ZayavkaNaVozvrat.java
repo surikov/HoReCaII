@@ -183,7 +183,7 @@ public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parce
 			values.put("DataOtgruzki", DateTimeHelper.SQLDateString(mDataOtgruzki));
 			values.put("AktPretenziy", mAktPretenziyPath);
 			values.put("_Version", mVersion);
-
+			values.put("Nomer", mNomer);
 
 			DatabaseHelper.updateInTranzaction(db, mDocumentTableName, values, "_id=" + String.valueOf(m_id), null);
 		}

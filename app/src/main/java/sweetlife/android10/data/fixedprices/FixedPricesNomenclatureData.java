@@ -8,14 +8,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 
-public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems {
+public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems{
 
-	public FixedPricesNomenclatureData(SQLiteDatabase db, ZayavkaNaSkidki zayavka) {
+	public FixedPricesNomenclatureData(SQLiteDatabase db, ZayavkaNaSkidki zayavka){
 		super(db, zayavka);
 
 		Cursor cursor = Request_FixedPriceNomenclature.RequestNomenclature(db, mZayavka.getIDRRef());
 
-		if (cursor != null && cursor.moveToFirst()) {
+		if(cursor != null && cursor.moveToFirst()){
 
 			ReadFromDataBase(cursor, db);
 
@@ -23,17 +23,17 @@ public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems 
 		}
 	}
 
-	protected void ReadFromDataBase(Cursor cursorReturnsNomenclature, SQLiteDatabase db) {
+	protected void ReadFromDataBase(Cursor cursorReturnsNomenclature, SQLiteDatabase db){
 
 		ZayavkaNaSkidki_TovaryPhiksCen nomenclature;
 
 		int nomerStroki;
 
-		do {
+		do{
 
 			nomerStroki = Request_FixedPriceNomenclature.getNomerStroki(cursorReturnsNomenclature);
 
-			if (mNomenclatureNumber < nomerStroki) {
+			if(mNomenclatureNumber < nomerStroki){
 
 				mNomenclatureNumber = nomerStroki;
 			}
@@ -52,14 +52,15 @@ public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems 
 
 			mNomenclaureList.add(nomenclature);
 		}
-		while (cursorReturnsNomenclature.moveToNext());
+		while(cursorReturnsNomenclature.moveToNext());
 
 	}
+
 	public void newFixedPriceNomenclatureWithPrice(String nomenklaturaID,
-										  String artikul,
-										  String nomenklaturaNaimenovanie
-	,double price
-	) {
+												   String artikul,
+												   String nomenklaturaNaimenovanie
+			, double price
+	){
 
 		mNomenclaureList.add(new ZayavkaNaSkidki_TovaryPhiksCen(0,
 				++mNomenclatureNumber,
@@ -72,9 +73,10 @@ public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems 
 				true//,"",""
 		));
 	}
+
 	public void newFixedPriceNomenclature(String nomenklaturaID,
 										  String artikul,
-										  String nomenklaturaNaimenovanie) {
+										  String nomenklaturaNaimenovanie){
 
 		mNomenclaureList.add(new ZayavkaNaSkidki_TovaryPhiksCen(0,
 				++mNomenclatureNumber,
@@ -88,16 +90,16 @@ public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems 
 		));
 	}
 
-	public ZayavkaNaSkidki_TovaryPhiksCen getNomenclature(int index) {
+	public ZayavkaNaSkidki_TovaryPhiksCen getNomenclature(int index){
 
-		return (ZayavkaNaSkidki_TovaryPhiksCen) mNomenclaureList.get(index);
+		return (ZayavkaNaSkidki_TovaryPhiksCen)mNomenclaureList.get(index);
 	}
 
-	public boolean IsAllDataFilled() {
+	public boolean IsAllDataFilled(){
 
-		for (NomenclatureBasedItem item : mNomenclaureList) {
+		for(NomenclatureBasedItem item: mNomenclaureList){
 
-			if (((ZayavkaNaSkidki_TovaryPhiksCen) item).getCena() == 0) {
+			if(((ZayavkaNaSkidki_TovaryPhiksCen)item).getCena() == 0){
 
 				return false;
 			}
@@ -105,24 +107,24 @@ public class FixedPricesNomenclatureData extends NomenclatureBasedDocumentItems 
 		return true;
 	}
 
-	public void WriteToDataBase(SQLiteDatabase db) {
+	public void WriteToDataBase(SQLiteDatabase db){
 
 		db.beginTransactionNonExclusive();
 
-		try {
+		try{
 
-			for (NomenclatureBasedItem item : mNomenclaureList) {
+			for(NomenclatureBasedItem item: mNomenclaureList){
 
 				item.setToDataBase(db);
 			}
 
-			for (Integer id : mIDsForDelete) {
+			for(Integer id: mIDsForDelete){
 
 				db.execSQL("delete from ZayavkaNaSkidki_TovaryPhiksCen where _id = " + id.toString());
 			}
 
 			db.setTransactionSuccessful();
-		} finally {
+		}finally{
 
 			db.endTransaction();
 		}

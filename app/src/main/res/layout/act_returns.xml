@@ -147,7 +147,13 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
 			android:text="@string/nomenclature" />
+		<Button
+			android:id="@+id/btn_upload_vozvrat"
+			android:layout_width="250dip"
+			android:layout_height="wrap_content"
 
+			android:layout_toLeftOf="@+id/btn_save"
+			android:text="Выгрузить" />
 		<Button
 			android:id="@+id/btn_save"
 			android:layout_width="250dip"

@@ -68,7 +68,7 @@ public class Activity_NomenclatureNew extends Activity{
 	static int color4 = 0x40000000;
 	static int color5 = 0x50000000;
 	Layoutless layoutless;
-	int itemsMaxCount = 200;
+	int itemsMaxCount = 33;
 	Bough selectedRow = null;
 	RedactSingleChoice choiceKuhnya;
 	RedactText searchHistoryBox;
@@ -133,6 +133,7 @@ public class Activity_NomenclatureNew extends Activity{
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
+		System.out.println("Activity_NomenclatureNew.onCreate");
 		super.onCreate(savedInstanceState);
 		Activity_NomenclatureNew.this.stopBackgroundActions=false;
 		buildUI();
@@ -445,7 +446,7 @@ public class Activity_NomenclatureNew extends Activity{
 	void requeryGridData(){
 
 		//searchWeb();
-		//System.out.println("requeryGridData mode " + filterBySTM.value());
+		System.out.println("requeryGridData mode " + mode.value()+"/"+searchWord.value());
 		if(mode.value() == ShowViewIstoria){
 			String sql = Request_NomenclatureBase.composeSQLall_Old(//.composeSQLall(//
 					DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
@@ -473,7 +474,7 @@ public class Activity_NomenclatureNew extends Activity{
 			int searchBy = sweetlife.android10.database.nomenclature.ISearchBy.SEARCH_ARTICLE;
 			if(mode.value() == ShowViewPoisk){
 				String filter = searchWord.value();
-				if(searchMode.value() == 3){
+				if(searchMode.value() == 3 && searchWord.value().trim().length()>0){
 					filter = searchWeb();
 					if(filter.equals("")){
 						searchBy = ISearchBy.SEARCH_NAME;
@@ -482,10 +483,10 @@ public class Activity_NomenclatureNew extends Activity{
 						searchBy = ISearchBy.SEARCH_CUSTOM;
 					}
 				}else{
-					if(searchMode.value() == 1){
+					if(searchMode.value() == 1 || searchWord.value().trim().length()==0){
 						searchBy = ISearchBy.SEARCH_NAME;
 					}
-					if(searchMode.value() == 2){
+					if(searchMode.value() == 2 ){
 						searchBy = ISearchBy.SEARCH_VENDOR;
 					}
 				}
@@ -524,7 +525,7 @@ public class Activity_NomenclatureNew extends Activity{
 						, filterStmStarRecomendaciaKorzina.value() == 3
 						, filterStmStarRecomendaciaKorzina.value() == 4, false
 				);
-				System.out.println("Activity_NomenclatureNew.requeryGridData" + sql);
+				//System.out.println("Activity_NomenclatureNew.requeryGridData" + sql);
 				itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 				//}
 			}else{
@@ -566,6 +567,7 @@ public class Activity_NomenclatureNew extends Activity{
 				}
 			}
 		}
+		System.out.println("requeryGridData done");
 	}
 
 	Intent SetActivityResult(){
@@ -1032,6 +1034,7 @@ public class Activity_NomenclatureNew extends Activity{
 	@Override
 	protected void onPause(){
 		super.onPause();
+		System.out.println("Activity_NomenclatureNew.onPause");
 		Activity_NomenclatureNew.this.stopBackgroundActions=true;
 		me = null;
 		double newOffset = Math.floor(gridOffset.value() + this.gridItems.scrollView.getScrollY() / Auxiliary.tapSize);
@@ -1047,6 +1050,7 @@ public class Activity_NomenclatureNew extends Activity{
 	@Override
 	protected void onResume(){
 		super.onResume();
+		System.out.println("Activity_NomenclatureNew.onResume");
 		Activity_NomenclatureNew.this.stopBackgroundActions=false;
 		me = this;
 		//doRefreshData.start();
