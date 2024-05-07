@@ -351,6 +351,26 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				bg = 0xffdddddd;
 			}*/
 			String compArt = art;
+			if(row.child("LastSell").value.property.value().trim().length() > 0){
+				bg = 0xffdddddd;//grey
+				SimpleDateFormat sdf = new SimpleDateFormat(("yyyy-MM-dd"));
+				Date val = new Date();
+				try{
+					val = sdf.parse(row.child("LastSell").value.property.value());
+				}catch(Throwable tt){
+					tt.printStackTrace();
+				}
+				if(val.before(lostedLimit)){
+					bg = 0xffff6699;//pink
+				}
+				//compArt = art + " " + row.child("LastSell").value.property.value();
+			}else{
+				if(row.child("artCount").value.property.value().length() > 0){
+					bg = 0xffddffdd;//green
+				}
+			}
+
+			/*
 			if(row.child("artCount").value.property.value().length() > 0){
 				bg = 0xffddffdd;//green
 			}else{
@@ -370,6 +390,9 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				}
 
 			}
+			*/
+
+
             /*columnProduct.cell(
                     row.child("Artikul").value.property.value() + ": " + row.child("Naimenovanie").value.property.value()
                     ,tap3

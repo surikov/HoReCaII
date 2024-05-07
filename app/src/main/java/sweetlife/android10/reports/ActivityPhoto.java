@@ -2,8 +2,11 @@ package sweetlife.android10.reports;
 
 import android.app.Activity;
 
+import android.content.*;
 import android.graphics.*;
 import android.os.Bundle;
+
+import java.io.*;
 
 import reactive.ui.*;
 import sweetlife.android10.ApplicationHoreca;
@@ -17,6 +20,7 @@ import tee.binding.*;
 
 public class ActivityPhoto extends Activity{
 	Layoutless layoutless;
+	WebRender brwsr;
 	public static String artikulField = "artikulField";
 	public static String nameField = "nameField";
 	Bitmap bm = null;
@@ -82,7 +86,27 @@ public class ActivityPhoto extends Activity{
 				.left().is(layoutless.width().property.divide(2))//
 				.top().is(Auxiliary.tapSize * 0.5)//
 		);
-		String description = "";
+		brwsr = new WebRender(this).afterLink.is(new Task() {
+			@Override
+			public void doTask() {
+				try {
+					final android.net.Uri uri = android.net.Uri.parse(brwsr.url.property.value());
+					System.out.println(uri);
+					Intent openUrlIntent = new Intent(Intent.ACTION_VIEW, uri);
+					ActivityPhoto.this.startActivity(openUrlIntent);
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		});
+		layoutless.child(brwsr//
+				.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 0.7))//
+				.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 1.2))//
+				.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize *0.1))//
+				.top().is(Auxiliary.tapSize*0.6)//
+		);
+
+		String description = "<html><body>";
 		description = description + "<p><i>Производитель:</i> <b>" + proizvoditel + "</b></p>";
 		description = description + "<p><i>Срок годности:</i> " + SrokGodnosti + "</p>";
 		description = description + "<p><i>Квант:</i> " + EdinicyIzmereniyaNaimenovanie + "</p>";
@@ -97,26 +121,41 @@ public class ActivityPhoto extends Activity{
 			java.util.Vector<Bough> kontakts = all.get(ii).children("Контакты");
 			String delimtr = ": <i>";
 			for(int kk = 0; kk < kontakts.size(); kk++){
-				if(kontakts.get(kk).child("Контакт").value.property.value().length()>3){
-					description = description + delimtr
-							+ kontakts.get(kk).child("ВидКонтакта").value.property.value()
-							+ ": "
-							+ kontakts.get(kk).child("Контакт").value.property.value();
+				if(kontakts.get(kk).child("Контакт").value.property.value().length() > 3){
+					String vid = kontakts.get(kk).child("ВидКонтакта").value.property.value().trim();
+					String znach = kontakts.get(kk).child("Контакт").value.property.value().trim();
+					description = description + delimtr + vid;
+					if(isemail(znach)){
+						description = description + ": <a href='mailto:" + znach + "'>" + znach + "</a>";
+					}else{
+						description = description + ": " + znach + "";
+					}
 					delimtr = ", ";
 				}
 			}
 			description = description + "</i></li>";
 		}
 		description = description + "</ul>";
+		description = description + "</body></html>";
+		/*
 		layoutless.child(new HTMLBox(ActivityPhoto.this)//.background.is(0xffccff99)//
-				.htmlText.is(description)//
+				.htmlText.is(description + description + description)//
 				.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 1.5))//
 				.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 2))//
 				.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize / 2))//
 				.top().is(Auxiliary.tapSize)//
-		);
+		);*/
+		String page = Cfg.workFolder+"artikul.html";
+		File html = new File(page);
+		Auxiliary.writeTextToFile(html, description, "utf-8");
+		brwsr.go("file://" + page);
 	}
 
+	boolean isemail(String emailStr){
+		java.util.regex.Pattern emailRegex = java.util.regex.Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", java.util.regex.Pattern.CASE_INSENSITIVE);
+		java.util.regex.Matcher matcher = emailRegex.matcher(emailStr);
+		return matcher.matches();
+	}
 
 	void loadPhoto(final String a){
 		new Expect().status.is("Подождите...").task.is(new Task(){

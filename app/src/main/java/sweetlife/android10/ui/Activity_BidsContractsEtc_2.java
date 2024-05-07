@@ -3,6 +3,7 @@ package sweetlife.android10.ui;
 import android.app.*;
 //import android.app.Activity;
 import android.content.*;
+import android.net.*;
 import android.os.*;
 import android.view.*;
 
@@ -26,6 +27,7 @@ import android.database.sqlite.*;
 
 import java.text.*;
 import java.util.*;
+import java.io.*;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -35,6 +37,16 @@ import sweetlife.android10.*;
 public class Activity_BidsContractsEtc_2 extends Activity{
 
 	static String checkedTerritoryKod = null;
+
+	final int etiketkaObratnayaSvyazKlientPicture = 734766;
+	final int tovarObratnayaSvyazKlientPicture = 1098834;
+
+	Note docNumObratnayaSvyazKlient = new Note();
+	Note artikulObratnayaSvyazKlient = new Note();
+	Note etiketkaObratnayaSvyazKlient = new Note();
+	Note tovarObratnayaSvyazKlient = new Note();
+	Note commentObratnayaSvyazKlient = new Note();
+	Numeric dateObratnayaSvyazKlient = new Numeric();
 
 	Layoutless layoutless;
 	DataGrid dataGrid;
@@ -49,13 +61,14 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 	MenuItem menuShoMap;
 	//MenuItem menuRequestMailList;
 	MenuItem menuKlientPeople;
+	MenuItem menuObratnayaSvyazKlient;
 
 	MenuItem menuSklad;
 
 	MenuItem menuSendLimit;
 	MenuItem menuClearFixPrice;
 
-	MenuItem menuZayavakaRazdelenieNakladnih;
+	//MenuItem menuZayavakaRazdelenieNakladnih;
 
 
 	MenuItem menuVislatNakladnieNaPochtu;
@@ -86,26 +99,29 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
+		menuAktSverki = menu.add("Акты сверки клиента");
+		menuVzaimoraschety = menu.add("Взаиморасчёты с контрагентом");
+		menuVislatNakladnieNaPochtu = menu.add("Выслать накладные на почту");
+		menuDostavkaKarta = menu.add("Доставка на карте");
+		menuKlienta = menu.add("Заметки");
+		//menuZayavakaRazdelenieNakladnih = menu.add("Заявки на разделение накладной");
+		menuSendLimit = menu.add("Заявка на увеличение лимита");
+		menuKlientPeople = menu.add("Контактные лица клиента");
+		menuObnoIstoria = menu.add("Обновить историю");
+		menuObratnayaSvyazKlient = menu.add("Обратная связь от клиента");
 		menuOtchety = menu.add("Отчёты");
 		menuPechati = menu.add("Печати контрагента");
-		menuVzaimoraschety = menu.add("Взаиморасчёты с контрагентом");
+		menuShoMap = menu.add("Показать на карте");
+		menuRassylkaSchetovNaOplatu = menu.add("Рассылка счетов на оплату");
+		menuClearFixPrice = menu.add("Удалить заявки на фикс.цены");
+
 		//menuChekList = menu.add("Чек-лист");
 		//menuKartaKlienta = menu.add("Карта клиента");
-		menuObnoIstoria = menu.add("Обновить историю");
-		menuShoMap = menu.add("Показать на карте");
-		menuDostavkaKarta = menu.add("Доставка на карте");
+
+
 		//menuRequestMailList = menu.add("Выслать шаблон заказа");
 		//menuSklad = menu.add("Установить склад");
 
-		menuSendLimit = menu.add("Заявка на увеличение лимита");
-		menuZayavakaRazdelenieNakladnih = menu.add("Заявки на разделение накладной");
-
-		menuClearFixPrice = menu.add("Удалить заявки на фикс.цены");
-		menuKlientPeople = menu.add("Контактные лица клиента");
-		menuVislatNakladnieNaPochtu = menu.add("Выслать накладные на почту");
-		menuKlienta = menu.add("Заметки");
-		menuAktSverki = menu.add("Акты сверки клиента");
-		menuRassylkaSchetovNaOplatu = menu.add("Рассылка счетов на оплату");
 
 		//menuZayavkaNaPerevodVdosudebnye = menu.add("Заявка на перевод в досудебные");
 
@@ -178,11 +194,12 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 			promptLimit();
 			return true;
 		}
+		/*
 		if(item == menuZayavakaRazdelenieNakladnih){
 			promptZayavkaRazdelenieNakladnih();
 			return true;
 		}
-
+*/
 		if(item == menuClearFixPrice){
 			promptDeleteFixPrices();
 			return true;
@@ -208,6 +225,10 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 		}
 		if(item == menuRassylkaSchetovNaOplatu){
 			promptRassylkaSchetovNaOplatu();
+			return true;
+		}
+		if(item == menuObratnayaSvyazKlient){
+			promptObratnayaSvyazKlient();
 			return true;
 		}
 /*
@@ -350,6 +371,187 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 			}
 		};
 		Auxiliary.pickSingleChoice(this, listItems, defaultSelection, title, afterSelect, positiveButtonTitle, callbackPositiveBtn, null, null);
+	}
+
+	boolean okObratnayaSvyazKlient(){
+		if(docNumObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не заполнен номер реализации", this);
+			return false;
+		}
+		if(dateObratnayaSvyazKlient.value() < 3){
+			Auxiliary.warn("Не заполнена дата реализации", this);
+			return false;
+		}
+		if(commentObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не заполнен комментарий", this);
+			return false;
+		}
+		if(artikulObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не указан артикул", this);
+			return false;
+		}
+		if(etiketkaObratnayaSvyazKlient.value().length() < 3 && tovarObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не добавлены фото", this);
+			return false;
+		}
+		return true;
+	}
+
+	void promptObratnayaSvyazKlient(){
+
+		Auxiliary.pick(this, "", new SubLayoutless(this)//
+						.child(new Decor(this).labelText.is("Обратная связь").top().is(Auxiliary.tapSize * 0.5).left().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("№ реализации").labelAlignRightTop().top().is(Auxiliary.tapSize * 1.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(docNumObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 1.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("дата реализации").labelAlignRightTop().top().is(Auxiliary.tapSize * 2.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactDate(this).date.is(dateObratnayaSvyazKlient).format.is("dd.MM.yyyy").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 2.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("комментарий").labelAlignRightTop().top().is(Auxiliary.tapSize * 3.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(commentObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 3.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("артикул").labelAlignRightTop().top().is(Auxiliary.tapSize * 4.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(artikulObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 4.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("фото этикетки").labelAlignLeftTop().left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 5.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(etiketkaObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 6).width().is(Auxiliary.tapSize * 7.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								etiketkaObratnayaSvyazKlient.value("");
+							}
+						}).left().is(Auxiliary.tapSize * 7.5).top().is(Auxiliary.tapSize * 6).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(this).labelText.is("...").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								Auxiliary.startMediaGallery(Activity_BidsContractsEtc_2.this, etiketkaObratnayaSvyazKlientPicture);
+							}
+						}).left().is(Auxiliary.tapSize * 8.5).top().is(Auxiliary.tapSize * 6).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("фото товара").labelAlignLeftTop().left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 7).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(tovarObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 7.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								tovarObratnayaSvyazKlient.value("");
+							}
+						}).left().is(Auxiliary.tapSize * 7.5).top().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(this).labelText.is("...").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								Auxiliary.startMediaGallery(Activity_BidsContractsEtc_2.this, tovarObratnayaSvyazKlientPicture);
+							}
+						}).left().is(Auxiliary.tapSize * 8.5).top().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+
+
+						.width().is(Auxiliary.tapSize * 10)//
+						.height().is(Auxiliary.tapSize * 11)//
+				, "Отправить", new Task(){
+					@Override
+					public void doTask(){
+						if(okObratnayaSvyazKlient()){
+							sendObratnayaSvyazKlient();
+						}
+					}
+				}, null, null, null, null);
+	}
+
+	void sendObratnayaSvyazKlient(){
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/FeedbackCustomer/Создать/" + Cfg.whoCheckListOwner();
+		System.out.println("url " + url);
+		String data = "{"
+				+ "\n	\"NumberDoc\": \"" + Auxiliary.mssqlTime.format(new Date()) + "\","
+				+ "\n	\"CodClient\": \"" + ApplicationHoreca.getInstance().getClientInfo().getKod() + "\","
+				+ "\n	\"Товары\": [{"
+				+ "\n			\"Article\": \"" + artikulObratnayaSvyazKlient.value() + "\","
+				+ "\n			\"NumberNac\": \"" + docNumObratnayaSvyazKlient.value() + "\","
+				+ "\n			\"DateNac\": \"" + Auxiliary.sqliteDate.format(new Date(dateObratnayaSvyazKlient.value().longValue())) + "\","
+				+ "\n			\"Comment\": \"" + commentObratnayaSvyazKlient.value() + "\""
+				+ "\n		}"
+				+ "\n	],"
+				+ "\n	\"Files\": [";
+		if(etiketkaObratnayaSvyazKlient.value().length() > 3){
+			String filePath = etiketkaObratnayaSvyazKlient.value().trim();
+			String encodedFile = android.util.Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), android.util.Base64.NO_WRAP);
+			String[] spl = filePath.split("\\.");
+			String rash = spl[spl.length - 1];
+			data = data + "\n		{\"File\": \"" + encodedFile + "\", \"rassh\": \"" + rash + "\"}";
+			if(tovarObratnayaSvyazKlient.value().length() > 3){
+				filePath = tovarObratnayaSvyazKlient.value().trim();
+				encodedFile = android.util.Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), android.util.Base64.NO_WRAP);
+				spl = filePath.split("\\.");
+				rash = spl[spl.length - 1];
+				data = data + "\n		,{\"File\": \"" + encodedFile + "\", \"rassh\": \"" + rash + "\"}";
+			}
+		}else{
+			if(tovarObratnayaSvyazKlient.value().length() > 3){
+				String filePath = tovarObratnayaSvyazKlient.value().trim();
+				String encodedFile = android.util.Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), android.util.Base64.NO_WRAP);
+				String[] spl = filePath.split("\\.");
+				String rash = spl[spl.length - 1];
+				data = data + "\n		{\"File\": \"" + encodedFile + "\", \"rassh\": \"" + rash + "\"}";
+			}
+		}
+		data = data + "\n	]"
+				+ "\n}"
+				+ "\n";
+		final String body = data;
+		//https://service.swlife.ru/hrc120107/hs/FeedbackCustomer/Создать/hrc221
+		//if(etiketkaObratnayaSvyazKlient.value().length() < 3 && tovarObratnayaSvyazKlient.value().length() < 3){
+		//14:44
+		System.out.println("body " + body);
+		final Note result = new Note();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					//Bough b = Auxiliary.loadTextFromPublicPOST(url, post, 99, "UTF-8");
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url, body.getBytes("UTF-8"), 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					System.out.println(b.dumpXML());
+					result.value(Bough.parseJSON(b.child("raw").value.property.value()).child("Сообщение").value.property.value());
+
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Auxiliary.warn("Результат: " + result.value(), Activity_BidsContractsEtc_2.this);
+			}
+		}).status.is("Отправка").start(this);
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + data);
+		super.onActivityResult(requestCode, resultCode, data);
+		String filePath = null;
+		Uri uri = null;
+		if(resultCode == RESULT_OK){
+			switch(requestCode){
+				case etiketkaObratnayaSvyazKlientPicture:
+					uri = data.getData();
+					filePath = Auxiliary.pathForMediaURI(this, uri);
+					if(filePath == null){
+						Auxiliary.warn("Не удалось прочитать " + uri, Activity_BidsContractsEtc_2.this);
+						return;
+					}
+					etiketkaObratnayaSvyazKlient.value(filePath);
+					break;
+				case tovarObratnayaSvyazKlientPicture:
+					uri = data.getData();
+					filePath = Auxiliary.pathForMediaURI(this, uri);
+					if(filePath == null){
+						Auxiliary.warn("Не удалось прочитать " + uri, Activity_BidsContractsEtc_2.this);
+						return;
+					}
+					tovarObratnayaSvyazKlient.value(filePath);
+					break;
+			}
+		}
 	}
 
 	void promptRassylkaSchetovNaOplatu(){
@@ -676,7 +878,7 @@ I/System.out: </>
 					}
 				}, null, null, null, null);
 	}
-
+/*
 	void promptZayavkaRazdelenieNakladnih(){
 		final Calendar current = Calendar.getInstance();
 		final Numeric result = new Numeric();
@@ -695,7 +897,8 @@ I/System.out: </>
 			}
 		});
 	}
-
+*/
+/*
 	void sendZayavkaRazdelenieNakladnih(String kod, String data){
 		//https://service.swlife.ru/hrc120107/hs/RazdelenieNakladnih/104717/20230104
 		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/RazdelenieNakladnih/" + kod + "/" + data;
@@ -719,7 +922,7 @@ I/System.out: </>
 			}
 		}).status.is("Отправка данных").start(this);
 	}
-
+*/
 	void promptLimit(){
 		Intent intent = new Intent();
 		intent.setClass(this, ActivityLimitList.class);
@@ -807,7 +1010,7 @@ I/System.out: </>
 		if(skladNum.equals("000000009")){
 			sel.value(1);
 		}
-		Auxiliary.pickSingleChoice(this, new String[]{"Только 8 склад", "8 и 17 склад"}, sel//
+		Auxiliary.pickSingleChoice(this, new String[]{"Только 8 склад", "8 и 17 склад" }, sel//
 				, "Склады отгрузок"//
 				, new Task(){
 					@Override

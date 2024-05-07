@@ -18,6 +18,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+
+import tee.binding.*;
+import tee.binding.it.*;
+import tee.binding.task.*;
+
+import tee.binding.properties.*;
+import reactive.ui.*;
+
 public class Dialog_Upload extends Activity_Base implements Observer {
 	/*final String easterEggFlag = "/sdcard/horeca/1apr.txt";
 

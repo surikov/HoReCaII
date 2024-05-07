@@ -414,7 +414,12 @@ public class Cfg {
 		new Expect().status.is(resultMessage).task.is(new Task() {
 			@Override
 			public void doTask() {
+
 				String url = Settings.getInstance().getBaseURL() + "DanniePoTovaram.1cws";
+
+				System.out.println("url " + url);
+				System.out.println("soapXML " + soapXML);
+
 				rr.url.is(url).xml.is(soapXML);
 				rr.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 			}

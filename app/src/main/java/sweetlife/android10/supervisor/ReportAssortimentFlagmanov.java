@@ -111,7 +111,8 @@ public class ReportAssortimentFlagmanov extends Report_Base{
 		if(nn > 0){
 			if(this.foldersList() != null){
 				if(nn - 1 < foldersList().children.size()){
-					pp = "{\"ДопИерархия\":\"" + foldersList().children.get(nn - 1).child("kod1").value.property.value() + "\"}";
+					//pp = "{\"ДопИерархия\":\"" + foldersList().children.get(nn - 1).child("kod1").value.property.value() + "\"}";
+					pp = "{\"Сегмент\":\"" + foldersList().children.get(nn - 1).child("kod").value.property.value() + "\"}";
 				}
 			}
 		}
@@ -152,6 +153,7 @@ public class ReportAssortimentFlagmanov extends Report_Base{
 						+ "		join nomenklatura par on par._idrref=itm.Roditel"
 						+ "	where itm.EtoGruppa=x'01' and itm.PometkaUdaleniya=x'00'"
 						+ "	order by par.naimenovanie,itm.naimenovanie;";*/
+				/*
 			String sql = "select * from ("
 					+ "\n		select item.naimenovanie as item"
 					+ "\n		,folder1.naimenovanie as folder1,folder1.kod as kod1"
@@ -172,6 +174,8 @@ public class ReportAssortimentFlagmanov extends Report_Base{
 					+ "\n	where folder1.EtoGruppa=x'01' and folder1.PometkaUdaleniya=x'00'"
 					+ "\n	group by folder1._idrref"
 					+ "\n	) order by folder2,cnt;";
+			*/
+			String sql = "select segmentkod as kod, segmentname as name from PlanSegmentov group by Segmentkod order by segmentname";
 			foldersdata = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		}
 		return foldersdata;
@@ -186,7 +190,8 @@ public class ReportAssortimentFlagmanov extends Report_Base{
 			arts.item("[Все]");
 			for(int ii = 0; ii < foldersList().children.size(); ii++){
 				//arts.item(data.children.get(ii).child("title").value.property.value() + ", код " + data.children.get(ii).child("kod").value.property.value() + "");
-				String label = "";
+				String label = foldersList().children.get(ii).child("name").value.property.value();
+				/*
 				if(foldersList().children.get(ii).child("cnt").value.property.value().equals("0")){
 					label = foldersList().children.get(ii).child("folder2").value.property.value();
 				}else{
@@ -196,7 +201,9 @@ public class ReportAssortimentFlagmanov extends Report_Base{
 						label = foldersList().children.get(ii).child("folder1").value.property.value();
 					}
 				}
+				*/
 				//label=foldersList().children.get(ii).child("folder1").value.property.value()+foldersList().children.get(ii).child("folder2").value.property.value();
+
 				arts.item(label);
 			}
 			propertiesForm = new SubLayoutless(context);

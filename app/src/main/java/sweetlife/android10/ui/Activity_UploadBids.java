@@ -382,11 +382,18 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 										kolichestvo.update(gridNum);
 									}
 								};
+								long ms=0;
+								try{
+									ms = Auxiliary.sqliteDate.parse(dataOtgruzki).getTime();
+								}catch(Throwable t){
+									t.printStackTrace();
+								}
 								Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(
 										//Activity_UploadBids.this.mList
 										Activity_UploadBids.this.lastDialogView
 										, mOnPopupClose
-										, zayavkaPokupatelya_Foodstaff);
+										, zayavkaPokupatelya_Foodstaff
+										,ms);
 								popup.showLikeQuickAction();
 							}
 						};

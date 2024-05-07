@@ -20,6 +20,7 @@ public class ReportDZDlyaTP extends Report_Base {
 	Numeric dateTo = new Numeric();
 	//Numeric territory = new Numeric();
 	Numeric whoPlus1 = new Numeric();
+	Numeric territory = new Numeric();
 
 	public ReportDZDlyaTP(ActivityWebServicesReports p) {
 		super(p);
@@ -96,7 +97,7 @@ public class ReportDZDlyaTP extends Report_Base {
 		}
 		dateFrom.value(Numeric.string2double(b.child("dateFrom").value.property.value()));
 		dateTo.value(Numeric.string2double(b.child("dateTo").value.property.value()));
-		//territory.value(Numeric.string2double(b.child("territory").value.property.value()));
+		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
 		whoPlus1.value(Numeric.string2double(b.child("who").value.property.value()));
 		//System.out.println("---readForm "+whoPlus1.value());
 	}
@@ -106,7 +107,7 @@ public class ReportDZDlyaTP extends Report_Base {
 		Bough b = new Bough().name.is(getFolderKey());
 		b.child("dateFrom").value.is("" + dateFrom.value());
 		b.child("dateTo").value.is("" + dateTo.value());
-		//b.child("territory").value.is("" + territory.value());
+		b.child("territory").value.is("" + territory.value());
 		b.child("who").value.is("" + whoPlus1.value());
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
@@ -125,7 +126,7 @@ public class ReportDZDlyaTP extends Report_Base {
 		b.child("dateTo").value.is("" + d);
 		//b.child("shipFrom").value.is("" + (d + 1 * 24 * 60 * 60 * 1000.0));
 		//b.child("shipTo").value.is("" + (d + 1 * 24 * 60 * 60 * 1000.0));
-		//b.child("territory").value.is("0");
+		b.child("territory").value.is("0");
 		b.child("who").value.is("0");
 		String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
 		Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
@@ -186,7 +187,9 @@ public class ReportDZDlyaTP extends Report_Base {
 				//+ "GolovaNew"//
 				+Settings.selectedBase1C()//
 				+ "/hs/Report/"//
-				+ serviceName+"/" + Cfg.whoCheckListOwner()//
+				+ serviceName+"/"
+				//+ Cfg.whoCheckListOwner()//
+				+ Cfg.territory().children.get(territory.value().intValue()).child("hrc").value.property.value().trim()
 				+ "?param=" + e//
 				;
 
@@ -200,12 +203,12 @@ public class ReportDZDlyaTP extends Report_Base {
 	public SubLayoutless getParametersView(Context context) {
 		if (propertiesForm == null) {
 			propertiesForm = new SubLayoutless(context);
-			//RedactSingleChoice terr = new RedactSingleChoice(context);
-			//terr.selection.is(territory);
-		/*for(int i = 0; i < Cfg.territory().children.size(); i++) {
+			RedactSingleChoice terr = new RedactSingleChoice(context);
+			terr.selection.is(territory);
+		for(int i = 0; i < Cfg.territory().children.size(); i++) {
 			String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
 			terr.item(s);
-		}*/
+		}
 			RedactFilteredSingleChoice kontr = new RedactFilteredSingleChoice(context);
 			kontr.selection.is(whoPlus1);
 			//kontr.item("[Все контрагенты]");
@@ -226,6 +229,8 @@ public class ReportDZDlyaTP extends Report_Base {
 					.input(context, 1, Auxiliary.tapSize * 0.3, "Дата от", new RedactDate(context).date.is(dateFrom).format.is("dd.MM.yyyy"))//
 					.input(context, 2, Auxiliary.tapSize * 0.3, "до", new RedactDate(context).date.is(dateTo).format.is("dd.MM.yyyy"))//
 					.input(context, 3, Auxiliary.tapSize * 0.3, "Контрагент", kontr, Auxiliary.tapSize * 9)//
+
+					.input(context, 4, Auxiliary.tapSize * 0.3, "Подразделение", terr)//
 			;
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("На сегодня")//
@@ -243,7 +248,7 @@ public class ReportDZDlyaTP extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -256,7 +261,7 @@ public class ReportDZDlyaTP extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 1 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 1 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);
@@ -270,7 +275,7 @@ public class ReportDZDlyaTP extends Report_Base {
 						}
 					})//
 					.left().is(propertiesForm.shiftX.property.plus(Auxiliary.tapSize * (0.3 + 0 * 2.5)))//
-					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 4 + 2 + 0.5)))//
+					.top().is(propertiesForm.shiftY.property.plus(Auxiliary.tapSize * (1.5 * 5 + 2 + 0.5)))//
 					.width().is(Auxiliary.tapSize * 2.5)//
 					.height().is(Auxiliary.tapSize * 0.8)//
 			);

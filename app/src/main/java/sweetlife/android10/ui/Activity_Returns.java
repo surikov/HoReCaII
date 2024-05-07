@@ -1,6 +1,7 @@
 package sweetlife.android10.ui;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.Calendar;
 import java.util.regex.*;
 
@@ -21,8 +22,7 @@ import sweetlife.android10.widgets.BetterPopupWindow.OnCloseListener;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.*;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -41,14 +41,19 @@ import tee.binding.*;
 import tee.binding.it.*;
 import tee.binding.task.*;
 
+import tee.binding.properties.*;
+import reactive.ui.*;
+
+
 public class Activity_Returns extends Activity_Base implements ITableColumnsNames, IRemoveItem{
 
 	//private EditText mEditShippingDate;
 	MenuItem menuDelete;
+	MenuItem menuClearFiles;
 	//MenuItem menuUploadDocument;
 	//MenuItem menuAddFile;
 	//MenuItem menuDoFoto;
-	String uploadedDocId = "";
+	//String uploadedDocId = "";
 
 	int prichinaNum = 0;
 	private ListView mReturnsList;
@@ -63,6 +68,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	private Calendar mShippingDate;
 	private ReturnsNomenclatureData mReturnsNomenclatureData;
 	private CameraCaptureHelper mCameraHelper;
+
 	private OnCloseListener mOnPopupClose = new OnCloseListener(){
 		@Override
 		public void onClose(int param){
@@ -71,6 +77,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 			mHasChanges = true;
 		}
 	};
+	/*
 	private OnClickListener mUploadDoc = new OnClickListener(){
 		@Override
 		public void onClick(View arg0){
@@ -92,6 +99,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 			});
 		}
 	};
+	*/
 	private OnClickListener mNomenclatureClick = new OnClickListener(){
 		@Override
 		public void onClick(View arg0){
@@ -109,21 +117,23 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	private OnClickListener mCameraClick = new OnClickListener(){
 		@Override
 		public void onClick(View arg0){
-			if(uploadedDocId.length()<1){
+			/*if(uploadedDocId.length()<1){
 				Auxiliary.warn("Выгрузите заявку для добавления файла." , Activity_Returns.this);
 				return;
-			}
+			}*/
+			//if(mIsEditable)
 			startCameraTakePicture();
 		}
 	};
 	private OnClickListener mGalleryClick = new OnClickListener(){
 		@Override
 		public void onClick(View arg0){
-			if(uploadedDocId.length()<1){
+			/*if(uploadedDocId.length()<1){
 				Auxiliary.warn("Выгрузите заявку для добавления файла." , Activity_Returns.this);
 				return;
-			}
-			startMediaGallery();
+			}*/
+			//if(mIsEditable)
+			Auxiliary.startMediaGallery(Activity_Returns.this,GET_GALLERY_PICTURE2);
 		}
 	};
 
@@ -142,6 +152,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		//menuUploadDocument = menu.add("Выгрузить заявку");
 		//menuAddFile = menu.add("Добавить файл");
 		//menuDoFoto = menu.add("Добавить фото");
+		menuClearFiles = menu.add("Удалить все вложения");
 		return true;
 	}
 
@@ -151,6 +162,11 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 			promptDelete();
 			return true;
 		}
+		if(item == menuClearFiles){
+			promptClear();
+			return true;
+		}
+
 		/*if(item == menuUploadDocument){
 			promptUploadDocument();
 			return true;
@@ -166,66 +182,74 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		return false;
 	}
 
-	void uploadDocument(){
-		final Bough result = new Bough();
-		//final Note response = new Note();
-		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
-				+ "/hs/SoglasovanieVozvrata/Создать/"
-				+ Cfg.whoCheckListOwner();
-		String txt = "{"
-				+ "\n	\"NumberDoc\": \"" + this.mZayavka.getNomer() + "\""
-				+ "\n	,\"CodClient\": \"" + this.mZayavka.getClientKod() + "\""
-				+ "\n	,\"Comment\": \"" + this.mZayavka.getComment().replace('\"', '\'') + "\""
-				+ "\n	,\"Товары\":[";
-		String delmtr = "";
-		for(int ii = 0; ii < mReturnsNomenclatureData.getCount(); ii++){
-			ZayavkaNaVozvrat_Tovary tovar=mReturnsNomenclatureData.getNomenclature(ii);
-			txt = txt + "\n		"+delmtr+"{"
-					+ "\n		\"Article\": \""+tovar.getArtikul()+"\""
-					+ "\n		,\"Quantity\": "+tovar.getKolichestvo()+""
-					+ "\n		,\"Prim\": "+tovar.getPrichina()+""
-					+ "\n		,\"NumberNac\": \""+tovar.getNomerNakladnoy()+"\""
-					+ "\n		,\"DateNac\": \""+Auxiliary.short1cDate.format(tovar.getDataNakladnoy().getTime())+"\""
-					+ "\n		,\"TovarnyVid\": \""+tovar.getPrichina()+"\""
-					+ "\n		}";
-			delmtr = ",";
-		}
-		txt = txt+ "\n	]"
-				+ "\n}";
-		System.out.println(url);
-		System.out.println(txt);
-		final String txtdata=txt;
-		new Expect().status.is("Отправка").task.is(new Task(){
-			@Override
-			public void doTask(){
-				result.children = Auxiliary.loadTextFromPrivatePOST(url, txtdata, 21000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()).children;
-				System.out.println(result.dumpXML());
+	/*
+		void ____uploadDocument(){
+			final Bough result = new Bough();
+			//final Note response = new Note();
+			final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+					+ "/hs/SoglasovanieVozvrata/Создать/"
+					+ Cfg.whoCheckListOwner();
+			String txt = "{"
+					+ "\n	\"NumberDoc\": \"" + this.mZayavka.getNomer() + "\""
+					+ "\n	,\"CodClient\": \"" + this.mZayavka.getClientKod() + "\""
+					+ "\n	,\"Comment\": \"" + this.mZayavka.getComment().replace('\"', '\'') + "\""
+					+ "\n	,\"Товары\":[";
+			String delmtr = "";
+			for(int ii = 0; ii < mReturnsNomenclatureData.getCount(); ii++){
+				ZayavkaNaVozvrat_Tovary tovar=mReturnsNomenclatureData.getNomenclature(ii);
+				int prichina = tovar.getPrichina();
+				int TovarnyVid = 0;
+				if (prichina >= 100) {
+					prichina = prichina - 100;
+					TovarnyVid = 1;
+				}
+				txt = txt + "\n		"+delmtr+"{"
+						+ "\n		\"Article\": \""+tovar.getArtikul()+"\""
+						+ "\n		,\"Quantity\": "+tovar.getKolichestvo()+""
+						+ "\n		,\"Prim\": "+prichina+""
+						+ "\n		,\"NumberNac\": \""+tovar.getNomerNakladnoy()+"\""
+						+ "\n		,\"DateNac\": \""+Auxiliary.short1cDate.format(tovar.getDataNakladnoy().getTime())+"\""
+						+ "\n		,\"TovarnyVid\": "+TovarnyVid
+						+ "\n		}";
+				delmtr = ",";
 			}
-		}).afterDone.is(new Task(){
-			@Override
-			public void doTask(){
-				String raw = result.child("raw").value.property.value();
-				Bough data = Bough.parseJSON(raw);
-				String soobchenie = data.child("Сообщение").value.property.value();
-				String status = data.child("Статус").value.property.value();
-				try{
-					Pattern pattern = Pattern.compile("\\d*-\\d*");
-					Matcher matcher = pattern.matcher(soobchenie);
-					if(matcher.find()){
-						uploadedDocId = matcher.group(0);
+			txt = txt+ "\n	]"
+					+ "\n}";
+			System.out.println(url);
+			System.out.println(txt);
+			final String txtdata=txt;
+			new Expect().status.is("Отправка").task.is(new Task(){
+				@Override
+				public void doTask(){
+					result.children = Auxiliary.loadTextFromPrivatePOST(url, txtdata, 21000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()).children;
+					System.out.println(result.dumpXML());
+				}
+			}).afterDone.is(new Task(){
+				@Override
+				public void doTask(){
+					String raw = result.child("raw").value.property.value();
+					Bough data = Bough.parseJSON(raw);
+					String soobchenie = data.child("Сообщение").value.property.value();
+					String status = data.child("Статус").value.property.value();
+					try{
+						Pattern pattern = Pattern.compile("\\d*-\\d*");
+						Matcher matcher = pattern.matcher(soobchenie);
+						if(matcher.find()){
+							uploadedDocId = matcher.group(0);
+						}
+					}catch(Throwable tt){
+						tt.printStackTrace();
 					}
-				}catch(Throwable tt){
-					tt.printStackTrace();
+					Auxiliary.warn("Отправка: " + soobchenie, Activity_Returns.this);
+					if(uploadedDocId.length()>1 && status.equals("0")){
+						lockDocument();
+					}
 				}
-				Auxiliary.warn("Отправка: " + soobchenie, Activity_Returns.this);
-				if(uploadedDocId.length()>1 && status.equals("0")){
-					lockDocument();
-				}
-			}
-		}).start(this);
-	}
-
-	void lockDocument(){
+			}).start(this);
+		}
+		*/
+/*
+	void __lockDocument(){
 		if(uploadedDocId.length() > 1){
 			System.out.println("lock " + uploadedDocId);
 
@@ -256,6 +280,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 			saveToDB();
 		}
 	}
+	*/
 /*
 	void promptFile(){
 
@@ -264,6 +289,20 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	void promptCamera(){
 
 	}*/
+	void promptClear(){
+		if(mIsEditable){
+			Auxiliary.pickConfirm(this, "Удаление вложений из заявки", "Удалить", new Task(){
+				@Override
+				public void doTask(){
+					mEditAktPretenziyPath.setText("");
+					mZayavka.setAktPretenziyPath("");
+					mZayavka.writeToDataBase(mDB);
+				}
+			});
+		}else{
+			Auxiliary.warn("Заявка уже выгружена", this);
+		}
+	}
 
 	void promptDelete(){
 		Auxiliary.pickConfirm(this, "Удаление заявки на возврат", "Удалить", new Task(){
@@ -281,12 +320,12 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		mIsEditable = extras.getBoolean(IS_EDITABLE);
 		mClient = new ClientInfo(mDB, extras.getString(CLIENT_ID));
 		mZayavka = extras.getParcelable(RETURNS_BID);
-		if(mZayavka!=null){
+		/*if(mZayavka!=null){
 			if(mZayavka.mProveden){
 				uploadedDocId = mZayavka.mNomer;
 				mIsEditable=false;
 			}
-		}
+		}*/
 		int p = extras.getInt("prichina");
 		prichinaNum = 0;
 		switch(p){
@@ -325,6 +364,34 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		mReturnsList.setAdapter(mReturnNomenclatureListAdapter);
 	}
 
+	void promptDeletePath(){
+		if(mIsEditable){
+			if(mEditAktPretenziyPath.getText().toString().length() > 1){
+				String[] items= mEditAktPretenziyPath.getText().toString().split(",");
+				final Numeric selection = new Numeric();
+				Auxiliary.pickSingleChoice(this, items, selection, "Удаление файла акта претензий", new Task(){
+					public void doTask(){
+						deleteSelectedPath(selection.value().intValue());
+					}
+				}, null, null, null, null);
+			}
+		}
+	}
+
+	void deleteSelectedPath(int nn){
+		String[] items= mEditAktPretenziyPath.getText().toString().split(",");
+		String txt="";
+		String delim="";
+		for(int ii=0;ii<items.length;ii++){
+			if(ii!=nn){
+				txt=txt+delim+items[ii];
+				delim=",";
+			}
+		}
+		mEditAktPretenziyPath.setText(txt);
+		this.mHasChanges=true;
+	}
+
 	private void InitializeControls(){
 		/*if(this.mZayavka.mProveden){
 			mIsEditable=false;
@@ -339,14 +406,19 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		//btnShippingDate.setOnClickListener(mShippingDateClick);
 		mEditAktPretenziyPath = (EditText)findViewById(R.id.edit_bill_file);
 		mEditAktPretenziyPath.setEnabled(mIsEditable);
+		mEditAktPretenziyPath.setOnClickListener(new OnClickListener(){
+			public void onClick(View v){
+				promptDeletePath();
+			}
+		});
 
 		mEditVersion = (EditText)findViewById(R.id.edit_comment);
 		mEditVersion.setEnabled(mIsEditable);
-
+/*
 		Button btnUpload = (Button)findViewById(R.id.btn_upload_vozvrat);
 		btnUpload.setEnabled(mIsEditable);
 		btnUpload.setOnClickListener(mUploadDoc);
-
+*/
 		Button btnNomenclature = (Button)findViewById(R.id.btn_nomeclature);
 		btnNomenclature.setEnabled(mIsEditable);
 		btnNomenclature.setOnClickListener(mNomenclatureClick);
@@ -386,8 +458,10 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	@SuppressWarnings("deprecation")
 	@Override
 	public void OnRemove(ZayavkaNaVozvrat_Tovary tovar){
+		//if(this.uploadedDocId.length()==0){
 		mListItemForDelete = tovar;
 		showDialog(IDD_DELETE);
+		//}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -419,7 +493,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 					mReturnNomenclatureListAdapter.notifyDataSetChanged();
 					mHasChanges = true;
 					break;
-				case GET_GALLERY_PICTURE:
+				case GET_GALLERY_PICTURE2:
 					String filePath = null;
 					/*
 					try {
@@ -434,23 +508,37 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 					filePath = Auxiliary.pathForMediaURI(this, uri);
 
 					if(filePath == null){
-						showDialog(IDD_BAD_FILE_PATH);
+						Auxiliary.warn("Не удалось прочитать " + uri, Activity_Returns.this);
 						return;
 					}
-					mZayavka.setAktPretenziyPath(filePath);
-					mEditAktPretenziyPath.setText(filePath);
+					//mZayavka.setAktPretenziyPath(filePath);
+					//mEditAktPretenziyPath.setText(filePath);
 					sendFile(filePath);
 					break;
 				case GET_CAMERA_PICTURE:
 					mCameraHelper.galleryAddPic(this);
-					mZayavka.setAktPretenziyPath(mCameraHelper.getCurrentPhotoPath());
-					mEditAktPretenziyPath.setText(mCameraHelper.getCurrentPhotoPath());
+					//mZayavka.setAktPretenziyPath(mCameraHelper.getCurrentPhotoPath());
+					//mEditAktPretenziyPath.setText(mCameraHelper.getCurrentPhotoPath());
 					sendFile(mCameraHelper.getCurrentPhotoPath());
 					break;
 			}
 		}
 	}
 
+	void sendFile(final String filePath){
+		System.out.println("sendFile " + filePath);
+		String path = mZayavka.getAktPretenziyPath();
+		if(("" + path).length() > 5){
+			path = path + ", ";
+		}
+		path = path + filePath;
+		mEditAktPretenziyPath.setText(path);
+		mZayavka.setAktPretenziyPath(path);
+		mZayavka.writeToDataBase(mDB);
+
+	}
+
+	/*
 	void sendFile(final String filePath){
 		System.out.println("sendFile " + filePath);
 		String[] spl = filePath.split("\\.");
@@ -485,7 +573,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 			}
 		}).start(this);
 	}
-
+*/
 	@SuppressWarnings("deprecation")
 	@Override
 	protected Dialog onCreateDialog(int id){
@@ -570,6 +658,10 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 			showDialog(IDD_EMPTY_FIELDS);
 			return;
 		}
+		if(mEditAktPretenziyPath.getText().toString().length() < 3){
+			Auxiliary.warn("Добавьте файл с актом претензий.", Activity_Returns.this);
+			return;
+		}
 		saveToDB();
 		setResult(RESULT_OK);
 		finish();
@@ -581,31 +673,10 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 		mZayavka.setAktPretenziyPath(mEditAktPretenziyPath.getText().toString());
 		mZayavka.setVersion(mEditVersion.getText().toString());
 		mZayavka.writeToDataBase(mDB);
+		mHasChanges = false;
 	}
 
-	public void startMediaGallery(){
-		LogHelper.debug(this.getClass().getCanonicalName() + " startMediaGallery");
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		//.ACTION_VIEW,Uri.parse("file:///sdcard/"));
-		//.ACTION_PICK,Uri.parse("file:///sdcard/"));
-		//.ACTION_PICK);
-		//intent.putExtra(Intent.EXTRA_TITLE, "Выбор файла");
-		//intent.setData(Uri.parse("file:///sdcard/"));
-		intent.setType("*/*");
-		intent.addCategory(Intent.CATEGORY_OPENABLE);
-		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-		//intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI//
-		//		, MediaStore.Images.Media.CONTENT_TYPE);
-		//startActivityForResult(intent, GET_GALLERY_PICTURE);
-		try{
-			Intent ch = Intent.createChooser(intent, "Выбор");
-			startActivityForResult(ch, GET_GALLERY_PICTURE);
-		}catch(android.content.ActivityNotFoundException ex){
-			LogHelper.debug(this.getClass().getCanonicalName() + " " + ex.getMessage());
-			// Potentially direct the user to the Market with a Dialog
-			//Toast.makeText(this, "Please install a File Manager.",                     Toast.LENGTH_SHORT).show();
-		}
-	}
+
 
 	@SuppressWarnings("deprecation")
 	private void startCameraTakePicture(){

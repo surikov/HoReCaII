@@ -390,7 +390,7 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 	private void startMediaGallery() {
 		Intent intent = new Intent(Intent.ACTION_PICK);
 		intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.CONTENT_TYPE);
-		startActivityForResult(intent, GET_GALLERY_PICTURE);
+		startActivityForResult(intent, GET_GALLERY_PICTURE2);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -450,7 +450,7 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
-				case GET_GALLERY_PICTURE:
+				case GET_GALLERY_PICTURE2:
 					String filePath = null;
 					try {
 						filePath = SystemHelper.getRealPathFromURI(data.getData(), this);

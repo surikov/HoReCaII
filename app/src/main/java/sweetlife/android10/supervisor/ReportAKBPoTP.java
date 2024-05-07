@@ -21,14 +21,14 @@ public class ReportAKBPoTP extends Report_Base {
     Numeric dateCreateFrom = new Numeric();
     Numeric dateCreateTo = new Numeric();
     Numeric territory = new Numeric();
-    Numeric sravnenie = new Numeric();
+    //Numeric sravnenie = new Numeric();
 
     public static String menuLabel() {
         return "АКБ";
     }
 
     public static String folderKey() {
-        return "AKBPoTP";
+        return "NEWAKB";
     }
 
     public String getMenuLabel() {
@@ -36,7 +36,7 @@ public class ReportAKBPoTP extends Report_Base {
     }
 
     public String getFolderKey() {
-        return "AKBPoTP";
+        return "NEWAKB";
     }
 
     public ReportAKBPoTP(ActivityWebServicesReports p) {
@@ -90,7 +90,7 @@ public class ReportAKBPoTP extends Report_Base {
         dateCreateFrom.value(Numeric.string2double(b.child("docFrom").value.property.value()));
         dateCreateTo.value(Numeric.string2double(b.child("docTo").value.property.value()));
         territory.value(Numeric.string2double(b.child("territory").value.property.value()));
-        sravnenie.value(Numeric.string2double(b.child("sravnenie").value.property.value()));
+       // sravnenie.value(Numeric.string2double(b.child("sravnenie").value.property.value()));
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ReportAKBPoTP extends Report_Base {
         b.child("docFrom").value.is("" + dateCreateFrom.value());
         b.child("docTo").value.is("" + dateCreateTo.value());
         b.child("territory").value.is("" + territory.value());
-        b.child("sravnenie").value.is("" + sravnenie.value());
+        //b.child("sravnenie").value.is("" + sravnenie.value());
         String xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>\n" + b.dumpXML();
         //System.out.println("writeForm " + xml);
         Auxiliary.writeTextToFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey)), xml, "utf-8");
@@ -121,7 +121,8 @@ public class ReportAKBPoTP extends Report_Base {
     public String composeGetQuery(int queryKind) {
         int i = territory.value().intValue();
         String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-        String p = "{\"Sravnenie\":"+(sravnenie.value()>0?"true":"false")+",\"ДатаНачала\":\"" + Cfg.formatMills(dateCreateFrom.value(), "yyyyMMdd") + "\",\"ДатаОкончания\":\"" + Cfg.formatMills(dateCreateTo.value(), "yyyyMMdd") + "\"}";
+        String p = "{\"ВариантОтчета\":\"АКБ\",\"ДатаНачала\":\"" + Cfg.formatMills(dateCreateFrom.value(), "yyyyMMdd") + "\",\"ДатаОкончания\":\"" + Cfg.formatMills(dateCreateTo.value(), "yyyyMMdd") + "\"}";
+        //https://service.swlife.ru/hrc120107/hs/Report/АКБНовый/superkaz3_hrc?param={"ВариантОтчета":"АКБ","ДатаНачала":"20240304","ДатаОкончания":"20240309"}
         String e = "";
         try {
             e = URLEncoder.encode(p, "UTF-8");
@@ -129,7 +130,7 @@ public class ReportAKBPoTP extends Report_Base {
             t.printStackTrace();
             e = t.getMessage();
         }
-        String serviceName="АКБ";
+        String serviceName="АКБНовый";
         try {
             serviceName = URLEncoder.encode(serviceName, "UTF-8");
         } catch (Throwable t) {
@@ -150,30 +151,7 @@ public class ReportAKBPoTP extends Report_Base {
     @Override
     public String composeRequest() {
         return null;
-        //http://89.109.7.162/shatov/hs/Report/АКБ/hrc229/?param={"Sravnenie":true,"ДатаНач":"20200414","ДатаКон":"20200416","ДатаНачала":"20200414","ДатаОкончания":"20200416"}
-        /*int i = territory.value().intValue();
-        String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-        String xml = ""//
-                + "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>"//
-                + "\n		<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-                + "\n			<soap:Body>"//
-                + "\n				<m:getReport xmlns:m=\"http://ws.swl/fileHRC\">"//
-                + "\n					<m:Имя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"//
-                + "АКБПоТП"//
-                + "</m:Имя>"//
-                + "\n					<m:НачалоПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(dateCreateFrom.value(), "yyyy-MM-dd") + "T00:00:00</m:НачалоПериода>"//
-                + "\n					<m:КонецПериода xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.formatMills(dateCreateTo.value(), "yyyy-MM-dd") + "T23:59:59</m:КонецПериода>"//
-                + "\n					<m:КодПользователя xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + hrc//Cfg.currentHRC()
-                + "</m:КодПользователя>"//
-                + "\n					<m:Параметры xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"//
-                + "\n					</m:Параметры>"//
-                + "\n					<m:IMEI xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + Cfg.hrc_imei() + "</m:IMEI>"//
-                + "\n				</m:getReport>" //
-                + "\n			</soap:Body>"//
-                + "\n		</soap:Envelope>";
-        //System.out.println(xml);
-        return xml;*/
-    }
+           }
 
 
     @Override
@@ -187,17 +165,19 @@ public class ReportAKBPoTP extends Report_Base {
                         + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
                 terr.item(s);
             }
+            /*
             RedactSingleChoice sravnenieControl = new RedactSingleChoice(context);
             sravnenieControl.item("Весь период");
             sravnenieControl.item("Сравнение двух дат");
             sravnenieControl.selection.is(sravnenie);
+            */
             propertiesForm//
                     .input(context, 0, Auxiliary.tapSize * 0.3, "", new Decor(context).labelText.is(getMenuLabel()).labelStyleLargeNormal(), Auxiliary.tapSize * 9)//
                     .input(context, 1, Auxiliary.tapSize * 0.3, "Период с", new RedactDate(context).date.is(dateCreateFrom).format.is("dd.MM.yyyy"))//
                     .input(context, 2, Auxiliary.tapSize * 0.3, "по", new RedactDate(context).date.is(dateCreateTo).format.is("dd.MM.yyyy"))//
-                    .input(context, 3, Auxiliary.tapSize * 0.3, "Показать", sravnenieControl)//
+                    //.input(context, 3, Auxiliary.tapSize * 0.3, "Показать", sravnenieControl)//
 
-                    .input(context, 4, Auxiliary.tapSize * 0.3, "Территория", terr)//
+                    .input(context, 3, Auxiliary.tapSize * 0.3, "Территория", terr)//
             ;
             propertiesForm.child(new Knob(context)//
                     .labelText.is("Обновить")//

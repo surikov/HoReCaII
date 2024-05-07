@@ -64,7 +64,8 @@ public class ZayavkaNaVozvrat_Tovary extends NomenclatureBasedItem {
 			values.put("DataNakladnoy", DateTimeHelper.SQLDateString(mDataNakladnoy.getTime()));
 			values.put("Prichina", mPrichina);
 			values.put("_ZayavkaNaVozvrat_IDRRef", Hex.decodeHexWithPrefix(mZayavka_IDRRef));
-			DatabaseHelper.insertInTranzaction(db, "ZayavkaNaVozvrat_Tovary", values);
+			m_id=(int)DatabaseHelper.insertInTranzaction(db, "ZayavkaNaVozvrat_Tovary", values);
+			mNew=false;
 		} else {
 			values.put("Kolichestvo", mKolichestvo);
 			values.put("NomerNakladnoy", mNomerNakladnoy);
@@ -72,6 +73,7 @@ public class ZayavkaNaVozvrat_Tovary extends NomenclatureBasedItem {
 			values.put("Prichina", mPrichina);
 			DatabaseHelper.updateInTranzaction(db, "ZayavkaNaVozvrat_Tovary", values, "_id=" + String.valueOf(m_id), null);
 		}
+
 	}
 
 	public double getKolichestvo() {

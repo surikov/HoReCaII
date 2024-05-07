@@ -35,7 +35,8 @@ public interface IExtras {
 	int RETURNS_ADD                    = 9;
 	int DISPOSAL_ADD                   = 10;
 
-	int GET_GALLERY_PICTURE            = 12;
+	int GET_GALLERY_PICTURE1            = 957463412;
+	int GET_GALLERY_PICTURE2            = 12;
 	int GET_CAMERA_PICTURE             = 13;
 
 	String DEGUSTACIA_POISK               = "DEGUSTACIA_POISK";

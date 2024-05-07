@@ -509,9 +509,9 @@ public abstract class Report_Base {
 						);
 						//txt = new String(bytes,"windows-1251");
 						txt = new String(bytes);
-						if(txt.indexOf("HTML")<0){
+						/*if(txt.indexOf("HTML")<0){
 							txt = txt+"\n"+new String(bytes,"windows-1251");
-						}
+						}*/
 					} else {
 						System.out.println("getQueryLink " + getQueryLink);
 						//Bough result=Auxiliary.loadTextFromPrivatePOST(getQueryLink, postBody.getBytes(), 30000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());

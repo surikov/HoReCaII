@@ -1016,7 +1016,7 @@ I/System.out: </soap:Envelope>
 	}
 
 	void sendRequestPrice(final String soapXML) {
-		//System.out.println(soapXML);
+		System.out.println("sendRequestPrice "+soapXML);
 		final String url = Settings.getInstance().getBaseURL() + "DanniePoTovaram.1cws";
 		final RawSOAP r = new RawSOAP();
 		final Numeric countUpdate = new Numeric();

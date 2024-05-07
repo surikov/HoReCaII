@@ -268,6 +268,9 @@ public class ActivityWebServicesReports extends Activity{
 		if(key.equals(ReportAKBPoTP.folderKey())){
 			report = new ReportAKBPoTP(this);
 		}
+		if(key.equals(ReportRV.folderKey())){
+			report = new ReportRV(this);
+		}
 		if(key.equals(ReportStatistikaVozvratovAktovSverki.folderKey())){
 			report = new ReportStatistikaVozvratovAktovSverki(this);
 		}
@@ -465,6 +468,10 @@ public class ActivityWebServicesReports extends Activity{
 		if(key.equals(ReportDistribucia2.folderKey())){
 			report = new ReportDistribucia2(this);
 		}
+		if(key.equals(ReportDistribuciaKrasnodar.folderKey())){
+			report = new ReportDistribuciaKrasnodar(this);
+		}
+
 
 
 		if(key.equals(ReportProdajiFlagmanovPoKontragentam.folderKey())){
@@ -726,6 +733,8 @@ public class ActivityWebServicesReports extends Activity{
 		addReportMenu2(ReportDZDlyaTP.folderKey(), ReportDZDlyaTP.menuLabel());
 
 		addReportMenu2(ReportDistribucia2.folderKey(), ReportDistribucia2.menuLabel());
+		addReportMenu2(ReportDistribuciaKrasnodar.folderKey(), ReportDistribuciaKrasnodar.menuLabel());
+
 		//addReportMenu2(ReportDistribucia.folderKey(), ReportDistribucia.menuLabel());
 		//addReportMenu2(ReportDistribuciaPoKluchevimPosiciam.folderKey(), ReportDistribuciaPoKluchevimPosiciam.menuLabel());
 		//addReportMenu2(ReportDostavkaPoVoditelam.folderKey(), ReportDostavkaPoVoditelam.menuLabel());
@@ -762,11 +771,14 @@ public class ActivityWebServicesReports extends Activity{
 		addReportMenu2(ReportPredzakazyNaTrafiki.folderKey(), ReportPredzakazyNaTrafiki.menuLabel());
 		//addReportMenu2(ReportProbegTPSV.folderKey(), ReportProbegTPSV.menuLabel());
 
-
+		addReportMenu2(ReportProdazhiSTM.folderKey(), ReportProdazhiSTM.menuLabel());
 		addReportMenu2(ReportProdajiFlagmanov.folderKey(), ReportProdajiFlagmanov.menuLabel());
 		addReportMenu2(ReportProdajiFlagmanovPoKontragentam.folderKey(), ReportProdajiFlagmanovPoKontragentam.menuLabel());
+
+
+		addReportMenu2(ReportRV.folderKey(), ReportRV.menuLabel());
 		addReportMenu2(ReportResultatyUtverjdenihSpecifikaciy.folderKey(), ReportResultatyUtverjdenihSpecifikaciy.menuLabel());
-		addReportMenu2(ReportProdazhiSTM.folderKey(), ReportProdazhiSTM.menuLabel());
+
 
 		//addReportMenu2(ReportRekomendaciiKlientam.folderKey(), ReportRekomendaciiKlientam.menuLabel());
 		addReportMenu2(ReportSvodDlyaTP.folderKey(), ReportSvodDlyaTP.menuLabel());
@@ -897,8 +909,8 @@ public class ActivityWebServicesReports extends Activity{
 				});*/
 	}
 
-	void doHOOKReturn(final String num){
-		Auxiliary.pick3Choice(this, "Заявка №" + num, "Утверждение заявки на возврат."//
+	void doHOOKReturn(final String num, final String dat){
+		Auxiliary.pick3Choice(this, "Заявка №" + num+" от "+dat, "Утверждение заявки на возврат."//
 				, "Утвердить", new Task(){
 					@Override
 					public void doTask(){
@@ -909,7 +921,12 @@ public class ActivityWebServicesReports extends Activity{
 					public void doTask(){
 						sendReturnApprove(false, num);
 					}
-				}, null, null);
+				},  "Удалить", new Task(){
+					@Override
+					public void doTask(){
+						sendReturnDelete( num,dat);
+					}
+				});
 	}
 
 	void sendFixirovanieKoordinat(final String num){
@@ -1263,6 +1280,7 @@ public class ActivityWebServicesReports extends Activity{
 							+ "/" + URLEncoder.encode(num, "utf-8")//
 							+ "/" + URLEncoder.encode(art, "utf-8")//
 							;
+					System.out.println("sendReturnAnswer "+url);
 					Report_Base.startPing();
 					Bough result;
 					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
@@ -1315,7 +1333,37 @@ public class ActivityWebServicesReports extends Activity{
 		});
 		expect.start(ActivityWebServicesReports.this);
 	}
-
+	void sendReturnDelete(final String num,final String dat){
+		System.out.println(num+"/"+dat);
+		final Bough b = new Bough();
+		Expect expect = new Expect().status.is("Подождите")//
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						try{
+							String url =  Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+											+ "/hs/UdalenieZayavkiNaVozvrat"
+											+ "/" + URLEncoder.encode(num.trim(), "utf-8")
+											+ "/" + URLEncoder.encode(Auxiliary.tryReFormatDate(dat,"dd.MM.yyyy","yyyyMMdd"), "utf-8")//
+									;
+							Report_Base.startPing();
+							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+							b.child("result").value.is(new String(bytes));
+							preReport.writeCurrentPage();
+						}catch(Throwable t){
+							t.printStackTrace();
+							b.child("result").value.is(t.toString());
+						}
+					}
+				}).afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
+						tapInstance2(preReport.getFolderKey(), preKey);
+					}
+				});
+		expect.start(ActivityWebServicesReports.this);
+	}
 	void sendReturnApprove(final boolean approve, final String num){
 		final RawSOAP r = new RawSOAP();
 		new Expect().status.is("Выполнение...").task.is(new Task(){
@@ -1848,7 +1896,8 @@ public class ActivityWebServicesReports extends Activity{
 				}
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportReturnState)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
-					doHOOKReturn(num);
+					String dat = brwsr.getQueryParameter(Report_Base.FIELDDocumentDate);
+					doHOOKReturn(num,dat);
 				}
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportVzaimoraschety)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);

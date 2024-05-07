@@ -374,7 +374,7 @@ public class Activity_Route_2 extends Activity{
 						String tpFIO = Cfg.polzovatelFIO(Cfg.whoCheckListOwner());
 						Auxiliary.pickSingleChoice(Activity_Route_2.this, new String[]{//
 								"GPS (" + tpFIO + ")", "Заявки", "Фиксированные цены"
-								//, "Возвраты от покупателей"
+								, "Возвраты от покупателей"
 						}, vigruzitN, "Выгрузить", new Task(){
 							public void doTask(){
 								if(vigruzitN.value() == 0){
@@ -659,7 +659,7 @@ public class Activity_Route_2 extends Activity{
 						for(int i = 0; i < commands.length; i++){
 							String sql = commands[i].trim();
 							if(sql.length() > 1){
-								//System.out.println(i + ": " + sql);
+								//System.out.println(i + ": " + sql);0
 								ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 								if(i % 300 == 0){
 									System.out.println("sql: " + i + ": " + sql);

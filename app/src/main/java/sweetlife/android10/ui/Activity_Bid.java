@@ -8,10 +8,12 @@ import java.util.Date;
 
 import org.apache.http.impl.cookie.DateUtils;
 
-import jxl.format.Alignment;
+import jxl.format.*;
 import jxl.format.BorderLineStyle;
 import jxl.format.Colour;
 import jxl.write.WritableFont;
+import jxl.write.WritableCellFormat;
+
 import reactive.ui.*;
 import sweetlife.android10.ApplicationHoreca;
 import sweetlife.android10.Settings;
@@ -898,7 +900,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 					//System.out.println("Popup_EditNomenclatureCountPrice");
 					ZayavkaPokupatelya_Foodstaff zayavkaPokupatelya_Foodstaff = mBidData.getFoodStuffs().getFoodstuff(position);
 					//System.out.println("zayavkaPokupatelya_Foodstaff: " + zayavkaPokupatelya_Foodstaff.getArtikul() + ", " + zayavkaPokupatelya_Foodstaff.getVidSkidki());
-					Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(view, mOnPopupClose, zayavkaPokupatelya_Foodstaff);
+					Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(view, mOnPopupClose, zayavkaPokupatelya_Foodstaff
+							, mShippingDate.getTimeInMillis());
 					popup.showLikeQuickAction();
 				}
 			});
@@ -1835,7 +1838,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	public void onWindowFocusChanged(boolean hasFocus){
 		if(hasFocus && mShowEditCountAndPricePopup){
 			mShowEditCountAndPricePopup = false;
-			Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(mBtnArticle, mOnPopupClose, mBidData.getFoodStuffs().getFoodstuff(0));
+			Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(mBtnArticle, mOnPopupClose, mBidData.getFoodStuffs().getFoodstuff(0)
+					, mShippingDate.getTimeInMillis());
 			popup.showLikeQuickAction();
 		}
 		super.onWindowFocusChanged(hasFocus);
@@ -2942,12 +2946,13 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 
 	}
-
 	void doMenuExport(){
+		exportBidData(mBidData);
+	}
+	void exportBidData(BidData mBidData){
 		try{
 			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
 					+ "/Заказ "
-					//+ApplicationHoreca.getInstance().getClientInfo().getName()
 					+ Auxiliary.safeFileName(ApplicationHoreca.getInstance().getClientInfo().getName())
 					+ Math.floor(Math.random() * 10000)
 					+ ".xls";
@@ -2956,81 +2961,70 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
 			ZayavkaPokupatelya bid = mBidData.getBid();
 			jxl.write.WritableWorkbook workbook = jxl.Workbook.createWorkbook(xfile, wbSettings);
-			workbook.setColourRGB(Colour.BLUE, 53, 43, 111);
-			workbook.setColourRGB(Colour.RED, 220, 44, 94);
-			workbook.setColourRGB(Colour.GOLD, 220, 233, 94);
+			workbook.setColourRGB(Colour.PLUM, 210, 0, 99);
 			workbook.createSheet("" + bid.getClientKod(), 0);
 			jxl.write.WritableSheet excelSheet = workbook.getSheet(0);
-			excelSheet.setColumnView(0, 6);
-			excelSheet.setColumnView(1, 12);
-			excelSheet.setColumnView(2, 60);
-			excelSheet.setColumnView(3, 6);
-			excelSheet.setColumnView(4, 12);
+			excelSheet.setColumnView(1, 6);
+			excelSheet.setColumnView(2, 12);
+			excelSheet.setColumnView(3, 60);
+			excelSheet.setColumnView(4, 6);
 			excelSheet.setColumnView(5, 12);
 			excelSheet.setColumnView(6, 12);
+			excelSheet.setColumnView(7, 12);
 			jxl.write.Label label;
-			InputStream inStream = this.getResources().openRawResource(R.raw.logo3);
+			InputStream inStream = this.getResources().openRawResource(R.raw.export_header);
 			byte[] logo = new byte[inStream.available()];
 			int nn = 0;
 			while(inStream.available() > 0){
 				logo[nn] = (byte)inStream.read();
 				nn++;
 			}
+			jxl.write.WritableImage img = new jxl.write.WritableImage(1, 1, 7, 1, logo);
+			excelSheet.addImage(img);
 			jxl.write.WritableFont titleFont = new jxl.write.WritableFont(WritableFont.ARIAL, 16);
 			jxl.write.WritableCellFormat titleFormat = new jxl.write.WritableCellFormat(titleFont);
-			jxl.write.WritableImage img = new jxl.write.WritableImage(0, 0, 7, 3, logo);
-			excelSheet.addImage(img);
-			excelSheet.addCell(new jxl.write.Label(2, 3, "ООО \"Свит Лайф Фудсервис\"", titleFormat));
-			excelSheet.addCell(new jxl.write.Label(0, 4, "603058, г. Н. Новгород, ул. Героя Попова, д.43В, офис 1, тел. (831) 215-25-25, e-mail: office_hrc@swlife.nnov.ru"));
-			excelSheet.addCell(new jxl.write.Label(0, 5, "ОКПО 80451411, ОГРН 1075258005008, ИНН/КПП 5258068806/525801001 Р/сч. 40702810142020102827,  К/сч. "));
-			excelSheet.addCell(new jxl.write.Label(0, 6, "30101810900000000603 в Волго-Вятском Банке Сбербанка РФ г.  Н. Новгорода БИК 042202603"));
-			excelSheet.addCell(new jxl.write.Label(2, 7, "Коммерческое предложение", titleFormat));
-			/*
-			label = new jxl.write.Label(0, 3, "Ваш Менеджер: " + Requests.getTPfio(mDB));
+			titleFormat.setAlignment(Alignment.CENTRE);
+			titleFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			excelSheet.mergeCells(1, 2, 7, 2);
+			excelSheet.setRowView(2, 900);
+			excelSheet.addCell(new jxl.write.Label(1, 2, "Коммерческое предложение", titleFormat));
+			WritableFont whiteFont = new WritableFont(WritableFont.createFont("Arial"), 10, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, Colour.WHITE);
+			WritableCellFormat headerFormat = new WritableCellFormat(whiteFont);
+			int headerSkip = 4;
+			headerFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			headerFormat.setAlignment(Alignment.CENTRE);
+			headerFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			headerFormat.setBackground(Colour.LAVENDER);
+			label = new jxl.write.Label(1, headerSkip - 1, "№", headerFormat);
 			excelSheet.addCell(label);
-			label = new jxl.write.Label(0, 4, "Сервисный Центр, тел:  8-800-200-58-58");
+			label = new jxl.write.Label(2, headerSkip - 1, "Код", headerFormat);
 			excelSheet.addCell(label);
-			*/
-			jxl.write.WritableCellFormat headerFormat = new jxl.write.WritableCellFormat();
-			//f.setBackground(jxl.format.Colour.ICE_BLUE);
-			int headerSkip = 9;
-			headerFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THICK, Colour.BLACK);
-			label = new jxl.write.Label(0, headerSkip - 1, "№", headerFormat);
+			label = new jxl.write.Label(3, headerSkip - 1, "Наименование", headerFormat);
 			excelSheet.addCell(label);
-			label = new jxl.write.Label(1, headerSkip - 1, "Код", headerFormat);
+			label = new jxl.write.Label(4, headerSkip - 1, "Ед.изм.", headerFormat);
 			excelSheet.addCell(label);
-			label = new jxl.write.Label(2, headerSkip - 1, "Наименование", headerFormat);
+			label = new jxl.write.Label(5, headerSkip - 1, "Мин. партия отгрузки", headerFormat);
 			excelSheet.addCell(label);
-			label = new jxl.write.Label(3, headerSkip - 1, "Ед.изм.", headerFormat);
+			label = new jxl.write.Label(6, headerSkip - 1, "Кол-во в месте", headerFormat);
 			excelSheet.addCell(label);
-			label = new jxl.write.Label(4, headerSkip - 1, "Мин. партия отгрузки", headerFormat);
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(5, headerSkip - 1, "Кол-во в месте", headerFormat);
-			excelSheet.addCell(label);
-			label = new jxl.write.Label(6, headerSkip - 1, "Цена", headerFormat);
+			label = new jxl.write.Label(7, headerSkip - 1, "Цена", headerFormat);
 			excelSheet.addCell(label);
 			jxl.write.WritableCellFormat cellFormat = new jxl.write.WritableCellFormat();
-			cellFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THICK, Colour.BLACK);
-			//cellFormat.setWrap(true);
-			//jxl.write.WritableFont whiteFont = new jxl.write.WritableFont(jxl.write.WritableFont.ARIAL, 10, jxl.write.WritableFont.BOLD);
-			//whiteFont.setColour(Colour.GRAY_50);
-			jxl.write.WritableFont catFont = new jxl.write.WritableFont(jxl.write.WritableFont.createFont("Arial"), 10, jxl.write.WritableFont.BOLD, false//
-					, jxl.format.UnderlineStyle.NO_UNDERLINE, Colour.GOLD);
-			//catFont.setColour(Colour.GOLD);
-			//jxl.write.WritableFont wfontSt = new jxl.write.WritableFont(WritableFont.createFont("Arial"), WritableFont.DEFAULT_POINT_SIZE, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, colour);
-			//jxl.write.WritableCellFormat catFormat = new jxl.write.WritableCellFormat(catFont);
-			jxl.write.WritableCellFormat catFormat = new jxl.write.WritableCellFormat();//catFont);
-			catFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THICK, Colour.BLACK);
-			catFormat.setBackground(Colour.BLUE);
-			//catFormat.setFont(catFont);
+			cellFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			cellFormat.setAlignment(Alignment.CENTRE);
+			cellFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			jxl.write.WritableCellFormat catFormat = new jxl.write.WritableCellFormat(whiteFont);
+			catFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			catFormat.setBackground(Colour.PLUM);
 			catFormat.setAlignment(Alignment.CENTRE);
-			jxl.write.WritableCellFormat subFormat = new jxl.write.WritableCellFormat();
-			subFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THICK, Colour.BLACK);
-			subFormat.setBackground(Colour.RED);
+			catFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			jxl.write.WritableCellFormat subFormat = new jxl.write.WritableCellFormat(whiteFont);
+			subFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			subFormat.setBackground(Colour.PLUM);
 			subFormat.setAlignment(Alignment.CENTRE);
+			subFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
 			excelSheet.setRowView(headerSkip - 1, 900);
-			excelSheet.setRowView(headerSkip - 2, 900);
-			excelSheet.setRowView(headerSkip - 6, 900);
+			excelSheet.setRowView(1, 5500);
 			int cnt = mBidData.getFoodStuffs().getCount();
 			Vector<Vector<String>> rows = new Vector<Vector<String>>();
 			for(int ii = 0; ii < cnt; ii++){
@@ -3061,7 +3055,6 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				for(int kk = 0; kk < item.size(); kk++){
 					txttst = txttst + '/' + kk + ':' + item.get(kk);
 				}
-				System.out.println(txttst);
 			}
 			Collections.sort(rows, new Comparator<Vector<String>>(){
 				@Override
@@ -3075,43 +3068,54 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			for(int i = 0; i < cnt; i++){
 				if(!cat.equals(rows.get(i).get(7))){
 					cat = rows.get(i).get(7);
-					excelSheet.mergeCells(0, headerSkip + i + catcount, 6, headerSkip + i + catcount);
-					label = new jxl.write.Label(0, headerSkip + i + catcount, "" + cat, catFormat);
+					excelSheet.mergeCells(1, headerSkip + i + catcount, 7, headerSkip + i + catcount);
+					label = new jxl.write.Label(1, headerSkip + i + catcount, "" + cat, catFormat);
 					excelSheet.addCell(label);
+					excelSheet.setRowView(headerSkip + i + catcount, 500);
 					catcount++;
 				}
 				if(!subcat.equals(rows.get(i).get(6))){
 					subcat = rows.get(i).get(6);
-					label = new jxl.write.Label(0, headerSkip + i + catcount, "" + subcat, subFormat);
+					label = new jxl.write.Label(1, headerSkip + i + catcount, "" + subcat, subFormat);
 					excelSheet.addCell(label);
-					excelSheet.mergeCells(0, headerSkip + i + catcount, 6, headerSkip + i + catcount);
+					excelSheet.mergeCells(1, headerSkip + i + catcount, 7, headerSkip + i + catcount);
+					excelSheet.setRowView(headerSkip + i + catcount, 300);
 					catcount++;
 				}
-				label = new jxl.write.Label(0, headerSkip + i + catcount, "" + (1 + i), cellFormat);
+				label = new jxl.write.Label(1, headerSkip + i + catcount, "" + (1 + i), cellFormat);
 				excelSheet.addCell(label);
-				label = new jxl.write.Label(1, headerSkip + i + catcount, rows.get(i).get(0), cellFormat);
+				label = new jxl.write.Label(2, headerSkip + i + catcount, rows.get(i).get(0), cellFormat);
 				excelSheet.addCell(label);
-				label = new jxl.write.Label(2, headerSkip + i + catcount, rows.get(i).get(1), cellFormat);
+				label = new jxl.write.Label(3, headerSkip + i + catcount, rows.get(i).get(1), cellFormat);
 				excelSheet.addCell(label);
-				label = new jxl.write.Label(3, headerSkip + i + catcount, rows.get(i).get(2), cellFormat);
+				label = new jxl.write.Label(4, headerSkip + i + catcount, rows.get(i).get(2), cellFormat);
 				excelSheet.addCell(label);
-				label = new jxl.write.Label(4, headerSkip + i + catcount, rows.get(i).get(3), cellFormat);
+				label = new jxl.write.Label(5, headerSkip + i + catcount, rows.get(i).get(3), cellFormat);
 				excelSheet.addCell(label);
-				label = new jxl.write.Label(5, headerSkip + i + catcount, rows.get(i).get(4), cellFormat);
+				label = new jxl.write.Label(6, headerSkip + i + catcount, rows.get(i).get(4), cellFormat);
 				excelSheet.addCell(label);
-				label = new jxl.write.Label(6, headerSkip + i + catcount, rows.get(i).get(5), cellFormat);
+				label = new jxl.write.Label(7, headerSkip + i + catcount, rows.get(i).get(5), cellFormat);
 				excelSheet.addCell(label);
 			}
+			excelSheet.setRowView(headerSkip + cnt + catcount + 1, 4500);
+			InputStream inStream2 = this.getResources().openRawResource(R.raw.export_bottom);
+			byte[] logo2 = new byte[inStream2.available()];
+			int nn2 = 0;
+			while(inStream2.available() > 0){
+				logo2[nn2] = (byte)inStream2.read();
+				nn2++;
+			}
+			jxl.write.WritableImage img2 = new jxl.write.WritableImage(1, headerSkip + cnt + catcount + 1, 7, 1, logo2);
+			excelSheet.addImage(img2);
 			workbook.write();
 			workbook.close();
-
-			//Auxiliary.startFile(this, android.content.Intent.ACTION_VIEW, "application/vnd.ms-excel", xfile);
 			Auxiliary.startFile(this, xfile);
 		}catch(Throwable t){
 			t.printStackTrace();
 			Auxiliary.warn("Ошибка: " + t.getMessage(), Activity_Bid.this);
 		}
 	}
+
 
 	void dataModeRoll(){
 		DATA_CURRENT++;
@@ -3885,8 +3889,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 
 					System.out.println("done add from history panel");
 					UpdateAfterAddingNomenclature();
-					//System.out.println("2");
+					System.out.println("mShippingDate " + mShippingDate.toString());
 					Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(mBtnArticle, mOnPopupClose, mBidData.getFoodStuffs().getFoodstuff(0)//
+							, mShippingDate.getTimeInMillis()
 					);
 					popup.showLikeQuickAction();
 					//System.out.println("3");

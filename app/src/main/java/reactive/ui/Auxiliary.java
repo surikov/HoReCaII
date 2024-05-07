@@ -2,6 +2,7 @@ package reactive.ui;
 
 import android.media.MediaScannerConnection;
 import android.app.admin.*;
+import android.content.pm.*;
 import android.view.*;
 import android.app.*;
 import android.content.*;
@@ -20,6 +21,7 @@ import android.content.res.*;
 import android.view.inputmethod.InputMethodManager;
 
 import sweetlife.android10.*;
+import sweetlife.android10.log.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
 import tee.binding.*;
@@ -85,17 +87,17 @@ public class Auxiliary{
 	//public static double accelerometerAverageY = 0;
 	//public static double accelerometerAverageZ = 0;
 	public static double accelerometerNoise = 1.0;
-	public static SimpleDateFormat mssqlTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss" );
-	public static SimpleDateFormat sqliteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS" );
-	public static SimpleDateFormat sqliteDate = new SimpleDateFormat("yyyy-MM-dd" );
-	public static SimpleDateFormat short1cDate = new SimpleDateFormat("yyyyMMdd" );
-	public static SimpleDateFormat rusDate = new SimpleDateFormat("dd.MM.yy" );
-	public static SimpleDateFormat rusTimeDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss" );
+	public static SimpleDateFormat mssqlTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	public static SimpleDateFormat sqliteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	public static SimpleDateFormat sqliteDate = new SimpleDateFormat("yyyy-MM-dd");
+	public static SimpleDateFormat short1cDate = new SimpleDateFormat("yyyyMMdd");
+	public static SimpleDateFormat rusDate = new SimpleDateFormat("dd.MM.yy");
+	public static SimpleDateFormat rusTimeDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 	public static double latitude = 0;//https://www.google.ru/maps/@56.3706531,44.0456248,10.25z - latitude+":"+longitude
 	public static double longitude = 0;//east-west, долгота
 	public static long gpsTime = 0;//last time
 	//
-	//
+	//public static final int startMediaGalleryID = 22779984;
 	//
 	private static LocationListener locationListener = null;
 
@@ -339,9 +341,9 @@ public class Auxiliary{
 	}
 
 	public static Bough fromCursor(Cursor cursor, boolean parseDate){
-		Bough bough = new Bough().name.is("cursor" );
+		Bough bough = new Bough().name.is("cursor");
 		while(cursor.moveToNext()){
-			Bough row = new Bough().name.is("row" );
+			Bough row = new Bough().name.is("row");
 			for(int i = 0; i < cursor.getColumnCount(); i++){
 				String name = cursor.getColumnName(i);
 				String value = null;
@@ -398,7 +400,7 @@ public class Auxiliary{
 		String r = "";
 		if(date.trim().length() > 0){
 			SimpleDateFormat fromDate = new SimpleDateFormat(from);
-			fromDate.setTimeZone(TimeZone.getTimeZone("UTC" ));
+			fromDate.setTimeZone(TimeZone.getTimeZone("UTC"));
 			SimpleDateFormat toDate = new SimpleDateFormat(to);
 			try{
 				Date d = fromDate.parse(date);
@@ -418,7 +420,7 @@ public class Auxiliary{
 				, 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 		String[] abcLat = {" "
 				, "a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "ts", "ch", "sh", "sch", "", "i", "", "e", "ju", "ja"
-				, "A", "B", "V", "G", "D", "E", "E", "Zh", "Z", "I", "Y", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "H", "Ts", "Ch", "Sh", "Sch", "", "I", "", "E", "Ju", "Ja", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+				, "A", "B", "V", "G", "D", "E", "E", "Zh", "Z", "I", "Y", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "H", "Ts", "Ch", "Sh", "Sch", "", "I", "", "E", "Ju", "Ja", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
 		StringBuilder builder = new StringBuilder();
 		for(int i = 0; i < message.length(); i++){
 			for(int x = 0; x < abcCyr.length; x++){
@@ -456,7 +458,7 @@ public class Auxiliary{
 						.replace('\"', '_')
 						.replace(',', '_')
 						.replace('&', '_')
-						.replace("_", "" )
+						.replace("_", "")
 				//)
 				;
 	}
@@ -557,9 +559,9 @@ public class Auxiliary{
 	}
 
 	public static Bough fromStrictCursor(Cursor cursor, String[] strings, String[] dates, String[] times, String[] blobs){
-		Bough bough = new Bough().name.is("cursor" );
+		Bough bough = new Bough().name.is("cursor");
 		while(cursor.moveToNext()){
-			Bough row = new Bough().name.is("row" );
+			Bough row = new Bough().name.is("row");
 			if(strings != null){
 				for(int f = 0; f < strings.length; f++){
 					String name = strings[f];
@@ -608,16 +610,39 @@ public class Auxiliary{
 		return txt;
 	}
 
+	public static String pathForMediaURItest(Context context, Uri uri){
+		try{
+			System.out.println("pathForMediaURI " + uri.toString());
+		/*for (PackageInfo pack : context.getPackageManager().getInstalledPackages(PackageManager.GET_PROVIDERS)) {
+			ProviderInfo[] providers = pack.providers;
+			if (providers != null) {
+				for(int ii=0;ii<providers.length;ii++){
+					System.out.println(ii+": " + providers[ii].toString());
+				}
+			}
+		}*/
+			Uri provider = Uri.parse("content://com.android.providers.media.documents/");
+			System.out.println("provider " + provider);
+			Cursor cursor = context.getContentResolver().query(provider, null, null, null, null);
+		}catch(Throwable t){
+			t.printStackTrace();
+		}
+		return null;
+	}
+
 	public static String pathForMediaURI(Context context, Uri uri){
 		System.out.println("pathForMediaURI " + uri);
 		try{
+			System.out.println("Build.VERSION.SDK_INT " + Build.VERSION.SDK_INT);
+			System.out.println("isDocumentUri " + DocumentsContract.isDocumentUri(context, uri));
 			if(Build.VERSION.SDK_INT >= 19 && DocumentsContract.isDocumentUri(context, uri)){
 				String docId;
 				String[] split;
 				String type;
+				System.out.println("isExternalStorageDocument " + isExternalStorageDocument(uri));
 				if(isExternalStorageDocument(uri)){
 					docId = DocumentsContract.getDocumentId(uri);
-					split = docId.split(":" );
+					split = docId.split(":");
 					type = split[0];
 					if("primary".equalsIgnoreCase(type)){
 						return Environment.getExternalStorageDirectory() + "/" + split[1];
@@ -625,14 +650,15 @@ public class Auxiliary{
 				}else{
 					if(isDownloadsDocument(uri)){
 						docId = DocumentsContract.getDocumentId(uri);
-						Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads" ), Long.valueOf(docId).longValue());
+						Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId).longValue());
 						return getDataColumn(context, contentUri, (String)null, (String[])null);
 					}
 					if(isMediaDocument(uri)){
 						docId = DocumentsContract.getDocumentId(uri);
-						split = docId.split(":" );
+						split = docId.split(":");
 						type = split[0];
 						Uri contentUri = null;
+						System.out.println("type " + type + ", " + docId);
 						if("image".equals(type)){
 							contentUri = Images.Media.EXTERNAL_CONTENT_URI;
 						}else{
@@ -641,12 +667,31 @@ public class Auxiliary{
 							}else{
 								if("audio".equals(type)){
 									contentUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-								}
+								}/*else{
+									contentUri = Uri.parse("content://com.android.providers.media.documents/document/"+split[1]);
+								}*/
 							}
 						}
+
 						String selection = "_id=?";
 						String[] selectionArgs = new String[]{split[1]};
-						return getDataColumn(context, contentUri, selection, selectionArgs);
+						System.out.println("contentUri " + contentUri);
+						System.out.println("selection " + selection);
+						System.out.println("selectionArgs " + selectionArgs[0]);
+
+						/*for (android.content.pm.PackageInfo pack : context.getPackageManager().getInstalledPackages(android.content.pm.PackageManager.GET_PROVIDERS)) {
+							android.content.pm.ProviderInfo[] providers = pack.providers;
+							if (providers != null) {
+								for (android.content.pm.ProviderInfo provider : providers) {
+									System.out.println("provider info: " + provider.authority);
+								}
+							}
+						}*/
+
+						String dataColumn = getDataColumn(context, contentUri, selection, selectionArgs);
+						//String path=pathFromFileURI(context,uri);
+						//System.out.println("path " + path);
+						return dataColumn;
 					}
 				}
 			}else{
@@ -663,13 +708,57 @@ public class Auxiliary{
 		return null;
 	}
 
+	public static String pathFromFileURI(Context inContext, Uri uri){
+		Cursor cursor = inContext.getContentResolver().query(uri, null, null, null, null);
+		cursor.moveToFirst();
+		int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+
+		return cursor.getString(idx);
+	}
+
+	public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs){
+		Cursor cursor = null;
+		final String column = "_data";
+		final String[] projection = {column};
+		try{
+			ContentResolver contentResolver = context.getContentResolver();
+			cursor = contentResolver.query(uri, projection, selection, selectionArgs, null);
+
+			//cursor = contentResolver.query(uri, projection, null, null, null);
+			//Bough ll=Auxiliary.fromCursor(cursor);
+			//System.out.println("contentResolver "+ll.dumpXML());
+
+			if(cursor != null && cursor.moveToFirst()){
+				final int column_index = cursor.getColumnIndexOrThrow(column);
+				return cursor.getString(column_index);
+			}
+		}finally{
+			if(cursor != null){
+				cursor.close();
+			}
+		}
+		return null;
+	}
+
+	public static boolean isExternalStorageDocument(Uri uri){
+		return "com.android.externalstorage.documents".equals(uri.getAuthority());
+	}
+
+	public static boolean isDownloadsDocument(Uri uri){
+		return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+	}
+
+	public static boolean isMediaDocument(Uri uri){
+		return "com.android.providers.media.documents".equals(uri.getAuthority());
+	}
+
 	public static Bough loadTextFromPublicPOST(String pathurl, byte[] data, int timeout){
-		Bough r = new Bough().name.is("result" );
+		Bough r = new Bough().name.is("result");
 		try{
 			HttpURLConnection httpURLConnection = null;
 			URL link = new URL(pathurl);
 			httpURLConnection = (HttpURLConnection)link.openConnection();
-			httpURLConnection.setRequestMethod("POST" );
+			httpURLConnection.setRequestMethod("POST");
 			httpURLConnection.setConnectTimeout(timeout);
 			httpURLConnection.setReadTimeout(timeout);
 			httpURLConnection.setDoInput(true);
@@ -681,13 +770,13 @@ public class Auxiliary{
 			if(data != null){
 				String base64 = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
 
-				OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8" );
+				OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8");
 				writer.write(base64);
 				writer.close();
 			}
 			//System.out.println("loadTextFromPOST response: "+httpURLConnection.getResponseCode()+", "+httpURLConnection.getResponseMessage());
-			r.child("code" ).value.is("" + httpURLConnection.getResponseCode());
-			r.child("message" ).value.is(httpURLConnection.getResponseMessage());
+			r.child("code").value.is("" + httpURLConnection.getResponseCode());
+			r.child("message").value.is(httpURLConnection.getResponseMessage());
 			InputStream inputStream = httpURLConnection.getInputStream();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 			byte[] bytes = new byte[1024];
@@ -699,10 +788,10 @@ public class Auxiliary{
 			}
 			bufferedInputStream.close();
 			byte[] raw = byteArrayOutputStream.toByteArray();
-			r.child("raw" ).value.is(new String(raw));
+			r.child("raw").value.is(new String(raw));
 			httpURLConnection.disconnect();
 		}catch(Throwable t){
-			r.child("message" ).value.is(r.child("message" ).value.property.value() + " / " + t.toString());
+			r.child("message").value.is(r.child("message").value.property.value() + " / " + t.toString());
 			t.printStackTrace();
 		}
 		return r;
@@ -716,12 +805,12 @@ public class Auxiliary{
 		if(login == null || password == null){
 			return loadTextFromPublicPOST(pathurl, data, timeout);
 		}
-		Bough r = new Bough().name.is("result" );
+		Bough r = new Bough().name.is("result");
 		try{
 			HttpURLConnection httpURLConnection = null;
 			URL link = new URL(pathurl);
 			httpURLConnection = (HttpURLConnection)link.openConnection();
-			httpURLConnection.setRequestMethod("POST" );
+			httpURLConnection.setRequestMethod("POST");
 			httpURLConnection.setConnectTimeout(timeout);
 			httpURLConnection.setReadTimeout(timeout);
 			httpURLConnection.setDoInput(true);
@@ -737,20 +826,20 @@ public class Auxiliary{
 			if(data != null){
 				//System.out.println(noBase64);
 				if(noBase64){
-					OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8" );
-					writer.write(new String(data, "UTF-8" ));
+					OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8");
+					writer.write(new String(data, "UTF-8"));
 					writer.close();
 				}else{
 					String base64 = android.util.Base64.encodeToString(data, android.util.Base64.DEFAULT);
 					//System.out.println(base64);
-					OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8" );
+					OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8");
 					writer.write(base64);
 					writer.close();
 				}
 			}
 			//System.out.println("loadTextFromPOST response: "+httpURLConnection.getResponseCode()+", "+httpURLConnection.getResponseMessage());
-			r.child("code" ).value.is("" + httpURLConnection.getResponseCode());
-			r.child("message" ).value.is(httpURLConnection.getResponseMessage());
+			r.child("code").value.is("" + httpURLConnection.getResponseCode());
+			r.child("message").value.is(httpURLConnection.getResponseMessage());
 			try{
 				InputStream inputStream = httpURLConnection.getInputStream();
 				BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
@@ -763,11 +852,11 @@ public class Auxiliary{
 				}
 				bufferedInputStream.close();
 				byte[] raw = byteArrayOutputStream.toByteArray();
-				r.child("raw" ).value.is(new String(raw));
-				r.child("message" ).value.is(r.child("message" ).value.property.value() + " / " + new String(raw));
+				r.child("raw").value.is(new String(raw));
+				r.child("message").value.is(r.child("message").value.property.value() + " / " + new String(raw));
 			}catch(Throwable t2){
 				t2.printStackTrace();
-				r.child("message" ).value.is(r.child("message" ).value.property.value() + " / " + t2.toString());
+				r.child("message").value.is(r.child("message").value.property.value() + " / " + t2.toString());
 			}
 			try{
 				InputStream input = httpURLConnection.getErrorStream();
@@ -779,16 +868,16 @@ public class Auxiliary{
 					}
 					input.close();
 
-					String s2 = new String(output.toByteArray(), "UTF-8" );// "windows-1251");
-					r.child("message" ).value.is(r.child("message" ).value.property.value() + " / " + s2);
+					String s2 = new String(output.toByteArray(), "UTF-8");// "windows-1251");
+					r.child("message").value.is(r.child("message").value.property.value() + " / " + s2);
 				}
 			}catch(Throwable t3){
 				t3.printStackTrace();
-				r.child("message" ).value.is(r.child("message" ).value.property.value() + " / " + t3.toString());
+				r.child("message").value.is(r.child("message").value.property.value() + " / " + t3.toString());
 			}
 			httpURLConnection.disconnect();
 		}catch(Throwable t){
-			r.child("message" ).value.is(r.child("message" ).value.property.value() + " / " + t.toString());
+			r.child("message").value.is(r.child("message").value.property.value() + " / " + t.toString());
 			t.printStackTrace();
 		}
 		return r;
@@ -800,12 +889,12 @@ public class Auxiliary{
 
 	public static Bough loadTextFromPublicPOST(String pathurl, String text, int timeout, String charset, String contentType, String accept){
 		System.out.println("loadTextFromPOST: " + pathurl + ", " + timeout + ", " + charset + ", " + text);
-		Bough rr = new Bough().name.is("result" );
+		Bough rr = new Bough().name.is("result");
 		try{
 			HttpURLConnection httpURLConnection = null;
 			URL link = new URL(pathurl);
 			httpURLConnection = (HttpURLConnection)link.openConnection();
-			httpURLConnection.setRequestMethod("POST" );
+			httpURLConnection.setRequestMethod("POST");
 			httpURLConnection.setConnectTimeout(timeout);
 			httpURLConnection.setReadTimeout(timeout);
 			//httpURLConnection.setRequestProperty("Content-Type", "application/json");
@@ -828,8 +917,8 @@ public class Auxiliary{
 			bufferedOutputStream.close();
 			outputStream.close();
 			//System.out.println("loadTextFromPOST response: "+httpURLConnection.getResponseCode()+", "+httpURLConnection.getResponseMessage());
-			rr.child("code" ).value.is("" + httpURLConnection.getResponseCode());
-			rr.child("message" ).value.is(httpURLConnection.getResponseMessage());
+			rr.child("code").value.is("" + httpURLConnection.getResponseCode());
+			rr.child("message").value.is(httpURLConnection.getResponseMessage());
 			InputStream inputStream = httpURLConnection.getInputStream();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 			byte[] bytes = new byte[1024];
@@ -841,9 +930,9 @@ public class Auxiliary{
 			}
 			bufferedInputStream.close();
 			byte[] raw = byteArrayOutputStream.toByteArray();
-			rr.child("raw" ).value.is(new String(raw));
+			rr.child("raw").value.is(new String(raw));
 		}catch(Throwable t){
-			rr.child("message" ).value.is(rr.child("message" ).value.property.value() + " / " + t.toString());
+			rr.child("message").value.is(rr.child("message").value.property.value() + " / " + t.toString());
 			t.printStackTrace();
 		}
 		return rr;
@@ -867,12 +956,12 @@ public class Auxiliary{
 		}
 		//login = "bot28";
 		//password ="28bot";
-		Bough r = new Bough().name.is("result" );
+		Bough r = new Bough().name.is("result");
 		try{
 			HttpURLConnection httpURLConnection = null;
 			URL link = new URL(pathurl);
 			httpURLConnection = (HttpURLConnection)link.openConnection();
-			httpURLConnection.setRequestMethod("POST" );
+			httpURLConnection.setRequestMethod("POST");
 			httpURLConnection.setConnectTimeout(timeout);
 			httpURLConnection.setReadTimeout(timeout);
 			httpURLConnection.setDoInput(true);
@@ -890,8 +979,8 @@ public class Auxiliary{
 			bufferedOutputStream.close();
 			outputStream.close();
 			//System.out.println("loadTextFromPOST response: "+httpURLConnection.getResponseCode()+", "+httpURLConnection.getResponseMessage());
-			r.child("code" ).value.is("" + httpURLConnection.getResponseCode());
-			r.child("message" ).value.is(httpURLConnection.getResponseMessage());
+			r.child("code").value.is("" + httpURLConnection.getResponseCode());
+			r.child("message").value.is(httpURLConnection.getResponseMessage());
 			InputStream inputStream = httpURLConnection.getInputStream();
 			BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
 			byte[] bytes = new byte[1024];
@@ -903,12 +992,12 @@ public class Auxiliary{
 			}
 			bufferedInputStream.close();
 			byte[] raw = byteArrayOutputStream.toByteArray();
-			System.out.println("raw: " + (new String(raw, "windows-1251" )));
+			System.out.println("raw: " + (new String(raw, "windows-1251")));
 
-			r.child("raw" ).value.is(new String(raw, charset));
+			r.child("raw").value.is(new String(raw, charset));
 		}catch(Throwable t){
 			//t.printStackTrace();
-			r.child("message" ).value.is(r.child("message" ).value.property.value() + " / " + t.toString());
+			r.child("message").value.is(r.child("message").value.property.value() + " / " + t.toString());
 		}
 		return r;
 	}
@@ -928,7 +1017,7 @@ public class Auxiliary{
 	}
 
 	public static byte[] loadFileFromPrivateURL(String pathurl, String login, String password) throws Exception{
-		return loadFileFromPrivateURL(pathurl, login, password, "windows-1251" );
+		return loadFileFromPrivateURL(pathurl, login, password, "windows-1251");
 	}
 
 	public static byte[] loadFileFromPrivateURL(String pathurl, String login, String password, String encoding) throws Exception{
@@ -990,10 +1079,10 @@ public class Auxiliary{
 	public static Bough checkPrivateURL(String pathurl, String login, String password) throws Exception{
 		String errorText = "";
 		String responseText = "";
-		String exception="";
+		String exception = "";
 		int responseStatus = 0;
 		//String result = "";
-		Bough result=new Bough();
+		Bough result = new Bough();
 		HttpURLConnection connection = null;
 		URL url = new URL(pathurl);
 		connection = (HttpURLConnection)url.openConnection();
@@ -1013,11 +1102,11 @@ public class Auxiliary{
 				output.write(data, 0, nn);
 			}
 			input.close();
-			responseText = new String(output.toByteArray(), "UTF-8" );
+			responseText = new String(output.toByteArray(), "UTF-8");
 			//System.out.println("checkPrivateURL responseText " + responseText);
 		}catch(Throwable t){
 			t.printStackTrace();
-			exception=exception+"\n"+t.getMessage();
+			exception = exception + "\n" + t.getMessage();
 		}
 		try{
 			byte data[] = new byte[1024];
@@ -1029,17 +1118,17 @@ public class Auxiliary{
 					output.write(data, 0, nn);
 				}
 				input.close();
-				errorText = new String(output.toByteArray(), "UTF-8" );
+				errorText = new String(output.toByteArray(), "UTF-8");
 				//System.out.println("checkPrivateURL errorText " + errorText);
 			}
 		}catch(Throwable t){
 			t.printStackTrace();
-			exception=exception+"\n"+t.getMessage();
+			exception = exception + "\n" + t.getMessage();
 		}
 		//if(connection.getResponseCode() != HttpURLConnection.HTTP_OK){
 		//	result = "" + responseStatus + "\n" + errorText + "\n" + responseText;
 		//}
-		result.child("status").value.is(""+responseStatus);
+		result.child("status").value.is("" + responseStatus);
 		result.child("error").value.is(errorText);
 		result.child("data").value.is(responseText);
 		result.child("exception").value.is(exception);
@@ -1151,7 +1240,7 @@ public class Auxiliary{
 	public static long pickDate(Context context//
 			, final Numeric date){
 		Calendar c = Calendar.getInstance();
-		c.setTimeZone(TimeZone.getTimeZone("GMT+00:00" ));
+		c.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 		c.setTimeInMillis(date.value().longValue());
 		if(date.value() == 0){
 			c.setTimeInMillis(new Date().getTime());
@@ -1160,7 +1249,7 @@ public class Auxiliary{
 			@Override
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth){
 				Calendar newCalendar = Calendar.getInstance();
-				newCalendar.setTimeZone(TimeZone.getTimeZone("GMT+00:00" ));
+				newCalendar.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 				newCalendar.setTimeInMillis(date.value().longValue());
 				newCalendar.set(Calendar.YEAR, year);
 				newCalendar.set(Calendar.MONTH, monthOfYear);
@@ -1267,7 +1356,7 @@ public class Auxiliary{
 	public static String formatNonEmptyNumber(String num, String name){
 		String rr = "";
 		if(num.trim().length() > 0){
-			if(!num.trim().equals("0" )){
+			if(!num.trim().equals("0")){
 				rr = num + name;
 			}
 		}
@@ -1299,7 +1388,7 @@ public class Auxiliary{
 								.width().is(Auxiliary.tapSize * 14)
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(grid.noHead.is(true).columns(new Column[]{
-								lines.title.is("data" ).width.is(Auxiliary.tapSize * 14)
+								lines.title.is("data").width.is(Auxiliary.tapSize * 14)
 						})
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 1.0)
@@ -1413,24 +1502,24 @@ public class Auxiliary{
 						lines.cell("✔ " + rows.get(i).txt, rowtap);
 						Task tapUp = new Task(){
 							public void doTask(){
-								onState.doTask2(rows.get(nn).id,"1");
-								int yy=grid.scrollView.getScrollY();
+								onState.doTask2(rows.get(nn).id, "1");
+								int yy = grid.scrollView.getScrollY();
 								rows.get(nn).state3 = 1;
 								refreshFilteredMultiChoice(grid, rows, filter, lines, up, down, onState);
-								grid.scrollView.scrollTo(0,yy);
+								grid.scrollView.scrollTo(0, yy);
 							}
 						};
 						Task tapDown = new Task(){
 							public void doTask(){
-								onState.doTask2(rows.get(nn).id,"0");
-								int yy=grid.scrollView.getScrollY();
+								onState.doTask2(rows.get(nn).id, "0");
+								int yy = grid.scrollView.getScrollY();
 								rows.get(nn).state3 = 2;
 								refreshFilteredMultiChoice(grid, rows, filter, lines, up, down, onState);
-								grid.scrollView.scrollTo(0,yy);
+								grid.scrollView.scrollTo(0, yy);
 							}
 						};
 						if(rows.get(nn).state3 == 1){
-							up.cell(Auxiliary.bmLike,tapUp);
+							up.cell(Auxiliary.bmLike, tapUp);
 						}else{
 							up.cell(Auxiliary.bmLikeOff, tapUp);
 						}
@@ -1456,24 +1545,24 @@ public class Auxiliary{
 						lines.cell("" + rows.get(i).txt, rowtap);
 						Task tapUp = new Task(){
 							public void doTask(){
-								onState.doTask2(rows.get(nn).id,"1");
-								int yy=grid.scrollView.getScrollY();
+								onState.doTask2(rows.get(nn).id, "1");
+								int yy = grid.scrollView.getScrollY();
 								rows.get(nn).state3 = 1;
 								refreshFilteredMultiChoice(grid, rows, filter, lines, up, down, onState);
-								grid.scrollView.scrollTo(0,yy);
+								grid.scrollView.scrollTo(0, yy);
 							}
 						};
 						Task tapDown = new Task(){
 							public void doTask(){
-								onState.doTask2(rows.get(nn).id,"0");
-								int yy=grid.scrollView.getScrollY();
+								onState.doTask2(rows.get(nn).id, "0");
+								int yy = grid.scrollView.getScrollY();
 								rows.get(nn).state3 = 2;
 								refreshFilteredMultiChoice(grid, rows, filter, lines, up, down, onState);
-								grid.scrollView.scrollTo(0,yy);
+								grid.scrollView.scrollTo(0, yy);
 							}
 						};
 						if(rows.get(nn).state3 == 1){
-							up.cell(Auxiliary.bmLike,tapUp);
+							up.cell(Auxiliary.bmLike, tapUp);
 						}else{
 							up.cell(Auxiliary.bmLikeOff, tapUp);
 						}
@@ -1524,9 +1613,9 @@ public class Auxiliary{
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(grid.noHead.is(true).columns(
 								new Column[]{
-										lines.title.is("data" ).width.is(Auxiliary.tapSize * 8.5)
-										, stateUp.noVerticalBorder.is(true).title.is("up" ).width.is(Auxiliary.tapSize * 0.5)
-										, stateDown.noVerticalBorder.is(true).title.is("down" ).width.is(Auxiliary.tapSize * 1)
+										lines.title.is("data").width.is(Auxiliary.tapSize * 8.5)
+										, stateUp.noVerticalBorder.is(true).title.is("up").width.is(Auxiliary.tapSize * 0.5)
+										, stateDown.noVerticalBorder.is(true).title.is("down").width.is(Auxiliary.tapSize * 1)
 								})
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 1.0)
@@ -1624,7 +1713,7 @@ public class Auxiliary{
 	}
 
 	public static boolean isNumeric(String strNum){
-		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("-?\\d+(\\.\\d+)?" );
+		java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("-?\\d+(\\.\\d+)?");
 		if(strNum == null){
 			return false;
 		}
@@ -1698,7 +1787,7 @@ public class Auxiliary{
 
 	public static void pickDate(Context context, final java.util.Calendar current, final Numeric result, final Task onSet){
 		Calendar c = Calendar.getInstance();
-		c.setTimeZone(TimeZone.getTimeZone("GMT+00:00" ));
+		c.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 		c.setTimeInMillis(current.getTimeInMillis());
 		if(Math.abs(current.getTimeInMillis()) < 10000){
 			c.setTimeInMillis(new Date().getTime());
@@ -1707,7 +1796,7 @@ public class Auxiliary{
 			@Override
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth){
 				Calendar newCalendar = Calendar.getInstance();
-				newCalendar.setTimeZone(TimeZone.getTimeZone("GMT+00:00" ));
+				newCalendar.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 				newCalendar.setTimeInMillis(current.getTimeInMillis());
 				newCalendar.set(Calendar.YEAR, year);
 				newCalendar.set(Calendar.MONTH, monthOfYear);
@@ -1820,13 +1909,13 @@ public class Auxiliary{
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < s.size(); i++){
 			sb.append(s.get(i));
-			sb.append("\n" );
+			sb.append("\n");
 		}
 		return sb.toString();
 	}
 
 	public static Vector<String> readTextFromFile(File file){
-		return readTextFromFile(file, "UTF-8" );
+		return readTextFromFile(file, "UTF-8");
 	}
 
 	public static Vector<String> x_readTextFromFile(Context context, String fileName, String encoding){
@@ -2180,9 +2269,9 @@ public class Auxiliary{
 	public static Bough bundle2bough(Bundle bundle){
 		Bough bough = new Bough();
 		if(bundle == null){
-			bough.name.is("null" );
+			bough.name.is("null");
 		}else{
-			bough.name.is("extra" );
+			bough.name.is("extra");
 			for(String key: bundle.keySet()){
 				String value = "" + bundle.get(key);
 				//System.out.println(key + ": " + value);
@@ -2197,43 +2286,6 @@ public class Auxiliary{
 		inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 		String path = Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
 		return Uri.parse(path);
-	}
-
-	public static String pathFromFileURI(Context inContext, Uri uri){
-		Cursor cursor = inContext.getContentResolver().query(uri, null, null, null, null);
-		cursor.moveToFirst();
-		int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-		return cursor.getString(idx);
-	}
-
-	public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs){
-		Cursor cursor = null;
-		final String column = "_data";
-		final String[] projection = {column};
-		try{
-			cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
-			if(cursor != null && cursor.moveToFirst()){
-				final int column_index = cursor.getColumnIndexOrThrow(column);
-				return cursor.getString(column_index);
-			}
-		}finally{
-			if(cursor != null){
-				cursor.close();
-			}
-		}
-		return null;
-	}
-
-	public static boolean isExternalStorageDocument(Uri uri){
-		return "com.android.externalstorage.documents".equals(uri.getAuthority());
-	}
-
-	public static boolean isDownloadsDocument(Uri uri){
-		return "com.android.providers.downloads.documents".equals(uri.getAuthority());
-	}
-
-	public static boolean isMediaDocument(Uri uri){
-		return "com.android.providers.media.documents".equals(uri.getAuthority());
 	}
 
 	public static void sendNotification(String messageTitle, String messageBody, Context packageContext, Class<?> cls){
@@ -2274,6 +2326,18 @@ public class Auxiliary{
 
 	}
 
+	public static void startMediaGallery(Activity aa,final int resultID){
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("*/*");
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+		try{
+			Intent ch = Intent.createChooser(intent, "Выбор");
+			aa.startActivityForResult(ch, resultID);
+		}catch(android.content.ActivityNotFoundException ex){
+			ex.printStackTrace();
+		}
+	}
 	/*public static String pathForMediaURI(final Context context, final Uri uri) {
 		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) && DocumentsContract.isDocumentUri(context, uri)) {
 			if (isExternalStorageDocument(uri)) {

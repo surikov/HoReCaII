@@ -175,7 +175,9 @@ public class ZayavkaNaVozvrat extends NomenclatureBasedDocument implements Parce
 			values.put("_Version", mVersion);
 			values.put("Otvetstvennyy", mOtvetstvennyyKod);
 
-			DatabaseHelper.insertInTranzaction(db, mDocumentTableName, values);
+			m_id=(int)DatabaseHelper.insertInTranzaction(db, mDocumentTableName, values);
+
+			setNew(false);
 
 		} else {
 
