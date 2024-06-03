@@ -26,7 +26,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ActivityKlientPeople extends Activity implements ITableColumnsNames {
+public class ActivityKlientPeople extends Activity implements ITableColumnsNames{
 
 	int productPageSize = 30;
 	Numeric productOffset = new Numeric();
@@ -73,6 +73,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 	Note textOsnovKlient = new Note();
 	Note textNDS = new Note();
 	Note valNDS = new Note();
+	Note textFilledDocs = new Note();
+
 	Note osobennosti = new Note();
 	Note KommentariiPropusk = new Note();
 	Note osobennostiRejimaRaboty = new Note();
@@ -87,19 +89,19 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 	Vector<Bough> rows = new Vector<Bough>();
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		//
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item){
 		super.onOptionsItemSelected(item);
 		return true;
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 
 
@@ -107,7 +109,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 	}
 
 
-	void createGUI() {
+	void createGUI(){
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		this.setTitle(ApplicationHoreca.getInstance().getClientInfo().getKod() + ": " + ApplicationHoreca.getInstance().getClientInfo().getName());
@@ -129,7 +131,15 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 				.left().is(layoutless.width().property.divide(2))
 				.top().is(0 * Auxiliary.tapSize)//
 				.width().is(layoutless.width().property.divide(2))//
-				.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
+				//.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
+				.height().is(5 * Auxiliary.tapSize)//
+		);
+		layoutless.child(new Decor(this).labelText.is(textFilledDocs) //
+				.labelAlignLeftBottom()
+				.left().is(layoutless.width().property.divide(2))
+				.top().is(Auxiliary.tapSize * 6)//
+				.width().is(layoutless.width().property.divide(2))//
+				.height().is(layoutless.height().property.minus(7.5 * Auxiliary.tapSize))//
 		);
 
 		layoutless.child(new Decor(this).labelText.is(textPochta) //
@@ -262,10 +272,10 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
                         .width().is(layoutless.width().property.divide(2))//
                         .height().is(Auxiliary.tapSize)//
         );*/
-		layoutless.child(new Knob(this).labelText.is("Добавить контакт").afterTap.is(new Task() {
+		layoutless.child(new Knob(this).labelText.is("Добавить контакт").afterTap.is(new Task(){
 					@Override
-					public void doTask() {
-						promptDobavit(null, false, 0, null, null, 0, null, null,null);
+					public void doTask(){
+						promptDobavit(null, false, 0, null, null, 0, null, null, null);
 					}
 				})//
 						.left().is(layoutless.width().property.minus(4 * Auxiliary.tapSize))//
@@ -273,9 +283,9 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.width().is(Auxiliary.tapSize * 4)//
 						.height().is(Auxiliary.tapSize)//
 		);
-		layoutless.child(new Knob(this).labelText.is("Смена адр. дост.").afterTap.is(new Task() {
+		layoutless.child(new Knob(this).labelText.is("Смена адр. дост.").afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						promptAdresDostavki();
 					}
 				})//
@@ -284,9 +294,9 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.width().is(Auxiliary.tapSize * 4)//
 						.height().is(Auxiliary.tapSize)//
 		);
-		layoutless.child(new Knob(this).labelText.is("Изменить").afterTap.is(new Task() {
+		layoutless.child(new Knob(this).labelText.is("Изменить").afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						promptInfo();
 					}
 				})//
@@ -305,7 +315,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		loadData();
 	}
 
-	void promptInfo() {
+	void promptInfo(){
 		final Note email = new Note();
 		//final Note vremya = new Note();
 		/*
@@ -328,18 +338,21 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 
 		email.value(this.pochta);
 		//vremya.value(this.vremyaRaboty);
-		try {
+		try{
 			SimpleDateFormat fromDate = new SimpleDateFormat("yyyyMMddHHmmss");
 			fromDate.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 			//vremS.value((double) fromDate.parse(this.vremyaRabotyS).getTime());
 			//vremPo.value((double) fromDate.parse(this.vremyaRabotyPo).getTime());
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		final Numeric ndsSelect = new Numeric();
-		if (valNDS.value().equals("-1")) ndsSelect.value(0);
-		if (valNDS.value().equals("0")) ndsSelect.value(0);
-		if (valNDS.value().equals("1")) ndsSelect.value(1);
+		if(valNDS.value().equals("-1"))
+			ndsSelect.value(0);
+		if(valNDS.value().equals("0"))
+			ndsSelect.value(0);
+		if(valNDS.value().equals("1"))
+			ndsSelect.value(1);
 		Auxiliary.pick(this, "", new SubLayoutless(this)//
 						.child(new Decor(this).labelText.is("e-mail").labelAlignRightTop().top().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactText(this).text.is(email).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 0.25).width().is(Auxiliary.tapSize * 5).height().is(Auxiliary.tapSize * 0.75))//
@@ -357,8 +370,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("время работы").labelAlignRightTop().top().is(Auxiliary.tapSize * 3.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(fromTime[0]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 3.25).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[0]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 3.25).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[0].value(0);
 								toTime[0].value(0);
 							}
@@ -366,8 +379,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("пн").labelAlignRightTop().top().is(Auxiliary.tapSize * 4.25).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactTime(this).time.is(fromTime[1]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 4.0).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[1]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 4.0).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[1].value(0);
 								toTime[1].value(0);
 							}
@@ -375,8 +388,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("вт").labelAlignRightTop().top().is(Auxiliary.tapSize * 5.0).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactTime(this).time.is(fromTime[2]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 4.75).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[2]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 4.75).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[2].value(0);
 								toTime[2].value(0);
 							}
@@ -384,8 +397,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("ср").labelAlignRightTop().top().is(Auxiliary.tapSize * 5.75).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactTime(this).time.is(fromTime[3]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 5.5).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[3]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 5.5).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[3].value(0);
 								toTime[3].value(0);
 							}
@@ -393,8 +406,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("чт").labelAlignRightTop().top().is(Auxiliary.tapSize * 6.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactTime(this).time.is(fromTime[4]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 6.25).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[4]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 6.25).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[4].value(0);
 								toTime[4].value(0);
 							}
@@ -402,8 +415,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("пт").labelAlignRightTop().top().is(Auxiliary.tapSize * 7.25).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactTime(this).time.is(fromTime[5]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 7.0).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[5]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 7.0).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[5].value(0);
 								toTime[5].value(0);
 							}
@@ -411,8 +424,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("сб").labelAlignRightTop().top().is(Auxiliary.tapSize * 8.0).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactTime(this).time.is(fromTime[6]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 7.75).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[6]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 7.75).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[6].value(0);
 								toTime[6].value(0);
 							}
@@ -420,8 +433,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.child(new Decor(this).labelText.is("вс").labelAlignRightTop().top().is(Auxiliary.tapSize * 8.75).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
 						.child(new RedactTime(this).time.is(fromTime[7]).format.is("HH:mm").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 8.5).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactTime(this).time.is(toTime[7]).format.is("HH:mm").left().is(Auxiliary.tapSize * 6.5).top().is(Auxiliary.tapSize * 8.5).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).labelText.is("X").afterTap.is(new Task() {
-							public void doTask() {
+						.child(new Knob(this).labelText.is("X").afterTap.is(new Task(){
+							public void doTask(){
 								fromTime[7].value(0);
 								toTime[7].value(0);
 							}
@@ -439,9 +452,9 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 */
 						.width().is(Auxiliary.tapSize * 12)//
 						.height().is(Auxiliary.tapSize * 10.5)//
-				, "Сохранить", new Task() {
+				, "Сохранить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						pochta = email.value();
 						//vremyaRaboty=vremya.value();
 
@@ -450,13 +463,15 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						toDate.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 						//vremyaRabotyS = toDate.format(new Date(new Double(vremS.value()).longValue()));
 						//vremyaRabotyPo = toDate.format(new Date(new Double(vremPo.value()).longValue()));
-						if (ndsSelect.value() == 0) valNDS.value("0");
-						if (ndsSelect.value() == 1) valNDS.value("1");
-						if (valNDS.value().equals("-1"))
+						if(ndsSelect.value() == 0)
+							valNDS.value("0");
+						if(ndsSelect.value() == 1)
+							valNDS.value("1");
+						if(valNDS.value().equals("-1"))
 							ActivityKlientPeople.this.textNDS.value("Плательщик НДС: -");
-						if (valNDS.value().equals("0"))
+						if(valNDS.value().equals("0"))
 							ActivityKlientPeople.this.textNDS.value("Плательщик НДС: нет");
-						if (valNDS.value().equals("1"))
+						if(valNDS.value().equals("1"))
 							ActivityKlientPeople.this.textNDS.value("Плательщик НДС: да");
 						//if (ndsSelect.value() == 2) valNDS.value("1");
 /*
@@ -465,8 +480,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
                         System.out.println(toDate.format(new Date(new Double(vremS.value()).longValue())));
                         System.out.println(toDate.format(new Date(new Double(vremPo.value()).longValue())));
 */
-						sendDelete("", new Task() {
-							public void doTask() {
+						sendDelete("", new Task(){
+							public void doTask(){
 								loadData();
 							}
 						});
@@ -475,7 +490,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 				}, null, null, null, null);
 	}
 
-	void sendAdresDostavki() {//String noviy, String komment) {
+	void sendAdresDostavki(){//String noviy, String komment) {
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkaNaSmenuAdresaKlienta";
 		System.out.println("sendAdresDostavki url is " + url);
 		String sql = "select pdr.kod as podrkod from Kontragenty kk join Podrazdeleniya pdr on pdr._idrref=kk.podrazdelenie where kk.kod=\"" + ApplicationHoreca.getInstance().getClientInfo().getKod() + "\";";
@@ -491,10 +506,10 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		final Note status = new Note();
 		final Note message = new Note();
 		final Note numDoc = new Note();
-		Expect expect = new Expect().status.is("Отправка заявки").task.is(new Task() {
+		Expect expect = new Expect().status.is("Отправка заявки").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					Bough result = Auxiliary.loadTextFromPrivatePOST(url, body.getBytes("UTF-8"), 60 * 1000
 							, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
 							, true
@@ -508,14 +523,14 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 					sendFileByNum(numDoc.value(), message, fileAbsPath_1);
 					sendFileByNum(numDoc.value(), message, fileAbsPath_2);
 					sendFileByNum(numDoc.value(), message, fileAbsPath_3);
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 					message.value(t.getMessage());
 				}
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				/*if (status.value().equals("0")) {
 					sendFileByNum(numDoc.value(), message, fileAbsPath_1);
 				} else {
@@ -526,38 +541,40 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		});
 		expect.start(this);
 	}
-	void sendFileByNum(String numdoc, final Note message, Note fileAbsPath) {
-		if (fileAbsPath.value().length() > 2) {
+
+	void sendFileByNum(String numdoc, final Note message, Note fileAbsPath){
+		if(fileAbsPath.value().length() > 2){
 			String rashirenie = fileAbsPath.value().substring(fileAbsPath.value().lastIndexOf(".") + 1);
 			final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkaNaSmenuAdresaKlienta/" + numdoc + "?rash=" + rashirenie;
 			System.out.println("sendFileByNum " + url);
 			final Bough result = new Bough();
-			try {
+			try{
 				File iofile = new File(fileAbsPath.value());
-				int length = (int) iofile.length();
+				int length = (int)iofile.length();
 				final byte[] bytes = new byte[length];
 				FileInputStream fileInputStream = new FileInputStream(iofile);
 				DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 				dataInputStream.readFully(bytes);
 				dataInputStream.close();
-				System.out.println("bytes.length " + bytes.length+" /"+fileAbsPath.value());
+				System.out.println("bytes.length " + bytes.length + " /" + fileAbsPath.value());
 				Bough b = Auxiliary.loadTextFromPrivatePOST(url, bytes, 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), false);
-				message.value(message.value() + "\n" + "Файл в заявке ("+fileAbsPath.value()+"): " + b.child("raw").value.property.value());
-			} catch (Throwable t) {
+				message.value(message.value() + "\n" + "Файл в заявке (" + fileAbsPath.value() + "): " + b.child("raw").value.property.value());
+			}catch(Throwable t){
 				message.value(message.value() + "\n" + t.getMessage());
 				Auxiliary.warn(message.value(), ActivityKlientPeople.this);
 			}
 		}
 	}
-	void sendFileByNum222(String numdoc, final Note message, Note fileAbsPath) {
-		if (fileAbsPath.value().length() > 2) {
+
+	void sendFileByNum222(String numdoc, final Note message, Note fileAbsPath){
+		if(fileAbsPath.value().length() > 2){
 			String rashirenie = fileAbsPath.value().substring(fileAbsPath.value().lastIndexOf(".") + 1);
 			final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkaNaSmenuAdresaKlienta/" + numdoc + "?rash=" + rashirenie;
 			System.out.println("sendFileByNum " + url);
 			final Bough result = new Bough();
-			try {
+			try{
 				File iofile = new File(fileAbsPath.value());
-				int length = (int) iofile.length();
+				int length = (int)iofile.length();
 				final byte[] bytes = new byte[length];
 				FileInputStream fileInputStream = new FileInputStream(iofile);
 				DataInputStream dataInputStream = new DataInputStream(fileInputStream);
@@ -565,22 +582,22 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 				dataInputStream.close();
 				System.out.println("bytes.length " + bytes.length);
 				final Bough raw = new Bough();
-				new Expect().task.is(new Task() {
+				new Expect().task.is(new Task(){
 					@Override
-					public void doTask() {
-						try {
+					public void doTask(){
+						try{
 							Bough b = Auxiliary.loadTextFromPrivatePOST(url, bytes, 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), false);
 							System.out.println(b.dumpXML());
 							//result.child("raw").value.is(b.child("raw").value.property.value());
 							//result.child("message").value.is(b.child("message").value.property.value());
 							message.value(message.value() + "\n" + "Файл в заявке: " + b.child("raw").value.property.value());
-						} catch (Exception e) {
+						}catch(Exception e){
 							e.printStackTrace();
 						}
 					}
-				}).afterDone.is(new Task() {
+				}).afterDone.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//if (result.child("raw").value.property.value().equals("Всё ОК")) {
 						//	saveFile(filePath);
 						//}
@@ -588,17 +605,17 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						Auxiliary.warn(message.value(), ActivityKlientPeople.this);
 					}
 				}).status.is("Отправка файла").start(this);
-			} catch (Throwable t) {
+			}catch(Throwable t){
 				//Auxiliary.warn(t.getMessage(),this);
 				message.value(message.value() + "\n" + t.getMessage());
 				Auxiliary.warn(message.value(), ActivityKlientPeople.this);
 			}
-		} else {
+		}else{
 			Auxiliary.warn(message.value(), ActivityKlientPeople.this);
 		}
 	}
 
-	void promptAdresDostavki() {
+	void promptAdresDostavki(){
 		/*final Note noviAdres = new Note().value(this.oldAdresDostavki);
 		final Note komment = new Note();
 		final Note filePath = new Note();*/
@@ -611,8 +628,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 
 						.child(new Decor(this).labelText.is("файл 1").labelAlignLeftTop().left().is(Auxiliary.tapSize * 0.25).top().is(Auxiliary.tapSize * 3.5).width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactText(this).text.is(fileAbsPath_1).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 4).width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).afterTap.is(new Task() {
-									public void doTask() {
+						.child(new Knob(this).afterTap.is(new Task(){
+									public void doTask(){
 										Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 										intent.setType("*/*");
 										intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -624,8 +641,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						)
 						.child(new Decor(this).labelText.is("файл 2").labelAlignLeftTop().left().is(Auxiliary.tapSize * 0.25).top().is(Auxiliary.tapSize * 5).width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactText(this).text.is(fileAbsPath_2).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 5.5).width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).afterTap.is(new Task() {
-									public void doTask() {
+						.child(new Knob(this).afterTap.is(new Task(){
+									public void doTask(){
 										Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 										intent.setType("*/*");
 										intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -637,8 +654,8 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						)
 						.child(new Decor(this).labelText.is("файл 3").labelAlignLeftTop().left().is(Auxiliary.tapSize * 0.25).top().is(Auxiliary.tapSize * 6.5).width().is(Auxiliary.tapSize * 3).height().is(Auxiliary.tapSize * 0.75))//
 						.child(new RedactText(this).text.is(fileAbsPath_3).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 7).width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.75))//
-						.child(new Knob(this).afterTap.is(new Task() {
-									public void doTask() {
+						.child(new Knob(this).afterTap.is(new Task(){
+									public void doTask(){
 										Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 										intent.setType("*/*");
 										intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -652,9 +669,9 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 						.height().is(Auxiliary.tapSize * 11)//
 
 
-				, "Отправить", new Task() {
+				, "Отправить", new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						sendAdresDostavki();//noviAdres.value(), komment.value());
 					}
 				}, null, null, null, null);
@@ -663,12 +680,12 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + data);
 
 		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == RESULT_OK) {
-			switch (requestCode) {
+		if(resultCode == RESULT_OK){
+			switch(requestCode){
 				case GET_GALLERY_PICTURE_1:
 					String filePath1 = null;
 					Uri uri1 = data.getData();
@@ -691,7 +708,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		}
 	}
 
-	void promptDobavit(final String kod, boolean _main, int _rolNum, String _doljnost, final String _fio, long _datarojd, String _mobtel, String _gortel,String _email) {
+	void promptDobavit(final String kod, boolean _main, int _rolNum, String _doljnost, final String _fio, long _datarojd, String _mobtel, String _gortel, String _email){
 
 		String firstLabel = null;
 		Task firstTask = null;
@@ -708,40 +725,40 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 		final Note gortel = new Note();
 		final Note email = new Note();
 
-		if (kod == null) {
+		if(kod == null){
 			firstLabel = "Добавить";
-			firstTask = new Task() {
+			firstTask = new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					String dastring = "";
-					if (datarojd.value().longValue() > 0) {
+					if(datarojd.value().longValue() > 0){
 						Date d = new Date(datarojd.value().longValue());
 						dastring = Auxiliary.short1cDate.format(d);
 					}
 					final String s = dastring;
-					sendAdd("",fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value(), s, main.value(), mobtel.value(), gortel.value(),email.value()
-							, new Task() {
-								public void doTask() {
+					sendAdd("", fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value(), s, main.value(), mobtel.value(), gortel.value(), email.value()
+							, new Task(){
+								public void doTask(){
 									loadData();
 								}
 							}
 					);
 				}
 			};
-		} else {
+		}else{
 			main.value(_main);
 			//final Note kontakntnoeLico = new Note();
 			rolNum.value(_rolNum);
 			doljnost.value(_doljnost);
 			fio.value(_fio);
-			datarojd.value((float) _datarojd);
+			datarojd.value((float)_datarojd);
 			mobtel.value(_mobtel);
 			gortel.value(_gortel);
 			email.value(_email);
 			firstLabel = "Изменить";
-			firstTask = new Task() {
+			firstTask = new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					/*
 					sendDelete(kod, new Task() {
 						public void doTask() {
@@ -761,24 +778,24 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 					});
 */
 					String dastring = "";
-					if (datarojd.value().longValue() > 0) {
+					if(datarojd.value().longValue() > 0){
 						Date d = new Date(datarojd.value().longValue());
 						dastring = Auxiliary.short1cDate.format(d);
 					}
 					final String s = dastring;
-					sendAdd(kod,fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value()
-							, s, main.value(), mobtel.value(), gortel.value(),email.value()
-							, new Task() {
-								public void doTask() {
+					sendAdd(kod, fio.value(), rolByNum(rolNum.value().intValue()), doljnost.value(), fio.value()
+							, s, main.value(), mobtel.value(), gortel.value(), email.value()
+							, new Task(){
+								public void doTask(){
 									loadData();
 								}
 							});
 				}
 			};
 			secondLabel = "Удалить";
-			secondTask = new Task() {
+			secondTask = new Task(){
 				@Override
-				public void doTask() {
+				public void doTask(){
 					promptDelete(kod, _fio);
 				}
 			};
@@ -821,74 +838,101 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 				, firstLabel, firstTask, secondLabel, secondTask, null, null);
 	}
 
-	public String rol(String kod) {
-		if (kod.equals("00001")) return rol00001;
-		if (kod.equals("00002")) return rol00002;
-		if (kod.equals("00003")) return rol00003;
-		if (kod.equals("00004")) return rol00004;
-		if (kod.equals("00005")) return rol00005;
-		if (kod.equals("00006")) return rol00006;
-		if (kod.equals("00008")) return rol00008;
+	public String rol(String kod){
+		if(kod.equals("00001"))
+			return rol00001;
+		if(kod.equals("00002"))
+			return rol00002;
+		if(kod.equals("00003"))
+			return rol00003;
+		if(kod.equals("00004"))
+			return rol00004;
+		if(kod.equals("00005"))
+			return rol00005;
+		if(kod.equals("00006"))
+			return rol00006;
+		if(kod.equals("00008"))
+			return rol00008;
 		return "№" + kod;
 	}
 
-	public String rolByNum(int nn) {
-		if (nn == 1) return "00002";
-		if (nn == 2) return "00003";
-		if (nn == 3) return "00004";
-		if (nn == 4) return "00005";
-		if (nn == 5) return "00006";
-		if (nn == 6) return "00008";
+	public String rolByNum(int nn){
+		if(nn == 1)
+			return "00002";
+		if(nn == 2)
+			return "00003";
+		if(nn == 3)
+			return "00004";
+		if(nn == 4)
+			return "00005";
+		if(nn == 5)
+			return "00006";
+		if(nn == 6)
+			return "00008";
 		return "00001";
 	}
 
-	public int rolNumByKod(String kod) {
-		if (kod.equals("00001")) return 0;
-		if (kod.equals("00002")) return 1;
-		if (kod.equals("00003")) return 2;
-		if (kod.equals("00004")) return 3;
-		if (kod.equals("00005")) return 4;
-		if (kod.equals("00006")) return 5;
-		if (kod.equals("00008")) return 6;
+	public int rolNumByKod(String kod){
+		if(kod.equals("00001"))
+			return 0;
+		if(kod.equals("00002"))
+			return 1;
+		if(kod.equals("00003"))
+			return 2;
+		if(kod.equals("00004"))
+			return 3;
+		if(kod.equals("00005"))
+			return 4;
+		if(kod.equals("00006"))
+			return 5;
+		if(kod.equals("00008"))
+			return 6;
 		return 0;
 	}
 
-	String timeDayName(int nn) {
-		if (nn == 1) return "пн.";
-		if (nn == 2) return "вт.";
-		if (nn == 3) return "ср.";
-		if (nn == 4) return "чт.";
-		if (nn == 5) return "пт.";
-		if (nn == 6) return "сб.";
-		if (nn == 7) return "вс.";
+	String timeDayName(int nn){
+		if(nn == 1)
+			return "пн.";
+		if(nn == 2)
+			return "вт.";
+		if(nn == 3)
+			return "ср.";
+		if(nn == 4)
+			return "чт.";
+		if(nn == 5)
+			return "пт.";
+		if(nn == 6)
+			return "сб.";
+		if(nn == 7)
+			return "вс.";
 		return "";
 	}
 
-	void formatVremyaRaboty(Vector<Bough> vrem) {
-		for (int i = 0; i < fromTime.length; i++) {
+	void formatVremyaRaboty(Vector<Bough> vrem){
+		for(int i = 0; i < fromTime.length; i++){
 			fromTime[i].value(0);
 		}
-		for (int i = 0; i < toTime.length; i++) {
+		for(int i = 0; i < toTime.length; i++){
 			toTime[i].value(0);
 		}
 		SimpleDateFormat HHmm = new SimpleDateFormat("HH:mm");
 		HHmm.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 		String zpt = "";
 		String timeString = "";
-		for (int i = 0; i < vrem.size(); i++) {
-			int dennedeli = (int) Numeric.string2double(vrem.get(i).child("ДеньНедели").value.property.value());
+		for(int i = 0; i < vrem.size(); i++){
+			int dennedeli = (int)Numeric.string2double(vrem.get(i).child("ДеньНедели").value.property.value());
 			System.out.println(dennedeli + ": " + timeDayName(dennedeli) + ": " + vrem.get(i).child("Начало").value.property.value());
-			if ((!vrem.get(i).child("Начало").value.property.value().equals("00:00")) && vrem.get(i).child("Начало").value.property.value().length() > 1) {
-				try {
-					if (dennedeli < fromTime.length) {
-						fromTime[dennedeli].value((double) HHmm.parse(vrem.get(i).child("Начало").value.property.value()).getTime());
+			if((!vrem.get(i).child("Начало").value.property.value().equals("00:00")) && vrem.get(i).child("Начало").value.property.value().length() > 1){
+				try{
+					if(dennedeli < fromTime.length){
+						fromTime[dennedeli].value((double)HHmm.parse(vrem.get(i).child("Начало").value.property.value()).getTime());
 					}
-					if (dennedeli < toTime.length) {
-						toTime[dennedeli].value((double) HHmm.parse(vrem.get(i).child("Конец").value.property.value()).getTime());
+					if(dennedeli < toTime.length){
+						toTime[dennedeli].value((double)HHmm.parse(vrem.get(i).child("Конец").value.property.value()).getTime());
 						timeString = timeString + zpt + timeDayName(dennedeli) + vrem.get(i).child("Начало").value.property.value() + " - " + vrem.get(i).child("Конец").value.property.value();
 						zpt = ", ";
 					}
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 			}
@@ -913,23 +957,23 @@ I/System.out: 		</ВремяРаботы>
 */
 	}
 
-	public void loadData() {
+	public void loadData(){
 		ActivityKlientPeople.this.rows.removeAllElements();
 		String kod = ApplicationHoreca.getInstance().getClientInfo().getKod();
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ContactInfo/" + kod;
 		//final String url = "https://testservice.swlife.ru/simutkin_hrc/hs/ContactInfo/" + kod;
 
-		System.out.println(url);
-		Expect expect = new Expect().status.is("Обновление списка").task.is(new Task() {
+		System.out.println("loadData " + url);
+		Expect expect = new Expect().status.is("Обновление списка").task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					//.loadTextFromPrivatePOST(url, txt, 21000, "UTF-8",Cfg.hrcPersonalLogin,Cfg.hrcPersonalPassword);
 					String txt = new String(bytes, "UTF-8");
-					System.out.println(txt);
+					//System.out.println(txt);
 					Bough b = new Bough().parseJSON(txt);
-					//System.out.println(b.dumpXML());
+					System.out.println(b.dumpXML());
 					ActivityKlientPeople.this.pochta = b.child("КонтактныеЛица").child("Почта").value.property.value();
 					//ActivityKlientPeople.this.vremyaRaboty = b.child("КонтактныеЛица").child("ВремяРаботы").value.property.value();
 					//ActivityKlientPeople.this.vremyaRabotyS = b.child("КонтактныеЛица").child("ВремяРаботыС").value.property.value();
@@ -960,29 +1004,53 @@ I/System.out: 		</ВремяРаботы>
 
 
 					ActivityKlientPeople.this.valNDS.value(b.child("КонтактныеЛица").child("ПлательщикНДС").value.property.value());
-					if (valNDS.value().equals("-1"))
+					if(valNDS.value().equals("-1"))
 						ActivityKlientPeople.this.textNDS.value("Плательщик НДС: -");
-					if (valNDS.value().equals("0"))
+					if(valNDS.value().equals("0"))
 						ActivityKlientPeople.this.textNDS.value("Плательщик НДС: нет");
-					if (valNDS.value().equals("1"))
+					if(valNDS.value().equals("1"))
 						ActivityKlientPeople.this.textNDS.value("Плательщик НДС: да");
 
 
 					Vector<Bough> people = b.child("КонтактныеЛица").children("КонтактныеЛица");
-					for (int i = 0; i < people.size(); i++) {
+					for(int i = 0; i < people.size(); i++){
 						ActivityKlientPeople.this.rows.add(people.get(i));
 						//System.out.println(people.get(i).dumpXML());
 					}
+					textFilledDocs.value("Наличие документов: ");
+
+					Bough eldocs=b.child("КонтактныеЛица").child("ЭлектронныеДокументы");
+					//System.out.println(eldocs.dumpXML());
+					String dlmtr="";
+
+					for(int ii = 0; ii < eldocs.children.size(); ii++){
+						Bough it = eldocs.children.get(ii);
+						System.out.println(it.name.property.value()+": "+it.value.property.value());
+						if(it.value.property.value().equals("true")){
+							String docname=it.name.property.value().replace("__"," ");
+							docname=it.name.property.value().replace("_"," ");
+							textFilledDocs.value(textFilledDocs.value() + dlmtr + docname);
+							dlmtr=", ";
+						}
+					}
+					if(b.child("КонтактныеЛица").child("ЕстьДоговорПоставки").value.property.value().equals("true")){
+						textFilledDocs.value(textFilledDocs.value() + dlmtr + "Договор поставки");
+						dlmtr=", ";
+					}
+					if(b.child("КонтактныеЛица").child("ПечатиПодписи").value.property.value().equals("true")){
+						textFilledDocs.value(textFilledDocs.value() + dlmtr + "Печати и подписи");
+						dlmtr=", ";
+					}
 
 
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				flipItemsGrid();
 				itemsGrid.refresh();
 
@@ -992,11 +1060,11 @@ I/System.out: 		</ВремяРаботы>
 	}
 
 
-	public void flipItemsGrid() {
+	public void flipItemsGrid(){
 		itemsGrid.clearColumns();
-		if (rows != null) {
+		if(rows != null){
 
-			for (int i = 0; i < rows.size(); i++) {
+			for(int i = 0; i < rows.size(); i++){
 				Bough row = rows.get(i);
 				//final String art = row.child("Артикул").value.property.value();
 				// final String name = row.child("name").value.property.value();
@@ -1007,9 +1075,9 @@ I/System.out: 		</ВремяРаботы>
 				final String doljnost = row.child("Должность").value.property.value();
 				final String fio = row.child("ФИО").value.property.value();
 				long dms = 0;
-				try {
+				try{
 					dms = Auxiliary.short1cDate.parse(row.child("ДатаРождения").value.property.value()).getTime();
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 				final long datarojd = dms;
@@ -1017,40 +1085,40 @@ I/System.out: 		</ВремяРаботы>
 				final String gortel = row.child("ГородскойТелефон").value.property.value();
 				final String email = row.child("Почта").value.property.value();
 
-				Task tap = new Task() {
+				Task tap = new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						//promptDelete(kod, name);
 						//promptInfo(art);
-						promptEditOrDelete(kod, main, rolNum, doljnost, fio, datarojd, mobtel, gortel,email);
+						promptEditOrDelete(kod, main, rolNum, doljnost, fio, datarojd, mobtel, gortel, email);
 					}
 				};//mOrder
 				String info = row.child("КонтактноеЛицо").value.property.value();
-				if (mobtel.length() > 0) {
+				if(mobtel.length() > 0){
 					info = info + ", моб.тел: " + mobtel;
 				}
-				if (gortel.length() > 0) {
+				if(gortel.length() > 0){
 					info = info + ", гор.тел: " + gortel;
 				}
-				if (email.length() > 0) {
+				if(email.length() > 0){
 					info = info + ", e-mail: " + email;
 				}
 				String descr = "код: " + kod;
-				if (kod.startsWith("/"))
+				if(kod.startsWith("/"))
 					descr = "";
-				if (row.child("Должность").value.property.value().length() > 0) {
+				if(row.child("Должность").value.property.value().length() > 0){
 					descr = descr + ", должность: " + doljnost;
 				}
-				if (row.child("КодРоль").value.property.value().length() > 0) {
+				if(row.child("КодРоль").value.property.value().length() > 0){
 					descr = descr + ", роль: " + rol(row.child("КодРоль").value.property.value());
 				}
-				if (row.child("ФИО").value.property.value().length() > 0) {
+				if(row.child("ФИО").value.property.value().length() > 0){
 					descr = descr + ", ФИО: " + fio;
 				}
-				if (row.child("ДатаРождения").value.property.value().length() > 0) {
+				if(row.child("ДатаРождения").value.property.value().length() > 0){
 					descr = descr + ", д.р.: " + Auxiliary.tryReFormatDate(row.child("ДатаРождения").value.property.value(), "yyyyMMdd", "dd.MM.YYYY");
 				}
-				if (row.child("Основное").value.property.value().length() > 0) {
+				if(row.child("Основное").value.property.value().length() > 0){
 					descr = descr + ", основной: " + (main ? "да" : "нет");
 				}
 				columnItemNaimenovanie.cell(info, tap, descr);
@@ -1059,17 +1127,17 @@ I/System.out: 		</ВремяРаботы>
 		}
 	}
 
-	void promptEditOrDelete(final String kod, boolean _main, int _rolNum, String _doljnost, String _fio, long _datarojd, String _mobtel, String _gortel, String _email) {
-		promptDobavit(kod, _main, _rolNum, _doljnost, _fio, _datarojd, _mobtel, _gortel,_email);
+	void promptEditOrDelete(final String kod, boolean _main, int _rolNum, String _doljnost, String _fio, long _datarojd, String _mobtel, String _gortel, String _email){
+		promptDobavit(kod, _main, _rolNum, _doljnost, _fio, _datarojd, _mobtel, _gortel, _email);
 	}
 
-	void promptDelete(final String kod, String name) {
-		Auxiliary.pickConfirm(ActivityKlientPeople.this, "Удалить контакт №" + kod + ", " + name, "Удалить", new Task() {
+	void promptDelete(final String kod, String name){
+		Auxiliary.pickConfirm(ActivityKlientPeople.this, "Удалить контакт №" + kod + ", " + name, "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				System.out.println("promptDelete " + kod);
-				sendDelete(kod, new Task() {
-					public void doTask() {
+				sendDelete(kod, new Task(){
+					public void doTask(){
 						loadData();
 					}
 				});
@@ -1077,7 +1145,7 @@ I/System.out: 		</ВремяРаботы>
 		});
 	}
 
-	void sendDelete(String kod, Task doAfterDone) {
+	void sendDelete(String kod, Task doAfterDone){
 
 		String json = "[";
 		json = json + "\n {";
@@ -1164,7 +1232,7 @@ I/System.out: 		</ВремяРаботы>
 		//json = json + "\n ,\"КлиентРаботаетБезПечати\":" + (this.klientRabotayetBezPechati.value()?"true":"false") + "";
 		json = json + "\n ,\"КлиентРаботаетБезПечати\":false";
 		json = json + "\n ,\"Удаленные\":[";
-		if (kod.length() > 1) {
+		if(kod.length() > 1){
 			json = json + "\n   {\"КодКонтактногоЛица\": \"" + kod + "\"}";
 		}
 		json = json + "\n  ]";
@@ -1176,9 +1244,9 @@ I/System.out: 		</ВремяРаботы>
 		sendData(json, doAfterDone);
 	}
 
-	void sendAdd(String kod,String kontaktLico, String kodRol, String doljnost, String fio, String dataRojd, boolean osnov, String mobTel, String gorTel, String email, Task doAfterDone) {
+	void sendAdd(String kod, String kontaktLico, String kodRol, String doljnost, String fio, String dataRojd, boolean osnov, String mobTel, String gorTel, String email, Task doAfterDone){
 		String main = "false";
-		if (osnov) {
+		if(osnov){
 			main = "true";
 		}
 
@@ -1191,7 +1259,7 @@ I/System.out: 		</ВремяРаботы>
 		json = json + "\n ,\"ПлательщикНДС\":\"" + valNDS.value() + "\"";
 		json = json + "\n ,\"Удаленные\":[]";
 		json = json + "\n ,\"КонтактныеЛица\":[";
-		json = json + "\n  {\"КодКонтактногоЛица\": \""+kod+"\""
+		json = json + "\n  {\"КодКонтактногоЛица\": \"" + kod + "\""
 				+ "\n     ,\"КонтактноеЛицо\": \"" + kontaktLico + "\""
 				+ "\n     ,\"КодРоль\": \"" + kodRol + "\""
 				+ "\n     ,\"Должность\": \"" + doljnost + "\""
@@ -1235,7 +1303,7 @@ I/System.out: 		</ВремяРаботы>
 		sendData(json, doAfterDone);
 	}
 
-	void sendData(final String json, final Task doAfterDone) {
+	void sendData(final String json, final Task doAfterDone){
 		final String url =
 				Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 						//"http://89.109.7.162/shatov"
@@ -1243,21 +1311,22 @@ I/System.out: 		</ВремяРаботы>
 						+ "/hs/ContactInfo/Peredat/"
 						+ ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
 		final Note msg = new Note();
-		Expect expect = new Expect().status.is("Отправка").task.is(new Task() {
+		Expect expect = new Expect().status.is("Отправка").task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				System.out.println(url);
 				System.out.println(json);
 				Bough result = Auxiliary.loadTextFromPrivatePOST(url, json, 21000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				System.out.println(result.dumpXML());
 				msg.value(result.child("message").value.property.value() + " " + result.child("raw").value.property.value());
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.inform(msg.value(), ActivityKlientPeople.this);
 				//loadData();
-				if (doAfterDone != null) doAfterDone.doTask();
+				if(doAfterDone != null)
+					doAfterDone.doTask();
 			}
 		});
 		expect.start(this);

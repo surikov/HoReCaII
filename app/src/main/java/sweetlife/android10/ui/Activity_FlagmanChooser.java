@@ -334,6 +334,7 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 		lostedLimit.setDate(1);
 		lostedLimit.setHours(0);
 		lostedLimit.setMinutes(1);
+
 		for(int i = 0; i < data.children.size(); i++){
 			Bough row = data.children.get(i);
 			//System.out.println(row.dumpXML());
@@ -346,13 +347,14 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 					selectArtikul(art);
 				}
 			};
-			int bg = 0x00000000;//white
+			//int bg = 0x00000000;//white
+			int bcGrndFill = Auxiliary.colorTransparent;
 			/*if (Numeric.string2double(row.child("LastPrice").value.property.value()) > 0) {
 				bg = 0xffdddddd;
 			}*/
 			String compArt = art;
 			if(row.child("LastSell").value.property.value().trim().length() > 0){
-				bg = 0xffdddddd;//grey
+				bcGrndFill = Auxiliary.colorGrey;//0xffdddddd;//grey
 				SimpleDateFormat sdf = new SimpleDateFormat(("yyyy-MM-dd"));
 				Date val = new Date();
 				try{
@@ -360,13 +362,20 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
 				}catch(Throwable tt){
 					tt.printStackTrace();
 				}
-				if(val.before(lostedLimit)){
-					bg = 0xffff6699;//pink
+				if(row.child("artCount").value.property.value().length() > 0){
+					//bg = 0xffddffdd;//green
+					bcGrndFill = Auxiliary.colorGreen;
+				}else{
+					if(val.before(lostedLimit)){
+						//bg = 0xffff6699;//pink
+						bcGrndFill = Auxiliary.colorPink;
+					}
 				}
 				//compArt = art + " " + row.child("LastSell").value.property.value();
 			}else{
 				if(row.child("artCount").value.property.value().length() > 0){
-					bg = 0xffddffdd;//green
+					//bg = 0xffddffdd;//green
+					bcGrndFill = Auxiliary.colorGreen;
 				}
 			}
 
@@ -400,11 +409,11 @@ public class Activity_FlagmanChooser extends Activity_Base implements ITableColu
             );*/
 
 
-			columnProductArtikul.cell(compArt, bg, tap3);
-			columnProductNaimenovanie.cell(row.child("Naimenovanie").value.property.value(), bg, tap3);
-			columnProductProizvoditel.cell(row.child("ProizvoditelNaimenovanie").value.property.value(), bg
+			columnProductArtikul.cell(compArt, bcGrndFill, tap3);
+			columnProductNaimenovanie.cell(row.child("Naimenovanie").value.property.value(), bcGrndFill, tap3);
+			columnProductProizvoditel.cell(row.child("ProizvoditelNaimenovanie").value.property.value(), bcGrndFill
 					, tap3, row.child("MinNorma").value.property.value() + " " + row.child("EdinicyIzmereniyaNaimenovanie").value.property.value());
-			columnProductCena.cell(row.child("Cena").value.property.value() + "р", bg
+			columnProductCena.cell(row.child("Cena").value.property.value() + "р", bcGrndFill
 					, tap3, row.child("MinCena").value.property.value() + " / " + row.child("MaxCena").value.property.value());
 		}
 

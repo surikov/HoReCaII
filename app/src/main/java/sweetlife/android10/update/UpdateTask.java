@@ -872,7 +872,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 		mDB.execSQL("	CREATE INDEX IX_EdinicyIzmereniya_strip_IDRRef on EdinicyIzmereniya_strip(_IDRRef);	");
 		*/
-
+/*
 		if(upd != null){
 			upd.logAndPublishProcess("Анализ БД - Текущие цены остатков партий" );
 		}
@@ -895,6 +895,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 		mDB.execSQL("	CREATE INDEX IX_TekuschieCenyOstatkovPartiy_strip_Cena on TekuschieCenyOstatkovPartiy_strip(Cena);	" );
 		mDB.execSQL("	CREATE INDEX IX_TekuschieCenyOstatkovPartiy_strip_Nomenklatura on TekuschieCenyOstatkovPartiy_strip(nomenklatura);	" );
+		*/
 		/*if (upd != null) {
 			upd.logAndPublishProcess("Анализ БД - Величины квантования");
 		}

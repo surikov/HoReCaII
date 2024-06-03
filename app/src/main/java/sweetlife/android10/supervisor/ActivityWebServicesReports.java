@@ -24,7 +24,8 @@ import java.nio.channels.*;
 import sweetlife.android10.consts.ITableColumnsNames;
 import sweetlife.android10.data.common.ClientInfo;
 import sweetlife.android10.data.orders.FoodstuffsData;
-import sweetlife.android10.ui.Popup_EditNomenclatureCountPrice;
+import sweetlife.android10.ui.*;
+import sweetlife.android10.utils.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
 import tee.binding.*;
@@ -56,6 +57,16 @@ public class ActivityWebServicesReports extends Activity{
 	MenuItem menuSendXLS;
 	MenuItem menuSendPDF;
 	static int reportGridScrollViewY = 0;
+
+	final public static int etiketkaIDPicture = 734766;
+	final public static int tovarIDPicture = 1098834;
+	public static Note etiketkaObratnayaSvyazKlient = new Note();
+	public static Note tovarObratnayaSvyazKlient = new Note();
+	static Note docNumObratnayaSvyazKlient = new Note();
+	static Note artikulObratnayaSvyazKlient = new Note();
+	static Note commentObratnayaSvyazKlient = new Note();
+	static Numeric dateObratnayaSvyazKlient = new Numeric();
+
 
 	Note seekReport = new Note();
 
@@ -441,6 +452,13 @@ public class ActivityWebServicesReports extends Activity{
 		if(key.equals(ReportStatusyZakazov.folderKey())){
 			report = new ReportStatusyZakazov(this);
 		}
+
+
+		if(key.equals(ReportRealizacii.folderKey())){
+			report = new ReportRealizacii(this);
+		}
+
+
 		if(key.equals(ReportSvodDlyaTP.folderKey())){
 			report = new ReportSvodDlyaTP(this);
 		}
@@ -471,7 +489,6 @@ public class ActivityWebServicesReports extends Activity{
 		if(key.equals(ReportDistribuciaKrasnodar.folderKey())){
 			report = new ReportDistribuciaKrasnodar(this);
 		}
-
 
 
 		if(key.equals(ReportProdajiFlagmanovPoKontragentam.folderKey())){
@@ -777,6 +794,7 @@ public class ActivityWebServicesReports extends Activity{
 
 
 		addReportMenu2(ReportRV.folderKey(), ReportRV.menuLabel());
+		addReportMenu2(ReportRealizacii.folderKey(), ReportRealizacii.menuLabel());
 		addReportMenu2(ReportResultatyUtverjdenihSpecifikaciy.folderKey(), ReportResultatyUtverjdenihSpecifikaciy.menuLabel());
 
 
@@ -910,7 +928,7 @@ public class ActivityWebServicesReports extends Activity{
 	}
 
 	void doHOOKReturn(final String num, final String dat){
-		Auxiliary.pick3Choice(this, "Заявка №" + num+" от "+dat, "Утверждение заявки на возврат."//
+		Auxiliary.pick3Choice(this, "Заявка №" + num + " от " + dat, "Утверждение заявки на возврат."//
 				, "Утвердить", new Task(){
 					@Override
 					public void doTask(){
@@ -921,10 +939,10 @@ public class ActivityWebServicesReports extends Activity{
 					public void doTask(){
 						sendReturnApprove(false, num);
 					}
-				},  "Удалить", new Task(){
+				}, "Удалить", new Task(){
 					@Override
 					public void doTask(){
-						sendReturnDelete( num,dat);
+						sendReturnDelete(num, dat);
 					}
 				});
 	}
@@ -1072,7 +1090,7 @@ public class ActivityWebServicesReports extends Activity{
 
 	void promptReportDeleteSpec(final String num, final String art){
 		final Numeric sel = new Numeric();
-		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки"}, sel, "№" + num, new Task(){
+		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки" }, sel, "№" + num, new Task(){
 			@Override
 			public void doTask(){
 				if(sel.value() == 0){
@@ -1100,7 +1118,7 @@ public class ActivityWebServicesReports extends Activity{
 
 	void doHOOKDegustacia(final String num){
 		final Numeric sel = new Numeric();
-		Auxiliary.pickSingleChoice(this, new String[]{"Отказать", "Утвердить"}, sel, "№" + num, new Task(){
+		Auxiliary.pickSingleChoice(this, new String[]{"Отказать", "Утвердить" }, sel, "№" + num, new Task(){
 			@Override
 			public void doTask(){
 				sendDegustaciaState(num, sel.value().intValue());
@@ -1208,6 +1226,292 @@ public class ActivityWebServicesReports extends Activity{
 		});
 	}
 
+	void doHOOKHookArtDocDateSent(String docNum, String docDate, String docArt){
+		//System.out.println(docNum + "/" + docDate + "/" + docArt);
+		//Auxiliary.warn(docNum + "/" + docDate + "/" + docArt,this);
+		docNumObratnayaSvyazKlient.value(docNum);
+		artikulObratnayaSvyazKlient.value(docArt);
+		try{
+			dateObratnayaSvyazKlient.value((double)(Auxiliary.ddMMyyyy.parse(docDate).getTime()));
+			//promptObratnayaSvyazKlient(this);
+			getChatCurrent();
+		}catch(Throwable t){
+			Auxiliary.warn("Неверная дата " + docDate + " " + t.getMessage(), this);
+		}
+	}
+
+	void getChatCurrent(){
+		//String url="https://service.swlife.ru/hrc120107/hs/FeedbackCustomer/receive/hrc221"；
+		final String url = Settings.getInstance().getBaseURL()
+				+ Settings.selectedBase1C() + "/hs/FeedbackCustomer/receive/" + Cfg.whoCheckListOwner();
+		System.out.println("url " + url);
+		String body = "{"
+				+ "\n	\"DateNac\": \"" + Auxiliary.mssqlTime.format(new Date(dateObratnayaSvyazKlient.value().longValue())) + "\""
+				//+ "\n	,\"CodClient\": \"\"" //\"134567\""// + ApplicationHoreca.getInstance().getClientInfo().getKod() + "\","
+				+ "\n	,\"NumberNac\": \"" + docNumObratnayaSvyazKlient.value() + "\""
+				+ "\n	,\"Article\": \"" + artikulObratnayaSvyazKlient.value() + "\""
+				+ "\n}";
+		System.out.println("body " + body);
+		final Bough obratnayaSvyazOtKlienta = new Bough();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url, body.getBytes("UTF-8"), 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					String raw = b.child("raw").value.property.value();
+					Bough data = Bough.parseJSON(raw);
+					//System.out.println(data.dumpXML());
+					obratnayaSvyazOtKlienta.children = data.child("ОбратнаяСвязьОтКлиента").children;
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				//Auxiliary.warn("Результат: " + result.value(), activity);
+				if(obratnayaSvyazOtKlienta.child("Номер").value.property.value().equals("null")){
+
+					promptObratnayaSvyazKlient(ActivityWebServicesReports.this);
+				}else{
+					promptChatArtMessages(obratnayaSvyazOtKlienta);
+
+				}
+			}
+		}).status.is("Отправка").start(this);
+	}
+
+	void promptChatArtMessages(Bough obratnayaSvyazOtKlienta){
+		//Auxiliary.warn(answer.dumpXML(),ActivityWebServicesReports.this);
+		System.out.println(obratnayaSvyazOtKlienta.dumpXML());
+		Vector<Bough> items = obratnayaSvyazOtKlienta.children("Переписка");
+		final String Nomer = obratnayaSvyazOtKlienta.child("Номер").value.property.value();
+		String chat = "";
+		for(int ii = 0; ii < items.size(); ii++){
+			Bough one = items.get(ii);
+			String line = Auxiliary.tryReFormatDate(one.child("Дата").value.property.value(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yy HH:mm:ss") + ": ";
+			line = line + one.child("Пользователь").value.property.value() + ": ";
+			line = line + one.child("Текст").value.property.value().trim() + "\n";
+			chat = chat + line;
+		}
+		//System.out.println(chat);
+		//Auxiliary.warn(chat,ActivityWebServicesReports.this);
+		final Note newStr = new Note();
+		Auxiliary.pick(ActivityWebServicesReports.this, "", new SubLayoutless(ActivityWebServicesReports.this)//
+						.child(new Decor(ActivityWebServicesReports.this).labelText.is(chat).labelAlignLeftBottom()
+								.top().is(Auxiliary.tapSize * 0.5)
+								.left().is(Auxiliary.tapSize * 0.5)
+								.width().is(Auxiliary.tapSize * 9)
+								.height().is(Auxiliary.tapSize * 7))//
+						.child(new RedactText(ActivityWebServicesReports.this).text.is(newStr)
+								.left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 7.5)
+								.width().is(Auxiliary.tapSize * 9)
+								.height().is(Auxiliary.tapSize * 1))//
+						.width().is(Auxiliary.tapSize * 10)//
+						.height().is(Auxiliary.tapSize * 10)//
+				, "Добавить комментарий", new Task(){
+					@Override
+					public void doTask(){
+						System.out.println("otpr" + newStr.value());
+						sendArtikulComment(newStr.value(), Nomer);
+					}
+				}, null, null, null, null);
+	}
+
+	void sendArtikulComment(String txt, String Nomer){
+		//https://service.swlife.ru/hrc120107/hs/FeedbackCustomer/message/hrc221
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/FeedbackCustomer/message/" + Cfg.whoCheckListOwner();
+		System.out.println("url " + url);
+		String body = "{"
+				+ "\n	\"NumberDoc\": \"" + Nomer + "\""
+				+ "\n	,\"Comment\": \"" + txt.replace("\n", " ").replace("\r", " ").replace("\"", " ").replace("  ", " ") + "\""
+				+ "\n}";
+		System.out.println("body " + body);
+		final Bough response = new Bough();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url, body.getBytes("UTF-8"), 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					String raw = b.child("raw").value.property.value();
+					Bough data = Bough.parseJSON(raw);
+					//System.out.println(data.dumpXML());
+					response.children = data.children;
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				//Auxiliary.warn("Результат: " + result.value(), activity);
+				System.out.println(response.dumpXML());
+				getChatCurrent();
+				if(response.child("Статус").value.property.value().equals("0")){
+					//
+				}else{
+					Auxiliary.warn("Отправка: " + response.dumpXML(), ActivityWebServicesReports.this);
+				}
+			}
+		}).status.is("Отправка").start(this);
+	}
+
+	public  void promptObratnayaSvyazKlient(Activity activity){
+
+		Auxiliary.pick(activity, "", new SubLayoutless(activity)//
+						.child(new Decor(activity).labelText.is("Обратная связь").top().is(Auxiliary.tapSize * 0.5).left().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(activity).labelText.is("№ реализации").labelAlignRightTop().top().is(Auxiliary.tapSize * 1.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(activity).text.is(docNumObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 1.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(activity).labelText.is("дата реализации").labelAlignRightTop().top().is(Auxiliary.tapSize * 2.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactDate(activity).date.is(dateObratnayaSvyazKlient).format.is("dd.MM.yyyy").left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 2.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(activity).labelText.is("комментарий").labelAlignRightTop().top().is(Auxiliary.tapSize * 3.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(activity).text.is(commentObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 3.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(activity).labelText.is("артикул").labelAlignRightTop().top().is(Auxiliary.tapSize * 4.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(activity).text.is(artikulObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 4.0).top().is(Auxiliary.tapSize * 4.0).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(activity).labelText.is("фото этикетки").labelAlignLeftTop().left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 5.5).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(activity).text.is(etiketkaObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 6).width().is(Auxiliary.tapSize * 7.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(activity).labelText.is("X").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								etiketkaObratnayaSvyazKlient.value("");
+							}
+						}).left().is(Auxiliary.tapSize * 7.5).top().is(Auxiliary.tapSize * 6).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(activity).labelText.is("...").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								Auxiliary.startMediaGallery(activity, etiketkaIDPicture);
+							}
+						}).left().is(Auxiliary.tapSize * 8.5).top().is(Auxiliary.tapSize * 6).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(activity).labelText.is("фото товара").labelAlignLeftTop().left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 7).width().is(Auxiliary.tapSize * 3.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(activity).text.is(tovarObratnayaSvyazKlient).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 7.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(activity).labelText.is("X").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								tovarObratnayaSvyazKlient.value("");
+							}
+						}).left().is(Auxiliary.tapSize * 7.5).top().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+						.child(new Knob(activity).labelText.is("...").afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								Auxiliary.startMediaGallery(activity, tovarIDPicture);
+							}
+						}).left().is(Auxiliary.tapSize * 8.5).top().is(Auxiliary.tapSize * 7.5).width().is(Auxiliary.tapSize * 1.0).height().is(Auxiliary.tapSize * 1))//
+
+
+						.width().is(Auxiliary.tapSize * 10)//
+						.height().is(Auxiliary.tapSize * 11)//
+				, "Отправить", new Task(){
+					@Override
+					public void doTask(){
+						if(okObratnayaSvyazKlient(activity)){
+							sendObratnayaSvyazKlient(activity);
+						}
+					}
+				}, null, null, null, null);
+	}
+
+	public static boolean okObratnayaSvyazKlient(Activity activity){
+		if(docNumObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не заполнен номер реализации", activity);
+			return false;
+		}
+		if(dateObratnayaSvyazKlient.value() < 3){
+			Auxiliary.warn("Не заполнена дата реализации", activity);
+			return false;
+		}
+		if(commentObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не заполнен комментарий", activity);
+			return false;
+		}
+		if(artikulObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не указан артикул", activity);
+			return false;
+		}
+		if(etiketkaObratnayaSvyazKlient.value().length() < 3 && tovarObratnayaSvyazKlient.value().length() < 3){
+			Auxiliary.warn("Не добавлены фото", activity);
+			return false;
+		}
+		return true;
+	}
+
+	public  void sendObratnayaSvyazKlient(Activity activity){
+		final String url = Settings.getInstance().getBaseURL()
+				+ Settings.selectedBase1C() + "/hs/FeedbackCustomer/Создать/" + Cfg.whoCheckListOwner();
+		System.out.println("url " + url);
+		String NumberDoc = docNumObratnayaSvyazKlient.value()
+				+ "-" + Auxiliary.sqliteDate.format(new Date(dateObratnayaSvyazKlient.value().longValue()))
+				+ "-" + artikulObratnayaSvyazKlient.value();
+		String data = "{"
+				+ "\n	\"NumberDoc\": \"" + NumberDoc + "\""
+				+ "\n	,\"CodClient\": \"\""// + ApplicationHoreca.getInstance().getClientInfo().getKod() + "\","
+				+ "\n	,\"Товары\": [{"
+				+ "\n			\"Article\": \"" + artikulObratnayaSvyazKlient.value() + "\""
+				+ "\n			,\"NumberNac\": \"" + docNumObratnayaSvyazKlient.value() + "\""
+				+ "\n			,\"DateNac\": \"" + Auxiliary.sqliteDate.format(new Date(dateObratnayaSvyazKlient.value().longValue())) + "\""
+				+ "\n			,\"Comment\": \"" + commentObratnayaSvyazKlient.value() + "\""
+				+ "\n		}"
+				+ "\n	],"
+				+ "\n	\"Files\": [";
+		if(etiketkaObratnayaSvyazKlient.value().length() > 3){
+			String filePath = etiketkaObratnayaSvyazKlient.value().trim();
+			String encodedFile = android.util.Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), android.util.Base64.NO_WRAP);
+			String[] spl = filePath.split("\\.");
+			String rash = spl[spl.length - 1];
+			data = data + "\n		{\"File\": \"" + encodedFile + "\", \"rassh\": \"" + rash + "\"}";
+			if(tovarObratnayaSvyazKlient.value().length() > 3){
+				filePath = tovarObratnayaSvyazKlient.value().trim();
+				encodedFile = android.util.Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), android.util.Base64.NO_WRAP);
+				spl = filePath.split("\\.");
+				rash = spl[spl.length - 1];
+				data = data + "\n		,{\"File\": \"" + encodedFile + "\", \"rassh\": \"" + rash + "\"}";
+			}
+		}else{
+			if(tovarObratnayaSvyazKlient.value().length() > 3){
+				String filePath = tovarObratnayaSvyazKlient.value().trim();
+				String encodedFile = android.util.Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), android.util.Base64.NO_WRAP);
+				String[] spl = filePath.split("\\.");
+				String rash = spl[spl.length - 1];
+				data = data + "\n		{\"File\": \"" + encodedFile + "\", \"rassh\": \"" + rash + "\"}";
+			}
+		}
+		data = data + "\n	]"
+				+ "\n}"
+				+ "\n";
+		final String body = data;
+		//https://service.swlife.ru/hrc120107/hs/FeedbackCustomer/Создать/hrc221
+		//if(etiketkaObratnayaSvyazKlient.value().length() < 3 && tovarObratnayaSvyazKlient.value().length() < 3){
+		//14:44
+		System.out.println("body " + body);
+		final Note result = new Note();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					//Bough b = Auxiliary.loadTextFromPublicPOST(url, post, 99, "UTF-8");
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url, body.getBytes("UTF-8"), 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					System.out.println(b.dumpXML());
+					result.value(Bough.parseJSON(b.child("raw").value.property.value()).child("Сообщение").value.property.value());
+
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				getChatCurrent();
+				Auxiliary.warn("Результат: " + result.value(), activity);
+			}
+		}).status.is("Отправка").start(activity);
+	}
+
 	void doHOOKHookZayavkiNaDobavlenieVmatricu(final String num){
 		//Auxiliary.warn(num,this);
 		Auxiliary.pick3Choice(this, "Заявка на добавление клиента", "№" + num
@@ -1280,7 +1584,7 @@ public class ActivityWebServicesReports extends Activity{
 							+ "/" + URLEncoder.encode(num, "utf-8")//
 							+ "/" + URLEncoder.encode(art, "utf-8")//
 							;
-					System.out.println("sendReturnAnswer "+url);
+					System.out.println("sendReturnAnswer " + url);
 					Report_Base.startPing();
 					Bough result;
 					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8"), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
@@ -1333,18 +1637,19 @@ public class ActivityWebServicesReports extends Activity{
 		});
 		expect.start(ActivityWebServicesReports.this);
 	}
-	void sendReturnDelete(final String num,final String dat){
-		System.out.println(num+"/"+dat);
+
+	void sendReturnDelete(final String num, final String dat){
+		System.out.println(num + "/" + dat);
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Подождите")//
 				.task.is(new Task(){
 					@Override
 					public void doTask(){
 						try{
-							String url =  Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
-											+ "/hs/UdalenieZayavkiNaVozvrat"
-											+ "/" + URLEncoder.encode(num.trim(), "utf-8")
-											+ "/" + URLEncoder.encode(Auxiliary.tryReFormatDate(dat,"dd.MM.yyyy","yyyyMMdd"), "utf-8")//
+							String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+									+ "/hs/UdalenieZayavkiNaVozvrat"
+									+ "/" + URLEncoder.encode(num.trim(), "utf-8")
+									+ "/" + URLEncoder.encode(Auxiliary.tryReFormatDate(dat, "dd.MM.yyyy", "yyyyMMdd"), "utf-8")//
 									;
 							Report_Base.startPing();
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
@@ -1364,6 +1669,7 @@ public class ActivityWebServicesReports extends Activity{
 				});
 		expect.start(ActivityWebServicesReports.this);
 	}
+
 	void sendReturnApprove(final boolean approve, final String num){
 		final RawSOAP r = new RawSOAP();
 		new Expect().status.is("Выполнение...").task.is(new Task(){
@@ -1897,7 +2203,7 @@ public class ActivityWebServicesReports extends Activity{
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportReturnState)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					String dat = brwsr.getQueryParameter(Report_Base.FIELDDocumentDate);
-					doHOOKReturn(num,dat);
+					doHOOKReturn(num, dat);
 				}
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportVzaimoraschety)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
@@ -1945,6 +2251,12 @@ public class ActivityWebServicesReports extends Activity{
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HookZayavkiNaDobavlenieVmatricu)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
 					doHOOKHookZayavkiNaDobavlenieVmatricu(num);
+				}
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKArtDocDateSent)){
+					doHOOKHookArtDocDateSent(brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber)
+							, brwsr.getQueryParameter(Report_Base.FIELDShipDate)
+							, brwsr.getQueryParameter(Report_Base.FIELDArtikul)
+					);
 				}
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportOrderState)){
 					String urlDocumentDate = brwsr.getQueryParameter(Report_Base.FIELDDocumentDate);
@@ -2420,10 +2732,12 @@ public class ActivityWebServicesReports extends Activity{
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+		String filePath = null;
+		Uri uri = null;
 		switch(requestCode){
 			case FILE_SELECT_SKD_RESULT:{
 				if(resultCode == RESULT_OK){
-					Uri uri = intent.getData();
+					uri = intent.getData();
 					String path = Auxiliary.pathForMediaURI(this, uri);
 					if(path != null && path.length() > 5){
 						sendSKDFile(path);
@@ -2435,7 +2749,7 @@ public class ActivityWebServicesReports extends Activity{
 			}
 			case FILE_PEREBIT_SKD_RESULT:{
 				if(resultCode == RESULT_OK){
-					Uri uri = intent.getData();
+					uri = intent.getData();
 					String path = Auxiliary.pathForMediaURI(this, uri);
 					if(path != null && path.length() > 5){
 						sendPerebitFile(path);
@@ -2445,6 +2759,24 @@ public class ActivityWebServicesReports extends Activity{
 				}
 				break;
 			}
+			case etiketkaIDPicture:
+				uri = intent.getData();
+				filePath = Auxiliary.pathForMediaURI(this, uri);
+				if(filePath == null){
+					Auxiliary.warn("Не удалось прочитать " + uri, ActivityWebServicesReports.this);
+					return;
+				}
+				etiketkaObratnayaSvyazKlient.value(filePath);
+				break;
+			case tovarIDPicture:
+				uri = intent.getData();
+				filePath = Auxiliary.pathForMediaURI(this, uri);
+				if(filePath == null){
+					Auxiliary.warn("Не удалось прочитать " + uri, ActivityWebServicesReports.this);
+					return;
+				}
+				tovarObratnayaSvyazKlient.value(filePath);
+				break;
 			/*case NOMENKLATURA_NEW: {
 				if (resultCode == RESULT_OK) {
 					//String art = intent.getStringExtra(ITableColumnsNames.ARTIKUL);

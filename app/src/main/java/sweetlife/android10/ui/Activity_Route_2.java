@@ -603,37 +603,50 @@ public class Activity_Route_2 extends Activity{
 		//menuVigrusit = menu.add("Выгрузить");
 		//menuDocumenti = menu.add("Документы");
 		menuGPSinformacia = menu.add("GPS информация" );
-		menuDobavitKlientaVMarsgrut = menu.add("Заявки на добавление клиента в маршрут" );
-		menuRasporyazheniaNaOtgruzku = menu.add("Распоряжения на отгрузку" );
-		menuOtchety = menu.add("Отчёты" );
-		menuDataCheck = menu.add("Проверка БД" );
-		//menuResetExchange = menu.add("Очистка БД");
-		menuMatricaTP = menu.add("Матрицы ТП" );
-		menuMap = menu.add("Положение на карте" );
-		//menuLimit = menu.add("Установка лимитов контрагентов");
 		menuAnketi = menu.add("Анкеты заявок на новых клиентов" );
-		//menuVizitGroup = menu.add("Открыть группу визитов");
-		//menuNezakrVizit = menu.add("Удалить все визиты");
-		menuVizitGroup = menu.add("Начать объединенный визит" );
-		menuCheckDocs = menu.add("Чек-листы" );
-		menuHelp = menu.add("Справочная документация" );
-		menuPlanObuchenia = menu.add("План обучения" );
-		menuFinDocs = menu.add("Фин/Юр. документы" );
-		menuZapiski = menu.add("Служебные записки на договоры" );
-		menuPoKassamDlyaTP = menu.add("Кассовые чеки" );
-		menuZayavkaVozmehenie = menu.add("Заявки на возмещение" );
-		menuPerebitNakladnuyu = menu.add("Заявки на изменение накладной" );
-
-		menuZayavkaNaPostavku = menu.add("Заявки на поставку" );
-		menuMarshrutDogovora = menu.add("Обновить маршрут и договоры" );
-		// menuTONacenka = menu.add("Обновить показатели");
 		menuDannieMercury = menu.add("Данные Меркурий" );
+		menuZayavkaVozmehenie = menu.add("Заявки на возмещение" );
+		menuZayavkaNaPerevodVdosudebnye = menu.add("Заявка на вывод/перевод в СБ" );
+		menuDobavitKlientaVMarsgrut = menu.add("Заявки на добавление клиента в маршрут" );
+		menuPerebitNakladnuyu = menu.add("Заявки на изменение накладной" );
+		menuZayavkaNaPostavku = menu.add("Заявки на поставку" );
+		menuIskluchenieVizitov = menu.add("Исключение визитов" );
+		menuPoKassamDlyaTP = menu.add("Кассовые чеки" );
+		menuKontaktnayaInformacia = menu.add("Контактная информация" );
+		menuMatricaTP = menu.add("Матрицы ТП" );
+		menuVizitGroup = menu.add("Начать объединенный визит" );
+		menuMarshrutDogovora = menu.add("Обновить маршрут и договоры" );
+		menuOtchety = menu.add("Отчёты" );
+		menuPeredatIsprNakl = menu.add("Передать исправленную накладную" );
+		menuPlanObuchenia = menu.add("План обучения" );
+		menuMap = menu.add("Положение на карте" );
+		menuDataCheck = menu.add("Проверка БД" );
+		menuRasporyazheniaNaOtgruzku = menu.add("Распоряжения на отгрузку" );
+		menuZapiski = menu.add("Служебные записки на договоры" );
 		menuChangeUser = menu.add("Сменить пользователя" );
 		menuFirebaseMesasages = menu.add("Сообщения" );
-		menuPeredatIsprNakl = menu.add("Передать исправленную накладную" );
-		menuKontaktnayaInformacia = menu.add("Контактная информация" );
-		menuZayavkaNaPerevodVdosudebnye = menu.add("Заявка на вывод/перевод в СБ" );
-		menuIskluchenieVizitov = menu.add("Исключение визитов" );
+		menuHelp = menu.add("Справочная документация" );
+		menuFinDocs = menu.add("Фин/Юр. документы" );
+		menuCheckDocs = menu.add("Чек-листы" );
+
+
+		//menuResetExchange = menu.add("Очистка БД");
+
+
+		//menuLimit = menu.add("Установка лимитов контрагентов");
+
+		//menuVizitGroup = menu.add("Открыть группу визитов");
+		//menuNezakrVizit = menu.add("Удалить все визиты");
+
+
+		// menuTONacenka = menu.add("Обновить показатели");
+
+
+
+
+
+
+
 		return true;
 	}
 

@@ -322,6 +322,7 @@ public class Activity_NomenclatureNew extends Activity{
 				.item("★")
 				.item("Рекомендованные")
 				.item("Корзина")
+				.item("Распродажа")
 				.selection.is(filterStmStarRecomendaciaKorzina)
 				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.5 * 4 + 5)))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
@@ -467,7 +468,9 @@ public class Activity_NomenclatureNew extends Activity{
 					, filterStmStarRecomendaciaKorzina.value() == 1//,filterBySTM.value()
 					, filterStmStarRecomendaciaKorzina.value() == 2
 					, filterStmStarRecomendaciaKorzina.value() == 3
-					, filterStmStarRecomendaciaKorzina.value() == 4, false
+					, filterStmStarRecomendaciaKorzina.value() == 4
+					, filterStmStarRecomendaciaKorzina.value() == 5
+					, false
 			);
 			itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		}else{
@@ -523,7 +526,9 @@ public class Activity_NomenclatureNew extends Activity{
 						, filterStmStarRecomendaciaKorzina.value() == 1//,filterBySTM.value()
 						, filterStmStarRecomendaciaKorzina.value() == 2
 						, filterStmStarRecomendaciaKorzina.value() == 3
-						, filterStmStarRecomendaciaKorzina.value() == 4, false
+						, filterStmStarRecomendaciaKorzina.value() == 4
+						, filterStmStarRecomendaciaKorzina.value() == 5
+						, false
 				);
 				//System.out.println("Activity_NomenclatureNew.requeryGridData" + sql);
 				itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -558,7 +563,9 @@ public class Activity_NomenclatureNew extends Activity{
 								, filterStmStarRecomendaciaKorzina.value() == 1//,filterBySTM.value()
 								, filterStmStarRecomendaciaKorzina.value() == 2
 								, filterStmStarRecomendaciaKorzina.value() == 3
-								, filterStmStarRecomendaciaKorzina.value() == 4, false
+								, filterStmStarRecomendaciaKorzina.value() == 4
+								, filterStmStarRecomendaciaKorzina.value() == 5
+								, false
 						);
 						itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sqlString, null));
 					}else{

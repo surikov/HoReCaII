@@ -3,7 +3,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
 	android:background="#E3E3E3">
-
+<!--
 	<include
 		android:id="@+id/bar_period"
 		android:layout_width="wrap_content"
@@ -13,11 +13,12 @@
 		android:layout_marginLeft="20dip"
 		android:layout_marginTop="10dip"
 		layout="@layout/bar_period" />
-
+-->
 	<RelativeLayout
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent"
-		android:layout_below="@+id/bar_period">
+
+		>
 
 		<RelativeLayout
 			android:layout_width="wrap_content"
@@ -26,6 +27,7 @@
 			<include
 				android:id="@+id/list_header"
 				layout="@layout/header_gps_points" />
+
 			<!-- 1280px -->
 			<ListView
 				android:id="@+id/list_gps_points"

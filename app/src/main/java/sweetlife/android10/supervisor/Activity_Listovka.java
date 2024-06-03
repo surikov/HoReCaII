@@ -225,6 +225,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames{
 					, false
 					, false
 					, false
+					, false
 					,false
 			);
 			//System.out.println(sql);
@@ -356,6 +357,7 @@ public class Activity_Listovka extends Activity implements ITableColumnsNames{
 					, null
 					, null
 					, null
+					, false
 					, false
 					, false
 					, false

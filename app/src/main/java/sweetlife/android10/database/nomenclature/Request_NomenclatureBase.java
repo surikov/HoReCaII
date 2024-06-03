@@ -333,7 +333,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		return composeSQLall_Old(dataOtgruzki, kontragentID, polzovatelID, dataNachala, dataKonca
 				, poiskovoeSlovo, tipPoiska, etoTrafik, history, skladPodrazdelenia, limit//
 				, offset, isMustList, isTop, kuhnya, tochkaIdrref, individualcena, DEGUSTACIA_POISK, ingredientIdrref, ingredientKluch
-				, flagmanTovarSegmentKod, false, false, false, false, no_assortiment);
+				, flagmanTovarSegmentKod, false, false, false, false, false, no_assortiment);
 		// }
 	}
 
@@ -408,6 +408,31 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		}
 	}
 
+	static String kontragentIDTekuschie = "";
+
+	static void adjustTekuschieCenyOstatkovPartiy_strip(String kontragentID){
+		if(kontragentIDTekuschie.equals(kontragentID)){
+			//
+		}else{
+			kontragentIDTekuschie = kontragentID;
+			System.out.println("adjustTekuschieCenyOstatkovPartiy_strip " + kontragentIDTekuschie);
+			String sql = "delete from TekuschieCenyOstatkovPartiy_strip;";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into TekuschieCenyOstatkovPartiy_strip (Nomenklatura,Cena,UstanavlivaetsyaVruchnuyu)"
+					+ "\n	select tt.Nomenklatura,tt.Cena,tt.UstanavlivaetsyaVruchnuyu"
+					+ "\n		from TekuschieCenyOstatkovPartiy tt"
+					+ "\n		join Nomenklatura_sorted nn on nn._idrref=tt.nomenklatura"
+					+ "\n		join Kontragenty kk on kk._idrref=" + kontragentID + " and kk.vidDostavki=tt.vidDostavki;";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into TekuschieCenyOstatkovPartiy_strip (Nomenklatura,Cena,UstanavlivaetsyaVruchnuyu)"
+					+ "\n	select tt.Nomenklatura,tt.Cena,tt.UstanavlivaetsyaVruchnuyu"
+					+ "\n		from TekuschieCenyOstatkovPartiy tt"
+					+ "\n		join Nomenklatura_sorted nn on nn._idrref=tt.nomenklatura and tt.vidDostavki=x'00'"
+					+ "\n		where tt.Nomenklatura not in (select Nomenklatura from TekuschieCenyOstatkovPartiy_strip);";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+		}
+	}
+
 	public static String composeSQLall_Old(
 			String dataOtgruzki//2013-01-30
 			, String kontragentID//
@@ -434,11 +459,12 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 			, boolean starsOnly
 			, boolean recomendaciaOnly
 			, boolean korzinaOnly
+			, boolean rasprodazhaOnly
 			, boolean no_assortiment
 	){
 
 		//refreshTovariGeroiDay(dataOtgruzki);
-
+		adjustTekuschieCenyOstatkovPartiy_strip(kontragentID);
 
 		//if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().equals("hrc00")) {
 		if(Cfg.selectedOrDbHRC().equals("hrc00")){
@@ -980,7 +1006,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 				sql = sql + "\n where curAssortiment.zapret!=x'01' ";
 			}
 		}
-
+		if(rasprodazhaOnly){
+			sql = sql + "\n and newSkidki.comment='Распродажа' and date(newSkidki.datastart)<=date(parameters.dataOtgruzki) and date(newSkidki.dataend)>=date(parameters.dataOtgruzki)";
+		}
 		if(poisk.length() > 0){
 			sql = sql + "\n and " + poisk;
 		}

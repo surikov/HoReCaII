@@ -90,12 +90,19 @@ public class Auxiliary{
 	public static SimpleDateFormat mssqlTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	public static SimpleDateFormat sqliteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	public static SimpleDateFormat sqliteDate = new SimpleDateFormat("yyyy-MM-dd");
+	public static SimpleDateFormat ddMMyyyy = new SimpleDateFormat("dd.MM.yyyy");
 	public static SimpleDateFormat short1cDate = new SimpleDateFormat("yyyyMMdd");
 	public static SimpleDateFormat rusDate = new SimpleDateFormat("dd.MM.yy");
 	public static SimpleDateFormat rusTimeDate = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 	public static double latitude = 0;//https://www.google.ru/maps/@56.3706531,44.0456248,10.25z - latitude+":"+longitude
 	public static double longitude = 0;//east-west, долгота
 	public static long gpsTime = 0;//last time
+
+	public static int colorTransparent=0x00000000;
+	public static int colorGrey=0xffdddddd;
+	public static int colorPink=0xffff6699;
+	public static int colorGreen=0xffddffdd;
+
 	//
 	//public static final int startMediaGalleryID = 22779984;
 	//

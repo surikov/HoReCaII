@@ -205,7 +205,11 @@ System.out.println("create RecommendationAndBasket1221");
 			System.out.println(t.getMessage());
 		}
 
-
+		try {
+			mDB.execSQL("alter table TekuschieCenyOstatkovPartiy add column VidDostavki blob;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
 
 		mDB.execSQL("create table if not exists Brand ("//
 				+ "_id integer primary key asc"//

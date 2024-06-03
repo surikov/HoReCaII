@@ -51,9 +51,7 @@ import tee.binding.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
 
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
+import android.app.*;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -2773,8 +2771,52 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 
 		}
 	}
-
 	void doHistoryPaneExport(){
+		String fileName="/export" + Math.floor(Math.random() * 10000) + ".xls";
+		Vector<Vector<String>> rows = new Vector<Vector<String>>();
+		requeryHistoryData();
+		Bough curdata = Auxiliary.fromCursor(this.historyCursor);
+		//System.out.println("curdata: " + curdata.dumpXML());
+		//Vector<Bough> datarows = curdata.children("row");
+
+		ZayavkaPokupatelya bid = mBidData.getBid();
+		Vector<Bough> datarows = curdata.children("row");
+		//System.out.println(curdata.dumpXML());
+		int n = datarows.size();
+		for(int i = 0; i < n; i++){
+			//System.out.println("row " + i + ": " + datarows.get(i).dumpXML());
+			Vector<String> item = new Vector<String>();
+			String s = datarows.get(i).child("Naimenovanie").value.property.value();//mBidData.getFoodStuffs().getFoodstuff(i).getNomenklaturaNaimenovanie();
+			s = s.replaceAll(" \\(склад 8\\)", "");
+			s = s.replaceAll(" \\(склад 10\\)", "");
+			s = s.replaceAll(" \\(склад 12\\)", "");
+			s = s.replaceAll(" \\(склад 14\\)", "");
+			s = s.replaceAll(" \\(склад 17\\)", "");
+			s = s.replaceAll(" \\(склад \\?\\)", "");
+			item.add(datarows.get(i).child("Artikul").value.property.value());//mBidData.getFoodStuffs().getFoodstuff(i).getArtikul());
+			item.add(s);
+			item.add(datarows.get(i).child("EdinicyIzmereniyaNaimenovanie").value.property.value());//mBidData.getFoodStuffs().getFoodstuff(i).getEdinicaIzmereniyaName());
+			item.add(datarows.get(i).child("MinNorma").value.property.value());// + mBidData.getFoodStuffs().getFoodstuff(i).getMinNorma());
+			item.add(datarows.get(i).child("Koephphicient").value.property.value());// + mBidData.getFoodStuffs().getFoodstuff(i).getKoefMest());
+			item.add(datarows.get(i).child("Cena").value.property.value());// + mBidData.getFoodStuffs().getFoodstuff(i).getCenaSoSkidkoy());
+			//item.add(datarows.get(i).child("LastPrice").value.property.value());
+			rows.add(item);
+			String sql = "select n.naimenovanie as n1,s.naimenovanie as n2,g.naimenovanie as n3"//
+					+ " from nomenklatura n"//
+					+ " left join nomenklatura s on n.roditel=s._idrref"//
+					+ " left join nomenklatura g on s.roditel=g._idrref"//
+					+ " where n.artikul='" + item.get(0) + "';";
+			//System.out.println(sql);
+			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+			//System.out.println(item.get(0)+", "+b.child("row").child("n2").value.property.value()+", "+b.child("row").child("n3").value.property.value());
+			item.add(b.child("row").child("n2").value.property.value());
+			item.add(b.child("row").child("n3").value.property.value());
+
+		}
+
+		Cfg.exportArtikulsList(this,  fileName, bid.getClientKod(),  rows);
+	}
+	void doHistoryPaneExport2222(){
 		//gridHistory.exportCurrentDataCSV(Activity_Bid.this, "history.csv", "windows-1251");
 		try{
 			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/export" + Math.floor(Math.random() * 10000) + ".xls";
@@ -2882,10 +2924,24 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				item.add(s);
 				item.add(datarows.get(i).child("EdinicyIzmereniyaNaimenovanie").value.property.value());//mBidData.getFoodStuffs().getFoodstuff(i).getEdinicaIzmereniyaName());
 				item.add(datarows.get(i).child("MinNorma").value.property.value());// + mBidData.getFoodStuffs().getFoodstuff(i).getMinNorma());
-				item.add("?");// + mBidData.getFoodStuffs().getFoodstuff(i).getKoefMest());
+				item.add(" ");// + mBidData.getFoodStuffs().getFoodstuff(i).getKoefMest());
 				item.add(datarows.get(i).child("Cena").value.property.value());// + mBidData.getFoodStuffs().getFoodstuff(i).getCenaSoSkidkoy());
 				item.add(datarows.get(i).child("LastPrice").value.property.value());
 				rows.add(item);
+
+				/*
+				s = s.replaceAll(" \\(склад \\?\\)", "");
+				item.add(mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul());
+				item.add(s);
+				item.add(mBidData.getFoodStuffs().getFoodstuff(ii).getEdinicaIzmereniyaName());
+				item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getMinNorma());
+				item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getKoefMest());
+				item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getCenaSoSkidkoy());
+				rows.add(item);
+				*/
+
+
+
 				String sql = "select n.naimenovanie as n1,s.naimenovanie as n2,g.naimenovanie as n3"//
 						+ " from nomenklatura n"//
 						+ " left join nomenklatura s on n.roditel=s._idrref"//
@@ -2946,10 +3002,51 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 
 	}
+
 	void doMenuExport(){
 		exportBidData(mBidData);
 	}
+
 	void exportBidData(BidData mBidData){
+		String fileName="/Заказ "
+				+ Auxiliary.safeFileName(ApplicationHoreca.getInstance().getClientInfo().getName())
+				+ Math.floor(Math.random() * 10000)
+				+ ".xls";
+		ZayavkaPokupatelya bid = mBidData.getBid();
+		Vector<Vector<String>> rows = new Vector<Vector<String>>();
+		int cnt = mBidData.getFoodStuffs().getCount();
+		for(int ii = 0; ii < cnt; ii++){
+			Vector<String> item = new Vector<String>();
+			String s = mBidData.getFoodStuffs().getFoodstuff(ii).getNomenklaturaNaimenovanie();
+			s = s.replaceAll(" \\(склад 8\\)", "");
+			s = s.replaceAll(" \\(склад 10\\)", "");
+			s = s.replaceAll(" \\(склад 12\\)", "");
+			s = s.replaceAll(" \\(склад 14\\)", "");
+			s = s.replaceAll(" \\(склад 17\\)", "");
+			s = s.replaceAll(" \\(склад \\?\\)", "");
+			item.add(mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul());
+			item.add(s);
+			item.add(mBidData.getFoodStuffs().getFoodstuff(ii).getEdinicaIzmereniyaName());
+			item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getMinNorma());
+			item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getKoefMest());
+			item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getCenaSoSkidkoy());
+			rows.add(item);
+			String sql = "select n.naimenovanie as n1,s.naimenovanie as n2,g.naimenovanie as n3"//
+					+ " from nomenklatura n"//
+					+ " left join nomenklatura s on n.roditel=s._idrref"//
+					+ " left join nomenklatura g on s.roditel=g._idrref"//
+					+ " where n.artikul='" + item.get(0) + "';";
+			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+			item.add(b.child("row").child("n2").value.property.value());
+			item.add(b.child("row").child("n3").value.property.value());
+			/*String txttst = "";
+			for(int kk = 0; kk < item.size(); kk++){
+				txttst = txttst + '/' + kk + ':' + item.get(kk);
+			}*/
+		}
+		Cfg.exportArtikulsList(this,  fileName, bid.getClientKod(),  rows);
+	}
+	void exportBidData222222222(BidData mBidData){
 		try{
 			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
 					+ "/Заказ "
@@ -2961,7 +3058,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
 			ZayavkaPokupatelya bid = mBidData.getBid();
 			jxl.write.WritableWorkbook workbook = jxl.Workbook.createWorkbook(xfile, wbSettings);
-			workbook.setColourRGB(Colour.PLUM, 210, 0, 99);
+			workbook.setColourRGB(Colour.PLUM, 229, 0, 81);
+			workbook.setColourRGB(Colour.LAVENDER, 195, 189, 217);
+			workbook.setColourRGB(Colour.BROWN, 55, 38, 128);
 			workbook.createSheet("" + bid.getClientKod(), 0);
 			jxl.write.WritableSheet excelSheet = workbook.getSheet(0);
 			excelSheet.setColumnView(1, 6);
@@ -2981,7 +3080,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			}
 			jxl.write.WritableImage img = new jxl.write.WritableImage(1, 1, 7, 1, logo);
 			excelSheet.addImage(img);
-			jxl.write.WritableFont titleFont = new jxl.write.WritableFont(WritableFont.ARIAL, 16);
+			jxl.write.WritableFont titleFont = new jxl.write.WritableFont(WritableFont.ARIAL, 16, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, Colour.BROWN);
 			jxl.write.WritableCellFormat titleFormat = new jxl.write.WritableCellFormat(titleFont);
 			titleFormat.setAlignment(Alignment.CENTRE);
 			titleFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
@@ -4653,6 +4752,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 					, false//,filterBySTM.value()
 					, false
 					, true
+					, false
 					, false, false
 			);
 			//System.out.println(sql);

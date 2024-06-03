@@ -8,15 +8,24 @@ import android.app.*;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.*;
+import android.os.*;
 //import android.telephony.TelephonyManager;
 
 import androidx.annotation.NonNull;
 
+import jxl.format.*;
+import jxl.format.Alignment;
+import jxl.format.Border;
+import jxl.format.BorderLineStyle;
+import jxl.format.Colour;
+import jxl.format.VerticalAlignment;
+import jxl.write.*;
 import reactive.ui.*;
-import sweetlife.android10.ApplicationHoreca;
-import sweetlife.android10.Settings;
+import sweetlife.android10.*;
+import sweetlife.android10.R;
 import sweetlife.android10.consts.IAppConsts;
-import sweetlife.android10.ui.Activity_Login;
+import sweetlife.android10.data.orders.*;
+import sweetlife.android10.ui.*;
 import tee.binding.Bough;
 import tee.binding.it.Note;
 import tee.binding.it.Numeric;
@@ -26,7 +35,7 @@ import com.google.firebase.messaging.*;
 import com.google.firebase.*;
 
 
-public class Cfg {
+public class Cfg{
 
 	public static String skidkaId_x_Gazeta = "914f887f023f24874f33033ac1cacceb".toUpperCase();//' – газета/листовка – не считать при расчете
 	public static String skidkaIdNakopitelnaya = "913ad1938af7144e4322ac76b890cfce".toUpperCase();//' – накопительная
@@ -110,8 +119,8 @@ public class Cfg {
 		}
 		return hrcPersonalLoginCached;
 	}*/
-	public static String hrcPersonalPassword() {
-		if (hrcPersonalPasswordCached.equals("")) {
+	public static String hrcPersonalPassword(){
+		if(hrcPersonalPasswordCached.equals("")){
 			android.content.Context context = ApplicationHoreca.getInstance().getApplicationContext();
 			SharedPreferences settings = context.getSharedPreferences(IAppConsts.PREFS_FILE_NAME, 0);
 			hrcPersonalPasswordCached = settings.getString(Activity_Login.hrcpasswordName, "");
@@ -120,18 +129,18 @@ public class Cfg {
 		//return "Molgav1024";
 	}
 
-	public static String whoCheckListOwner() {
-		if (checkListOwnerCfg == null) {
+	public static String whoCheckListOwner(){
+		if(checkListOwnerCfg == null){
 			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/HorecaL.xml")));
-			try {
+			try{
 				checkListOwnerCfg = Bough.parseXML(xml);
 				checkListOwner = checkListOwnerCfg.child("hrc").value.property.value();
-			} catch (Throwable t) {
+			}catch(Throwable t){
 				t.printStackTrace();
 				checkListOwnerCfg = new Bough();
 				checkListOwner = Cfg.DBHRC();
 			}
-			if (checkListOwnerCfg == null) {
+			if(checkListOwnerCfg == null){
 				checkListOwnerCfg = new Bough();
 			}
 		}
@@ -140,7 +149,7 @@ public class Cfg {
 	}
 
 
-	public static void setCurrentFirebaseToken(final Context context, String token) {
+	public static void setCurrentFirebaseToken(final Context context, String token){
 		Cfg.currentFirebaseToken = token;
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/IDPlanshet";
 		//final String url = "https://service.swlife.ru/hrc120107/ru_RU/hs/Planshet/IDPlanshet";
@@ -149,25 +158,25 @@ public class Cfg {
 		System.out.println("params " + params);
 		Note msg = new Note();
 		new Expect()
-				.task.is(new Task() {
+				.task.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					Bough b = Auxiliary.loadTextFromPrivatePOST(url
 							, params.getBytes("UTF-8"), 32000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
 							, true
 					);
 					System.out.println(b.dumpXML());
 					msg.value(b.child("message").value.property.value());
-				} catch (Throwable t) {
+				}catch(Throwable t){
 
 					t.printStackTrace();
 				}
 			}
 		})
-				.afterDone.is(new Task() {
+				.afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				Auxiliary.warn("Результат: " + msg.value(), context);
 			}
 		})
@@ -187,32 +196,32 @@ public class Cfg {
 	}
 
 
-	public static void requeryFirebaseToken(Context context) {//final Task afterDone) {
+	public static void requeryFirebaseToken(Context context){//final Task afterDone) {
 		//if (Cfg.currentFirebaseToken == null) {
-			System.out.println("requeryFirebaseToken start");
+		System.out.println("requeryFirebaseToken start");
 
-			new Expect().task.is(new Task() {
-				@Override
-				public void doTask() {
-					FirebaseApp.initializeApp(context);
-					FirebaseMessaging.getInstance().getToken()
-							.addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<String>() {
-								@Override
-								public void onComplete(@NonNull com.google.android.gms.tasks.Task<String> task) {
-									if (!task.isSuccessful()) {
-										System.out.println(task.getException());
-										return;
-									}
-									String token = task.getResult();
-									//System.out.println("requeryFirebaseToken token ====================");
-									//cYvgX8ihSMyFeEU_VpPPvZ:APA91bG2osDBV_qyAGb4wzu369Hu1EyaIq7DMqPIm5vu_y35GpnVouSYjBlE2_dOB4B1Us0WPmq8cFGplqX2dx96sKHwDJT3juuLbsCSrIwEuSKZ2Uht6_NkZ34ExG4HEnjUA9okHr29
-									Cfg.setCurrentFirebaseToken(context, token);
-									//System.out.println(token);
-									//afterDone.start();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				FirebaseApp.initializeApp(context);
+				FirebaseMessaging.getInstance().getToken()
+						.addOnCompleteListener(new com.google.android.gms.tasks.OnCompleteListener<String>(){
+							@Override
+							public void onComplete(@NonNull com.google.android.gms.tasks.Task<String> task){
+								if(!task.isSuccessful()){
+									System.out.println(task.getException());
+									return;
 								}
-							});
-				}
-			}).status.is("Ждите...").silentStart();
+								String token = task.getResult();
+								//System.out.println("requeryFirebaseToken token ====================");
+								//cYvgX8ihSMyFeEU_VpPPvZ:APA91bG2osDBV_qyAGb4wzu369Hu1EyaIq7DMqPIm5vu_y35GpnVouSYjBlE2_dOB4B1Us0WPmq8cFGplqX2dx96sKHwDJT3juuLbsCSrIwEuSKZ2Uht6_NkZ34ExG4HEnjUA9okHr29
+								Cfg.setCurrentFirebaseToken(context, token);
+								//System.out.println(token);
+								//afterDone.start();
+							}
+						});
+			}
+		}).status.is("Ждите...").silentStart();
 
 
 
@@ -232,12 +241,12 @@ public class Cfg {
                 }
             });*/
 		//} else {
-			//afterDone.start();
-			//System.out.println("requeryFirebaseToken skip");
+		//afterDone.start();
+		//System.out.println("requeryFirebaseToken skip");
 		//}
 	}
 
-	public static String findFizLicoKod(String hrc) {
+	public static String findFizLicoKod(String hrc){
 		String sql = "select l.naimenovanie as name,l.kod as kod from PhizLicaPolzovatelya f \n" +
 				"join Polzovateli p on p._idrref=f.polzovatel join PhizicheskieLica l on l._idrref=f.phizlico \n" +
 				"where trim(p.kod)='" + hrc + "' order by f.period desc;"//
@@ -248,8 +257,7 @@ public class Cfg {
 	}
 
 
-
-	public static void currentIMEI(Activity a, String hrc) {
+	public static void currentIMEI(Activity a, String hrc){
 	/*try {
 		if(deviceid == null) {
 			TelephonyManager tm = (TelephonyManager) a.getSystemService(a.TELEPHONY_SERVICE);
@@ -259,20 +267,20 @@ public class Cfg {
 	}catch(Throwable t){
 		deviceid=""+t.getMessage();
 	}*/
-		if (deviceid == null) {
+		if(deviceid == null){
 			deviceid = sweetlife.android10.utils.SystemHelper.getDiviceID(a);
 		}
 		hrcimei = hrc + ":" + deviceid;
 	}
 
-	public static int userLevel(String hrc) {
+	public static int userLevel(String hrc){
 		String sql = "select count(*) as cnt from Polzovateli p"//
 				+ " join Podrazdeleniya t1 on t1._idrref=p.podrazdelenie"//
 				+ " join Podrazdeleniya t2 on t1._idrref=t2.roditel"//
 				+ " join Podrazdeleniya t3 on t2._idrref=t3.roditel"//
 				+ " where p.kod='" + hrc + "';";
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		if (!data.child("row").child("cnt").value.property.value().equals("0")) {
+		if(!data.child("row").child("cnt").value.property.value().equals("0")){
 			return 2;
 		}
 		sql = "select count(*) as cnt from Polzovateli p"//
@@ -280,30 +288,30 @@ public class Cfg {
 				+ " join Podrazdeleniya t2 on t1._idrref=t2.roditel"//
 				+ " where p.kod='" + hrc + "';";
 		data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		if (!data.child("row").child("cnt").value.property.value().equals("0")) {
+		if(!data.child("row").child("cnt").value.property.value().equals("0")){
 			return 1;
 		}
 		return 0;
 	}
 
-	public static String device_id() {
-		if (deviceid == null) {
+	public static String device_id(){
+		if(deviceid == null){
 			return "null";
-		} else {
+		}else{
 			return deviceid;
 		}
 	}
 
-	public static String hrc_imei() {
-		if (hrcimei == null) {
+	public static String hrc_imei(){
+		if(hrcimei == null){
 			return "hrc987654321";
-		} else {
+		}else{
 			return hrcimei;
 		}
 	}
 
-	public static String DBHRC() {
-		if (dbHRC == null) {
+	public static String DBHRC(){
+		if(dbHRC == null){
 			String sql = "select name as hrc from cur_users where _id=2;";
 			Bough user = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			dbHRC = user.child("row").child("hrc").value.property.value();
@@ -321,13 +329,13 @@ public class Cfg {
 		return dbHRC;
 	}
 
-	public static void resetHRCmarshrut(String hrc, String polzovatel_idrref, String podraxdelenieKod) {
+	public static void resetHRCmarshrut(String hrc, String polzovatel_idrref, String podraxdelenieKod){
 		currentHRCmarshrut = hrc;
 		currentHRC_idrref = polzovatel_idrref;
 		currentKodPodrazdelenia = podraxdelenieKod;
 	}
 
-	public static String polzovatelFIO(String hrc) {
+	public static String polzovatelFIO(String hrc){
 		String sql = "select"//
 				+ " PhizicheskieLica.naimenovanie as fio"//
 				+ " from Polzovateli"//
@@ -345,75 +353,75 @@ public class Cfg {
 	//public static void setKodPodrazdelenia(String kod){
 	//	 currentKodPodrazdelenia=kod;
 	//}
-	public static String selectedKodPodrazdelenia() {
+	public static String selectedKodPodrazdelenia(){
 		return currentKodPodrazdelenia;
 	}
 
-	public static String selectedHRC_idrref() {
+	public static String selectedHRC_idrref(){
 		return currentHRC_idrref;
 	}
 
-	public static String selectedOrDbHRC() {
-		if (currentHRCmarshrut.length() > 1) {
+	public static String selectedOrDbHRC(){
+		if(currentHRCmarshrut.length() > 1){
 			return currentHRCmarshrut;
-		} else {
+		}else{
 			return Cfg.DBHRC();
 		}
 	}
 
-	public static boolean isChangedHRC() {
-		if (currentHRCmarshrut.length() > 1) {
+	public static boolean isChangedHRC(){
+		if(currentHRCmarshrut.length() > 1){
 			return true;
-		} else {
+		}else{
 			return false;
 		}
 	}
 
 
-	public static Vector<String> reportNames(String reportKey) {
+	public static Vector<String> reportNames(String reportKey){
 		Vector<String> names = new Vector<String>();
 		Auxiliary.createAbsolutePathForFolder(workFolder + "supervisor/reports/" + reportKey + "/parameters");
 		Auxiliary.createAbsolutePathForFolder(workFolder + "supervisor/reports/" + reportKey + "/pages");
 		String[] pars = new File(workFolder + "/supervisor/reports/" + reportKey + "/parameters").list();
 		Arrays.sort(pars);
-		for (int i = 0; i < pars.length; i++) {
+		for(int i = 0; i < pars.length; i++){
 			names.add(pars[i]);
 		}
 		return names;
 	}
 
-	public static String formatMills(double mills, String format) {
+	public static String formatMills(double mills, String format){
 		SimpleDateFormat f = new SimpleDateFormat(format);
 		Date d = new Date();
-		d.setTime((long) mills);
+		d.setTime((long)mills);
 		return f.format(d);
 	}
 
-	public static String pathToXML(String reportKey, String instanceKey) {
+	public static String pathToXML(String reportKey, String instanceKey){
 		return workFolder(reportKey) + "/parameters/" + instanceKey + ".xml";
 	}
 
-	public static String pathToHTML(String reportKey, String instanceKey) {
+	public static String pathToHTML(String reportKey, String instanceKey){
 		return workFolder(reportKey) + "/pages/" + instanceKey + ".html";
 	}
 
-	public static String workFolder(String reportKey) {
+	public static String workFolder(String reportKey){
 		return Cfg.workFolder + "supervisor/reports/" + reportKey;
 	}
 
-	public static int lastSQLiteChanesCount() {
+	public static int lastSQLiteChanesCount(){
 		int rr = 0;
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select changes() as changesCount;", null));
-		rr = (int) Numeric.string2double(data.child("row").child("changesCount").value.property.value());
+		rr = (int)Numeric.string2double(data.child("row").child("changesCount").value.property.value());
 		return rr;
 	}
 
-	public static void sendRequestPriceNew(Activity activity, Vector<String> artikuls, int timeout, final Note resultMessage, final Task afterFinishOrCancel) {
+	public static void sendRequestPriceNew(Activity activity, Vector<String> artikuls, int timeout, final Note resultMessage, final Task afterFinishOrCancel){
 		final String soapXML = Cfg.composeXMLpriceRenew(artikuls);
 		final RawSOAP rr = new RawSOAP().timeout.is(timeout);
-		new Expect().status.is(resultMessage).task.is(new Task() {
+		new Expect().status.is(resultMessage).task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 
 				String url = Settings.getInstance().getBaseURL() + "DanniePoTovaram.1cws";
 
@@ -423,19 +431,19 @@ public class Cfg {
 				rr.url.is(url).xml.is(soapXML);
 				rr.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				System.out.println("sendRequestPriceNew " + rr.statusCode.property.value() + "/" + rr.exception.property.value());
-				if (rr.exception.property.value() != null) {
+				if(rr.exception.property.value() != null){
 					resultMessage.value(resultMessage.value() + "\n" + "Исключение: " + rr.exception.property.value().getMessage());
 					rr.exception.property.value().printStackTrace();
-				} else {
+				}else{
 					System.out.println("result sendRequestPriceNew " + rr.data.dumpXML());
-					if (rr.statusCode.property.value() >= 100 && rr.statusCode.property.value() <= 300) {
+					if(rr.statusCode.property.value() >= 100 && rr.statusCode.property.value() <= 300){
 						Vector<Bough> rows = rr.data.child("soap:Body").child("m:GetResponse").child("m:return").children;
 						int r = 0;
-						for (int i = 0; i < rows.size(); i++) {
+						for(int i = 0; i < rows.size(); i++){
 							Bough b = rows.get(i);
 							int kkk = Cfg.updateMinMaxPriceForArtikul(b.child("Artikul").value.property.value()//
 									, b.child("TekuhayaCena").value.property.value().replace(',', '.').replaceAll("\\s+", "")//текущие цены остатков партий
@@ -444,30 +452,30 @@ public class Cfg {
 							);
 							r = r + kkk;
 						}
-						resultMessage.value(resultMessage.value() + "\n" + "Всего обновлено строк: " + ((int) r));
+						resultMessage.value(resultMessage.value() + "\n" + "Всего обновлено строк: " + ((int)r));
 
-					} else {
+					}else{
 						resultMessage.value(resultMessage.value() + "\n" + "Ошибка: " + rr.statusCode.property.value() + ": " + rr.statusDescription.property.value() + ", statusCode " + rr.statusCode.property.value());
 					}
 				}
 				afterFinishOrCancel.start();
 			}
-		}).afterCancel.is(new Task() {
+		}).afterCancel.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				resultMessage.value(resultMessage.value() + "\n" + "Омена");
 				afterFinishOrCancel.start();
 			}
 		}).start(activity);
 	}
 
-	public static String composeXMLpriceRenew(Vector<String> artikuls) {
+	public static String composeXMLpriceRenew(Vector<String> artikuls){
 		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"//
 				+ "\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns1=\"http://ws.swl/DanniePoTovaram\" xmlns:ns2=\"DanniePoTovaram\">"//
 				+ "\n  <SOAP-ENV:Body>"//
 				+ "\n    <ns2:Get>"//
 				+ "\n      <ns2:Spisok>";
-		for (int i = 0; i < artikuls.size(); i++) {
+		for(int i = 0; i < artikuls.size(); i++){
 			xml = xml + "\n        <ns1:Str>"//
 					+ "\n          <ns1:Artikul>" + artikuls.get(i) + "</ns1:Artikul>"//
 					+ "\n          <ns1:NaSklade></ns1:NaSklade>"//
@@ -485,7 +493,7 @@ public class Cfg {
 		return xml;
 	}
 
-	public static int updateMinMaxPriceForArtikul(String Artikul, String TekuhayaCena, String Prais, String MinPorog) {
+	public static int updateMinMaxPriceForArtikul(String Artikul, String TekuhayaCena, String Prais, String MinPorog){
 		System.out.println("updateByRequestNew: " + Artikul + ", " + TekuhayaCena + ", " + Prais + ", " + MinPorog + ".");
 		/*ApplicationHoreca.getInstance().getDataBase().execSQL("delete from CenyNomenklaturySklada_last"//
 				+ "\n		where _id in ("//
@@ -509,7 +517,7 @@ public class Cfg {
 				+ "\n				join nomenklatura on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura and nomenklatura.artikul='" + Artikul + "')"//
 				+ "\n	;");*/
 		int r = 0;
-		if (Prais.trim().length() > 0) {
+		if(Prais.trim().length() > 0){
 			r = 1;
 			String sql = "update CenyNomenklaturySklada_last"//
 					+ "\n		set cena=" + Prais//
@@ -519,7 +527,7 @@ public class Cfg {
 					+ "\n	;";
 			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-			if (Cfg.lastSQLiteChanesCount() < 1) {
+			if(Cfg.lastSQLiteChanesCount() < 1){
 				sql = "insert into CenyNomenklaturySklada_last (period,nomenklatura,cena)"
 						+ " select date('now') as period, nn._idrref as nomenklatura," + Prais + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
 				//System.out.println(sql);
@@ -534,14 +542,14 @@ public class Cfg {
 					+ "\n	;";
 			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-			if (Cfg.lastSQLiteChanesCount() < 1) {
+			if(Cfg.lastSQLiteChanesCount() < 1){
 				sql = "insert into CenyNomenklaturySklada (period,nomenklatura,cena)"
 						+ " select date('now') as period, nn._idrref as nomenklatura," + Prais + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
 				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 		}
-		if (TekuhayaCena.trim().length() > 0) {
+		if(TekuhayaCena.trim().length() > 0){
 			r = 1;
 			String sql = "update TekuschieCenyOstatkovPartiy_strip"//
 					+ "\n		set cena=" + TekuhayaCena//
@@ -551,7 +559,7 @@ public class Cfg {
 					+ "\n	;";
 			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-			if (Cfg.lastSQLiteChanesCount() < 1) {
+			if(Cfg.lastSQLiteChanesCount() < 1){
 				sql = "insert into TekuschieCenyOstatkovPartiy_strip (nomenklatura,cena)"
 						+ " select nn._idrref as nomenklatura," + TekuhayaCena + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
 				//System.out.println(sql);
@@ -565,7 +573,7 @@ public class Cfg {
 					+ "\n	;";
 			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-			if (Cfg.lastSQLiteChanesCount() < 1) {
+			if(Cfg.lastSQLiteChanesCount() < 1){
 				r = 1;
 				sql = "insert into TekuschieCenyOstatkovPartiy (nomenklatura,cena)"
 						+ " select nn._idrref as nomenklatura," + TekuhayaCena + " as cena from nomenklatura nn where artikul='" + Artikul + "' limit 1;";
@@ -573,7 +581,7 @@ public class Cfg {
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}
 		}
-		if (MinPorog.trim().length() > 0) {
+		if(MinPorog.trim().length() > 0){
 			String sql = "update MinimalnyeNacenki"//
 					+ "\n		set nacenka=" + MinPorog//
 					+ "\n		where _id in ("//
@@ -586,7 +594,7 @@ public class Cfg {
 		return r;
 	}
 
-	private static void fillTerritoriesCache() {
+	private static void fillTerritoriesCache(){
 		//System.out.println("fillTerritoriesCache " + ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase());
 		/*
 		String sql = "select hrc.kod as hrc,children.naimenovanie as territory,children.kod as kod"//
@@ -633,7 +641,7 @@ public class Cfg {
 				+ "\n	group by p1._idrref"//
 				+ "\n	order by p5.naimenovanie, p4.naimenovanie, p3.naimenovanie, p2.naimenovanie, p1.naimenovanie"//
 				;
-		if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase().equals("hrc00")) {
+		if(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase().equals("hrc00")){
 			sql = "select ifnull(p3.naimenovanie,'') || ' / ' || ifnull(p2.naimenovanie,'') || ' / ' || ifnull(p1.naimenovanie,'') as territory"//
 					+ "\n		,hrc1.kod as hrc"//
 					+ "\n		,p1.kod as kod"//
@@ -651,7 +659,7 @@ public class Cfg {
 			;
 		}
 		territoriesCache = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		System.out.println("fillTerritoriesCache "+sql);
+		System.out.println("fillTerritoriesCache " + sql);
 		//System.out.println(territoriesCache.dumpXML());
 		//System.out.println("done territoriesCache");
 	}
@@ -670,7 +678,7 @@ public class Cfg {
 		;
 		kontragentyDogovorCache = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 	}*/
-	private static void fillKontragentyCacheByKod(String kod) {
+	private static void fillKontragentyCacheByKod(String kod){
 		//System.out.println("Cfg.fillKontragentyCache " + kod);
 		podrazdeleniaKod = kod;
 		String sql = "select p1.kod as k1,p2.kod as k2,p3.kod as k3, Kontragenty._idrref as _idrref"//
@@ -681,10 +689,10 @@ public class Cfg {
 				+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"//
 				+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"//
 				;
-		if (ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase().equals("hrc00")) {
+		if(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase().equals("hrc00")){
 			//
-		} else {
-			if (podrazdeleniaKod.length() > 0) {
+		}else{
+			if(podrazdeleniaKod.length() > 0){
 				sql = sql + "\n	where p1.kod='" + podrazdeleniaKod + "' or p2.kod='" + podrazdeleniaKod + "' or p3.kod='" + podrazdeleniaKod + "'"//
 				;
 			}
@@ -697,7 +705,7 @@ public class Cfg {
 		//System.out.println("done kontragentyCache");
 	}
 
-	public static Bough vseKontragenty() {
+	public static Bough vseKontragenty(){
 		String sql = "select p1.kod as k1,p2.kod as k2,p3.kod as k3, Kontragenty._idrref as _idrref"//
 				+ "\n		,kontragenty.kod as kod,kontragenty.naimenovanie as naimenovanie,kontragenty.inn as inn"//
 				+ "\n	from kontragenty"//
@@ -712,36 +720,36 @@ public class Cfg {
 		return Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 	}
 
-	public static Bough territory() {
-		if (territoriesCache == null) {
+	public static Bough territory(){
+		if(territoriesCache == null){
 			fillTerritoriesCache();
 		}
 		return territoriesCache;
 	}
 
-	public static Bough kontragenty() {
+	public static Bough kontragenty(){
 		return kontragentyByKod(ApplicationHoreca.getInstance().getCurrentAgent().getPodrazdelenieKod());
 	}
 
-	public static Bough kontragentyForSelectedMarshrut() {
-		if (Cfg.isChangedHRC()) {
+	public static Bough kontragentyForSelectedMarshrut(){
+		if(Cfg.isChangedHRC()){
 			return kontragentyByKod(selectedKodPodrazdelenia());
-		} else {
+		}else{
 			return kontragenty();
 		}
 	}
 
-	public static Bough kontragentyByKod(String kod) {
-		if (kontragentyCache == null || (!kod.equals(podrazdeleniaKod))) {
+	public static Bough kontragentyByKod(String kod){
+		if(kontragentyCache == null || (!kod.equals(podrazdeleniaKod))){
 			fillKontragentyCacheByKod(kod);
 		}
 		return kontragentyCache;
 	}
 
-	public static CfgKontragentInfo kontragentByDogovor(String dogovorKod) {
-		for (int k = 0; k < crossDogovora().size(); k++) {
-			for (int d = 0; d < crossDogovora().get(k).dogovora.size(); d++) {
-				if (dogovorKod.equals(crossDogovora().get(k).dogovora.get(d).kod)) {
+	public static CfgKontragentInfo kontragentByDogovor(String dogovorKod){
+		for(int k = 0; k < crossDogovora().size(); k++){
+			for(int d = 0; d < crossDogovora().get(k).dogovora.size(); d++){
+				if(dogovorKod.equals(crossDogovora().get(k).dogovora.get(d).kod)){
 					return crossDogovora().get(k);
 				}
 			}
@@ -749,11 +757,11 @@ public class Cfg {
 		return null;
 	}
 
-	public static CfgKontragentInfo kontragentByNum(int nn) {
+	public static CfgKontragentInfo kontragentByNum(int nn){
 		int i = 0;
-		for (int k = 0; k < crossDogovora().size(); k++) {
-			for (int d = 0; d < crossDogovora().get(k).dogovora.size(); d++) {
-				if (nn == i) {
+		for(int k = 0; k < crossDogovora().size(); k++){
+			for(int d = 0; d < crossDogovora().get(k).dogovora.size(); d++){
+				if(nn == i){
 					return crossDogovora().get(k);
 				}
 				i++;
@@ -762,11 +770,11 @@ public class Cfg {
 		return null;
 	}
 
-	public static CfgDogovorInfo dogovorByNum(int nn) {
+	public static CfgDogovorInfo dogovorByNum(int nn){
 		int i = 0;
-		for (int k = 0; k < crossDogovora().size(); k++) {
-			for (int d = 0; d < crossDogovora().get(k).dogovora.size(); d++) {
-				if (nn == i) {
+		for(int k = 0; k < crossDogovora().size(); k++){
+			for(int d = 0; d < crossDogovora().get(k).dogovora.size(); d++){
+				if(nn == i){
 					return crossDogovora().get(k).dogovora.get(d);
 				}
 				i++;
@@ -775,10 +783,10 @@ public class Cfg {
 		return null;
 	}
 
-	public static CfgDogovorInfo dogovorByKod(String dogovorKod) {
-		for (int k = 0; k < crossDogovora().size(); k++) {
-			for (int d = 0; d < crossDogovora().get(k).dogovora.size(); d++) {
-				if (dogovorKod.equals(crossDogovora().get(k).dogovora.get(d).kod)) {
+	public static CfgDogovorInfo dogovorByKod(String dogovorKod){
+		for(int k = 0; k < crossDogovora().size(); k++){
+			for(int d = 0; d < crossDogovora().get(k).dogovora.size(); d++){
+				if(dogovorKod.equals(crossDogovora().get(k).dogovora.get(d).kod)){
 					return crossDogovora().get(k).dogovora.get(d);
 				}
 			}
@@ -858,7 +866,7 @@ public class Cfg {
 	public static String skidkiLastKontragentKod = "";
 	public static String skidkiLastHRC = "";
 
-	public static void refreshNomenklatureGroups(SQLiteDatabase mDB) {
+	public static void refreshNomenklatureGroups(SQLiteDatabase mDB){
 		//System.out.println("refreshNomenklatureGroups");
 		mDB.execSQL("drop table if exists nomenklatura_counts;");
 		mDB.execSQL("create table nomenklatura_counts (cnt integer,rdtl blob primary key,name text);");
@@ -889,7 +897,7 @@ public class Cfg {
 				+ "\n		left join nomenklatura_counts cnt5 on n5._IDRRef=cnt5.rdtl"
 				+ "\n 	where n1.EtoGruppa=x'01' and n1.PometkaUdaleniya=x'00' and n1.Roditel=x'00' and (count1>0 or count2>0 or count3>0 or count4>0 or count5>0)"
 				+ "\n	order by cat1,cat2,cat3,cat4,cat5;");*/
-		String sql="insert into nomenklatura_groups (cat1,count1,rod1,key1 ,cat2,count2,rod2,key2 ,cat3,count3,rod3,key3 ,cat4,count4,rod4,key4 ,cat5,count5,rod5,key5)"
+		String sql = "insert into nomenklatura_groups (cat1,count1,rod1,key1 ,cat2,count2,rod2,key2 ,cat3,count3,rod3,key3 ,cat4,count4,rod4,key4 ,cat5,count5,rod5,key5)"
 				+ "\n	select cat1,count1,rod1,key1 ,cat2,count2,rod2,key2 ,cat3,count3,rod3,key3 ,cat4,count4,rod4,key4 ,cat5,count5,rod5,key5 from ("
 				+ "\n			select n1.naimenovanie as cat1,cnt1.cnt as count1,n1.roditel as rod1,n1._IDRRef as key1"
 				+ "\n				,null as cat2,null as count2,null as rod2,null as key2"
@@ -988,17 +996,17 @@ public class Cfg {
 				+ "\n				and cnt5.cnt>0"
 				+ "\n	) uu";
 
-		System.out.println("refreshNomenklatureGroups "+sql);
+		System.out.println("refreshNomenklatureGroups " + sql);
 		mDB.execSQL(sql);
 	}
 
-	public static void refreshSkidkiKontragent(String kod) {
-		if (skidkiLastKontragentKod.equals(kod)
+	public static void refreshSkidkiKontragent(String kod){
+		if(skidkiLastKontragentKod.equals(kod)
 				//&& skidkiLastHRC.equals(ApplicationHoreca.getInstance().hrcSelectedRoute())
 				&& skidkiLastHRC.equals(Cfg.selectedOrDbHRC())
-		) {
+		){
 			//
-		} else {
+		}else{
 			String sql = "select k1._idrref as klient,k1.GolovnoyKontragent as golovnoy from kontragenty k1 where k1.kod=" + kod;
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			String kontr_idrref = b.child("row").child("klient").value.property.value();
@@ -1059,10 +1067,14 @@ public class Cfg {
 			//+ "\n			left join Kontragenty kk on kk._idrref=skidki.kontragent and kk.kod='" + kod + "' and DataOkonchaniya>=date('now')"//
 			sql = sql + "\n		where ss.kontragent=x'" + kontr_idrref + "' or ss.kontragent=x'" + golov_idrref + "'";
 			sql = sql + "\n		    or ss.podrazdelenie=x'" + p1 + "'";
-			if (p2.length() > 3) sql = sql + "\n		    or ss.podrazdelenie=x'" + p2 + "'";
-			if (p3.length() > 3) sql = sql + "\n		    or ss.podrazdelenie=x'" + p3 + "'";
-			if (p4.length() > 3) sql = sql + "\n		    or ss.podrazdelenie=x'" + p4 + "'";
-			if (p5.length() > 3) sql = sql + "\n		    or ss.podrazdelenie=x'" + p5 + "'";
+			if(p2.length() > 3)
+				sql = sql + "\n		    or ss.podrazdelenie=x'" + p2 + "'";
+			if(p3.length() > 3)
+				sql = sql + "\n		    or ss.podrazdelenie=x'" + p3 + "'";
+			if(p4.length() > 3)
+				sql = sql + "\n		    or ss.podrazdelenie=x'" + p4 + "'";
+			if(p5.length() > 3)
+				sql = sql + "\n		    or ss.podrazdelenie=x'" + p5 + "'";
 			sql = sql + "\n		;";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from SkidkiLast where nullif(comment,'') is null;");
@@ -1078,7 +1090,7 @@ public class Cfg {
 		}
 	}
 
-	public static void refreshArtikleCount() {
+	public static void refreshArtikleCount(){
 		String sql = "drop index if exists idx_atricle_count;";
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		sql = "drop table if exists atricle_count;";
@@ -1101,7 +1113,7 @@ public class Cfg {
 
 	}
 
-	public static void refreshPriceKontragent() {
+	public static void refreshPriceKontragent(){
 		//ApplicationHoreca.getInstance().getDataBase().execSQL("drop table AssortimentCurrent;");
 		ApplicationHoreca.getInstance().getDataBase().execSQL("create table if not exists AssortimentCurrent(\n" +
 				"  _id integer\n" +
@@ -1132,13 +1144,12 @@ public class Cfg {
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic  , klient_idrref             , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)"
-				+"\n  select   AssortimentNaSklade._id,NomenklaturaPostavshhik,zapret,trafic,KontragentPodrazdelenie   ,null                  ,null           ,null           ,null           ,null           ,null"
-				+"\n  from  AssortimentNaSklade "
-				+"\n  join Kontragenty on Kontragenty.kod=" + skidkiLastKontragentKod + "  and AssortimentNaSklade.KontragentPodrazdelenie=Kontragenty.VidDostavki"
-				+"\n group by NomenklaturaPostavshhik;";
+				+ "\n  select   AssortimentNaSklade._id,NomenklaturaPostavshhik,zapret,trafic,KontragentPodrazdelenie   ,null                  ,null           ,null           ,null           ,null           ,null"
+				+ "\n  from  AssortimentNaSklade "
+				+ "\n  join Kontragenty on Kontragenty.kod=" + skidkiLastKontragentKod + "  and AssortimentNaSklade.KontragentPodrazdelenie=Kontragenty.VidDostavki"
+				+ "\n group by NomenklaturaPostavshhik;";
 		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-
 
 
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
@@ -1205,7 +1216,7 @@ public class Cfg {
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
 
-	public static String findCurrentDogGroupIDRREF() {
+	public static String findCurrentDogGroupIDRREF(){
 		String kod = ApplicationHoreca.getInstance().getClientInfo().getKod();
 		String sql = "select grupdog._idrref as _idrref"
 				+ " from Kontragenty k1"
@@ -1217,14 +1228,14 @@ public class Cfg {
 		return dog.child("row").child("_idrref").value.property.value();
 	}
 
-	public static void saveCRGroup(String artikul, double cr) {
+	public static void saveCRGroup(String artikul, double cr){
 
 
 		String idrf = findCurrentDogGroupIDRREF();
 		System.out.println("saveCRGroup " + idrf + "/" + artikul + "/" + cr);
-		if (idrf.length() > 0) {
-			for (int i = 0; i < crGroupCache.size(); i++) {
-				if (crGroupCache.get(i).equals(idrf) && crArtikulCache.get(i).equals(artikul)) {
+		if(idrf.length() > 0){
+			for(int i = 0; i < crGroupCache.size(); i++){
+				if(crGroupCache.get(i).equals(idrf) && crArtikulCache.get(i).equals(artikul)){
 					crCenaCache.set(i, cr);
 					return;
 				}
@@ -1235,15 +1246,15 @@ public class Cfg {
 		}
 	}
 
-	public static double findCRGroup(String artikul) {
+	public static double findCRGroup(String artikul){
 
 		//float cr = 0;
 
 
 		String idrf = findCurrentDogGroupIDRREF();
 		//System.out.println("findCRGroup " + idrf + "/" + artikul);
-		for (int i = 0; i < crGroupCache.size(); i++) {
-			if (crGroupCache.get(i).equals(idrf) && crArtikulCache.get(i).equals(artikul)) {
+		for(int i = 0; i < crGroupCache.size(); i++){
+			if(crGroupCache.get(i).equals(idrf) && crArtikulCache.get(i).equals(artikul)){
 				//System.out.println("found " + crCenaCache.get(i));
 				return crCenaCache.get(i).doubleValue();
 			}
@@ -1251,7 +1262,7 @@ public class Cfg {
 		return 0;
 	}
 
-	public static Vector<CfgKontragentInfo> crossDogovora() {
+	public static Vector<CfgKontragentInfo> crossDogovora(){
 		/*
 		System.out.println("check crossDogovora");
 		System.out.println("getAgentName "+ApplicationHoreca.getInstance().getCurrentAgent().getAgentName()+".");
@@ -1265,14 +1276,14 @@ public class Cfg {
 		final long maxHeapSizeInMB = runtime.maxMemory() / 1048576L;
 		final long availHeapSizeInMB = maxHeapSizeInMB - usedMemInMB;
 		//System.out.println("memory "+usedMemInMB+"/"+maxHeapSizeInMB+"/"+availHeapSizeInMB);
-		if (all == null || (!lastHRCID.equals(//ApplicationHoreca.getInstance().currentIDmarshrut
+		if(all == null || (!lastHRCID.equals(//ApplicationHoreca.getInstance().currentIDmarshrut
 				Cfg.selectedHRC_idrref()
-		))) {
+		))){
 			//System.out.println("read crossDogovora");
 			//lastHRCID = ApplicationHoreca.getInstance().currentIDmarshrut;
 			lastHRCID = Cfg.selectedHRC_idrref();
 			String sqlX = "";
-			if (lastHRCID.length() > 1) {
+			if(lastHRCID.length() > 1){
 				sqlX = "\n join MarshrutyAgentov m on m.kontragent=k._idrref and m.agent=x'" + lastHRCID + "'";
 			}
 			all = new Vector<CfgKontragentInfo>();
@@ -1308,7 +1319,7 @@ public class Cfg {
 			System.out.println("crossDogovora " + sql);
 			Bough crossDogovoraCache = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			System.out.println(crossDogovoraCache.dumpXML());
-			for (int i = 0; i < crossDogovoraCache.children.size(); i++) {
+			for(int i = 0; i < crossDogovoraCache.children.size(); i++){
 				Bough b = crossDogovoraCache.children.get(i);
 				CfgDogovorInfo dogovor = new CfgDogovorInfo();
 				dogovor.kod = b.child("dogKod").value.property.value();
@@ -1321,15 +1332,15 @@ public class Cfg {
 						dogovor.GruppyDogovorov+" / "+
 						dogovor.phormaDogovora+" / ");*/
 				boolean found = false;
-				for (int n = 0; n < all.size(); n++) {
-					if (all.get(n).kod.equals(b.child("kod").value.property.value())) {
+				for(int n = 0; n < all.size(); n++){
+					if(all.get(n).kod.equals(b.child("kod").value.property.value())){
 						//System.out.println("merge	" + all.get(n).naimenovanie);
 						all.get(n).dogovora.add(dogovor);
 						found = true;
 						break;
 					}
 				}
-				if (!found) {
+				if(!found){
 					CfgKontragentInfo k = new CfgKontragentInfo();
 					k.kod = b.child("kod").value.property.value();
 					k.naimenovanie = b.child("naimenovanie").value.property.value();
@@ -1352,36 +1363,174 @@ public class Cfg {
 		return all;
 	}
 
-	public static String kodPodrazdeleni(int nn) {
-		if (nn >= 0 && nn < Cfg.territory().children.size()) {
+	public static String kodPodrazdeleni(int nn){
+		if(nn >= 0 && nn < Cfg.territory().children.size()){
 			String kod = Cfg.territory().children.get(nn).child("kod").value.property.value();
 			//System.out.println("Cfg.kodPodrazdeleni " + kod);
 			return kod;
-		} else {
+		}else{
 			System.out.println("Cfg.kodPodrazdeleni not found");
 			return "";
 		}
 	}
 
-	public static String kodKontragenta(int nn) {
+	public static String kodKontragenta(int nn){
 		//Cfg.kontragenty(kodPodrazdeleniya).children.get(OsnovnoiKlientTT.value().intValue() - 1).child("kod").value.property.value();
-		if (nn >= 0 && nn < Cfg.vseKontragenty().children.size()) {
+		if(nn >= 0 && nn < Cfg.vseKontragenty().children.size()){
 			String kod = Cfg.vseKontragenty().children.get(nn).child("kod").value.property.value();
 			return kod;
-		} else {
+		}else{
 			return "";
 		}
 	}
 
-	public static String kodKontragenta(int nn, String kodPodrazdeleniya) {
+	public static String kodKontragenta(int nn, String kodPodrazdeleniya){
 		//Cfg.kontragenty(kodPodrazdeleniya).children.get(OsnovnoiKlientTT.value().intValue() - 1).child("kod").value.property.value();
-		if (nn >= 0 && nn < Cfg.kontragentyByKod(kodPodrazdeleniya).children.size()) {
+		if(nn >= 0 && nn < Cfg.kontragentyByKod(kodPodrazdeleniya).children.size()){
 			String kod = Cfg.kontragentyByKod(kodPodrazdeleniya).children.get(nn).child("kod").value.property.value();
 			return kod;
-		} else {
+		}else{
 			return "";
 		}
 	}
+
+	public static void exportArtikulsList(Activity activity, String fileName, String kodKlient, Vector<Vector<String>> rows){
+		try{
+			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + "/" + fileName + ".xls";
+			File xfile = new File(xname);
+			jxl.WorkbookSettings wbSettings = new jxl.WorkbookSettings();
+			wbSettings.setLocale(new java.util.Locale("ru", "RU"));
+			//ZayavkaPokupatelya bid = mBidData.getBid();
+			jxl.write.WritableWorkbook workbook = jxl.Workbook.createWorkbook(xfile, wbSettings);
+			workbook.setColourRGB(Colour.PLUM, 229, 0, 81);
+			workbook.setColourRGB(Colour.LAVENDER, 195, 189, 217);
+			workbook.setColourRGB(Colour.BROWN, 55, 38, 128);
+			workbook.createSheet("" + kodKlient, 0);
+			jxl.write.WritableSheet excelSheet = workbook.getSheet(0);
+			excelSheet.setColumnView(1, 6);
+			excelSheet.setColumnView(2, 12);
+			excelSheet.setColumnView(3, 60);
+			excelSheet.setColumnView(4, 6);
+			excelSheet.setColumnView(5, 12);
+			excelSheet.setColumnView(6, 12);
+			excelSheet.setColumnView(7, 12);
+			jxl.write.Label label;
+			InputStream inStream = activity.getResources().openRawResource(sweetlife.android10.R.raw.export_header);
+			byte[] logo = new byte[inStream.available()];
+			int nn = 0;
+			while(inStream.available() > 0){
+				logo[nn] = (byte)inStream.read();
+				nn++;
+			}
+			jxl.write.WritableImage img = new jxl.write.WritableImage(1, 1, 7, 1, logo);
+			excelSheet.addImage(img);
+			jxl.write.WritableFont titleFont = new jxl.write.WritableFont(WritableFont.ARIAL, 16, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, Colour.BROWN);
+			jxl.write.WritableCellFormat titleFormat = new jxl.write.WritableCellFormat(titleFont);
+			titleFormat.setAlignment(Alignment.CENTRE);
+			titleFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			excelSheet.mergeCells(1, 2, 7, 2);
+			excelSheet.setRowView(2, 900);
+			excelSheet.addCell(new jxl.write.Label(1, 2, "Коммерческое предложение", titleFormat));
+			WritableFont whiteFont = new WritableFont(WritableFont.createFont("Arial"), 10, WritableFont.BOLD, false, UnderlineStyle.NO_UNDERLINE, Colour.WHITE);
+			WritableCellFormat headerFormat = new WritableCellFormat(whiteFont);
+			int headerSkip = 4;
+			headerFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			headerFormat.setAlignment(Alignment.CENTRE);
+			headerFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			headerFormat.setBackground(Colour.LAVENDER);
+			label = new jxl.write.Label(1, headerSkip - 1, "№", headerFormat);
+			excelSheet.addCell(label);
+			label = new jxl.write.Label(2, headerSkip - 1, "Код", headerFormat);
+			excelSheet.addCell(label);
+			label = new jxl.write.Label(3, headerSkip - 1, "Наименование", headerFormat);
+			excelSheet.addCell(label);
+			label = new jxl.write.Label(4, headerSkip - 1, "Ед.изм.", headerFormat);
+			excelSheet.addCell(label);
+			label = new jxl.write.Label(5, headerSkip - 1, "Мин. партия отгрузки", headerFormat);
+			excelSheet.addCell(label);
+			label = new jxl.write.Label(6, headerSkip - 1, "Кол-во в месте", headerFormat);
+			excelSheet.addCell(label);
+			label = new jxl.write.Label(7, headerSkip - 1, "Цена", headerFormat);
+			excelSheet.addCell(label);
+			jxl.write.WritableCellFormat cellFormat = new jxl.write.WritableCellFormat();
+			cellFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			cellFormat.setAlignment(Alignment.CENTRE);
+			cellFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			jxl.write.WritableCellFormat catFormat = new jxl.write.WritableCellFormat(whiteFont);
+			catFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			catFormat.setBackground(Colour.PLUM);
+			catFormat.setAlignment(Alignment.CENTRE);
+			catFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			jxl.write.WritableCellFormat subFormat = new jxl.write.WritableCellFormat(whiteFont);
+			subFormat.setBorder(jxl.format.Border.ALL, BorderLineStyle.THIN, Colour.BLACK);
+			subFormat.setBackground(Colour.PLUM);
+			subFormat.setAlignment(Alignment.CENTRE);
+			subFormat.setVerticalAlignment(VerticalAlignment.CENTRE);
+			excelSheet.setRowView(headerSkip - 1, 900);
+			excelSheet.setRowView(1, 5500);
+			//int cnt = mBidData.getFoodStuffs().getCount();
+			int cnt = rows.size();
+
+			Collections.sort(rows, new Comparator<Vector<String>>(){
+				@Override
+				public int compare(Vector<String> a, Vector<String> b){
+					return a.get(7).compareTo(b.get(7)) * 1000000 + a.get(6).compareTo(b.get(6)) * 1000 + a.get(1).compareTo(b.get(1));
+				}
+			});
+			String cat = "";
+			String subcat = "";
+			int catcount = 0;
+			for(int i = 0; i < cnt; i++){
+				if(!cat.equals(rows.get(i).get(7))){
+					cat = rows.get(i).get(7);
+					excelSheet.mergeCells(1, headerSkip + i + catcount, 7, headerSkip + i + catcount);
+					label = new jxl.write.Label(1, headerSkip + i + catcount, "" + cat, catFormat);
+					excelSheet.addCell(label);
+					excelSheet.setRowView(headerSkip + i + catcount, 500);
+					catcount++;
+				}
+				if(!subcat.equals(rows.get(i).get(6))){
+					subcat = rows.get(i).get(6);
+					label = new jxl.write.Label(1, headerSkip + i + catcount, "" + subcat, subFormat);
+					excelSheet.addCell(label);
+					excelSheet.mergeCells(1, headerSkip + i + catcount, 7, headerSkip + i + catcount);
+					excelSheet.setRowView(headerSkip + i + catcount, 300);
+					catcount++;
+				}
+				label = new jxl.write.Label(1, headerSkip + i + catcount, "" + (1 + i), cellFormat);
+				excelSheet.addCell(label);
+				label = new jxl.write.Label(2, headerSkip + i + catcount, rows.get(i).get(0), cellFormat);
+				excelSheet.addCell(label);
+				label = new jxl.write.Label(3, headerSkip + i + catcount, rows.get(i).get(1), cellFormat);
+				excelSheet.addCell(label);
+				label = new jxl.write.Label(4, headerSkip + i + catcount, rows.get(i).get(2), cellFormat);
+				excelSheet.addCell(label);
+				label = new jxl.write.Label(5, headerSkip + i + catcount, rows.get(i).get(3), cellFormat);
+				excelSheet.addCell(label);
+				label = new jxl.write.Label(6, headerSkip + i + catcount, rows.get(i).get(4), cellFormat);
+				excelSheet.addCell(label);
+				label = new jxl.write.Label(7, headerSkip + i + catcount, rows.get(i).get(5), cellFormat);
+				excelSheet.addCell(label);
+			}
+			excelSheet.setRowView(headerSkip + cnt + catcount + 1, 4500);
+			InputStream inStream2 = activity.getResources().openRawResource(R.raw.export_bottom);
+			byte[] logo2 = new byte[inStream2.available()];
+			int nn2 = 0;
+			while(inStream2.available() > 0){
+				logo2[nn2] = (byte)inStream2.read();
+				nn2++;
+			}
+			jxl.write.WritableImage img2 = new jxl.write.WritableImage(1, headerSkip + cnt + catcount + 1, 7, 1, logo2);
+			excelSheet.addImage(img2);
+			workbook.write();
+			workbook.close();
+			Auxiliary.startFile(activity, xfile);
+		}catch(Throwable t){
+			t.printStackTrace();
+			Auxiliary.warn("Ошибка: " + t.getMessage(), activity);
+		}
+	}
+
 /*
     public static String kodKontragentaByIndex(int nn) {
         Bough bb=Cfg.vseKontragenty();
