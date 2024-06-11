@@ -160,13 +160,13 @@ public class Auxiliary{
 		a.startActivity(intent);
 	}
 
-	public static void stopGPS(Activity activity){
+	public static void ___stopGPS(Activity activity){
 		if(locationListener != null){
 			//
 		}
 	}
 
-	public static void startGPS(final Activity activity){
+	public static void __startGPS(final Activity activity){
 		try{
 			if(locationListener == null){
 

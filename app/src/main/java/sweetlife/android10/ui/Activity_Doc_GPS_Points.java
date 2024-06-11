@@ -7,6 +7,7 @@ import reactive.ui.*;
 import sweetlife.android10.*;
 import sweetlife.android10.consts.ITableColumnsNames;
 import sweetlife.android10.data.common.ZoomListCursorAdapter;
+import sweetlife.android10.supervisor.*;
 import sweetlife.android10.utils.DateTimeHelper;
 
 import tee.binding.task.*;
@@ -22,8 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 public class Activity_Doc_GPS_Points extends Activity_Base {//Activity_BasePeriod{
 	private ListView mPointsList;
@@ -44,6 +44,8 @@ public class Activity_Doc_GPS_Points extends Activity_Base {//Activity_BasePerio
 	final static String notuploaded = "нет";
 	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	SimpleDateFormat to = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+
+	//Cursor lastUsedCursor=null;
 
 	public static boolean autoRefreshDone = false;
 
@@ -177,11 +179,30 @@ public class Activity_Doc_GPS_Points extends Activity_Base {//Activity_BasePerio
 		//setTitle(R.string.doc_gps_points);
 		this.setTitle("Все GPS-отметки");
 		Cursor cursor = RequestGPSPoints();//DateTimeHelper.SQLDateString(mFromPeriod.getTime()), DateTimeHelper.SQLDateString(mToPeriod.getTime()));
+
 		mPointsList = (ListView)findViewById(R.id.list_gps_points);
 		mGPSPointstListAdapter = new GPSPointsListAdapter(this, cursor);
 		mPointsList.setAdapter(mGPSPointstListAdapter);
 		mPointsList.setOnTouchListener(this);
+		mPointsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				System.out.println("onItemClick "+position);
+				Cursor cursor = mGPSPointstListAdapter.getCursor();
+				cursor.moveToPosition(position);
+				String shirota=new Double(cursor.getDouble(cursor.getColumnIndex("longitude"))).toString();
+				String dolgota=new Double(cursor.getDouble(cursor.getColumnIndex("latitude"))).toString();
+				System.out.println(shirota+"/"+dolgota);
+				String url = "https://yandex.ru/maps/?pt="
+						+ dolgota + "," +shirota
+						+ "&z=18&l=map";
+				System.out.println(url);
+				Activity_Doc_GPS_Points.this.startActivity(new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url)));
+			}
+		});
 	}
+
+
 
 	private Cursor RequestGPSPoints(){//String dateFrom, String dateTo){
 		//System.out.println("RequestGPSPoints from " + dateFrom + " to " + dateTo);
@@ -192,7 +213,8 @@ public class Activity_Doc_GPS_Points extends Activity_Base {//Activity_BasePerio
 				+ "ORDER BY _id desc";
 		*/
 		String sql = "select _id,BeginDate,BeginTime,longitude,latitude,Upload from GPSPoints order by beginDate desc,BeginTime desc limit 200";
-		return mDB.rawQuery(sql, null);
+		Cursor lastUsedCursor = mDB.rawQuery(sql, null);
+		return lastUsedCursor;
 	}
 	void requeryPoints(){
 		Cursor cursor = RequestGPSPoints();

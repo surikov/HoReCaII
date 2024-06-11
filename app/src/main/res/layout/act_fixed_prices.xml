@@ -105,14 +105,14 @@
 			android:layout_height="wrap_content"
 			android:layout_alignParentLeft="true"
 			android:text="@string/nomenclature" />
-
+<!--
 		<CheckBox
 			android:id="@+id/check_owner_too"
 			android:layout_width="500dip"
 			android:layout_toRightOf="@+id/btn_nomeclature"
 			android:layout_height="wrap_content"
 			android:text="Распространить на всех клиентов холдинга" />
-
+-->
 		<Button
 			android:id="@+id/btn_save"
 			android:layout_width="250dip"

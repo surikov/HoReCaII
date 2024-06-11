@@ -494,6 +494,7 @@ public class Activity_BidSpecificaciya extends Activity {
 
 	void refreshItems() {
 		if (!id.value().equals("")) {
+			sweetlife.android10.database.nomenclature.Request_NomenclatureBase.adjustTekuschieCenyOstatkovPartiy_strip(ApplicationHoreca.getInstance().getClientInfo().getID());
 			String sql = "select"//
 					+ " ZayavkaNaSpecifikasiaNomenklatura.Artikul as Artikul"//
 					+ ",ZayavkaNaSpecifikasiaNomenklatura.Cena as newCena"//
@@ -504,7 +505,7 @@ public class Activity_BidSpecificaciya extends Activity {
 					+ " from ZayavkaNaSpecifikasiaNomenklatura"//
 					+ " join nomenklatura on nomenklatura.artikul=ZayavkaNaSpecifikasiaNomenklatura.Artikul"//
 					+ " join CenyNomenklaturySklada on nomenklatura._idrref=CenyNomenklaturySklada.nomenklatura and CenyNomenklaturySklada.period=(select max(Period) from CenyNomenklaturySklada where nomenklatura=nomenklatura._idrref)"//
-					+ " join TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura" + " where ZayavkaNaSpecifikasiaNomenklatura.parent=" + id.value()//
+					+ " join TekuschieCenyOstatkovPartiy_strip TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura" + " where ZayavkaNaSpecifikasiaNomenklatura.parent=" + id.value()//
 					;
 			if (sortByName) {
 				sql = sql + " order by nomenklatura.naimenovanie";

@@ -410,7 +410,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 
 	static String kontragentIDTekuschie = "";
 
-	static void adjustTekuschieCenyOstatkovPartiy_strip(String kontragentID){
+	public static void adjustTekuschieCenyOstatkovPartiy_strip(String kontragentID){
 		if(kontragentIDTekuschie.equals(kontragentID)){
 			//
 		}else{

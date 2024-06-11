@@ -363,6 +363,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 		}
 
 		System.out.println("klient " + mZayavka.getClientID());
+		/*
 		CheckBox check_owner_too = ((CheckBox)findViewById(R.id.check_owner_too));
 		if(check_owner_too.isChecked()){
 			String sql = "select k2.kod as kod,k2.naimenovanie as name,k2._idrref as idrf"
@@ -378,7 +379,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 					, owner.child("row").child("name").value.property.value()
 			);
 		}
-
+*/
 
 		mFixedPricesNomenclatureData.WriteToDataBase(mDB);
 		mZayavka.setVremyaNachalaSkidkiPhiksCen(mFromPeriod.getTime());

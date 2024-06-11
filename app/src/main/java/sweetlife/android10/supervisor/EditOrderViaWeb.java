@@ -29,10 +29,7 @@ import sweetlife.android10.data.common.ClientInfo;
 import sweetlife.android10.data.common.NomenclatureBasedDocument;
 import sweetlife.android10.data.fixedprices.FixedPricesNomenclatureData;
 import sweetlife.android10.data.fixedprices.ZayavkaNaSkidki;
-import sweetlife.android10.ui.Activity_Bid;
-import sweetlife.android10.ui.Activity_Disposals;
-import sweetlife.android10.ui.Activity_FixedPrices;
-import sweetlife.android10.ui.Dialog_EditDisposal;
+import sweetlife.android10.ui.*;
 import tee.binding.Bough;
 import tee.binding.it.Note;
 import tee.binding.it.Numeric;
@@ -176,7 +173,7 @@ void promptRasporyajenieNaOtgruzku(){
 	}
 
 	void sendForceApprove() {
-		final Note result = new Note().value("Проведение заказа:" );
+		final Bough b = new Bough();
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 				+ "/hs/ZakaziPokupatelya/ProvestiPoNacenke/" + documentNumber
 				+ "/" + Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyMMdd" )
@@ -189,18 +186,23 @@ void promptRasporyajenieNaOtgruzku(){
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String msg = new String(bytes, "UTF-8" );
 					//String txt = Auxiliary.parseChildOrRaw(msg, "Message");
-					result.value(result.value() + "\n" + msg);
+					//result.value(result.value() + "\n" + msg);
+					Bough dump = Bough.parseJSONorThrow(msg);
+					System.out.println(dump.dumpXML());
+					b.child("ДанныеПоЗаказам").child("Заказы").children=dump.children;
+
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
 					t.printStackTrace();
-					result.value(result.value() + "\n" + t.getMessage());
+					//b.value(b.value() + "\n" + t.getMessage());
 				}
 			}
 		};
 		Task afterSend = new Task() {
 			@Override
 			public void doTask() {
-				Auxiliary.warn(result.value(), context);
+				//Auxiliary.warn(result.value(), context);
+				Activity_UploadBids.buildDialogResult(context,"Проведение заказов по наценке", b);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		};
@@ -369,7 +371,11 @@ void promptRasporyajenieNaOtgruzku(){
 							byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 							String msg = new String(bytes, "UTF-8" );
 							System.out.println(msg);
-							b.child("result" ).value.is(msg);
+							//b.child("result" ).value.is(msg);
+							Bough dump = Bough.parseJSONorThrow(msg);
+							System.out.println(dump.dumpXML());
+							b.child("ДанныеПоЗаказам").child("Заказы").children=dump.children;
+
 							me.preReport.writeCurrentPage();
 						} catch (Throwable t) {
 							t.printStackTrace();
@@ -379,7 +385,8 @@ void promptRasporyajenieNaOtgruzku(){
 				}).afterDone.is(new Task() {
 					@Override
 					public void doTask() {
-						Auxiliary.warn(b.child("result" ).value.property.value(), context);
+						//Auxiliary.warn(b.child("result" ).value.property.value(), context);
+						Activity_UploadBids.buildDialogResult(context,"Смена контрагента", b);
 						me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 					}
 				});
@@ -491,19 +498,37 @@ void promptRasporyajenieNaOtgruzku(){
 					Report_Base.startPing();
 					System.out.println(url);
 					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					String msg = new String(bytes, "UTF-8" );
-					System.out.println(msg);
-					b.child("result" ).value.is(msg);
+					String txt = new String(bytes, "UTF-8" );
+					System.out.println(txt);
+					Bough dump = Bough.parseJSONorThrow(txt);
+					System.out.println(dump.dumpXML());
+					//System.out.println(msg);
+					//b.child("result" ).value.is(msg);
+					b.child("ДанныеПоЗаказам").child("Заказы").children=dump.children;
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
 					t.printStackTrace();
-					b.child("result" ).value.is(t.toString());
+					b.child("error" ).value.is(t.toString());
 				}
 			}
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				Auxiliary.warn(b.child("result" ).value.property.value(), context);
+				Activity_UploadBids.buildDialogResult(context,"Смена договора или типа оплаты", b);
+				/*Bough bb = Bough.parseJSONorThrow(response);
+				if(bb.children.size() > 0){
+					String msg = "Выгрузка (" + result.child("result").child("code").value.property.value()
+							+ ", " + result.child("result").child("message").value.property.value() + "):\n"
+							+ bb.child("Сообщение").value.property.value();
+					showUploadResult(msg, bb);
+				}else{
+					System.out.println("Empty " + result.dumpXML());
+					String msg = " \nВозможны ошибки при выгрузке" //+ result.dumpXML();
+							+ "\n\nПроверьте статус заказов в отчёте, возможно необходимо удалить повторы"//
+							+ "\n\nТекст ответа:"//
+							+ result.dumpXML().substring(0, 160).replace("\n", "").replace("  ", " ");
+					Auxiliary.alertBreak(msg, Activity_UploadBids.this);
+				}*/
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		});
@@ -551,10 +576,14 @@ void promptRasporyajenieNaOtgruzku(){
 					String text = "{\"Номер\":\"" + documentNumber + "\", \"Дата\":\"" + ActivityWebServicesReports.reformatDate2(documentDate) + "\"}";
 					//Report_Base.startPing();
 					System.out.println(url + ": " + text);
+
 					Bough result;
 					result = Auxiliary.loadTextFromPrivatePOST(url, text.getBytes("utf-8" ), 12000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
-					b.child("result" ).value.is(result.child("message" ).value.property.value());
+					//b.child("result" ).value.is(result.child("message" ).value.property.value());
 					System.out.println(result.dumpXML());
+					b.child("ДанныеПоЗаказам").child("Заказы").children=result.child("raw").children;
+
+
 					me.preReport.writeCurrentPage();
 				} catch (Throwable t) {
 					t.printStackTrace();
@@ -564,7 +593,8 @@ void promptRasporyajenieNaOtgruzku(){
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				Auxiliary.warn(b.child("result" ).value.property.value(), context);
+				//Auxiliary.warn(b.child("result" ).value.property.value(), context);
+				Activity_UploadBids.buildDialogResult(context,"Пересчёт цен", b);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		});
@@ -1088,6 +1118,26 @@ void promptRasporyajenieNaOtgruzku(){
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
+				System.out.println("requestSaveOrder "+r.data.dumpXML());
+				Bough result=new Bough();
+
+
+				Bough response=r.data.child("soap:Body" ).child("m:ChangeResponse" ).child("m:return" );
+				result.child("Сообщение").value.property.value(response.child("m:Message" ).value.property.value());
+				result.child("Номер").value.property.value(response.child("m:Nomer" ).value.property.value());
+				Vector<Bough> NePodtverzdeniePozicii=response.children("m:NePodtverzdeniePozicii" );
+				for(int ii=0;ii<NePodtverzdeniePozicii.size();ii++){
+					Bough one=new Bough().name.is("НеПодтвержденныеПозиции");
+					result.children.add(one);
+					one.child("Номенклатура").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:Nomenklatura").value.property.value());
+					one.child("КоличествоЗаказано").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:KolichestvoZakazano").value.property.value());
+					one.child("КоличествоДефицит").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:KolichestvoDeficit").value.property.value());
+					one.child("КоличествоПодтверждено").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:KolichestvoPodtverzdeno").value.property.value());
+					one.child("ДатаПоступления").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:DataPostupleniya").value.property.value());
+				}
+				Bough b=new Bough();
+				b.child("ДанныеПоЗаказам").child("Заказы").children=result.children;
+				/*
 				if (r.exception.property.value() != null) {
 					Auxiliary.warn("Ошибка: " + r.exception.property.value().getMessage(), context);
 				} else {
@@ -1101,6 +1151,8 @@ void promptRasporyajenieNaOtgruzku(){
 						Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), context);
 					}
 				}
+				*/
+				Activity_UploadBids.buildDialogResult(context,"Сохранение заказа", b);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		}).afterCancel.is(new Task() {
@@ -1113,6 +1165,7 @@ void promptRasporyajenieNaOtgruzku(){
 
 	void requestChangeOrderState(final String thatDone) {
 		final RawSOAP r = new RawSOAP();
+
 		new Expect().status.is("Выполнение..." ).task.is(new Task() {
 			@Override
 			public void doTask() {
@@ -1139,6 +1192,25 @@ void promptRasporyajenieNaOtgruzku(){
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
+				System.out.println("requestChangeOrderState "+r.data.dumpXML());
+				Bough result=new Bough();
+				//result.child("Сообщение").value.property.value(r.data.child("Message" ).value.property.value());
+				Bough response=r.data.child("soap:Body" ).child("m:ChangeResponse" ).child("m:return" );
+				result.child("Сообщение").value.property.value(response.child("m:Message" ).value.property.value());
+				result.child("Номер").value.property.value(response.child("m:Nomer" ).value.property.value());
+				Vector<Bough> NePodtverzdeniePozicii=response.children("m:NePodtverzdeniePozicii" );
+				for(int ii=0;ii<NePodtverzdeniePozicii.size();ii++){
+					Bough one=new Bough().name.is("НеПодтвержденныеПозиции");
+					result.children.add(one);
+					one.child("Номенклатура").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:Nomenklatura").value.property.value());
+					one.child("КоличествоЗаказано").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:KolichestvoZakazano").value.property.value());
+					one.child("КоличествоДефицит").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:KolichestvoDeficit").value.property.value());
+					one.child("КоличествоПодтверждено").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:KolichestvoPodtverzdeno").value.property.value());
+					one.child("ДатаПоступления").value.property.value(NePodtverzdeniePozicii.get(ii).child("m:DataPostupleniya").value.property.value());
+				}
+				Bough b=new Bough();
+				b.child("ДанныеПоЗаказам").child("Заказы").children=result.children;
+				/*
 				if (r.exception.property.value() != null) {
 					Auxiliary.warn("Ошибка: " + r.exception.property.value().getMessage(), context);
 				} else {
@@ -1151,7 +1223,8 @@ void promptRasporyajenieNaOtgruzku(){
 					} else {
 						Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), context);
 					}
-				}
+				}*/
+				Activity_UploadBids.buildDialogResult(context,"Сохранение заказа", b);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		}).afterCancel.is(new Task() {

@@ -68,7 +68,7 @@ public class Activity_Route_2 extends Activity{
 	//MenuItem menuVigrusit;
 	//MenuItem menuNezakrVizit;
 	//MenuItem menuDocumenti;
-	MenuItem menuGPSinformacia;
+	//MenuItem menuGPSinformacia;
 	MenuItem menuRasporyazheniaNaOtgruzku;
 	MenuItem menuPerebitNakladnuyu;
 	MenuItem menuZayavkaNaPostavku;
@@ -602,7 +602,7 @@ public class Activity_Route_2 extends Activity{
 	public boolean onCreateOptionsMenu(Menu menu){
 		//menuVigrusit = menu.add("Выгрузить");
 		//menuDocumenti = menu.add("Документы");
-		menuGPSinformacia = menu.add("GPS информация" );
+		//menuGPSinformacia = menu.add("GPS информация" );
 		menuAnketi = menu.add("Анкеты заявок на новых клиентов" );
 		menuDannieMercury = menu.add("Данные Меркурий" );
 		menuZayavkaVozmehenie = menu.add("Заявки на возмещение" );
@@ -1189,12 +1189,14 @@ public class Activity_Route_2 extends Activity{
 			startActivity(intent);
 			return true;
 		}
+		/*
 		if(item == menuGPSinformacia){
 			Intent intent = new Intent();
 			intent.setClass(this, Activity_GpsInfo.class);
 			startActivity(intent);
 			return true;
 		}
+		*/
 		if(item == menuDobavitKlientaVMarsgrut){
 			//promptDobavitKlientaVMarsgrut();
 			Intent intent = new Intent();

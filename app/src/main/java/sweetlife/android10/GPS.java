@@ -56,13 +56,13 @@ public class GPS {
 				//getGPSInfo();
 				mGPSService.SetLocationChangeClient(new ILocationChange() {
 					@Override
-					public void OnLocationUpdate(Location location) {
+					public void newLocationPoint(Location location,String comment) {
 						//System.out.println("OnLocationUpdate");
 						Calendar calendar = Calendar.getInstance();
 						calendar.setTimeInMillis(location.getTime());
 						Calendar now = Calendar.getInstance();
 						if (Math.abs(now.getTimeInMillis() - calendar.getTimeInMillis()) < 2 * 24 * 60 * 60 * 1000) {
-							getGPSInfo().insertGpsPoint(calendar, location.getLatitude(), location.getLongitude());
+							getGPSInfo().insertGpsPoint(calendar, location.getLatitude(), location.getLongitude(),comment);
 						}
 					}
 				});

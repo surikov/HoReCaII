@@ -17,7 +17,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerServiceClient {
+public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerServiceClient
+{
 	SimpleDateFormat mPointsDateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 	TextView mTextLatitude;
 	TextView mTextLongitude;
@@ -46,9 +47,9 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 		mTextStatus = (TextView) findViewById(R.id.textStatus);
 		if (true != //ApplicationHoreca.getInstance()
 				GPS.SetServiceClient(this)) {
-			Session.setCurrentStatus(getString(R.string.stopped), SWLifeGpsService.RED_COLOR);
+			Session.setCurrentStatus("GPS провайдеры недоступны!", SWLifeGpsService.RED_COLOR);
 		}
-		OnLocationNotAvailable();
+		On_LocationNotAvailable();
 		//System.out.println("done Activity_GpsInfo.onCreate");
 	}
 
@@ -113,16 +114,16 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 	}
 
 	@Override
-	public void OnStopLogging() {
+	public void On_StopLogging() {
 	}
 
 	@Override
-	public void OnLocationUpdate(Location loc) {
+	public void On_LocationUpdate(Location loc) {
 		DisplayLocationInfo(loc);
 	}
 
 	@Override
-	public void OnSatelliteCount(int count) {
+	public void On_SatelliteCount(int count) {
 		SetSatelliteInfo(count);
 	}
 
@@ -132,12 +133,12 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 	}
 
 	@Override
-	public Activity GetActivity() {
+	public Activity Get_Activity() {
 		return this;
 	}
 
 	@Override
-	public void OnLocationNotAvailable() {
+	public void On_LocationNotAvailable() {
 		//System.out.println("OnLocationNotAvailable");
 		mTextLatitude.setText(R.string.not_applicable);
 		mTextLongitude.setText(R.string.not_applicable);

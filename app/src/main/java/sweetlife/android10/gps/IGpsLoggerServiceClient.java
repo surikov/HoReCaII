@@ -6,13 +6,13 @@ import android.location.Location;
 public interface IGpsLoggerServiceClient {
 	public void OnStatusMessage(String message, int color);
 
-	public void OnLocationUpdate(Location loc);
+	public void On_LocationUpdate(Location loc);
 
-	public void OnLocationNotAvailable();
+	public void On_LocationNotAvailable();
 
-	public void OnSatelliteCount(int count);
+	public void On_SatelliteCount(int count);
 
-	public void OnStopLogging();
+	public void On_StopLogging();
 
-	public Activity GetActivity();
+	public Activity Get_Activity();
 }

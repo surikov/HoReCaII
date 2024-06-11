@@ -143,6 +143,12 @@ public class DatabaseHelper {
 			System.out.println(t.getMessage());
 		}
 
+		try {
+			mDB.execSQL("alter table GPSPoints add column comment text;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
+
 		
 		LogHelper.debug("recept tables");
 		mDB.execSQL("create table if not exists Receptii ("//

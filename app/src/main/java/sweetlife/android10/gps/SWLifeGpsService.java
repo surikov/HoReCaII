@@ -97,7 +97,7 @@ public class SWLifeGpsService extends Service {
 	}
 
 	private void StartLogging() {
-		//System.out.println("StartLogging, Session.isStarted() "+Session.isStarted());
+		System.out.println("SWLifeGpsService.StartLogging, Session.isStarted() "+Session.isStarted());
 		if (Session.isStarted()) {
 			return;
 		}
@@ -135,7 +135,7 @@ public class SWLifeGpsService extends Service {
 		CheckGpsStatus();
 		if (Session.isGpsEnabled()) {
 			mGPSLocationManager.addGpsStatusListener(mGPSLocationListener);
-			SetStatus(R.string.started_waiting, YELLOW_COLOR);
+			SetStatus("Установка соединения со спутниками!", YELLOW_COLOR);
 			Session.setUsingGps(true);
 		} else {
 		}
@@ -169,7 +169,7 @@ public class SWLifeGpsService extends Service {
 			mGPSLocationManager.removeGpsStatusListener(mGPSLocationListener);
 		}
 		Session.setUsingGps(false);
-		SetStatus(getString(R.string.gps_stopped), RED_COLOR);
+		SetStatus("GPS провайдеры недоступны.", RED_COLOR);
 	}
 
 	void SetStatus(String status, int color) {
@@ -187,21 +187,21 @@ public class SWLifeGpsService extends Service {
 	public void LocationNotAvailable() {
 		CheckGpsStatus();
 		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.OnLocationNotAvailable();
+			mDetailsServiceClient.On_LocationNotAvailable();
 		}
 	}
 
 	void StopDetailsServiceClient() {
 		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.OnStopLogging();
+			mDetailsServiceClient.On_StopLogging();
 			mDetailsServiceClient = null;
 		}
 	}
 
 
 
-	void OnLocationChanged(Location loc) {
-
+	void SweetLocationChanged(Location loc,String comment) {
+//System.out.println("SweetLocationChanged "+loc);
 		if (loc.isFromMockProvider()) {
 			loc.setLatitude(1);
 			loc.setLongitude(1);
@@ -211,7 +211,7 @@ public class SWLifeGpsService extends Service {
 		//Session.setLongitude(loc.getLongitude());
 		//Session.setGPSTime(loc.getTime());
 		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.OnLocationUpdate(loc);
+			mDetailsServiceClient.On_LocationUpdate(loc);
 		}
 		//if ((System.currentTimeMillis() - Session.getLocalTime()) < mPeriod) {
 		if ((System.currentTimeMillis() - lastSavedGPSms) < mPeriod) {
@@ -226,13 +226,13 @@ public class SWLifeGpsService extends Service {
 		whenSavedGPSms = System.currentTimeMillis();
 		//Session.setCurrentLocationInfo(loc);
 		if (mLocationChangeClient != null) {
-			mLocationChangeClient.OnLocationUpdate(loc);
+			mLocationChangeClient.newLocationPoint(loc, comment);
 		}
 	}
 
 	void SetSatelliteInfo(int count) {
 		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.OnSatelliteCount(count);
+			mDetailsServiceClient.On_SatelliteCount(count);
 		}
 	}
 

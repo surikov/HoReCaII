@@ -210,6 +210,7 @@ public class Activity_BidDegustacia extends Activity {
 		columnEdizm.clear();
 		columnSumma.clear();
 		if (!id.value().equals("")) {
+			sweetlife.android10.database.nomenclature.Request_NomenclatureBase.adjustTekuschieCenyOstatkovPartiy_strip(ApplicationHoreca.getInstance().getClientInfo().getID());
 			String sql = "select"//
 					+ " ZayavkaNaDegustaciuNomenklatura._id as aid"//
 					+ ",ZayavkaNaDegustaciuNomenklatura.nomenklatura as nomenklatura"//
@@ -224,14 +225,14 @@ public class Activity_BidDegustacia extends Activity {
 					+ " ,nomenklatura.kvant as minNorma" //
 					+ " from ZayavkaNaDegustaciuNomenklatura "//
 					+ " join nomenklatura on nomenklatura._IDRRef=ZayavkaNaDegustaciuNomenklatura.nomenklatura"//
-					+ " left join TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura"//
+					+ " left join TekuschieCenyOstatkovPartiy_strip TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura"//
 					//+ " join EdinicyIzmereniya_strip on nomenklatura.EdinicaKhraneniyaOstatkov=EdinicyIzmereniya_strip._idrref"//
 					//+ " join VelichinaKvantovNomenklatury_strip VelichinaKvantovNomenklatury on VelichinaKvantovNomenklatury.nomenklatura=nomenklatura.[_IDRRef] "// 
 					+ " where ZayavkaNaDegustaciuNomenklatura.parent=" + id.value()//
 					+ " order by nomenklatura.artikul"//
 					;
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-			//System.out.println(sql);
+			System.out.println(sql);
 			//System.out.println(b.dumpXML());
 			for (int i = 0; i < b.children.size(); i++) {
 				Bough row = b.children.get(i);
@@ -396,6 +397,7 @@ public class Activity_BidDegustacia extends Activity {
 		int toY = calendar.get(Calendar.YEAR);
 		int toM = calendar.get(Calendar.MONTH) + 1;
 		int toD = calendar.get(Calendar.DAY_OF_MONTH);
+		sweetlife.android10.database.nomenclature.Request_NomenclatureBase.adjustTekuschieCenyOstatkovPartiy_strip(ApplicationHoreca.getInstance().getClientInfo().getID());
 		String sql = "select"//
 				+ " ZayavkaNaDegustaciuNomenklatura._id as aid"//
 				+ ",ZayavkaNaDegustaciuNomenklatura.nomenklatura as nomenklatura"//
@@ -408,13 +410,13 @@ public class Activity_BidDegustacia extends Activity {
 				+ ",TekuschieCenyOstatkovPartiy.Cena * ZayavkaNaDegustaciuNomenklatura.kolichestvo as summa" //
 				+ " from ZayavkaNaDegustaciuNomenklatura "//
 				+ " join nomenklatura on nomenklatura._IDRRef=ZayavkaNaDegustaciuNomenklatura.nomenklatura"//
-				+ " left join TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura"//
+				+ " left join TekuschieCenyOstatkovPartiy_strip TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura"//
 				//+ " join EdinicyIzmereniya_strip on nomenklatura.EdinicaKhraneniyaOstatkov=EdinicyIzmereniya_strip._idrref"//
 				+ " where ZayavkaNaDegustaciuNomenklatura.parent=" + id.value()//
 				+ " order by nomenklatura.artikul"//
 				;
 		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		//System.out.println(sql);
+		System.out.println(sql);
 		//System.out.println(b.dumpXML());
 		//for (int i = 0; i < b.children.size(); i++) {}
 		//http://89.109.7.162/Degustaciya.1cws?wsdl

@@ -18,14 +18,14 @@ import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.ManagedAsyncTask;
 import sweetlife.android10.utils.SystemHelper;
 
-import android.app.AlertDialog;
+import android.app.*;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.*;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.*;
-import android.view.Menu;
+import android.view.*;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,7 +46,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	private static ListView mList;
 	private static ImageView mCheckAll;
 	MenuItem menuOtchety;
-	View lastDialogView=null;
+	public static View lastDialogView=null;
 
 	public static String composeUploadOrderString(String key){
 		return composeUploadOrderString(key, "");
@@ -206,10 +206,13 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	}
 
 	void showUploadResult(String msg, Bough result){
-		buildDialogResult(msg, result);
+		buildDialogResult(this,msg, result);
 	}
 
-	void buildDialogResult(String msg, Bough result){
+	public static void buildDialogResult(Context activity,String msg, Bough result){
+		System.out.println("buildDialogResult");
+		System.out.println("msg "+msg);
+		System.out.println("result "+result.dumpXML());
 		if(result.child("Сообщение").value.property.value().length() > 0){
 			msg = msg + result.child("Сообщение").value.property.value().trim() + "\n";
 		}
@@ -232,7 +235,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 					+ " from ZayavkaPokupatelyaIskhodyaschaya zpi"
 					+ " join Kontragenty ka on ka._idrref=zpi.kontragent"
 					+ " where zpi.nomer='" + vneshniyNomer + "';";
-			Bough data = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+			Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			String kontragent = data.child("row").child("naimenovanie").value.property.value();
 			String kod = data.child("row").child("kod").value.property.value();
 			String dataOtgruzki = data.child("row").child("dataOtgruzki").value.property.value();
@@ -247,7 +250,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 			for(int ff = 0; ff < zakazy.size(); ff++){
 				String nomer = zakazy.get(ff).child("Номер").value.property.value();
 				String zakazSoobshenie = zakazy.get(ff).child("Сообщение").value.property.value().trim();
-				msg = msg + "№" + nomer + ": " + zakazSoobshenie + "\n";
+				msg = msg + nomer + ": " + zakazSoobshenie + "\n";
 
 				Vector<Bough> nepodtverjdenniePosisii = zakazy.get(ff).children("НеПодтвержденныеПозиции");
 				for(int nn = 0; nn < nepodtverjdenniePosisii.size(); nn++){
@@ -317,13 +320,13 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 										//+ "\n 	order by date(zp.dataOtgruzki) desc, zp._id desc"//
 										//+ "\n 	limit 77"//
 										+ "\n 	;";
-								Bough data = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+								Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 								//System.out.println(sql);
 								//System.out.println(data.dumpXML());
 								String dataOtgruzki = data.child("row").child("dataOtgruzki").value.property.value();
 								String clientID = "x'" + data.child("row").child("kontragent_idrref").value.property.value() + "'";
 
-								ClientInfo clientInfo = new ClientInfo(mDB, clientID);
+								ClientInfo clientInfo = new ClientInfo(ApplicationHoreca.getInstance().getDataBase(), clientID);
 								ApplicationHoreca.getInstance().setClientInfo(clientInfo);
 								String polzovatelID = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
 								String sklad = ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya();
@@ -340,7 +343,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 										, sklad//
 										, 200//
 										, 0, false, false, false, null, null, false);
-								Bough found = Auxiliary.fromCursor(mDB.rawQuery(sql, null)).child("row");
+								Bough found = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null)).child("row");
 								double CENA = Numeric.string2double(found.child("Cena").value.property.value());
 								double SKIDKA = Numeric.string2double(found.child("Skidka").value.property.value());
 								String VID_SKIDKI = found.child("VidSkidki").value.property.value();
@@ -390,7 +393,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 								}
 								Popup_EditNomenclatureCountPrice popup = new Popup_EditNomenclatureCountPrice(
 										//Activity_UploadBids.this.mList
-										Activity_UploadBids.this.lastDialogView
+										lastDialogView
 										, mOnPopupClose
 										, zayavkaPokupatelya_Foodstaff
 										,ms);
@@ -414,7 +417,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 			}
 			if(rowStatus > 0){
 				sql = "update ZayavkaPokupatelyaIskhodyaschaya set proveden=x'01' where nomer='" + vneshniyNomer.trim() + "';";
-				mDB.execSQL(sql);
+				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			}else{
 				//
 			}
@@ -427,20 +430,20 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 			buttonAction = new Task(){
 				@Override
 				public void doTask(){
-					createZakazAnalog(newArtikuls, newCounts, newPrices,newClients, oldOrders);
+					createZakazAnalog(activity,newArtikuls, newCounts, newPrices,newClients, oldOrders);
 				}
 			};
 		}
-		SubLayoutless subLayoutless=new SubLayoutless(this) ;
+		SubLayoutless subLayoutless=new SubLayoutless(activity) ;
 		lastDialogView=subLayoutless;
-		AlertDialog alertDialog=Auxiliary.pick(this, ""
-				,subLayoutless.child(new Decor(this)
+		AlertDialog alertDialog=Auxiliary.pick(activity, ""
+				,subLayoutless.child(new Decor(activity)
 						.labelText.is(msg)
 						.left().is(Auxiliary.tapSize * 0.5)
 						.top().is(Auxiliary.tapSize * 0.5)
 						.width().is(Auxiliary.tapSize * 13)
 						.height().is(Auxiliary.tapSize * 5))//
-						.child(new DataGrid2(this).columns(
+						.child(new DataGrid2(activity).columns(
 								new Column[]{
 										zakazyNomenklatura.title.is("Заказы/Номенклатура").width.is(17.5 * Auxiliary.tapSize)
 										, kolichestvo.title.is("Кол-во").width.is(1.5 * Auxiliary.tapSize)
@@ -456,7 +459,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 
 	}
 
-	void createZakazAnalog(Vector<String> newArtikuls, Vector<Double> newCounts, Vector<Double> newPrices, Vector<String> newClients, Vector<String> oldOrders){
+	public static void createZakazAnalog(Context activity,Vector<String> newArtikuls, Vector<Double> newCounts, Vector<Double> newPrices, Vector<String> newClients, Vector<String> oldOrders){
 		HashMap<String, BidData> orders = new HashMap<String, BidData>();
 		for(int ii = 0; ii < newArtikuls.size(); ii++){
 			if(newCounts.get(ii) > 0){
@@ -489,21 +492,21 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 							//+ "\n 	order by date(zp.dataOtgruzki) desc, zp._id desc"//
 							//+ "\n 	limit 77"//
 							+ "\n 	;";
-					Bough data = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+					Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 					Bough row = data.child("row");
 					Calendar chosedDay = Calendar.getInstance();
 					chosedDay.setTimeInMillis(DateTimeHelper.SQLDateToDate(row.child("dataOtgruzki").value.property.value()).getTime());
-					ClientInfo clientInfo = new ClientInfo(mDB, "x'" + row.child("kontragent").value.property.value() + "'");
-					ZayavkaPokupatelya zayavkaPokupatelya = new ZayavkaPokupatelya(mDB, clientInfo, chosedDay);
+					ClientInfo clientInfo = new ClientInfo(ApplicationHoreca.getInstance().getDataBase(), "x'" + row.child("kontragent").value.property.value() + "'");
+					ZayavkaPokupatelya zayavkaPokupatelya = new ZayavkaPokupatelya(ApplicationHoreca.getInstance().getDataBase(), clientInfo, chosedDay);
 					zayavkaPokupatelya.setContract("x'" + row.child("dogovorKontragenta").value.property.value() + "'");
 					zayavkaPokupatelya.setTipOplaty("x'" + row.child("tipOplaty").value.property.value() + "'");
 					bidData = new BidData();
 					bidData.setBid(zayavkaPokupatelya);
-					bidData.setFoodStuffs(new FoodstuffsData(mDB, zayavkaPokupatelya));
+					bidData.setFoodStuffs(new FoodstuffsData(ApplicationHoreca.getInstance().getDataBase(), zayavkaPokupatelya));
 					bidData.setClientID(zayavkaPokupatelya.getClientID());
 					orders.put(oldOrders.get(ii), bidData);
 				}
-				ClientInfo clientInfo = new ClientInfo(mDB, bidData.getClientID());
+				ClientInfo clientInfo = new ClientInfo(ApplicationHoreca.getInstance().getDataBase(), bidData.getClientID());
 				ApplicationHoreca.getInstance().setClientInfo(clientInfo);
 				String dataOtgruzki = Auxiliary.sqliteDate.format(bidData.getBid().getShippingDate());
 				String clientID = bidData.getClientID();
@@ -522,7 +525,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 						, sklad//
 						, 200//
 						, 0, false, false, false, null, null, false);
-				Bough bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
+				Bough bb = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 				Bough found = bb.child("row");
 				double CENA = Numeric.string2double(found.child("Cena").value.property.value());
 				double SKIDKA = Numeric.string2double(found.child("Skidka").value.property.value());
@@ -551,25 +554,25 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		BidData createdBidData = null;
 		for(Map.Entry<String, BidData> entry: orders.entrySet()){
 			createdBidData = entry.getValue();
-			ClientInfo clientInfo = new ClientInfo(mDB, createdBidData.getClientID());
+			ClientInfo clientInfo = new ClientInfo(ApplicationHoreca.getInstance().getDataBase(), createdBidData.getClientID());
 			ApplicationHoreca.getInstance().setClientInfo(clientInfo);
 			createdBidData.getBid().setSumma(createdBidData.getFoodStuffs().getAmount());
-			createdBidData.getBid().writeToDataBase(mDB);
-			createdBidData.getFoodStuffs().WriteToDataBase(mDB);
+			createdBidData.getBid().writeToDataBase(ApplicationHoreca.getInstance().getDataBase());
+			createdBidData.getFoodStuffs().WriteToDataBase(ApplicationHoreca.getInstance().getDataBase());
 		}
 		if(createdBidData != null){
 			System.out.println("open " + createdBidData);
 			ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
-			ClientInfo clientInfo = new ClientInfo(mDB, createdBidData.getClientID());
+			ClientInfo clientInfo = new ClientInfo(ApplicationHoreca.getInstance().getDataBase(), createdBidData.getClientID());
 			ApplicationHoreca.getInstance().setClientInfo(clientInfo);
 			Intent intent = new Intent();
-			intent.setClass(Activity_UploadBids.this, Activity_Bid.class);
+			intent.setClass(activity, Activity_Bid.class);
 			intent.putExtra("client_id", createdBidData.getClientID());
 			intent.putExtra("ZayavkaPokupatelya", createdBidData.getBid());
-			this.startActivity(intent);
+			activity.startActivity(intent);
 		}
 	}
-
+/*
 	void _testResponse(){
 		String json = "{\n" +
 				"	\"Статус\": 1,\n" +
@@ -723,7 +726,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		showUploadResult("test\n", data);
 		//System.out.println(msg);
 	}
-
+*/
 
 	private View.OnClickListener nextUploadClick = new OnClickListener(){
 		@Override

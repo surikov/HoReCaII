@@ -325,11 +325,11 @@
 	<string name="not_applicable">Недоступно</string>
 	<string name="meters_per_second"> м/с</string>
 	<string name="unknown_direction">Направление неизвестно</string>
-	<string name="stopped">GPS сервис остановлен.</string>
-	<string name="fix_obtained">GPS сервис запущен.</string>
-	<string name="started_waiting">Установка соединения со спутниками.</string>
-	<string name="gps_stopped">GPS провайдеры недоступны.</string>
-	<string name="gps_available">GPS сервис запущен. Соединение со спутниками установлено.</string>
+	<string name="stopped3333">GPS сервис остановлен.</string>
+	<string name="fix_obtained222">GPS сервис запущен.</string>
+	<string name="started_waiting2222">Установка соединения со спутниками.</string>
+	<string name="gps_stopped22222">GPS провайдеры недоступны.</string>
+	<string name="gps_available2222">GPS сервис запущен. Соединение со спутниками установлено.</string>
 	<string name="update">Обновление</string>
 	<string name="update_complete">Обновление завершено.</string>
 	<string name="update_all">Полное обновление</string>

@@ -227,7 +227,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 	public void setUploadPointGPS() {
 		ContentValues updateValues = new ContentValues();
 		updateValues.put(UPLOAD, TRUE);
-		DatabaseHelper.updateInTranzaction(mDB, GPSPOINTStableName, updateValues, null, null);
+		DatabaseHelper.updateInTranzaction(mDB, "GPSPoints", updateValues, null, null);
 	}
 
 	public void setUploadVisits() {
@@ -237,12 +237,12 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		DatabaseHelper.updateInTranzaction(mDB, VizitsTableName, updateValues, "Upload = 0 and EndTime is not null", null);
 	}
 
-	public synchronized void insertGpsPoint(Calendar time, double lat, double lon) {
+	public synchronized void insertGpsPoint(Calendar time, double lat, double lon,String comment) {
 		if (lockInsertGPS) {
 			//System.out.println("insertPoint locked");
 			//return;
 		}
-		//System.out.println("insertPoint " + time.getTime() + " / " + time.getTimeZone().getDisplayName());
+		System.out.println("insertGpsPoint " + time.getTime() + " / " + time.getTimeZone().getDisplayName()+": "+comment);
 		ContentValues initialValues = new ContentValues();
 		/*
 				if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
@@ -255,9 +255,10 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		initialValues.put(LONGITUDE, lat);
 		initialValues.put(LATITUDE, lon);//IsoDate.dateToString(coordGPS.time, IsoDate.DATE_TIME));
 		initialValues.put(UPLOAD, FALSE);
+		initialValues.put("comment", comment);
 		if (IsDatabaseOpened()) {
 			//LogHelper.debug(this.getClass().getCanonicalName() + " insertPoint "+mDateTimeFormat.format(date));
-			DatabaseHelper.insertInTranzaction(mDB, GPSPOINTStableName, initialValues);
+			DatabaseHelper.insertInTranzaction(mDB, "GPSPoints", initialValues);
 		}
 	}
 
@@ -368,7 +369,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 
 	public ArrayList<CoordGPS> getGPSPointsArray() {
 		ArrayList<CoordGPS> list = new ArrayList<CoordGPS>();
-		Cursor cursor = mDB.query(GPSPOINTStableName, new String[]{BEGIN_TIME, LATITUDE, LONGITUDE},
+		Cursor cursor = mDB.query("GPSPoints", new String[]{BEGIN_TIME, LATITUDE, LONGITUDE},
 				//"date(BeginDate) = date() and Upload = " + FALSE, null, null, null, null);
 				" Upload = " + FALSE, null, null, null, null);
 		if (cursor.moveToFirst()) {

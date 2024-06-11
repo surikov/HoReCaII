@@ -4,5 +4,5 @@ import android.location.Location;
 
 public interface ILocationChange {
 
-	public void OnLocationUpdate(Location loc);
+	public void newLocationPoint(Location loc,String comment);
 }
