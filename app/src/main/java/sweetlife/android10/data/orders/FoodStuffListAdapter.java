@@ -127,9 +127,9 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 			mTextPlaceCount.setText(DecimalFormatHelper.format(foodstuff.getKoefMest()));
 			mTextPlaceCount.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
 			mTextUnit.setText(foodstuff.getEdinicaIzmereniyaName());
-			mTextUnit.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
+			mTextUnit.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize()-5);
 			double count = foodstuff.getKolichestvo();
-			mTextCount.setText(DecimalFormatHelper.format(count) + "/" + DecimalFormatHelper.format(count * foodstuff.ves) + "кг");
+			mTextCount.setText(DecimalFormatHelper.format(count) + "/" + DecimalFormatHelper.format(count * foodstuff.requestVes()) + "кг");
 			mTextCount.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize() - 5);
 			mTextPrice.setText(DecimalFormatHelper.format(foodstuff.getCena()));
 			mTextPrice.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
@@ -164,11 +164,15 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 				mTextPricewithsale.setText("");
 			}*/
 			if (Activity_Bid.hideNacenkaStatus) {
-				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy()));
+				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy())+ "р.");
 			} else {
 				//int fakt = (int) (100 * (foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice());
 				double fakt = 100 * (foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice()) / foodstuff.getBasePrice();
-				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy()) + "р.\n" + String.format("%.2f", fakt) + "%");
+				double val=(foodstuff.getCenaSoSkidkoy() - foodstuff.getBasePrice())/foodstuff.requestVes();
+				mTextPricewithsale.setText(DecimalFormatHelper.format(foodstuff.getCenaSoSkidkoy())+ "р."
+						+"\n" + String.format("%.2f", fakt) + "%"
+						+"\n" + String.format("%.2f", val) + "р/кг"
+				);
 				mTextPricewithsale.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize() - 5);
 			}
 			//if(cursor.getInt(37)>0){

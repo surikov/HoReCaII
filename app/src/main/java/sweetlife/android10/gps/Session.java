@@ -9,10 +9,10 @@ public class Session extends Application {
 	private static boolean gpsEnabled;
 	private static boolean isStarted;
 	private static boolean isUsingGps;
-	private static String lastStatus;
-	private static int lastStatusColor;
-	private static int satellites;
-	private static boolean notificationVisible;
+	//private static String lastStatus;
+	//private static int lastStatusColor;
+	//private static int satellites;
+	//private static boolean notificationVisible;
 	//private static Location currentLocationInfo;
 	private static boolean isBound;
 
@@ -44,7 +44,7 @@ public class Session extends Application {
 	}
 
 	public static boolean isUsingGps() {
-
+//
 		return isUsingGps;
 	}
 
@@ -53,41 +53,41 @@ public class Session extends Application {
 		Session.isUsingGps = isUsingGps;
 	}
 
-	public static String getCurrentStatus() {
+	//public static String getCurrentStatus() {
 
-		return lastStatus;
-	}
+	//	return lastStatus;
+	//}
 
-	public static void setCurrentStatus(String currentStatus, int color) {
+	//public static void setCurrentStatus(String currentStatus, int color) {
 		//System.out.println("setCurrentStatus "+currentStatus);
-		Session.lastStatus = currentStatus;
-		Session.lastStatusColor = color;
-	}
+	//	Session.lastStatus = currentStatus;
+	//	Session.lastStatusColor = color;
+	//}
 
-	public static int getCurrentStatusColor() {
+	//public static int getCurrentStatusColor() {
 
-		return Session.lastStatusColor;
-	}
+	//	return Session.lastStatusColor;
+	//}
 
-	public static int getSatelliteCount() {
+	//public static int getSatelliteCount() {
 
-		return satellites;
-	}
+	//	return satellites;
+	//}
 
-	public static void setSatelliteCount(int satellites) {
+	//public static void setSatelliteCount(int satellites) {
 
-		Session.satellites = satellites;
-	}
+	//	Session.satellites = satellites;
+	//}
 
-	public static boolean isNotificationVisible() {
+	//public static boolean isNotificationVisible() {
 
-		return notificationVisible;
-	}
+	//	return notificationVisible;
+	//}
 
-	public static void setNotificationVisible(boolean notificationVisible) {
+	//public static void setNotificationVisible(boolean notificationVisible) {
 
-		Session.notificationVisible = notificationVisible;
-	}
+	//	Session.notificationVisible = notificationVisible;
+	//}
 /*
 	public static double getCurrentLatitude() {
 

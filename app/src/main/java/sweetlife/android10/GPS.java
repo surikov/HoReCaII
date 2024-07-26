@@ -19,7 +19,7 @@ public class GPS {
 	private static String agentIDstr = null;
 	private static ServiceConnection mGpsServiceConnection = null;
 	private static PowerManager.WakeLock mWakeLock = null;
-
+/*
 	public static boolean SetServiceClient(IGpsLoggerServiceClient client) {
 		//System.out.println("SetServiceClient "+client+" for "+mGPSService);
 		if (mGPSService != null) {
@@ -28,14 +28,15 @@ public class GPS {
 		}
 		return false;
 	}
-
+*/
+/*
 	public static void DeleteServiceClient() {
 		//System.out.println("DeleteServiceClient");
 		if (mGPSService != null) {
 			mGPSService.DeleteServiceClient();
 		}
 	}
-
+*/
 	private static void StartAndBindService(final Context context) {
 		//System.out.println("StartAndBindService");
 		//sweetlife.horeca.monitor.SQLexec.go();

@@ -262,7 +262,7 @@ public class Activity_Login extends Activity{
 				startActivity(intent);
 
 			}else{
-
+				startUpdateFirebaseToken();
 				Intent intent = new Intent();
 				intent.setClass(Activity_Login.this, Activity_Update.class);
 				startActivity(intent);
@@ -270,6 +270,12 @@ public class Activity_Login extends Activity{
 			sweetlife.android10.SweetStart ss = new sweetlife.android10.SweetStart();
 			ss.initSchedule(this);
 			finish();
+		}
+	}
+
+	void startUpdateFirebaseToken(){
+		if(new java.util.Date().getDay()==1){
+			Cfg.requeryFirebaseToken(this);
 		}
 	}
 

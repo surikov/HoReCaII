@@ -46,7 +46,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	private static ListView mList;
 	private static ImageView mCheckAll;
 	MenuItem menuOtchety;
-	public static View lastDialogView=null;
+	public static View lastDialogView = null;
 
 	public static String composeUploadOrderString(String key){
 		return composeUploadOrderString(key, "");
@@ -206,13 +206,15 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	}
 
 	void showUploadResult(String msg, Bough result){
-		buildDialogResult(this,msg, result);
+		buildDialogResult(this, msg, result);
 	}
-
-	public static void buildDialogResult(Context activity,String msg, Bough result){
+	public static void buildDialogResult(Context activity, String msg, Bough result){
+		buildDialogResultAndClose(activity, msg, result,null);
+	}
+	public static void buildDialogResultAndClose(Context activity, String msg, Bough result,Activity activityToClose){
 		System.out.println("buildDialogResult");
-		System.out.println("msg "+msg);
-		System.out.println("result "+result.dumpXML());
+		System.out.println("msg " + msg);
+		System.out.println("result " + result.dumpXML());
 		if(result.child("Сообщение").value.property.value().length() > 0){
 			msg = msg + result.child("Сообщение").value.property.value().trim() + "\n";
 		}
@@ -261,15 +263,15 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 					String kolZakazano = one.child("КоличествоЗаказано").value.property.value();
 					String kolPodtverjseno = one.child("КоличествоПодтверждено").value.property.value();
 					String dataPostuplenia = one.child("ДатаПоступления").value.property.value().trim();
-					if(dataPostuplenia.length()>0){
-						dataPostuplenia="поступление " +Auxiliary.tryReFormatDate(dataPostuplenia,"yyyyMMdd","dd.MM.yy");
+					if(dataPostuplenia.length() > 0){
+						dataPostuplenia = "поступление " + Auxiliary.tryReFormatDate(dataPostuplenia, "yyyyMMdd", "dd.MM.yy");
 					}
 
 					String txt = one.child("Текст").value.property.value();
 					if(nomenklatura.length > 0){
 						name = nomenklatura[1];
 					}
-					msg = msg + "не подтвержден " + " арт." + art + " " + name+" " +dataPostuplenia+ ", " + kolPodtverjseno + " из " + kolZakazano + " " + txt + "\n";
+					msg = msg + "не подтвержден " + " арт." + art + " " + name + " " + dataPostuplenia + ", " + kolPodtverjseno + " из " + kolZakazano + " " + txt + "\n";
 					zakazyNomenklatura.cell(name, 0x11000000, "арт." + art + ": заказано " + kolZakazano + " подверждено " + kolPodtverjseno + ", цена " + 12.34 + "р.");
 					kolichestvo.cell("", 0x11000000, "");
 					gridCounter++;
@@ -374,18 +376,18 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 								BetterPopupWindow.OnCloseListener mOnPopupClose = new BetterPopupWindow.OnCloseListener(){
 									public void onClose(int param){
 										System.out.println("BetterPopupWindow.OnCloseListenerюonClose: " + param
-												+": "+ zayavkaPokupatelya_Foodstaff.getCenaSoSkidkoy()
-												+": "+zayavkaPokupatelya_Foodstaff.getKolichestvo()
-												+": "+zayavkaPokupatelya_Foodstaff.isCRAvailable()
+												+ ": " + zayavkaPokupatelya_Foodstaff.getCenaSoSkidkoy()
+												+ ": " + zayavkaPokupatelya_Foodstaff.getKolichestvo()
+												+ ": " + zayavkaPokupatelya_Foodstaff.isCRAvailable()
 										);
 										newCounts.set(rowNum, zayavkaPokupatelya_Foodstaff.getKolichestvo());
 										newPrices.set(rowNum, zayavkaPokupatelya_Foodstaff.getCenaSoSkidkoy());
 										kolichestvo.strings.set(gridNum, "" + newCounts.get(rowNum));
-										kolichestvo.descriptions.set(gridNum,  newPrices.get(rowNum)+"р");
+										kolichestvo.descriptions.set(gridNum, newPrices.get(rowNum) + "р");
 										kolichestvo.update(gridNum);
 									}
 								};
-								long ms=0;
+								long ms = 0;
 								try{
 									ms = Auxiliary.sqliteDate.parse(dataOtgruzki).getTime();
 								}catch(Throwable t){
@@ -396,7 +398,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 										lastDialogView
 										, mOnPopupClose
 										, zayavkaPokupatelya_Foodstaff
-										,ms);
+										, ms);
 								popup.showLikeQuickAction();
 							}
 						};
@@ -430,19 +432,31 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 			buttonAction = new Task(){
 				@Override
 				public void doTask(){
-					createZakazAnalog(activity,newArtikuls, newCounts, newPrices,newClients, oldOrders);
+					createZakazAnalog(activity, newArtikuls, newCounts, newPrices, newClients, oldOrders);
 				}
 			};
 		}
-		SubLayoutless subLayoutless=new SubLayoutless(activity) ;
-		lastDialogView=subLayoutless;
-		AlertDialog alertDialog=Auxiliary.pick(activity, ""
-				,subLayoutless.child(new Decor(activity)
-						.labelText.is(msg)
-						.left().is(Auxiliary.tapSize * 0.5)
-						.top().is(Auxiliary.tapSize * 0.5)
-						.width().is(Auxiliary.tapSize * 13)
-						.height().is(Auxiliary.tapSize * 5))//
+		SubLayoutless subLayoutless = new SubLayoutless(activity);
+		lastDialogView = subLayoutless;
+		WebRender brwsr = new WebRender(activity);
+
+		AlertDialog alertDialog = Auxiliary.pickOrCancel(activity, ""
+				, subLayoutless
+						/*
+						.child(new Decor(activity)
+								.labelText.is(msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg)
+								.left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 0.5)
+								.width().is(Auxiliary.tapSize * 13)
+								.height().is(Auxiliary.tapSize * 5))//
+						*/
+						.child(brwsr
+								//.url.is("https://mail.ru")
+								//.labelText.is(msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg + msg)
+								.left().is(Auxiliary.tapSize * 0.5)
+								.top().is(Auxiliary.tapSize * 0.5)
+								.width().is(Auxiliary.tapSize * 18)
+								.height().is(Auxiliary.tapSize * 5))//
 						.child(new DataGrid2(activity).columns(
 								new Column[]{
 										zakazyNomenklatura.title.is("Заказы/Номенклатура").width.is(17.5 * Auxiliary.tapSize)
@@ -455,11 +469,25 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 						.width().is(Auxiliary.tapSize * 19)//
 						.height().is(Auxiliary.tapSize * 12)
 				, buttonTitle, buttonAction
-				, null, null, null, null);
-
+				, null, null, null, null
+		,new Task(){
+			@Override
+			public void doTask(){
+				if(activityToClose!=null){
+					activityToClose.finish();
+				}
+			}
+		}
+		);
+		String description="<html><body><pre>"+msg +"</pre></body></html>";
+		//System.out.println(description);
+		String page = Cfg.workFolder + "response.html";
+		File html = new File(page);
+		Auxiliary.writeTextToFile(html, description, "utf-8");
+		brwsr.go("file://" + page);
 	}
 
-	public static void createZakazAnalog(Context activity,Vector<String> newArtikuls, Vector<Double> newCounts, Vector<Double> newPrices, Vector<String> newClients, Vector<String> oldOrders){
+	public static void createZakazAnalog(Context activity, Vector<String> newArtikuls, Vector<Double> newCounts, Vector<Double> newPrices, Vector<String> newClients, Vector<String> oldOrders){
 		HashMap<String, BidData> orders = new HashMap<String, BidData>();
 		for(int ii = 0; ii < newArtikuls.size(); ii++){
 			if(newCounts.get(ii) > 0){

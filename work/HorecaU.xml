@@ -14,5 +14,6 @@
 <user><hrc>spb</hrc><label>Санкт-Петербург</label></user>
 <user><hrc>tula</hrc><label>Тула</label></user>
 <user><hrc>region_c</hrc><label>VIP+Госзаказчики</label></user>
-<user><hrc>krasnodar</hrc><label>Краснодар</label></user>
+<user><hrc>krasnodar</hrc><label>Краснодар/Ростов</label></user>
+<user><hrc>poberegie</hrc><label>Побережье</label></user>
 </config>

@@ -318,4 +318,18 @@ public class FoodstuffsData extends NomenclatureBasedDocumentItems {
 
 		return amount;
 	}
+	public double getWeight(){
+		double orderWeight = 0;
+		for(NomenclatureBasedItem item: this.mNomenclaureList){
+			//amount = amount + ((ZayavkaPokupatelya_Foodstaff) item).getSummaSoSkidkoy();
+			String artikul = item.getArtikul();
+			double ves =((ZayavkaPokupatelya_Foodstaff) item).requestVes();
+					//getVes(artikul);
+			ZayavkaPokupatelya_Foodstaff one = (ZayavkaPokupatelya_Foodstaff)item;
+			//one.ves = ves;
+			orderWeight = orderWeight + one.getKolichestvo() * ves;
+		}
+		return orderWeight;
+	}
+
 }

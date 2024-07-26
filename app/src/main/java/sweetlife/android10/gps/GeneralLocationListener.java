@@ -19,7 +19,7 @@ class GeneralLocationListener implements LocationListener, GpsStatus.Listener{
 
 		gpsLoggingService = service;
 	}
-
+@Override
 	public void onLocationChanged(Location loc){
 		//System.out.println("GeneralLocationListener.onLocationChanged "+loc);
 		try{
@@ -27,7 +27,7 @@ class GeneralLocationListener implements LocationListener, GpsStatus.Listener{
 				gpsLoggingService.SweetLocationChanged(loc, "GeneralLocationListener");
 			}
 		}catch(Exception ex){
-			gpsLoggingService.SetStatus(ex.getMessage(), SWLifeGpsService.RED_COLOR);
+			//gpsLoggingService.SetStatus(ex.getMessage(), SWLifeGpsService.RED_COLOR);
 		}
 
 	}
@@ -42,44 +42,44 @@ class GeneralLocationListener implements LocationListener, GpsStatus.Listener{
 
 		gpsLoggingService.StartGPSStatusListener();
 	}
-
+/*
 	public void onStatusChanged(String provider, int status, Bundle extras){
 
 		if(status == LocationProvider.OUT_OF_SERVICE){
 
-			gpsLoggingService.SetStatus("Установка соединения со спутниками...", SWLifeGpsService.YELLOW_COLOR);
+			//gpsLoggingService.SetStatus("Установка соединения со спутниками...", SWLifeGpsService.YELLOW_COLOR);
 			gpsLoggingService.LocationNotAvailable();
 		}
 
 		if(status == LocationProvider.AVAILABLE){
 
-			gpsLoggingService.SetStatus("GPS сервис запущен. Соединение со спутниками установлено:", SWLifeGpsService.GREEN_COLOR);
+			//gpsLoggingService.SetStatus("GPS сервис запущен. Соединение со спутниками установлено:", SWLifeGpsService.GREEN_COLOR);
 		}
 	}
-
+*/
 	public void onGpsStatusChanged(int event){
 
 		switch(event){
 
 			case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
-				gpsLoggingService.SetStatus("GPS сервис запущен.", SWLifeGpsService.GREEN_COLOR);
+				//gpsLoggingService.SetStatus("GPS сервис запущен.", SWLifeGpsService.GREEN_COLOR);
 
-				GpsStatus status = gpsLoggingService.getGPSLocationManager().getGpsStatus(null);
+				//GpsStatus status = gpsLoggingService.getGPSLocationManager().getGpsStatus(null);
 				//System.out.println("onGpsStatusChanged status "+status);
 
-				int maxSatellites = status.getMaxSatellites();
+				//int maxSatellites = status.getMaxSatellites();
 
-				Iterator<GpsSatellite> it = status.getSatellites().iterator();
-				int count = 0;
-				while(it.hasNext() && count <= maxSatellites){
-					GpsSatellite s = it.next();
+				//Iterator<GpsSatellite> it = status.getSatellites().iterator();
+				//int count = 0;
+				//while(it.hasNext() && count <= maxSatellites){
+				//	GpsSatellite s = it.next();
 
-					if(s.usedInFix()){
-						count++;
-					}
-				}
+				//	if(s.usedInFix()){
+				//		count++;
+				//	}
+				//}
 
-				gpsLoggingService.SetSatelliteInfo(count);
+				//gpsLoggingService.SetSatelliteInfo(count);
 
 				//				if(count == 0) {
 

@@ -16,7 +16,7 @@ public class BidData implements ISQLConsts {
 	private int mLiniyaDostavki = 0;
 	private Calendar mChoosedDay;
 
-	public void UpdateExtraChargeInfo(String dataOtgruzki) {
+	public void UpdateOrderExtraChargeInfo(String dataOtgruzki) {
 		try {
 
 			//mExtraChargeInfo.Update(mBid.getIDRRef(), mFoodStuffs.getBasePriceAmount(mClientID,dataOtgruzki), mFoodStuffs.getAmount());
@@ -29,14 +29,14 @@ public class BidData implements ISQLConsts {
 			//System.out.println("4");
 			double getVozvrat = mFoodStuffs.getVozvrat(mClientID, dataOtgruzki);
 			//System.out.println("5");
-			mExtraChargeInfo.Update(getIDRRef, getBasePriceAmount, getAmount, getVozvrat);
+			mExtraChargeInfo.UpdateInfo(getIDRRef, getBasePriceAmount, getAmount, getVozvrat,mFoodStuffs.getWeight());
 			//System.out.println("6");
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
 	}
-
-	public void AddNomenclature(String edinicaIzmereniyaID//
+/*
+	public void AddNomenclature22222(String edinicaIzmereniyaID//
 			, double kolichestvo//
 			, String nomenklaturaID//
 			, double cena//
@@ -81,7 +81,7 @@ public class BidData implements ISQLConsts {
 		//System.out.println("AddNomenclature "+artikul+": "+minimalnayaCena+"/"+maksimalnayaCena);
 		UpdateExtraChargeInfo(DateTimeHelper.SQLDateString(mChoosedDay.getTime()));
 	}
-
+*/
 	public ExtraChargeInfo getExtraChargeInfo() {
 		return mExtraChargeInfo;
 	}

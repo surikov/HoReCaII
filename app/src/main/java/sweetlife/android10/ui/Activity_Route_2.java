@@ -76,7 +76,7 @@ public class Activity_Route_2 extends Activity{
 	MenuItem menuDataCheck;
 	//MenuItem menuResetExchange;
 	MenuItem menuMatricaTP;
-	MenuItem menuMap;
+	//MenuItem menuMap;
 	//MenuItem menuLimit;
 	MenuItem menuAnketi;
 	MenuItem menuHelp;
@@ -85,6 +85,7 @@ public class Activity_Route_2 extends Activity{
 	MenuItem menuVizitGroup;
 	MenuItem menuZapiski;
 	MenuItem menuPoKassamDlyaTP;
+	MenuItem menuZayavkaVnutrenneePeremechenie;
 	MenuItem menuCheckDocs;
 	MenuItem menuZayavkaVozmehenie;
 	MenuItem menuMarshrutDogovora;
@@ -605,6 +606,7 @@ public class Activity_Route_2 extends Activity{
 		//menuGPSinformacia = menu.add("GPS информация" );
 		menuAnketi = menu.add("Анкеты заявок на новых клиентов" );
 		menuDannieMercury = menu.add("Данные Меркурий" );
+		menuZayavkaVnutrenneePeremechenie= menu.add("Заявка на внутреннее перемещение" );
 		menuZayavkaVozmehenie = menu.add("Заявки на возмещение" );
 		menuZayavkaNaPerevodVdosudebnye = menu.add("Заявка на вывод/перевод в СБ" );
 		menuDobavitKlientaVMarsgrut = menu.add("Заявки на добавление клиента в маршрут" );
@@ -619,7 +621,7 @@ public class Activity_Route_2 extends Activity{
 		menuOtchety = menu.add("Отчёты" );
 		menuPeredatIsprNakl = menu.add("Передать исправленную накладную" );
 		menuPlanObuchenia = menu.add("План обучения" );
-		menuMap = menu.add("Положение на карте" );
+		//menuMap = menu.add("Положение на карте" );
 		menuDataCheck = menu.add("Проверка БД" );
 		menuRasporyazheniaNaOtgruzku = menu.add("Распоряжения на отгрузку" );
 		menuZapiski = menu.add("Служебные записки на договоры" );
@@ -1147,6 +1149,13 @@ public class Activity_Route_2 extends Activity{
 			startActivity(intent);
 			return true;
 		}
+		if(item == menuZayavkaVnutrenneePeremechenie){
+			Intent intent = new Intent();
+			intent.setClass(this, ActivityZayavkaVnutrenneePeremechenie.class);
+			startActivity(intent);
+			return true;
+		}
+
 		if(item == menuPerebitNakladnuyu){
 			Intent intent = new Intent();
 			intent.setClass(this, ActivityZayavkaIzmenenieNakladnoy.class);
@@ -1230,12 +1239,12 @@ public class Activity_Route_2 extends Activity{
 			startActivity(intent);
 			return true;
 		}
-		if(item == menuMap){
+		/*if(item == menuMap){
 			Intent intent = new Intent();
 			intent.setClass(this, ActivityGPSMap.class);
 			this.startActivityForResult(intent, 0);
 			return true;
-		}
+		}*/
 		/*if(item == menuLimit) {
 			Intent intent = new Intent();
 			intent.setClass(this, ActivityLimitList.class);
@@ -2023,7 +2032,7 @@ I/System.out: </>
 				+ limitSQL.value()//
 				+ "  		) a" + sortDay//
 				;
-		//System.out.println(req);
+		System.out.println("gridSQL "+req);
 		return req;
 	}
 /*

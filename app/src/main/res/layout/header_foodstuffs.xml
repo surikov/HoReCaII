@@ -55,6 +55,7 @@
 		android:layout_height="40dip"
 		android:layout_width="0dip"
 		android:layout_weight="0.03"
+		android:textSize="7pt"
 		android:text="Ед.изм." />
 
 	<Button

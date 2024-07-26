@@ -205,7 +205,9 @@ public class ActivityCheckDocs extends Activity {
                         String territory = one.child("territory").value.property.value().trim();
                         String p[] = territory.split("/");
                         System.out.println("prompt " + territory);
-                        if (p[0].trim().length() > 0 || (p.length>3 && p[3].trim().equals("VIP Н.Новгород"))) {
+                        if (p[0].trim().length() > 0
+								|| (p.length>3 && p[3].trim().equals("VIP Н.Новгород")
+						)) {
                             System.out.println("promptNewTP " + for_hrc + ", " + p[p.length - 1]);
                             addFolderItems(ActivityCheckDocs.tpCode, date_key, for_hrc, "",isAudit);
                         } else {

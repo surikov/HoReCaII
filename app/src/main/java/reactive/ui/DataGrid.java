@@ -157,8 +157,9 @@ public class DataGrid extends SubLayoutless {
 	}
 
 	public void append() {
+		//System.out.println("DataGrid append "+lockAppend+"/"+columnsArray.length+"/"+columnsArray[0].count());
 		if (lockAppend) {
-			//System.out.println("append locked");
+			System.out.println("append locked");
 			return;
 		}
 		if (columnsArray == null) {
@@ -189,6 +190,7 @@ public class DataGrid extends SubLayoutless {
 						tableRow.addView(r.view());
 					}
 				}
+				//System.out.println("y "+y);
 			}
 			int lastDataRow = columnsArray[0].count();
 			int lastPageRow = (int) ((currentPage + 1) * pageSize.property.value());

@@ -11,6 +11,7 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 	private String mClientID;
 	private SQLiteDatabase mDB;
 	private double mOrderFactPercent = 0;
+	double orderFactValKg=0;
 	private double mClientPlanPercent = 0;
 	public double planPodrazdeleniaNaMesiac = 0;
 	public double nacenkaFactPodrzdelenia = 0;
@@ -28,8 +29,9 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 		return false;
 	}
 
-	public void Update(String editOrderID, double basePriceAmount, double amount, double vozvrat) {
+	public void UpdateInfo(String editOrderID, double basePriceAmount, double amount, double vozvrat,double orderWeight) {
 		//System.out.println(this.getClass().getCanonicalName()+": Update: "+editOrderID+"/"+basePriceAmount+"/"+amount);
+/*
 		UpdateFactCalculatePart(basePriceAmount, amount, vozvrat);
 	}
 
@@ -38,6 +40,7 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 	}
 
 	private void UpdateOrderFactCalculatePart(double basePriceAmount, double amount, double vozvrat) {
+*/
 		if (basePriceAmount != 0) {
 
 			double summaSVozvr = amount - vozvrat;
@@ -51,6 +54,8 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 			mOrderFactPercent = 0;
 		}
 		//System.out.println(this.getClass().getCanonicalName()+": mOrderFactPercent: "+mOrderFactPercent);
+
+		orderFactValKg=(amount-basePriceAmount)/orderWeight;
 	}
 
 	private void UpdateClientPlan() {
@@ -184,7 +189,12 @@ public class ExtraChargeInfo implements ITableColumnsNames {
 		}*/
 		return DecimalFormatHelper.format(mOrderFactPercent) + "%";
 	}
-
+	public String getOrderFactValKg() {
+		/*if (!IsExtraChargeInfoAvailable()) {
+			return null;
+		}*/
+		return DecimalFormatHelper.format(orderFactValKg) + "р/кг";
+	}
 	public String getClientPlanPersent() {
 		if (!IsExtraChargeInfoAvailable() || mClientPlanPercent == 0) {
 			return null;

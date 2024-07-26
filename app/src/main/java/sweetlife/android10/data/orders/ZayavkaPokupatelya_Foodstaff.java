@@ -1,11 +1,13 @@
 package sweetlife.android10.data.orders;
 
+import sweetlife.android10.*;
 import sweetlife.android10.data.common.NomenclatureBasedCountItem;
 import sweetlife.android10.data.common.Sales;
 import sweetlife.android10.database.ISklady;
 import sweetlife.android10.utils.Hex;
 
 import android.content.ContentValues;
+import android.database.*;
 import android.database.sqlite.SQLiteDatabase;
 
 public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
@@ -20,7 +22,7 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 	private double basePrice;
 	private double mLastPrice;
 	//private boolean isMustList;
-	public double ves = 0;
+	public double lastves = 0;
 
 	//public boolean CRbyHands=false;
 	public ZayavkaPokupatelya_Foodstaff(//
@@ -77,8 +79,26 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		}*/
 		setSummaSoSkidkoy(mCenaSoSkidkoy * mKolichestvo);
 		//System.out.println("new ZayavkaPokupatelya_Foodstaff: "+nomenklaturaNaimenovanie);
+		lastves=0;
+		requestVes();
 	}
-
+	public  double requestVes(){
+		if(lastves==0){
+			String artikul = this.mArtikul;
+			double ves = 0;
+			//String sql = "select ves from Nomenklatura_sorted n join EdinicyIzmereniya_strip eho on n.EdinicaKhraneniyaOstatkov = eho._IDRRef where artikul='" + artikul + "' limit 1";
+			String sql = "select skladEdVes from Nomenklatura_sorted where artikul='" + artikul + "' limit 1";
+			Cursor cursor = ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null);
+			if(cursor.moveToNext()){
+				ves = cursor.getDouble(0);
+				//System.out.println(artikul+" / "+ves);
+			}
+			if(cursor != null)
+				cursor.close();
+			lastves = ves;
+		}
+		return lastves;
+	}
 	@Override
 	public void setToDataBase(SQLiteDatabase db) {
 		ContentValues values = new ContentValues();
@@ -151,6 +171,8 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		mSummaSoSkidkoy = mCenaSoSkidkoy * mKolichestvo;
 		mSumma = mKolichestvo * mCena;
 		//System.out.println("setKolichestvo mSummaSoSkidkoy: " + mSummaSoSkidkoy);
+		lastves=0;
+		requestVes();
 	}
 
 	/*public boolean isMustList(){

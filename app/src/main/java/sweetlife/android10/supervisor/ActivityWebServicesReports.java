@@ -1090,7 +1090,7 @@ public class ActivityWebServicesReports extends Activity{
 
 	void promptReportDeleteSpec(final String num, final String art){
 		final Numeric sel = new Numeric();
-		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки" }, sel, "№" + num, new Task(){
+		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки"}, sel, "№" + num, new Task(){
 			@Override
 			public void doTask(){
 				if(sel.value() == 0){
@@ -1118,7 +1118,7 @@ public class ActivityWebServicesReports extends Activity{
 
 	void doHOOKDegustacia(final String num){
 		final Numeric sel = new Numeric();
-		Auxiliary.pickSingleChoice(this, new String[]{"Отказать", "Утвердить" }, sel, "№" + num, new Task(){
+		Auxiliary.pickSingleChoice(this, new String[]{"Отказать", "Утвердить"}, sel, "№" + num, new Task(){
 			@Override
 			public void doTask(){
 				sendDegustaciaState(num, sel.value().intValue());
@@ -1357,7 +1357,7 @@ public class ActivityWebServicesReports extends Activity{
 		}).status.is("Отправка").start(this);
 	}
 
-	public  void promptObratnayaSvyazKlient(Activity activity){
+	public void promptObratnayaSvyazKlient(Activity activity){
 
 		Auxiliary.pick(activity, "", new SubLayoutless(activity)//
 						.child(new Decor(activity).labelText.is("Обратная связь").top().is(Auxiliary.tapSize * 0.5).left().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
@@ -1441,7 +1441,7 @@ public class ActivityWebServicesReports extends Activity{
 		return true;
 	}
 
-	public  void sendObratnayaSvyazKlient(Activity activity){
+	public void sendObratnayaSvyazKlient(Activity activity){
 		final String url = Settings.getInstance().getBaseURL()
 				+ Settings.selectedBase1C() + "/hs/FeedbackCustomer/Создать/" + Cfg.whoCheckListOwner();
 		System.out.println("url " + url);
@@ -2734,49 +2734,50 @@ public class ActivityWebServicesReports extends Activity{
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent){
 		String filePath = null;
 		Uri uri = null;
-		switch(requestCode){
-			case FILE_SELECT_SKD_RESULT:{
-				if(resultCode == RESULT_OK){
-					uri = intent.getData();
-					String path = Auxiliary.pathForMediaURI(this, uri);
-					if(path != null && path.length() > 5){
-						sendSKDFile(path);
-					}else{
-						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
+		if(intent != null){
+			switch(requestCode){
+				case FILE_SELECT_SKD_RESULT:{
+					if(resultCode == RESULT_OK){
+						uri = intent.getData();
+						String path = Auxiliary.pathForMediaURI(this, uri);
+						if(path != null && path.length() > 5){
+							sendSKDFile(path);
+						}else{
+							Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
+						}
 					}
+					break;
 				}
-				break;
-			}
-			case FILE_PEREBIT_SKD_RESULT:{
-				if(resultCode == RESULT_OK){
-					uri = intent.getData();
-					String path = Auxiliary.pathForMediaURI(this, uri);
-					if(path != null && path.length() > 5){
-						sendPerebitFile(path);
-					}else{
-						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
+				case FILE_PEREBIT_SKD_RESULT:{
+					if(resultCode == RESULT_OK){
+						uri = intent.getData();
+						String path = Auxiliary.pathForMediaURI(this, uri);
+						if(path != null && path.length() > 5){
+							sendPerebitFile(path);
+						}else{
+							Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
+						}
 					}
+					break;
 				}
-				break;
-			}
-			case etiketkaIDPicture:
-				uri = intent.getData();
-				filePath = Auxiliary.pathForMediaURI(this, uri);
-				if(filePath == null){
-					Auxiliary.warn("Не удалось прочитать " + uri, ActivityWebServicesReports.this);
-					return;
-				}
-				etiketkaObratnayaSvyazKlient.value(filePath);
-				break;
-			case tovarIDPicture:
-				uri = intent.getData();
-				filePath = Auxiliary.pathForMediaURI(this, uri);
-				if(filePath == null){
-					Auxiliary.warn("Не удалось прочитать " + uri, ActivityWebServicesReports.this);
-					return;
-				}
-				tovarObratnayaSvyazKlient.value(filePath);
-				break;
+				case etiketkaIDPicture:
+					uri = intent.getData();
+					filePath = Auxiliary.pathForMediaURI(this, uri);
+					if(filePath == null){
+						Auxiliary.warn("Не удалось прочитать " + uri, ActivityWebServicesReports.this);
+						return;
+					}
+					etiketkaObratnayaSvyazKlient.value(filePath);
+					break;
+				case tovarIDPicture:
+					uri = intent.getData();
+					filePath = Auxiliary.pathForMediaURI(this, uri);
+					if(filePath == null){
+						Auxiliary.warn("Не удалось прочитать " + uri, ActivityWebServicesReports.this);
+						return;
+					}
+					tovarObratnayaSvyazKlient.value(filePath);
+					break;
 			/*case NOMENKLATURA_NEW: {
 				if (resultCode == RESULT_OK) {
 					//String art = intent.getStringExtra(ITableColumnsNames.ARTIKUL);
@@ -2832,6 +2833,7 @@ public class ActivityWebServicesReports extends Activity{
 				}
 				break;
 			}*/
+			}
 		}
 		super.onActivityResult(requestCode, resultCode, intent);
 	}

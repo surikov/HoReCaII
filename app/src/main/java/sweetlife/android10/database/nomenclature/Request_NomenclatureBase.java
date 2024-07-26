@@ -1049,7 +1049,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		}*/
 		sql = sql + "\n limit " + limit + " offset " + offset;
 		//System.out.println("stmOnly "+stmOnly);
-		//System.out.println( "composeSQLall_Old: " + sql);
+		System.out.println( "composeSQLall_Old: " + sql);
 		return sql;
 	}
 

@@ -212,7 +212,7 @@ public class Activity_Doc_GPS_Points extends Activity_Base {//Activity_BasePerio
 				+ dateTo + "'" //
 				+ "ORDER BY _id desc";
 		*/
-		String sql = "select _id,BeginDate,BeginTime,longitude,latitude,Upload from GPSPoints order by beginDate desc,BeginTime desc limit 200";
+		String sql = "select _id,BeginDate,BeginTime,longitude,latitude,Upload,comment from GPSPoints order by beginDate desc,BeginTime desc limit 12345";
 		Cursor lastUsedCursor = mDB.rawQuery(sql, null);
 		return lastUsedCursor;
 	}
@@ -302,7 +302,7 @@ public class Activity_Doc_GPS_Points extends Activity_Base {//Activity_BasePerio
 				//date.setTextSize(TypedValue.COMPLEX_UNIT_PX, rowTextFontSize);
 				date.setTextColor(color);
 				date.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
-				time.setText(to.format(dateTime));
+				time.setText(to.format(dateTime)+" "+cursor.getString(cursor.getColumnIndex("comment")));
 				//timeString.substring(timeString.lastIndexOf("T") + 1) + " ( +4 часа Московское время )");
 				time.setTextSize(TypedValue.COMPLEX_UNIT_SP, rowTextFontSize);
 				time.setTextColor(color);

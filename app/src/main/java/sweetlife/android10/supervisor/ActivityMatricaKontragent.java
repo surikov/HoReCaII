@@ -1,5 +1,6 @@
 package sweetlife.android10.supervisor;
 
+import android.net.*;
 import android.os.*;
 import android.app.*;
 import android.view.*;
@@ -8,16 +9,20 @@ import android.content.*;
 import java.util.*;
 
 import reactive.ui.*;
-import sweetlife.android10.ApplicationHoreca;
+import sweetlife.android10.*;
 //import sweetlife.horeca.reports.ActivityReports;
 
+import sweetlife.android10.data.common.*;
+import sweetlife.android10.data.returns.*;
+import sweetlife.android10.ui.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
 import tee.binding.*;
 
 import java.text.*;
 
-public class ActivityMatricaKontragent extends Activity {
+public class ActivityMatricaKontragent extends Activity{
+	final int deleteKontaragentFile=22331122;
 	Layoutless layoutless;
 	String _id = "";
 	Note kontragent = new Note();
@@ -29,26 +34,30 @@ public class ActivityMatricaKontragent extends Activity {
 	Numeric ct = new Numeric();
 	Numeric pt = new Numeric();
 	Numeric sb = new Numeric();
-	
+
 	Numeric pn1 = new Numeric();
 	Numeric vt1 = new Numeric();
 	Numeric sr1 = new Numeric();
 	Numeric ct1 = new Numeric();
 	Numeric pt1 = new Numeric();
 	Numeric sb1 = new Numeric();
-	
+
+	Toggle udalit = new Toggle();
+	Note deleteComment = new Note();
+	Note deletePath = new Note();
+
 	Numeric potencialTT = new Numeric();
 	//Numeric nacenka = new Numeric();
 	//Numeric tom1 = new Numeric();
 	//Numeric tom2 = new Numeric();
 	//Numeric tom3 = new Numeric();
 	Note tomValue = new Note();
-	
+
 	Note vrrab = new Note();
 	Note email = new Note();
-	
-	double dvuhnedel=0;
-	
+
+	double dvuhnedel = 0;
+
 	Numeric planTysRub = new Numeric();
 	Numeric planSTM = new Numeric();
 	//Note tom1Name = new Note();
@@ -61,26 +70,26 @@ public class ActivityMatricaKontragent extends Activity {
 	MenuItem menuOtchety;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		Bundle bundle = getIntent().getExtras();
-		if (bundle != null) {
-			String s = bundle.getString("_id");			
-			if (s != null) {
+		if(bundle != null){
+			String s = bundle.getString("_id");
+			if(s != null){
 				_id = s;
-				dvuhnedel=bundle.getDouble("dvuhnedel");
-				this.setTitle("Матрица " + _id+" ("+(dvuhnedel>0?"двухнедельный":"однонедельный")+" маршрут)");
-			}
-			else {
+				dvuhnedel = bundle.getDouble("dvuhnedel");
+				this.setTitle("Матрица " + _id + " (" + (dvuhnedel > 0 ? "двухнедельный" : "однонедельный") + " маршрут)");
+			}else{
 				//wrong
 			}
 		}
 		composeGUI();
 		fillData();
 	}
-	void fillData() {
+
+	void fillData(){
 		String sql = "select"//
 				+ " k.naimenovanie as kontragent"//
 				+ ",m.tipTT as tipTT"//
@@ -108,36 +117,43 @@ public class ActivityMatricaKontragent extends Activity {
 				+ ",m.email as email"//
 				//+ ",m.upload as upload"//
 				+ ",x.periodDeystvia as periodDeystvia"//
+				+ ",m.udalit as udalit"//
+				+ ",m.deleteComment as deleteComment"//
+				+ ",m.deletePath as deletePath"//
 				+ " from MatricaRowsX m"//
-				+ " join kontragenty k on m.kontragent=k.kod"//
+
 				+ " join matricaX x on x._id=m.matrica_id"//
+				+ " left join kontragenty k on m.kontragent=k.kod"//
 				+ " where m._id=" + _id;
 		Bough r = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		//System.out.println(r.dumpXML());
 		kontragent.value(r.child("row").child("kontragent").value.property.value());
 		tipTT.value(r.child("row").child("tipTT").value.property.value());
 		tipOplaty.value(r.child("row").child("tipOplaty").value.property.value());
-		
+
 		vrrab.value(r.child("row").child("vrrab").value.property.value());
 		email.value(r.child("row").child("email").value.property.value());
-		
-		
+
+		udalit.value(r.child("row").child("udalit").value.property.value().trim().equals("1") ? true : false);
+		deleteComment.value(r.child("row").child("deleteComment").value.property.value());
+		deletePath.value(r.child("row").child("deletePath").value.property.value());
+
+
 		pn.value(Numeric.string2double(r.child("row").child("pn").value.property.value()));
 		vt.value(Numeric.string2double(r.child("row").child("vt").value.property.value()));
 		sr.value(Numeric.string2double(r.child("row").child("sr").value.property.value()));
 		ct.value(Numeric.string2double(r.child("row").child("ct").value.property.value()));
 		pt.value(Numeric.string2double(r.child("row").child("pt").value.property.value()));
 		sb.value(Numeric.string2double(r.child("row").child("sb").value.property.value()));
-		
-		
-		
+
+
 		pn1.value(Numeric.string2double(r.child("row").child("pn1").value.property.value()));
 		vt1.value(Numeric.string2double(r.child("row").child("vt1").value.property.value()));
 		sr1.value(Numeric.string2double(r.child("row").child("sr1").value.property.value()));
 		ct1.value(Numeric.string2double(r.child("row").child("ct1").value.property.value()));
 		pt1.value(Numeric.string2double(r.child("row").child("pt1").value.property.value()));
 		sb1.value(Numeric.string2double(r.child("row").child("sb1").value.property.value()));
-		
+
 		potencialTT.value(Numeric.string2double(r.child("row").child("potencialTT").value.property.value()));
 		//nacenka.value(Numeric.string2double(r.child("row").child("nacenka").value.property.value()));
 		//tom1.value(Numeric.string2double(r.child("row").child("tom1").value.property.value()));
@@ -147,9 +163,9 @@ public class ActivityMatricaKontragent extends Activity {
 		planTysRub.value(Numeric.string2double(r.child("row").child("planTysRub").value.property.value()));
 		planSTM.value(Numeric.string2double(r.child("row").child("planSTM").value.property.value()));
 		Date d = new Date();
-		d.setTime((long) Numeric.string2double(r.child("row").child("periodDeystvia").value.property.value()));
+		d.setTime((long)Numeric.string2double(r.child("row").child("periodDeystvia").value.property.value()));
 		int p = d.getMonth();
-		if (p > 11) {
+		if(p > 11){
 			p = 0;
 		}
 		//tom1Name.value(ActivityMatricaEdit.monthName(p - 3));
@@ -157,84 +173,86 @@ public class ActivityMatricaKontragent extends Activity {
 		//tom3Name.value(ActivityMatricaEdit.monthName(p - 1));
 		tomName.value(ActivityMatricaEdit.monthName(p - 3) + " / " + ActivityMatricaEdit.monthName(p - 2) + " / " + ActivityMatricaEdit.monthName(p - 1));
 		tipOplatyChoise.item("").item("нал/отср").item("б/н").item("тов. чек").item("нал/факт").item("предоплата");
-		if (tipOplaty.value().equals("нал/отср")) {
+		if(tipOplaty.value().equals("нал/отср")){
 			tipOplatyChoise.selection.is(1);
 		}
-		if (tipOplaty.value().equals("б/н")) {
+		if(tipOplaty.value().equals("б/н")){
 			tipOplatyChoise.selection.is(2);
 		}
-		if (tipOplaty.value().equals("тов. чек")) {
+		if(tipOplaty.value().equals("тов. чек")){
 			tipOplatyChoise.selection.is(3);
 		}
-		if (tipOplaty.value().equals("нал/факт")) {
+		if(tipOplaty.value().equals("нал/факт")){
 			tipOplatyChoise.selection.is(4);
 		}
-		if (tipOplaty.value().equals("предоплата")) {
+		if(tipOplaty.value().equals("предоплата")){
 			tipOplatyChoise.selection.is(5);
 		}
 	}
-	void dayRow(String label,int row,final Numeric a,final Numeric b){
+
+	void dayRow(String label, int row, final Numeric a, final Numeric b){
 		layoutless.child(new Decor(this).labelText.is(label).labelAlignRightCenter()//
 				.width().is(layoutless.width().property.multiply(0.3))//
 				.height().is(0.8 * Auxiliary.tapSize)//
 				.left().is(layoutless.shiftX.property)//
-				.top().is(layoutless.shiftY.property.plus(0.8 * (row+0.25) * Auxiliary.tapSize)));
-		double w=2.5;
-		if(b==null){
-			w=5;
+				.top().is(layoutless.shiftY.property.plus(0.8 * (row + 0.25) * Auxiliary.tapSize)));
+		double w = 2.5;
+		if(b == null){
+			w = 5;
 		}
 		layoutless.child(new RedactTime(this).time.is(a)//
-			.width().is(w * Auxiliary.tapSize)//
-			.height().is(0.8 * Auxiliary.tapSize)//
-			.left().is(layoutless.width().property.multiply(0.3).plus(0.1 * Auxiliary.tapSize).plus(layoutless.shiftX.property))//
-			.top().is(layoutless.shiftY.property.plus(0.8 * (row+0.25) * Auxiliary.tapSize)));
-		if(b!=null){
-		layoutless.child(new RedactTime(this).time.is(b)//
-				.width().is(2.5 * Auxiliary.tapSize)//
+				.width().is(w * Auxiliary.tapSize)//
 				.height().is(0.8 * Auxiliary.tapSize)//
-				.left().is(layoutless.width().property.multiply(0.3).plus(2.6 * Auxiliary.tapSize).plus(layoutless.shiftX.property))//
-				.top().is(layoutless.shiftY.property.plus(0.8 * (row+0.25) * Auxiliary.tapSize)));
+				.left().is(layoutless.width().property.multiply(0.3).plus(0.1 * Auxiliary.tapSize).plus(layoutless.shiftX.property))//
+				.top().is(layoutless.shiftY.property.plus(0.8 * (row + 0.25) * Auxiliary.tapSize)));
+		if(b != null){
+			layoutless.child(new RedactTime(this).time.is(b)//
+					.width().is(2.5 * Auxiliary.tapSize)//
+					.height().is(0.8 * Auxiliary.tapSize)//
+					.left().is(layoutless.width().property.multiply(0.3).plus(2.6 * Auxiliary.tapSize).plus(layoutless.shiftX.property))//
+					.top().is(layoutless.shiftY.property.plus(0.8 * (row + 0.25) * Auxiliary.tapSize)));
 		}
-		
-		layoutless.child(new Knob(this).afterTap.is(new Task() {
+
+		layoutless.child(new Knob(this).afterTap.is(new Task(){
 			@Override
-			public void doTask() {
-				if(a!=null){
+			public void doTask(){
+				if(a != null){
 					a.value(0);
 				}
-				if(b!=null){
+				if(b != null){
 					b.value(0);
 				}
 			}
 		}).width().is(0.8 * Auxiliary.tapSize)//
-			.height().is(0.8 * Auxiliary.tapSize)//
-			.left().is(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize).plus(layoutless.shiftX.property))//
-			.top().is(layoutless.shiftY.property.plus(0.8 * (row+0.25) * Auxiliary.tapSize)));
-		
+				.height().is(0.8 * Auxiliary.tapSize)//
+				.left().is(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize).plus(layoutless.shiftX.property))//
+				.top().is(layoutless.shiftY.property.plus(0.8 * (row + 0.25) * Auxiliary.tapSize)));
+
 	}
-	void composeGUI() {
+
+	void composeGUI(){
 		tipOplatyChoise = new RedactSingleChoice(this);
 		layoutless.field(this, 0, "контрагент", new Decor(this).labelText.is(kontragent).labelAlignLeftCenter());
 		layoutless.field(this, 1, "тип ТТ", new Decor(this).labelText.is(tipTT).labelAlignLeftCenter());
 		layoutless.field(this, 2, "тип оплаты", tipOplatyChoise);
 		//layoutless.field(this, 3, "пн", new RedactTime(this).time.is(pn));
-		
-		if(dvuhnedel>0){
-			dayRow("пн (нечётн./чётн.)",3,pn,pn1);
-			dayRow("вт (нечётн./чётн.)",4,vt,vt1);
-			dayRow("ср (нечётн./чётн.)",5,sr,sr1);
-			dayRow("чт (нечётн./чётн.)",6,ct,ct1);
-			dayRow("пт (нечётн./чётн.)",7,pt,pt1);
-			dayRow("сб (нечётн./чётн.)",8,sb,sb1);
+
+		if(dvuhnedel > 0){
+			dayRow("пн (нечётн./чётн.)", 3, pn, pn1);
+			dayRow("вт (нечётн./чётн.)", 4, vt, vt1);
+			dayRow("ср (нечётн./чётн.)", 5, sr, sr1);
+			dayRow("чт (нечётн./чётн.)", 6, ct, ct1);
+			dayRow("пт (нечётн./чётн.)", 7, pt, pt1);
+			dayRow("сб (нечётн./чётн.)", 8, sb, sb1);
 		}else{
-			
-			
-			dayRow("пн",3,pn,null);
-			dayRow("вт",4,vt,null);
-			dayRow("ср",5,sr,null);
-			dayRow("чт",6,ct,null);
-			dayRow("пт",7,pt,null);
-			dayRow("сб",8,sb,null);
+
+
+			dayRow("пн", 3, pn, null);
+			dayRow("вт", 4, vt, null);
+			dayRow("ср", 5, sr, null);
+			dayRow("чт", 6, ct, null);
+			dayRow("пт", 7, pt, null);
+			dayRow("сб", 8, sb, null);
 		}
 		/*
 		layoutless.child(new Decor(this).labelText.is("пн").labelAlignRightCenter()//
@@ -319,10 +337,26 @@ public class ActivityMatricaKontragent extends Activity {
 		//RedactNumber r= new RedactNumber(this).number.is(nacenka);
 		//r.setSelectAllOnFocus(true);
 		//layoutless.field(this, 12, "наценка, %", new RedactNumber(this).number.is(nacenka).selectAllOnFocus.is(true));
-		
-		
+
+
 		layoutless.field(this, 13, "время работы", new RedactText(this).text.is(vrrab).selectAllOnFocus.is(true));
 		layoutless.field(this, 14, "e-mail", new RedactText(this).text.is(email).selectAllOnFocus.is(true));
+
+		layoutless.field(this, 15, "Удалить контрагента", new RedactToggle(this).yes.is(udalit));
+		layoutless.field(this, 16, "Причина удаления", new RedactText(this).text.is(deleteComment).selectAllOnFocus.is(true));
+		layoutless.field(this, 17, "Файл причины удаления", new RedactText(this).text.is(deletePath).selectAllOnFocus.is(true));
+
+		layoutless.child(new Knob(this)
+				.afterTap.is(new Task(){
+					@Override
+					public void doTask(){
+						Auxiliary.startMediaGallery(ActivityMatricaKontragent.this,deleteKontaragentFile);
+					}
+				})
+				.width().is(0.8 * Auxiliary.tapSize)//
+				.height().is(0.8 * Auxiliary.tapSize)//
+				.left().is(layoutless.width().property.multiply(0.3).plus(5.1 * Auxiliary.tapSize).plus(layoutless.shiftX.property))//
+				.top().is(layoutless.shiftY.property.plus(0.8 * (17 + 0.25) * Auxiliary.tapSize)));
 		
 		
 		/*layoutless.field(this, 14, "", new Knob(this).labelText.is("Сохранить")).afterTap.is(new Task() {
@@ -337,9 +371,31 @@ public class ActivityMatricaKontragent extends Activity {
 				delete();
 			}
 		});*/
-		layoutless.innerHeight.is(0.8 * 17 * Auxiliary.tapSize);
+		layoutless.innerHeight.is(0.8 * 19 * Auxiliary.tapSize);
 	}
-	void save() {
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		super.onActivityResult(requestCode, resultCode, data);
+		if(resultCode == RESULT_OK){
+			switch(requestCode){
+				case deleteKontaragentFile:
+					if(data!=null){
+						String filePath = null;
+						Uri uri = data.getData();
+						filePath = Auxiliary.pathForMediaURI(this, uri);
+						if(filePath == null){
+							Auxiliary.warn("Не удалось прочитать " + uri, ActivityMatricaKontragent.this);
+							return;
+						}
+						deletePath.value(filePath);
+					}
+					break;
+			}
+		}
+	}
+
+
+	void save(){
 		DecimalFormat format = new DecimalFormat("##########");
 		String sql = "update MatricaRowsX"//
 				+ "\n	set tipTT='" + tipTT.value() + "'"//
@@ -350,46 +406,48 @@ public class ActivityMatricaKontragent extends Activity {
 				+ "\n	,ct=" + format.format(ct.value())//
 				+ "\n	,pt=" + format.format(pt.value())//
 				+ "\n	,sb=" + format.format(sb.value())//
-				
-				
+
+
 				+ "\n	,pn1=" + format.format(pn1.value())//
 				+ "\n	,vt1=" + format.format(vt1.value())//
 				+ "\n	,sr1=" + format.format(sr1.value())//
 				+ "\n	,ct1=" + format.format(ct1.value())//
 				+ "\n	,pt1=" + format.format(pt1.value())//
 				+ "\n	,sb1=" + format.format(sb1.value())//
-				
-				
-				
-				
+
+
 				+ "\n	,potencialTT=" + potencialTT.value()//
 				//+ "\n	,nacenka=" + nacenka.value()//
 				+ "\n	,nacenka=''"
-				
-				
-				+ "\n	,vrrab='" + vrrab.value()+"'"//	
-				+ "\n	,email='" + email.value()+"'"//	
-				
+
+
+				+ "\n	,vrrab='" + vrrab.value() + "'"//
+				+ "\n	,email='" + email.value() + "'"//
+
 				//+ "\n	,tom1=" + tom1.value()//	
 				//+ "\n	,tom2=" + tom2.value()//	
 				//+ "\n	,tom3=" + tom3.value()//	
 				+ "\n	,planTysRub=" + planTysRub.value()//
 				+ "\n	,planSTM=" + planSTM.value()//
+				+ "\n	,udalit=" + (udalit.value() ? "1" : "0")
+				+ "\n	,deleteComment='" + deleteComment.value() + "'"//
+				+ "\n	,deletePath='" + deletePath.value() + "'"//
 				+ "\n	where _id=" + _id//
-		;
+				;
 		//System.out.println("="+planTysRub.value());
 		//System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		finish();
 	}
+
 	void delete() {
-		String sql="delete from MatricaRowsX where _id="+_id+" and ifnull(uploaded,0)=0;";
-		//System.out.println(sql);
+		String sql="delete from MatricaRowsX where _id="+_id+";";//" and ifnull(uploaded,0)=0;";
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		finish();
 	}
 	void promptDelete() {
-		Auxiliary.pickConfirm(this, "Удалить запись. Вы уверены?", "Удалить", new Task() {
+		Auxiliary.pickConfirm(this, "Удалить контрагента. Вы уверены?", "Удалить", new Task() {
 			@Override
 			public void doTask() {
 				delete();
@@ -397,30 +455,32 @@ public class ActivityMatricaKontragent extends Activity {
 		});
 	}
 	@Override
-	public void onBackPressed() {
+	public void onBackPressed(){
 		//save();
 		super.onBackPressed();
 	}
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		menuDelete = menu.add("Удалить");
 		menuSave = menu.add("Сохранить");
 		menuOtchety = menu.add("Отчёты");
 		return true;
 	}
+
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item){
 		if (item == menuDelete) {
 			promptDelete();
 			return true;
 		}
-		if (item == menuOtchety) {
+		if(item == menuOtchety){
 			Intent intent = new Intent();
 			intent.setClass(this, sweetlife.android10.supervisor.ActivityWebServicesReports.class);
 			startActivity(intent);
 			return true;
 		}
-		if (item == menuSave) {
+		if(item == menuSave){
 			save();
 			return true;
 		}

@@ -1270,7 +1270,7 @@ I/System.out: </>
 		layoutless.child(new Knob(this).afterTap.is(new Task(){
 					@Override
 					public void doTask(){
-						if(gpsTimeExists30())
+						if(gpsTimeExists60())
 							beginVizitButtonClick();
 					}
 				})//
@@ -1870,7 +1870,8 @@ I/System.out: </>
 			Auxiliary.warn("GPS данные недоступны. Невозможно начать визит.", this);
 		}else{
 			if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
-				String warning = "Удаление от контрагента " + distanceToClient + " метров. Начать визит?";
+				/*
+				String warning = "Удаление от контрагента " + distanceToClient + " метров. Визит засчитан не будет. Начать визит?";
 				if(mAppInstance.getClientInfo().getLat() == 0){
 					warning = "У клиента не зафиксированы координаты. Начать визит?";
 				}
@@ -1886,6 +1887,10 @@ I/System.out: </>
 						}
 					}
 				});
+				*/
+				Auxiliary.warn("Удаление от контрагента " + distanceToClient
+						+ " метров. Запрещено открывать визиты дальше "+Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()+"м"
+						,this);
 			}else{
 				//if (!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
 				String beginTime = mGPSInfo.findPreVizitTimeDaily(mAppInstance.getClientInfo().getKod());
@@ -1901,12 +1906,12 @@ I/System.out: </>
 		//}
 	}
 
-	boolean gpsTimeExists30(){
+	boolean gpsTimeExists60(){
 		//if(1==1)return true;
 
 		//if ((new Date().getTime()) - Session.getGPSTime() > 30 * 1000) {
-		if((new Date().getTime()) - GPSInfo.lastDateTime() > 30 * 1000){
-			Auxiliary.warn("Нет координат за последние 30с. Проверьте GPS и настройки даты/времени.", Activity_BidsContractsEtc_2.this);
+		if((new Date().getTime()) - GPSInfo.lastDateTime() > 60 * 1000){
+			Auxiliary.warn("Нет координат за последние 60с. Проверьте GPS и настройки даты/времени.", Activity_BidsContractsEtc_2.this);
 			return false;
 		}else{
 			return true;
@@ -1928,7 +1933,7 @@ I/System.out: </>
 		}*/
 
 
-		if(!gpsTimeExists30())
+		if(!gpsTimeExists60())
 			return false;
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		SQLiteDatabase mDB = mAppInstance.getDataBase();

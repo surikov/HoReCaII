@@ -154,6 +154,7 @@ public class Cfg{
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/IDPlanshet";
 		//final String url = "https://service.swlife.ru/hrc120107/ru_RU/hs/Planshet/IDPlanshet";
 		final String params = "{\"Данные\":[{\"ТорговыйПредставитель\":\"" + Cfg.whoCheckListOwner() + "\",\"IDПланшета\":\"" + token + "\"}]}";
+		//final String params = "{\"Данные\":[{\"ТорговыйПредставитель\":\"hrc600\",\"IDПланшета\":\"" + token + "\"}]}";
 		System.out.println("setCurrentFirebaseToken " + url);
 		System.out.println("params " + params);
 		Note msg = new Note();
@@ -1007,6 +1008,7 @@ public class Cfg{
 		){
 			//
 		}else{
+			System.out.println( "refreshSkidkiKontragent "+kod);
 			String sql = "select k1._idrref as klient,k1.GolovnoyKontragent as golovnoy from kontragenty k1 where k1.kod=" + kod;
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			String kontr_idrref = b.child("row").child("klient").value.property.value();
@@ -1129,6 +1131,7 @@ public class Cfg{
 				"  , common_idrref  blob null\n" +
 				");");
 		ApplicationHoreca.getInstance().getDataBase().execSQL("delete from AssortimentCurrent;");
+
 		ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_AssortimentCurrent_nomenklatura_idrref on AssortimentCurrent(nomenklatura_idrref);");
 		String sql = "";
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic  , klient_idrref             , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
@@ -1143,13 +1146,7 @@ public class Cfg{
 		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 
-		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic  , klient_idrref             , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)"
-				+ "\n  select   AssortimentNaSklade._id,NomenklaturaPostavshhik,zapret,trafic,KontragentPodrazdelenie   ,null                  ,null           ,null           ,null           ,null           ,null"
-				+ "\n  from  AssortimentNaSklade "
-				+ "\n  join Kontragenty on Kontragenty.kod=" + skidkiLastKontragentKod + "  and AssortimentNaSklade.KontragentPodrazdelenie=Kontragenty.VidDostavki"
-				+ "\n group by NomenklaturaPostavshhik;";
-		System.out.println(sql);
-		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
 
 
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
@@ -1159,7 +1156,7 @@ public class Cfg{
 				"    join AssortimentNaSklade aa on aa.KontragentPodrazdelenie=podr._IDRRef\n" +
 				"  where Polzovateli.Kod='" + skidkiLastHRC + "' and aa.NomenklaturaPostavshhik not in (select nomenklatura_idrref from AssortimentCurrent)\n" +
 				";";
-		//System.out.println(sql);
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
 				"  select aa._id,NomenklaturaPostavshhik,aa.zapret,aa.trafic,null                                   ,null                   ,p1._IDRRef     ,null           ,null           ,null           ,null\n" +
@@ -1169,7 +1166,7 @@ public class Cfg{
 				"    join AssortimentNaSklade aa on aa.KontragentPodrazdelenie=p1._IDRRef\n" +
 				"  where Polzovateli.Kod='" + skidkiLastHRC + "' and aa.NomenklaturaPostavshhik not in (select nomenklatura_idrref from AssortimentCurrent)\n" +
 				";";
-		//System.out.println(sql);
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
 				"  select aa._id,NomenklaturaPostavshhik,aa.zapret,aa.trafic,null                                   ,null                   ,null           ,p2._IDRRef     ,null           ,null           ,null\n" +
@@ -1180,7 +1177,7 @@ public class Cfg{
 				"    join AssortimentNaSklade aa on aa.KontragentPodrazdelenie=p2._IDRRef\n" +
 				"  where Polzovateli.Kod='" + skidkiLastHRC + "' and aa.NomenklaturaPostavshhik not in (select nomenklatura_idrref from AssortimentCurrent)\n" +
 				";";
-		//System.out.println(sql);
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
 				"  select aa._id,NomenklaturaPostavshhik,aa.zapret,aa.trafic,null                                   ,null                   ,null           ,null           ,p3._IDRRef        ,null        ,null\n" +
@@ -1192,7 +1189,7 @@ public class Cfg{
 				"    join AssortimentNaSklade aa on aa.KontragentPodrazdelenie=p3._IDRRef\n" +
 				"  where Polzovateli.Kod='" + skidkiLastHRC + "' and aa.NomenklaturaPostavshhik not in (select nomenklatura_idrref from AssortimentCurrent)\n" +
 				";";
-		//System.out.println(sql);
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
 				"  select aa._id,NomenklaturaPostavshhik,aa.zapret,aa.trafic,null                                   ,null                   ,null           ,null           ,null           ,p4._IDRRef     ,null\n" +
@@ -1205,14 +1202,25 @@ public class Cfg{
 				"    join AssortimentNaSklade aa on aa.KontragentPodrazdelenie=p4._IDRRef\n" +
 				"  where Polzovateli.Kod='" + skidkiLastHRC + "' and aa.NomenklaturaPostavshhik not in (select nomenklatura_idrref from AssortimentCurrent)\n" +
 				";";
-		//System.out.println(sql);
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
+		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic  , klient_idrref             , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)"
+				+ "\n  select   AssortimentNaSklade._id,NomenklaturaPostavshhik,zapret,trafic,KontragentPodrazdelenie   ,null                  ,null           ,null           ,null           ,null           ,null"
+				+ "\n  from  AssortimentNaSklade "
+				//+ "\n  join Kontragenty on Kontragenty.kod=" + skidkiLastKontragentKod + "  and AssortimentNaSklade.KontragentPodrazdelenie=Kontragenty.VidDostavki"
+				+ "\n  join Kontragenty on Kontragenty.kod=" + skidkiLastKontragentKod + "  and AssortimentNaSklade.KontragentPodrazdelenie=Kontragenty.VidDostavki"
+				+"\n  where AssortimentNaSklade.NomenklaturaPostavshhik not in (select nomenklatura_idrref from AssortimentCurrent)"
+				+ "\n group by NomenklaturaPostavshhik;";
+		System.out.println(sql);
+		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
 		sql = "insert into AssortimentCurrent   (_id, nomenklatura_idrref, zapret,trafic, klient_idrref               , podrazdelenie_idrref, parent1_idrref, parent2_idrref, parent3_idrref, parent4_idrref, common_idrref)\n" +
 				"  select aa._id,NomenklaturaPostavshhik,aa.zapret,aa.trafic,null                                   ,null                   ,null           ,null           ,null           ,null           ,x'00'\n" +
 				"  from AssortimentNaSklade aa\n" +
 				"  where aa.KontragentPodrazdelenie=x'00' and aa.NomenklaturaPostavshhik not in (select nomenklatura_idrref from AssortimentCurrent)\n" +
 				";";
-		//System.out.println(sql);
+		System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
 

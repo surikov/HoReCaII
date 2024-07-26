@@ -23,7 +23,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 
-public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
+public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 	public static final long GPS_NOT_AVAILABLE = -1;
 	private String mPhizlicoCode; //Need from PhizicheskieLica table
 	private SQLiteDatabase mDB;
@@ -31,7 +31,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 	private SimpleDateFormat mDateTimeFormatNoShift;
 	public static boolean lockInsertGPS = false;
 
-	public GPSInfo(SQLiteDatabase db, String agentID) {
+	public GPSInfo(SQLiteDatabase db, String agentID){
 		//System.out.println("GPSInfo create");
 		mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		mDateTimeFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -44,26 +44,26 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		mPhizlicoCode = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
 	}
 
-	public String getAgentCode() {
+	public String getAgentCode(){
 		return mPhizlicoCode;
 	}
 
-	public int HasUnfinishedVisits() {
-		if (IsDatabaseOpened()) {
+	public int HasUnfinishedVisits(){
+		if(IsDatabaseOpened()){
 			Cursor cursor = null;
-			try {
+			try{
 				String sql = "select count(Vizits._id)"//
 						+ " from Vizits"//
 						+ " join kontragenty on vizits.client=kontragenty.kod"//
 						+ " join MarshrutyAgentov on MarshrutyAgentov.kontragent=kontragenty._idrref"//
 						+ " where EndTime is null";
 				cursor = mDB.rawQuery(sql, null);
-				if (cursor.moveToFirst()) {
+				if(cursor.moveToFirst()){
 					return cursor.getInt(0);
 				}
 				return 0;
-			} finally {
-				if (cursor != null && !cursor.isClosed()) {
+			}finally{
+				if(cursor != null && !cursor.isClosed()){
 					cursor.close();
 				}
 			}
@@ -71,17 +71,17 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		return 0;
 	}
 
-	public String kontragentyVizitov(ClientInfo client) {
+	public String kontragentyVizitov(ClientInfo client){
 		String names = "";
 
-		try {
+		try{
 			Location clientLocation = new Location("ClientLocation");
 			clientLocation.setLatitude(client.getLat());
 			clientLocation.setLongitude(client.getLon());
 			String sql = "select k.Naimenovanie,GeographicheskayaShirota,GeographicheskayaDolgota from Vizits v join Kontragenty k on k.kod=v.client where v.EndTime is null";
 			Bough opened = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 
-			for (int i = 0; i < opened.children.size(); i++) {
+			for(int i = 0; i < opened.children.size(); i++){
 				double shir = Numeric.string2double(opened.children.get(i).child("GeographicheskayaShirota").value.property.value());
 				double dol = Numeric.string2double(opened.children.get(i).child("GeographicheskayaDolgota").value.property.value());
 				//System.out.println("Naimenovanie "+opened.children.get(i).child("Naimenovanie").value.property.value());
@@ -93,26 +93,26 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 
 				float distance = opLocation.distanceTo(clientLocation);
 				//System.out.println("distance "+distance);
-				if (distance > 300) {
+				if(distance > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
 					names = names + " /" + opened.children.get(i).child("Naimenovanie").value.property.value();
 				}
 			}
 
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return names;
 	}
 
-	public boolean estDalnieVizity(ClientInfo client) {
+	public boolean estDalnieVizity(ClientInfo client){
 		Cursor cursor = null;
-		try {
+		try{
 			String sql = "select _id from Vizits where EndTime is null and Client = " + client.getKod();
 			cursor = mDB.rawQuery(sql, null);
-			if (cursor.moveToFirst()) {
+			if(cursor.moveToFirst()){
 				cursor.close();
 				return true;
-			} else {
+			}else{
 				//cursor.close();
 				//System.out.println("lat " + client.getLat());
 				//System.out.println("lon " + client.getLon());
@@ -122,7 +122,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 				sql = "select k.Naimenovanie,GeographicheskayaShirota,GeographicheskayaDolgota from Vizits v join Kontragenty k on k.kod=v.client where v.EndTime is null and Client <> " + client.getKod();
 				Bough opened = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
 				//System.out.println(opened.dumpXML());
-				for (int i = 0; i < opened.children.size(); i++) {
+				for(int i = 0; i < opened.children.size(); i++){
 					double shir = Numeric.string2double(opened.children.get(i).child("GeographicheskayaShirota").value.property.value());
 					double dol = Numeric.string2double(opened.children.get(i).child("GeographicheskayaDolgota").value.property.value());
 					//System.out.println("Naimenovanie "+opened.children.get(i).child("Naimenovanie").value.property.value());
@@ -134,36 +134,36 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 
 					float distance = opLocation.distanceTo(clientLocation);
 					//System.out.println("distance "+distance);
-					if (distance > 300) {
-						if (cursor != null && !cursor.isClosed()) {
+					if(distance > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+						if(cursor != null && !cursor.isClosed()){
 							cursor.close();
 						}
 						return true;
 					}
 				}
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
-		} finally {
-			if (cursor != null && !cursor.isClosed()) {
+		}finally{
+			if(cursor != null && !cursor.isClosed()){
 				cursor.close();
 			}
 		}
 		return false;
 	}
 
-	public boolean IsVizitBegin(String clientCode) {
-		if (IsDatabaseOpened()) {
+	public boolean IsVizitBegin(String clientCode){
+		if(IsDatabaseOpened()){
 			Cursor cursor = null;
-			try {
+			try{
 				String sql = "select _id from Vizits where EndTime is null and Client = " + clientCode;
 				cursor = mDB.rawQuery(sql, null);
-				if (cursor.moveToFirst()) {
+				if(cursor.moveToFirst()){
 					return true;
 				}
 				return false;
-			} finally {
-				if (cursor != null && !cursor.isClosed()) {
+			}finally{
+				if(cursor != null && !cursor.isClosed()){
 					cursor.close();
 				}
 			}
@@ -171,13 +171,13 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		return false;
 	}
 
-	public String findPreVizitTimeDaily(String clientCode) {
-		if (IsDatabaseOpened()) {
+	public String findPreVizitTimeDaily(String clientCode){
+		if(IsDatabaseOpened()){
 			Cursor cursor = null;
-			try {
+			try{
 				String sql = "select beginTime from Vizits where strftime('%Y-%m-%d','now')=strftime('%Y-%m-%d',beginTime) and Client = " + clientCode + " order by beginTime desc";
 				cursor = mDB.rawQuery(sql, null);
-				if (cursor.moveToFirst()) {
+				if(cursor.moveToFirst()){
 					String txt = cursor.getString(0);
 					SimpleDateFormat fromDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 					java.util.Date tm = fromDate.parse(txt);
@@ -188,10 +188,10 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 					return beginTime;
 				}
 				return null;
-			} catch (Throwable t) {
+			}catch(Throwable t){
 				t.printStackTrace();
-			} finally {
-				if (cursor != null && !cursor.isClosed()) {
+			}finally{
+				if(cursor != null && !cursor.isClosed()){
 					cursor.close();
 				}
 			}
@@ -199,18 +199,18 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		return null;
 	}
 
-	public boolean IsFirstVizitDaily(String clientCode) {
-		if (IsDatabaseOpened()) {
+	public boolean IsFirstVizitDaily(String clientCode){
+		if(IsDatabaseOpened()){
 			Cursor cursor = null;
-			try {
+			try{
 				String sql = "select EndTime from Vizits where strftime('%Y-%m-%d','now')=strftime('%Y-%m-%d',EndTime) and Client = " + clientCode;
 				cursor = mDB.rawQuery(sql, null);
-				if (cursor.moveToFirst()) {
+				if(cursor.moveToFirst()){
 					return false;
 				}
 				return true;
-			} finally {
-				if (cursor != null && !cursor.isClosed()) {
+			}finally{
+				if(cursor != null && !cursor.isClosed()){
 					cursor.close();
 				}
 			}
@@ -218,31 +218,31 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		return true;
 	}
 
-	public void CleanPointGPS(String date) {
+	public void CleanPointGPS(String date){
 	}
 
-	public void CleanVisit(String allBeforeDate) {
+	public void CleanVisit(String allBeforeDate){
 	}
 
-	public void setUploadPointGPS() {
+	public void setUploadPointGPS(){
 		ContentValues updateValues = new ContentValues();
 		updateValues.put(UPLOAD, TRUE);
 		DatabaseHelper.updateInTranzaction(mDB, "GPSPoints", updateValues, null, null);
 	}
 
-	public void setUploadVisits() {
+	public void setUploadVisits(){
 		//System.out.println("setUploadVisits");
 		ContentValues updateValues = new ContentValues();
 		updateValues.put(UPLOAD, TRUE);
 		DatabaseHelper.updateInTranzaction(mDB, VizitsTableName, updateValues, "Upload = 0 and EndTime is not null", null);
 	}
 
-	public synchronized void insertGpsPoint(Calendar time, double lat, double lon,String comment) {
-		if (lockInsertGPS) {
+	public synchronized void insertGpsPoint(Calendar time, double lat, double lon, String comment){
+		if(lockInsertGPS){
 			//System.out.println("insertPoint locked");
 			//return;
 		}
-		System.out.println("insertGpsPoint " + time.getTime() + " / " + time.getTimeZone().getDisplayName()+": "+comment);
+		//System.out.println("insertGpsPoint " + time.getTime() + " / " + time.getTimeZone().getDisplayName()+": "+comment);
 		ContentValues initialValues = new ContentValues();
 		/*
 				if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
@@ -256,14 +256,14 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		initialValues.put(LATITUDE, lon);//IsoDate.dateToString(coordGPS.time, IsoDate.DATE_TIME));
 		initialValues.put(UPLOAD, FALSE);
 		initialValues.put("comment", comment);
-		if (IsDatabaseOpened()) {
+		if(IsDatabaseOpened()){
 			//LogHelper.debug(this.getClass().getCanonicalName() + " insertPoint "+mDateTimeFormat.format(date));
 			DatabaseHelper.insertInTranzaction(mDB, "GPSPoints", initialValues);
 		}
 	}
 
-	public synchronized boolean BeginVizit(String clientCode) {
-		if (clientCode == null || clientCode.length() == 0) {
+	public synchronized boolean BeginVizit(String clientCode){
+		if(clientCode == null || clientCode.length() == 0){
 			return false;
 		}
 		//System.out.println("BeginVizit " + clientCode);
@@ -275,13 +275,13 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		initialValues.put(CLIENT, clientCode);
 		initialValues.put(TP, mPhizlicoCode);
 		initialValues.put(UPLOAD, FALSE);
-		if (IsDatabaseOpened()) {
+		if(IsDatabaseOpened()){
 			DatabaseHelper.insertInTranzaction(mDB, VizitsTableName, initialValues);
 		}
 		return false;
 	}
 
-	public String getVizitTimeString() {
+	public String getVizitTimeString(){
 		Calendar satellitesTime = Calendar.getInstance();
 		//satellitesTime.setTimeInMillis(Session.getGPSTime());
 		/*
@@ -291,10 +291,10 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 				}*/
 		long tim = satellitesTime.getTimeInMillis();
 		String s = "";//mDateTimeFormat.format(new java.util.Date());
-		if (tim < 1) {
+		if(tim < 1){
 			//LogHelper.debug("wrong satellitesTime: " + satellitesTime.getTime());
 			//s = mDateTimeFormat.format(new java.util.Date());
-		} else {
+		}else{
 			s = mDateTimeFormat.format(new java.util.Date(tim));
 		}
 		//java.util.Date d=new java.util.Date();  
@@ -303,56 +303,56 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		return s;
 	}
 
-	public boolean EndVisit(String clientCode, String action) {
-		if (!IsVizitBegin(clientCode)) {
+	public boolean EndVisit(String clientCode, String action){
+		if(!IsVizitBegin(clientCode)){
 			return false;
 		}
 		ContentValues initialValues = new ContentValues();
-		if (action != null && action.length() != 0) {
+		if(action != null && action.length() != 0){
 			initialValues.put(ACTIVITY, action);
 		}
 		String timeString = getVizitTimeString();
 		//System.out.println(END_TIME + ": " + timeString);
 		initialValues.put(ENDTIMEfieldName, timeString);
-		if (IsDatabaseOpened()) {
+		if(IsDatabaseOpened()){
 			DatabaseHelper.updateInTranzaction(mDB, VizitsTableName, initialValues, "Client = " + clientCode + " and EndTime is null", null);
 			//DatabaseHelper.updateInTranzaction(mDB, VISITS, initialValues, "Client = " + clientCode + " and EndTime is null", null);
 			//DatabaseHelper.updateInTranzaction(mDB, VISITS, initialValues, "Client = " + clientCode + " and ((EndTime is null) or (length(EndTime)<4) or (EndTime=BeginTime))", null);
-		} else {
+		}else{
 			return false;
 		}
 		return true;
 	}
 
-	boolean IsDatabaseOpened() {
-		if (mDB != null && mDB.isOpen()) {
+	boolean IsDatabaseOpened(){
+		if(mDB != null && mDB.isOpen()){
 			return true;
 		}
 		//System.out.println("IsDatabaseOpened = false!");
 		return false;
 	}
 
-	public static double lastLatitude() {
+	public static double lastLatitude(){
 		Bough last = getLastSavedGPSpoin();
 		double latitude = Numeric.string2double(last.child("row").child("latitude").value.property.value());
 		return latitude;
 	}
 
-	public static double lastLongitude() {
+	public static double lastLongitude(){
 		Bough last = getLastSavedGPSpoin();
 		double longitude = Numeric.string2double(last.child("row").child("longitude").value.property.value());
 		return longitude;
 	}
 
-	public static long lastDateTime() {
+	public static long lastDateTime(){
 		Bough last = getLastSavedGPSpoin();
-		String timeString=last.child("row").child("beginTime").value.property.value();
-		try {
+		String timeString = last.child("row").child("beginTime").value.property.value();
+		try{
 			Date date = Auxiliary.mssqlTime.parse(timeString);
 			long ms = date.getTime();
 			Calendar cal = Calendar.getInstance();
 			TimeZone tz = cal.getTimeZone();
-			int offset=tz.getRawOffset();
+			int offset = tz.getRawOffset();
 			//return ms + 3 * 60 * 60 * 1000;
 			return ms + offset;
 		}catch(Throwable t){
@@ -361,32 +361,65 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		}
 	}
 
-	public static Bough getLastSavedGPSpoin() {
+	public static Bough getLastSavedGPSpoin(){
 		String sql = "select beginTime as beginTime, '' || longitude as longitude, '' || latitude as latitude from GPSPoints order by beginTime desc limit 1;";
 		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		return b;
 	}
 
-	public ArrayList<CoordGPS> getGPSPointsArray() {
+	public ArrayList<CoordGPS> getGPSPointsArray(){
 		ArrayList<CoordGPS> list = new ArrayList<CoordGPS>();
 		Cursor cursor = mDB.query("GPSPoints", new String[]{BEGIN_TIME, LATITUDE, LONGITUDE},
 				//"date(BeginDate) = date() and Upload = " + FALSE, null, null, null, null);
 				" Upload = " + FALSE, null, null, null, null);
-		if (cursor.moveToFirst()) {
-			do {
+		if(cursor.moveToFirst()){
+			do{
 				CoordGPS coordGPS = new CoordGPS( //IsoDate.stringToDate(cursor.getString(0), IsoDate.DATE_TIME)
 						cursor.getString(cursor.getColumnIndex(BEGIN_TIME)), cursor.getDouble(cursor.getColumnIndex(LATITUDE)), cursor.getDouble(cursor.getColumnIndex(LONGITUDE)));
 				list.add(coordGPS);
-			} while (cursor.moveToNext());
+			}while(cursor.moveToNext());
 		}
-		if (cursor != null && !cursor.isClosed()) {
+		if(cursor != null && !cursor.isClosed()){
 			cursor.close();
 			cursor = null;
 		}
 		return list;
 	}
 
-	public static long isTPNearClient(double lat, double lon) {
+	public static long isTPNearClient(double lat, double lon){
+		Location clientLocation = new Location("ClientLocation");
+		clientLocation.setLatitude(lat);
+		clientLocation.setLongitude(lon);
+		String sql = "select beginTime as beginTime, longitude as longitude, latitude as latitude from GPSPoints where datetime(BeginTime)>datetime('now','-1 minutes') order by beginTime desc limit 123456;";
+		//		System.out.println(sql);
+		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		//System.out.println(data.dumpXML());
+		java.util.Vector<Bough> rows = data.children("row");
+		float minFor1m = 987654321;
+		for(int ii = 0; ii < rows.size(); ii++){
+			Location point = new Location("MyLocation");
+			point.setLongitude(Numeric.string2double(rows.get(ii).child("latitude").value.property.value()));
+			point.setLatitude(Numeric.string2double(rows.get(ii).child("longitude").value.property.value()));
+			float distance = point.distanceTo(clientLocation);
+			//System.out.println(rows.get(ii).dumpXML()+": "+distance);
+			if(minFor1m > distance){
+				minFor1m = distance;
+			}
+		}
+		return (long)minFor1m;
+	}
+
+	public static boolean isExistsGPS1m(){
+		String sql = "select beginTime as beginTime, longitude as longitude, latitude as latitude from GPSPoints where datetime(BeginTime)>datetime('now','-1 minutes') order by beginTime desc limit 123456;";
+		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		if(data.children("row").size() > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	public static long isTPNearClient121212121(double lat, double lon){
 		/*
 		//if (System.currentTimeMillis() == 0 || Session.getLocalTime() == 0) {
 		if (System.currentTimeMillis() == 0 || SWLifeGpsService.whenSavedGPSms == 0) {
@@ -410,14 +443,14 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames {
 		return Float.valueOf(lastKnownLocation.distanceTo(clientLocation)).longValue();
 	}
 
-	public static ArrayList<String> getVisitsResultsList(SQLiteDatabase db) {
+	public static ArrayList<String> getVisitsResultsList(SQLiteDatabase db){
 		ArrayList<String> vizitsResults = new ArrayList<String>();
 		String sql = "select [Naimenovanie] from RezultatVizita order by [Kod]";
 		Cursor cursor = db.rawQuery(sql, null);
-		if (cursor != null && cursor.moveToFirst()) {
-			do {
+		if(cursor != null && cursor.moveToFirst()){
+			do{
 				vizitsResults.add(cursor.getString(0));
-			} while (cursor.moveToNext());
+			}while(cursor.moveToNext());
 			cursor.close();
 		}
 		return vizitsResults;

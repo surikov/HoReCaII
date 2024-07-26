@@ -91,6 +91,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	private static final int IDD_ALREADY_IN_LIST = 106;
 	public static boolean hideNacenkaStatus = true;
 
+	static final String Rstringfact_order="Наценка факт заказа";
+	static final String Rstringnot_available="Недоступно";
+
 	String nomerDokumenta1C = "";
 	String nomerDokumentaTablet = "";
 	boolean no_assortiment = false;
@@ -212,54 +215,6 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		ApplicationHoreca.getInstance().getDataBase().execSQL("update consts set TekKatalog='" + key + "';");
 	}
 
-	CannyTask _updateExtraChargeInfoTask = new CannyTask(){
-		@Override
-		public void doBackground(){
-			//System.out.println(": UpdateExtraChargeInfo start");
-			try{
-				mBidData.UpdateExtraChargeInfo(DateTimeHelper.SQLDateString(mShippingDate.getTime()));
-				info = mBidData.getExtraChargeInfo();
-			}catch(Throwable t){
-				t.printStackTrace();
-			}
-			//System.out.println(": UpdateExtraChargeInfo ok");
-		}
-
-		@Override
-		public void doTask(){
-			//System.out.println(": UpdateExtraChargeInfo show");
-			String status = getString(R.string.fact_order);
-			TextView textClientPlan = (TextView)findViewById(R.id.text_plan_client);
-			try{
-				/*if (info.getClientPlanPersent() != null) {
-					status = getString(R.string.plan_client) + "  " + info.getClientPlanPersent();
-				}
-				else {
-					status = getString(R.string.plan_client) + "  " + getString(R.string.not_available);
-				}*/
-				if(info.getOrderFactPersent() != null){
-					status = status + ": " + info.getOrderFactPersent();
-				}else{
-					status = status + ": " + getString(R.string.not_available);
-				}
-				/*
-				double p = ((int) (1000.0 * info.planPodrazdeleniaNaMesiac)) / 10.0;
-				status = status + ", План подразд. на мес.: " + p + "%";
-				p = ((int) (1000.0 * info.nacenkaFactPodrzdelenia)) / 10.0;
-				*/
-				/*
-				if (info.getOrderFactPersent() != null) {
-					status =  getString(R.string.fact_order) + ": " + info.getOrderFactPersent() + "%";
-				}*/
-				textClientPlan.setText(status);
-			}catch(Throwable t){
-				t.printStackTrace();
-				textClientPlan.setText(t.toString());
-			}
-			//System.out.println("- UpdateExtraChargeInfo done");
-		}
-	}//
-			.laziness.is(1000);
 	private boolean mHasChanges = false;
 	private boolean mIsOrderEditable = true;
 	private boolean mIsOrderPropertiesEditable = true;
@@ -581,6 +536,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	void clearExtraChargeInfo(){
+		System.out.println("clearExtraChargeInfo "+hideNacenkaStatus);
 		TextView textClientPlan = (TextView)findViewById(R.id.text_plan_client);
 		//textClientPlan.setText("");
 		textClientPlan.setText("пересчитывается...");
@@ -589,19 +545,22 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	void updateExtraChargeInfo(){
-		String status = getString(R.string.fact_order);
+		String status = "";//Rstringfact_order;
 		TextView textClientPlan = (TextView)findViewById(R.id.text_plan_client);
-		try{
-			mBidData.UpdateExtraChargeInfo(DateTimeHelper.SQLDateString(mShippingDate.getTime()));
-			info = mBidData.getExtraChargeInfo();
-			if(info.getOrderFactPersent() != null){
-				status = status + ": " + info.getOrderFactPersent();
-			}else{
-				status = status + ": " + getString(R.string.not_available);
+		if(!hideNacenkaStatus){
+
+			try{
+				mBidData.UpdateOrderExtraChargeInfo(DateTimeHelper.SQLDateString(mShippingDate.getTime()));
+				info = mBidData.getExtraChargeInfo();
+				if(info.getOrderFactPersent() != null){
+					status = Rstringfact_order + ": " + info.getOrderFactPersent() + ", Вал: " + info.getOrderFactValKg();
+				}else{
+					status = Rstringfact_order + ": " + Rstringnot_available;
+				}
+			}catch(Throwable t){
+				t.printStackTrace();
+				textClientPlan.setText(Rstringfact_order + " " + t.toString());
 			}
-		}catch(Throwable t){
-			t.printStackTrace();
-			textClientPlan.setText(status + " " + t.toString());
 		}
 		textClientPlan.setText(status);
 	}
@@ -707,8 +666,10 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		//fillTargetCondition();
 		composeHistoryTab();
 		//composeMustTab();
-		TextView textClientPlan = (TextView)findViewById(R.id.text_plan_client);
-		textClientPlan.setVisibility(textClientPlan.INVISIBLE);
+		if(hideNacenkaStatus){
+			TextView textClientPlan = (TextView)findViewById(R.id.text_plan_client);
+			textClientPlan.setVisibility(textClientPlan.INVISIBLE);
+		}
 		//System.out.println("Activity_Bid onCreate done");
 	}
 
@@ -1455,25 +1416,15 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		mTextOrderAmount.setText(DecimalFormatHelper.format(orderAmount));
 	}
 	*/
-	double getVes(String artikul){
-		double ves = 0;
-		//String sql = "select ves from Nomenklatura_sorted n join EdinicyIzmereniya_strip eho on n.EdinicaKhraneniyaOstatkov = eho._IDRRef where artikul='" + artikul + "' limit 1";
-		String sql = "select skladEdVes from Nomenklatura_sorted where artikul='" + artikul + "' limit 1";
-		Cursor cursor = this.mDB.rawQuery(sql, null);
-		if(cursor.moveToNext()){
-			ves = cursor.getDouble(0);
-			//System.out.println(artikul+" / "+ves);
-		}
-		if(cursor != null)
-			cursor.close();
-		return ves;
-	}
+
 
 	private void UpdateAvailableAmount(){
 		//System.out.println("UpdateAvailableAmount start");
 		double orderAmount = mBidData.getFoodStuffs().getAmount() + mBidData.getServices().getAmount();
-		double orderWeight = 0;//mBidData.getFoodStuffs().getWeight();
+		//double orderWeight = 0;//mBidData.getFoodStuffs().getWeight();
+		double orderWeight =mBidData.getFoodStuffs().getWeight();
 		//mBidData.getFoodStuffs().
+		/*
 		for(NomenclatureBasedItem item: mBidData.getFoodStuffs().mNomenclaureList){
 			//amount = amount + ((ZayavkaPokupatelya_Foodstaff) item).getSummaSoSkidkoy();
 			String artikul = item.getArtikul();
@@ -1481,7 +1432,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			ZayavkaPokupatelya_Foodstaff one = (ZayavkaPokupatelya_Foodstaff)item;
 			one.ves = ves;
 			orderWeight = orderWeight + one.getKolichestvo() * ves;
-		}
+		}*/
 		//System.out.println("1");
 		//double amount14 = mBidData.getFoodStuffs().getAmount(ISklady.KAZAN_sklad_14);
 		//System.out.println("2");
@@ -1505,10 +1456,10 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		ExtraChargeInfo info = mBidData.getExtraChargeInfo();
 
 	}*/
-	private void UpdateExtraChargeInfo(){
+	private void UpdateBidExtraChargeInfo1234567890(){
 		//if(1==1)return;
 		//System.out.println(this.getClass().getCanonicalName() + ": UpdateExtraChargeInfo start");
-		mBidData.UpdateExtraChargeInfo(DateTimeHelper.SQLDateString(mShippingDate.getTime()));
+		mBidData.UpdateOrderExtraChargeInfo(DateTimeHelper.SQLDateString(mShippingDate.getTime()));
 		ExtraChargeInfo info = mBidData.getExtraChargeInfo();
 		//System.out.println(this.getClass().getCanonicalName() + ": UpdateExtraChargeInfo show");
 		String status = "";
@@ -1522,9 +1473,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		}
 		*/
 		if(info.getOrderFactPersent() != null){
-			status = status + ", " + getString(R.string.fact_order) + ": " + info.getOrderFactPersent();
+			status = status + ", " + Rstringfact_order + ": " + info.getOrderFactPersent();
 		}else{
-			status = status + ", " + getString(R.string.fact_order) + ": " + getString(R.string.not_available);
+			status = status + ", " + Rstringfact_order + ": " + Rstringnot_available;
 		}
 		/*
 		double p = ((int) (1000.0 * info.planPodrazdeleniaNaMesiac)) / 10.0;
@@ -2108,6 +2059,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				clearExtraChargeInfo();
 				//updateExtraChargeInfoTask.start();
 			}else{
+
 				hideNacenkaStatus = true;
 				menuShowHideStatus.setTitle("Показать наценку");
 				textClientPlan.setVisibility(textClientPlan.INVISIBLE);
@@ -2771,8 +2723,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 
 		}
 	}
+
 	void doHistoryPaneExport(){
-		String fileName="/export" + Math.floor(Math.random() * 10000) + ".xls";
+		String fileName = "/export" + Math.floor(Math.random() * 10000) + ".xls";
 		Vector<Vector<String>> rows = new Vector<Vector<String>>();
 		requeryHistoryData();
 		Bough curdata = Auxiliary.fromCursor(this.historyCursor);
@@ -2814,8 +2767,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 
 		}
 
-		Cfg.exportArtikulsList(this,  fileName, bid.getClientKod(),  rows);
+		Cfg.exportArtikulsList(this, fileName, bid.getClientKod(), rows);
 	}
+
 	void doHistoryPaneExport2222(){
 		//gridHistory.exportCurrentDataCSV(Activity_Bid.this, "history.csv", "windows-1251");
 		try{
@@ -2941,7 +2895,6 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				*/
 
 
-
 				String sql = "select n.naimenovanie as n1,s.naimenovanie as n2,g.naimenovanie as n3"//
 						+ " from nomenklatura n"//
 						+ " left join nomenklatura s on n.roditel=s._idrref"//
@@ -3008,7 +2961,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	void exportBidData(BidData mBidData){
-		String fileName="/Заказ "
+		String fileName = "/Заказ "
 				+ Auxiliary.safeFileName(ApplicationHoreca.getInstance().getClientInfo().getName())
 				+ Math.floor(Math.random() * 10000)
 				+ ".xls";
@@ -3044,8 +2997,9 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				txttst = txttst + '/' + kk + ':' + item.get(kk);
 			}*/
 		}
-		Cfg.exportArtikulsList(this,  fileName, bid.getClientKod(),  rows);
+		Cfg.exportArtikulsList(this, fileName, bid.getClientKod(), rows);
 	}
+
 	void exportBidData222222222(BidData mBidData){
 		try{
 			String xname = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath()
@@ -3744,32 +3698,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		//LogHelper.debug(this.getClass().getCanonicalName() + ".requeryHistoryData done");
 	}
 
-	String __getVidSkidki(double FiksirovannyeCeny, double SkidkaPartneraKarta, double NakopitelnyeSkidki, double nacenka){
-		String withNacenka = "";
-		if(nacenka > 0){
-			withNacenka = "+наценка " + nacenka + "%";
-		}
-		String withSkidki = "";
-		if(FiksirovannyeCeny > 0){
-			withSkidki = "Фикс.цена";
-		}
-		if(SkidkaPartneraKarta > 0){
-			withSkidki = "Партнёр";
-		}
-		if(NakopitelnyeSkidki > 0){
-			withSkidki = "Накоп.";
-		}
-		String vidSkidki = withSkidki + " " + withNacenka;
-		return vidSkidki;
-	}
 
-	double __getRazmerSkidki(double FiksirovannyeCeny, double SkidkaPartneraKarta, double NakopitelnyeSkidki, double nacenka){
-		double razmSkidka = 0;
-		if(FiksirovannyeCeny == 0 && SkidkaPartneraKarta == 0 && NakopitelnyeSkidki > 0){
-			razmSkidka = NakopitelnyeSkidki;
-		}
-		return razmSkidka;
-	}
+
 
 	void fillClientHistoryPrompt(){
 		System.out.println("fillClientHistoryPrompt");
@@ -4693,33 +4623,58 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 				+ Activity_UploadBids.composeUploadOrderString(mBidData.getBid().getNomer(), nomerDokumentaTablet)
 				+ "}]";
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZakaziPokupatelya/" + Cfg.whoCheckListOwner();
-		final Note result = new Note();
-
+		//final Note result = new Note();
+		final Bough result = new Bough();
 		new Expect().task.is(new Task(){
 			@Override
 			public void doTask(){
 				System.out.println("post: " + post);
 				try{
 					Bough txt = Auxiliary.loadTextFromPrivatePOST(url, post, 300 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					Bough data = Bough.parseJSON(txt.child("raw").value.property.value());
-					System.out.println("post result is " + data.dumpXML());
+					result.children.add(txt);
+					//Bough data = Bough.parseJSON(txt.child("raw").value.property.value());
+					//Bough bb = Bough.parseJSONorThrow(response);
+					/*System.out.println("post result is " + data.dumpXML());
 					result.value(
 							data.child("Сообщение").value.property.value()
 									+ " " + data.child("ДанныеПоЗаказам").child("Сообщение").value.property.value()
 									+ " " + data.child("ДанныеПоЗаказам").child("Заказы").child("Сообщение").value.property.value()
-					);
+					);*/
 				}catch(Throwable t){
 					t.printStackTrace();
-					result.value(t.getMessage());
+					//result.value(t.getMessage());
 				}
 			}
 		}).afterDone.is(new Task(){
 							@Override
 							public void doTask(){
-								System.out.println("sendUpdateOrder result " + result.value());
-								Auxiliary.inform("Отправка заказа: " + result.value(), Activity_Bid.this);
+								//System.out.println("sendUpdateOrder result " + result.value());
+								//Auxiliary.inform("Отправка заказа: " + result.value(), Activity_Bid.this);
 								mBidData.getBid().deleteOrder(ApplicationHoreca.getInstance().getDataBase());
-								Activity_Bid.this.finish();
+								//Activity_Bid.this.finish();
+								String response = result.child("result").child("raw").value.property.value();
+								try{
+									Bough bb = Bough.parseJSONorThrow(response);
+									System.out.println("bb is " + bb.dumpXML());
+									if(bb.children.size() > 0){
+										String msg = "Выгрузка (" + result.child("result").child("code").value.property.value()
+												+ ", " + result.child("result").child("message").value.property.value() + "):\n"
+												+ bb.child("Сообщение").value.property.value();
+										//Activity_UploadBids.buildDialogResult( Activity_Bid.this,"Отправка заказа", bb);
+										Activity_UploadBids.buildDialogResultAndClose( Activity_Bid.this,"Отправка заказа", bb,Activity_Bid.this);
+										//Activity_Bid.this.finish();
+									}else{
+										System.out.println("Empty " + result.dumpXML());
+										String msg = " \nВозможны ошибки при выгрузке" //+ result.dumpXML();
+												+ "\n\nПроверьте статус заказов в отчёте, возможно необходимо удалить повторы"//
+												+ "\n\nТекст ответа:"//
+												+ result.dumpXML().substring(0, 160).replace("\n", "").replace("  ", " ");
+										Auxiliary.alertBreak(msg, Activity_Bid.this);
+									}
+								}catch(Throwable t){
+									String msg = "/ Ошибка /" + t.toString() + "/";
+									Auxiliary.alertBreak(msg, Activity_Bid.this);
+								}
 							}
 						}
 		).status.is("Подождите...").start(this);

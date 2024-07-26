@@ -67,7 +67,9 @@ public class RedactNumber extends EditText implements Rake {
 		left.property.afterChange(reFit);
 		top.property.afterChange(reFit);
 		setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		selectAllOnFocus.is(true);
 		this.setSelectAllOnFocus(selectAllOnFocus.property.value());
+
 		addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {

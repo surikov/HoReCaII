@@ -408,5 +408,9 @@
 			android:name="sweetlife.android10.ui.Activity_STM_chooser"
 			android:label="..."
 			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.supervisor.ActivityZayavkaVnutrenneePeremechenie"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
 	</application>
 </manifest>

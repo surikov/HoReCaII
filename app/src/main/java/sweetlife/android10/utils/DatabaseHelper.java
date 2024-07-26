@@ -144,6 +144,7 @@ public class DatabaseHelper {
 		}
 
 		try {
+			System.out.println("alter table GPSPoints add column comment text;");
 			mDB.execSQL("alter table GPSPoints add column comment text;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
@@ -250,13 +251,21 @@ System.out.println("create RecommendationAndBasket1221");
 		}*/
 
 		try {
-			mDB.execSQL("alter table AnketaKlienta add column osobennostiRejimaRaboty text;");
+			mDB.execSQL("alter table AnketaKlienta add column DogovorEDO number;");
+			mDB.execSQL("alter table AnketaKlienta add column OGRN text;");
+			mDB.execSQL("alter table AnketaKlienta add column OsnovaniePodpisi number;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}
 
 		try {
 			mDB.execSQL("alter table nomenklatura add column Tegi text;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
+		try {
+			mDB.execSQL("alter table MatricaRowsX add column deleteComment text;");
+			mDB.execSQL("alter table MatricaRowsX add column deletePath text;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}

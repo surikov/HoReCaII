@@ -45,10 +45,10 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 		mTextDirection = (TextView) findViewById(R.id.txtDirection);
 		mTextAccuracy = (TextView) findViewById(R.id.txtAccuracy);
 		mTextStatus = (TextView) findViewById(R.id.textStatus);
-		if (true != //ApplicationHoreca.getInstance()
-				GPS.SetServiceClient(this)) {
-			Session.setCurrentStatus("GPS провайдеры недоступны!", SWLifeGpsService.RED_COLOR);
-		}
+		//if (true != //ApplicationHoreca.getInstance()
+		//		GPS.SetServiceClient(this)) {
+		//	Session.setCurrentStatus("GPS провайдеры недоступны!", SWLifeGpsService.RED_COLOR);
+		//}
 		On_LocationNotAvailable();
 		//System.out.println("done Activity_GpsInfo.onCreate");
 	}
@@ -57,7 +57,7 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 	public void onDestroy() {
 		super.onDestroy();
 		//ApplicationHoreca.getInstance()
-		GPS.DeleteServiceClient();
+		//GPS.DeleteServiceClient();
 	}
 
 	private void SetStatus(String message, int color) {
@@ -66,7 +66,7 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 	}
 
 	private void SetSatelliteInfo(int number) {
-		Session.setSatelliteCount(number);
+		//Session.setSatelliteCount(number);
 		mTextSatellites.setText(String.valueOf(number));
 	}
 
@@ -100,7 +100,7 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 			}
 			if (!Session.isUsingGps()) {
 				mTextSatellites.setText(R.string.not_applicable);
-				Session.setSatelliteCount(0);
+				//Session.setSatelliteCount(0);
 			}
 			if (loc.hasAccuracy()) {
 				float accuracy = loc.getAccuracy();
@@ -148,6 +148,6 @@ public class Activity_GpsInfo extends Activity_Base implements IGpsLoggerService
 		mTextSatellites.setText(R.string.not_applicable);
 		mTextDirection.setText(R.string.not_applicable);
 		mTextAccuracy.setText(R.string.not_applicable);
-		SetStatus(Session.getCurrentStatus(), Session.getCurrentStatusColor());
+		//SetStatus(Session.getCurrentStatus(), Session.getCurrentStatusColor());
 	}
 }

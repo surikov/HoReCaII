@@ -121,7 +121,7 @@ public class ReportTovarnieNakladmie extends Report_Base{
 
 	@Override
 	public String composeGetQuery(int queryKind){
-		String dataNa=Auxiliary.short1cDate.format(new Date(queryDate.value().longValue()));
+		String dataNa = Auxiliary.short1cDate.format(new Date(queryDate.value().longValue()));
 		String p = "{";
 		p = p + "\"НомерНакладной\":\"" + naklNumber.value().trim() + "\"";
 		if(queryDate.value() > 0){
@@ -160,8 +160,10 @@ public class ReportTovarnieNakladmie extends Report_Base{
 		if(kind.value().intValue() == 3){
 			q = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/GetCertificates/"
 					+ naklNumber.value().trim()
-			+"/"+dataNa
+					+ "/" + dataNa
+					+ "?param=0"
 			;
+			q = q + tagForFormat(queryKind);
 		}
 
 		System.out.println("composeGetQuery " + q);

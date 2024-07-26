@@ -340,8 +340,8 @@
 	<string name="plan_order">Наценка план заказа</string>
 	<string name="fact_client">Наценка факт клиента</string>
 	<string name="fact_division">Наценка факт подразделения</string>
-	<string name="fact_order">Наценка факт заказа</string>
-	<string name="not_available">Недоступно</string>
+	<string name="fact_order22222">Наценка факт заказа</string>
+	<string name="not_available22222">Недоступно</string>
 	<string name="orders">Заказы</string>
 	<string name="available_amount">Доступная сумма</string>
 	<string name="nomenclature_from_prev_order">Номенклатура из предыдущего заказа</string>

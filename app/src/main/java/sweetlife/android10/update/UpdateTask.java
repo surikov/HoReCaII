@@ -212,7 +212,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		//mDB.execSQL("analyze");
 		//SendResponseXML();
 		//Обновляем временные таблицы
-		update2();
+		update2(mApplicationContext);
 		logAndPublishProcess("Анализ базы данных" );
 		UpdateTempTables(mDeltaUpdater.getTempTablesInfo().getTempTablesFlags());
 		sweetlife.android10.utils.DatabaseHelper.adjustDataBase(mDB);
@@ -279,7 +279,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 	}
 
-	boolean update2(){
+	boolean update2(Context context){
 		System.out.println("update2" );
 		Calendar lastSuccessfulUpdate;
 		//logUpdateBegin();
@@ -302,7 +302,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 			//testPrice();
 
 
-			updatePersonal(hrc);
+			updatePersonal(hrc,context);
 			//testPrice();
 			//logUpdateDone();
 		}catch(ParseException e){
@@ -348,7 +348,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 	}
 
-	void updatePersonal(String hrc){
+	void updatePersonal(String hrc,Context context){
 		//System.out.println("updatePersonal " + hrc);
 		//logAndPublishProcess(" обновление " + hrc);
 		//executeUpdate("обновление " + hrc, "http://89.109.7.162/androbmen/update2/personal/" + hrc + ".zip", hrc + ".sql");
@@ -358,11 +358,21 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		String wsURL = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/OthetOPrihtenii/" + hrc + "/" + numRead + "?komment=";
 		//String wsURL = Settings.getInstance().getBaseURL()+"GolovaNew/hs/OthetOPrihtenii/" + hrc + "/" + numRead + "?komment=";
 		byte[] b;
+		String versionName ="?";
+		try{
+			if(context!=null){
+				versionName = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+			}
+		}catch(Throwable t){
+			versionName=t.getMessage();
+		}
 		try{
 			Calendar c = Calendar.getInstance();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd-HH.mm" );
 			//String version=getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-			String updateComment = "v" + Activity_Login.packageVersion + "-" + sdf.format(c.getTime());
+
+			//String updateComment = "v" + Activity_Login.packageVersion + "-" + sdf.format(c.getTime());
+			String updateComment = "v" + versionName + "-" + sdf.format(c.getTime());
 			wsURL = wsURL + updateComment;
 			System.out.println("send " + wsURL);
 			b = Auxiliary.loadFileFromPrivateURL(wsURL, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());

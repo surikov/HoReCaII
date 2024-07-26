@@ -217,7 +217,7 @@ public class ReportRealizacii extends Report_Base{
 	public String interceptActions(String s){
 		String[] strings = s.split("\n");
 		for(int i = 0; i < strings.length; i++){
-			Pattern pattern = Pattern.compile("([\\s\\S]*)>(\\d\\d-\\d*) от (\\d\\d.\\d\\d.\\d\\d\\d\\d) 0:00:00, арт.(\\S*) ([\\s\\S]*)<([\\s\\S]*)");
+			Pattern pattern = Pattern.compile("([\\s\\S]*)>(\\d\\d-\\d*) от (\\d\\d.\\d\\d.\\d\\d\\d\\d) \\d+:\\d+:\\d+, арт.(\\S*) ([\\s\\S]*)<([\\s\\S]*)");
 			Matcher matcher = pattern.matcher(strings[i]);
 			//System.out.println(matcher.groupCount() + ": " + strings[i]);
 			if(matcher.matches()){

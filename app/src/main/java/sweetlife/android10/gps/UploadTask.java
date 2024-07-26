@@ -71,8 +71,8 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 				mResultString = "";
 				logAndPublishProgress("выгрузка GPS за " + BeginTime);
 				String url = Settings.getInstance().getBaseURL() + Settings.getInstance().selectedBase1C() + "/hs/GPS/ZagruzkaGPS/" + Cfg.whoCheckListOwner() + "/" + tpCode;
-				System.out.println(url);
-				System.out.println(jsonBody);
+				//System.out.println(url);
+				//System.out.println(jsonBody);
 				byte[] bytes = {};
 				try{
 					bytes = jsonBody.getBytes("UTF-8");
@@ -80,9 +80,9 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 					t.printStackTrace();
 				}
 				Bough resp = Auxiliary.loadTextFromPrivatePOST(url, bytes, 180000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
-				System.out.println("resp: " + resp.dumpXML());
+				//System.out.println("resp: " + resp.dumpXML());
 				raw.children = Bough.parseJSON(resp.child("raw").value.property.value()).children;
-				System.out.println("raw: " + raw.dumpXML());
+				//System.out.println("raw: " + raw.dumpXML());
 				if(!raw.child("Статус").value.property.value().equals("0")){
 					mResultString = "Точки GPS не выгружены, повторите выгрузку\n\n(" + raw.child("Сообщение").value.property.value() + ")\n";
 					return EParserResult.EError;

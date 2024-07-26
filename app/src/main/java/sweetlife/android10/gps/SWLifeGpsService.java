@@ -13,10 +13,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 
-public class SWLifeGpsService extends Service {
+public class SWLifeGpsService extends Service{
 	private static int NOTIFICATION_ID;
 	private IBinder mBinder = null;
-	private static IGpsLoggerServiceClient mDetailsServiceClient;
+	//private static IGpsLoggerServiceClient mDetailsServiceClient;
 	private static ILocationChange mLocationChangeClient;
 	private GeneralLocationListener mGPSLocationListener;
 	private LocationManager mGPSLocationManager;
@@ -25,18 +25,18 @@ public class SWLifeGpsService extends Service {
 	public static int RED_COLOR = Color.rgb(204, 0, 51);
 	public static int YELLOW_COLOR = Color.rgb(255, 204, 0);
 
-	public static long lastSavedGPSms = 0;
-	public static long whenSavedGPSms = 0;
-	public static long maxLocalGpsDiffMs=24*60*60*1000;
+	//public static long lastSavedGPSms = 0;
+	//public static long whenSavedGPSms = 0;
+	public static long maxLocalGpsDiffMs = 24 * 60 * 60 * 1000;
 
 	@Override
-	public void onCreate() {
+	public void onCreate(){
 		super.onCreate();
 		mBinder = new GpsLoggingBinder();
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
+	public IBinder onBind(Intent intent){
 		//System.out.println("onBind "+intent);
 		SetPeriod(intent);
 		HandleIntent(intent);
@@ -44,15 +44,15 @@ public class SWLifeGpsService extends Service {
 	}
 
 	@Override
-	public boolean onUnbind(Intent intent) {
+	public boolean onUnbind(Intent intent){
 		boolean result = super.onUnbind(intent);
 		stopSelf();
 		return result;
 	}
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		if (intent != null) {
+	public int onStartCommand(Intent intent, int flags, int startId){
+		if(intent != null){
 			SetPeriod(intent);
 			HandleIntent(intent);
 		}
@@ -60,45 +60,45 @@ public class SWLifeGpsService extends Service {
 	}
 
 	@Override
-	public void onDestroy() {
+	public void onDestroy(){
 		super.onDestroy();
 		StopLogging();
-		mDetailsServiceClient = null;
+		//mDetailsServiceClient = null;
 	}
 
-	private void HandleIntent(Intent intent) {
+	private void HandleIntent(Intent intent){
 		StartLogging();
 	}
 
-	public class GpsLoggingBinder extends Binder {
-		public SWLifeGpsService getService() {
+	public class GpsLoggingBinder extends Binder{
+		public SWLifeGpsService getService(){
 			return SWLifeGpsService.this;
 		}
 	}
 
-	public void SetServiceClient(IGpsLoggerServiceClient client) {
-		mDetailsServiceClient = client;
-	}
+	//public void SetServiceClient(IGpsLoggerServiceClient client) {
+	//	mDetailsServiceClient = client;
+	//}
 
-	public void SetLocationChangeClient(ILocationChange client) {
+	public void SetLocationChangeClient(ILocationChange client){
 		mLocationChangeClient = client;
 	}
 
-	public void DeleteServiceClient() {
-		mDetailsServiceClient = null;
-	}
+	//public void DeleteServiceClient() {
+	//	mDetailsServiceClient = null;
+	//}
 
-	public void DeleteLocationChangeClient() {
+	public void DeleteLocationChangeClient(){
 		mLocationChangeClient = null;
 	}
 
-	public boolean HasLocationChangeClient() {
+	public boolean HasLocationChangeClient(){
 		return mLocationChangeClient == null ? false : true;
 	}
 
-	private void StartLogging() {
-		System.out.println("SWLifeGpsService.StartLogging, Session.isStarted() "+Session.isStarted());
-		if (Session.isStarted()) {
+	private void StartLogging(){
+		System.out.println("SWLifeGpsService.StartLogging, Session.isStarted() " + Session.isStarted());
+		if(Session.isStarted()){
 			return;
 		}
 		LocationNotAvailable();
@@ -108,101 +108,101 @@ public class SWLifeGpsService extends Service {
 		StartGPSStatusListener();
 	}
 
-	private void StopLogging() {
+	private void StopLogging(){
 		Session.setStarted(false);
 		//Session.setCurrentLocationInfo(null);
 		StopGPSStatusListener();
 		StopGpsManager();
-		StopDetailsServiceClient();
+		//StopDetailsServiceClient();
 		stopForeground(true);
 	}
 
-	public LocationManager getGPSLocationManager() {
+	public LocationManager getGPSLocationManager(){
 		return mGPSLocationManager;
 	}
 
-	private void SetPeriod(Intent intent) {
-		if (intent != null) {
+	private void SetPeriod(Intent intent){
+		if(intent != null){
 			Bundle extras = intent.getExtras();
-			if (extras != null)
+			if(extras != null)
 				mPeriod = extras.getInt("period", 20 * 1000);
-		} else {
+		}else{
 			mPeriod = 20 * 1000;
 		}
 	}
 
-	public void StartGPSStatusListener() {
+	public void StartGPSStatusListener(){
 		CheckGpsStatus();
-		if (Session.isGpsEnabled()) {
+		if(Session.isGpsEnabled()){
 			mGPSLocationManager.addGpsStatusListener(mGPSLocationListener);
-			SetStatus("Установка соединения со спутниками!", YELLOW_COLOR);
+			//SetStatus("Установка соединения со спутниками!", YELLOW_COLOR);
 			Session.setUsingGps(true);
-		} else {
+		}else{
 		}
 	}
 
-	private void StartGpsManager() {
+	private void StartGpsManager(){
 		mGPSLocationListener = new GeneralLocationListener(this);
-		mGPSLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		mGPSLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		mGPSLocationManager.removeUpdates(mGPSLocationListener);
 		mGPSLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mGPSLocationListener);
+		mGPSLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mGPSLocationListener);
 		//		mGPSLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
 		//				1000, 0,
 		//				mGPSLocationListener);
 	}
 
-	private void StopGpsManager() {
-		if (mGPSLocationListener != null) {
+	private void StopGpsManager(){
+		if(mGPSLocationListener != null){
 			mGPSLocationManager.removeUpdates(mGPSLocationListener);
 			//			mGPSLocationManager.removeUpdates(mGPSLocationListener);
 		}
 	}
 
-	private void CheckGpsStatus() {
-		if (mGPSLocationManager != null) {
+	private void CheckGpsStatus(){
+		if(mGPSLocationManager != null){
 			Session.setGpsEnabled(mGPSLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
 		}
 	}
 
-	public void StopGPSStatusListener() {
-		if (mGPSLocationListener != null) {
+	public void StopGPSStatusListener(){
+		if(mGPSLocationListener != null){
 			mGPSLocationManager.removeGpsStatusListener(mGPSLocationListener);
 		}
 		Session.setUsingGps(false);
-		SetStatus("GPS провайдеры недоступны.", RED_COLOR);
+		//SetStatus("GPS провайдеры недоступны.", RED_COLOR);
 	}
 
-	void SetStatus(String status, int color) {
-		Session.setCurrentStatus(status, color);
-		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.OnStatusMessage(status, color);
-		}
-	}
+	//void SetStatus(String status, int color) {
+	//Session.setCurrentStatus(status, color);
+	//if (IsGPSInfoFormVisible()) {
+	//	mDetailsServiceClient.OnStatusMessage(status, color);
+	//}
+	//}
 
-	private void SetStatus(int stringId, int color) {
-		String s = getString(stringId);
-		SetStatus(s, color);
-	}
+	//private void SetStatus(int stringId, int color) {
+	//	String s = getString(stringId);
+	//	SetStatus(s, color);
+	//}
 
-	public void LocationNotAvailable() {
+	public void LocationNotAvailable(){
 		CheckGpsStatus();
-		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.On_LocationNotAvailable();
-		}
+		//if (IsGPSInfoFormVisible()) {
+		//	mDetailsServiceClient.On_LocationNotAvailable();
+		//}
 	}
 
-	void StopDetailsServiceClient() {
-		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.On_StopLogging();
-			mDetailsServiceClient = null;
-		}
-	}
+	//void StopDetailsServiceClient() {
+	//	if (IsGPSInfoFormVisible()) {
+	//		mDetailsServiceClient.On_StopLogging();
+	//		mDetailsServiceClient = null;
+	//	}
+	//}
 
 
-
-	void SweetLocationChanged(Location loc,String comment) {
-//System.out.println("SweetLocationChanged "+loc);
-		if (loc.isFromMockProvider()) {
+	void SweetLocationChanged(Location loc, String comment){
+		//System.out.println("SweetLocationChanged ±" + loc.getAccuracy() + ": " + loc.getLatitude() + "/" + loc.getLongitude());
+		if(loc.isFromMockProvider()){
 			loc.setLatitude(1);
 			loc.setLongitude(1);
 		}
@@ -210,33 +210,33 @@ public class SWLifeGpsService extends Service {
 		//Session.setLatitude(loc.getLatitude());
 		//Session.setLongitude(loc.getLongitude());
 		//Session.setGPSTime(loc.getTime());
-		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.On_LocationUpdate(loc);
-		}
+		//if (IsGPSInfoFormVisible()) {
+		//	mDetailsServiceClient.On_LocationUpdate(loc);
+		//}
 		//if ((System.currentTimeMillis() - Session.getLocalTime()) < mPeriod) {
-		if ((System.currentTimeMillis() - lastSavedGPSms) < mPeriod) {
-			return;
-		}
-		if (Math.abs(System.currentTimeMillis() - loc.getTime()) > maxLocalGpsDiffMs) {
+		//if((System.currentTimeMillis() - lastSavedGPSms) < mPeriod){
+		//	return;
+		//}
+		if(Math.abs(System.currentTimeMillis() - loc.getTime()) > maxLocalGpsDiffMs){
 			return;
 		}
 		//Session.setLocalTime(System.currentTimeMillis());
 		//Session.setGPSTime(loc.getTime());
-		lastSavedGPSms = loc.getTime();
-		whenSavedGPSms = System.currentTimeMillis();
+		//lastSavedGPSms = loc.getTime();
+		//whenSavedGPSms = System.currentTimeMillis();
 		//Session.setCurrentLocationInfo(loc);
-		if (mLocationChangeClient != null) {
-			mLocationChangeClient.newLocationPoint(loc, comment);
+		if(mLocationChangeClient != null){
+			mLocationChangeClient.newLocationPoint(loc, "±" + loc.getAccuracy()+"м");
 		}
 	}
 
-	void SetSatelliteInfo(int count) {
-		if (IsGPSInfoFormVisible()) {
-			mDetailsServiceClient.On_SatelliteCount(count);
-		}
-	}
+	//void SetSatelliteInfo(int count) {
+	//	if (IsGPSInfoFormVisible()) {
+	//		mDetailsServiceClient.On_SatelliteCount(count);
+	//	}
+	//}
 
-	private boolean IsGPSInfoFormVisible() {
-		return mDetailsServiceClient != null;
-	}
+	//private boolean IsGPSInfoFormVisible() {
+	//	return mDetailsServiceClient != null;
+	//}
 }
