@@ -412,5 +412,11 @@
 			android:name="sweetlife.android10.supervisor.ActivityZayavkaVnutrenneePeremechenie"
 			android:label="..."
 			android:screenOrientation="userLandscape" />
+
+
+		<activity
+			android:name="sweetlife.android10.ui.UploadOrderResult"
+			android:label="..."
+			android:screenOrientation="userLandscape" />
 	</application>
 </manifest>

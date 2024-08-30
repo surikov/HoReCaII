@@ -152,7 +152,7 @@ public class ColumnText extends Column {
 	public Rake header(Context context) {
 		//Knob k = new Knob(context).labelText.is(title.property.value());
 		//linePaint.setColor((int) (Auxiliary.colorLine));
-		Decor header = new Decor(context) {
+		Decor titleDecor = new Decor(context) {
 			//
 			@Override
 			protected void onDraw(Canvas canvas) {
@@ -165,11 +165,12 @@ public class ColumnText extends Column {
 				), Auxiliary.paintLine);
 			}
 		};
-		header.setPadding(3, 0, 3, 2);
-		header.labelStyleSmallNormal();
-		header.labelAlignCenterBottom();
-		header.labelText.is(title.property.value());
-		return header;
+		titleDecor.setPadding(3, 0, 3, 2);
+		titleDecor.labelStyleSmallNormal();
+		titleDecor.labelAlignCenterBottom();
+		titleDecor.labelText.is(title.property);
+		//System.out.println("column title "+title.property.value());
+		return titleDecor;
 	}
 
 	@Override

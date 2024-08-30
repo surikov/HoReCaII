@@ -48,6 +48,7 @@ public class Activity_Route_2 extends Activity{
 	ColumnText columnSb;
 	ColumnText columnMenu;
 
+
 	WebRender popup;
 
 	Toggle hidePopUp = new Toggle().value(true);
@@ -58,12 +59,12 @@ public class Activity_Route_2 extends Activity{
 	//ColumnText columnNacnk;
 	int gridPageSize = 99;
 	Toggle hideGPSwarning = new Toggle();
-	Note textGPSwarning = new Note().value("Нет GPS координат!" );
+	Note textGPSwarning = new Note().value("Нет GPS координат!");
 	Bough gridData = new Bough();
 	public static Numeric gridOffset = new Numeric();//.value(100);
 	//public static int gridScroll = 0;
 	//Note limitSQL = new Note().value("\n	limit " + (gridPageSize * 3) + " offset ").append(gridOffset.asNote());
-	Note limitSQL = new Note().value("\n	limit " + gridPageSize + " offset " ).append(gridOffset.asNote());
+	Note limitSQL = new Note().value("\n	limit " + gridPageSize + " offset ").append(gridOffset.asNote());
 	//boolean canRequery = false;
 	//MenuItem menuVigrusit;
 	//MenuItem menuNezakrVizit;
@@ -102,11 +103,10 @@ public class Activity_Route_2 extends Activity{
 	MenuItem menuIskluchenieVizitov;
 
 
-
-	Note currentHRCName = new Note().value("[все]" );
+	Note currentHRCName = new Note().value("[все]");
 	Numeric zaDatu = new Numeric().value(0);
 	Numeric otgruzkaNaDatu = new Numeric();
-	Expect requery22222 = new Expect().status.is("Подождите..." ).task.is(new Task(){
+	Expect requery22222 = new Expect().status.is("Подождите...").task.is(new Task(){
 		@Override
 		public void doTask(){
 			//System.out.println("requery.doTask");
@@ -131,6 +131,7 @@ public class Activity_Route_2 extends Activity{
 		//reShowGrid();
 		//requery.start(this);
 		requery22222.start(this);
+		refreshGridDayTitles();
 	}
 
 	void setupOtguzka(){
@@ -138,7 +139,7 @@ public class Activity_Route_2 extends Activity{
 		today.setTime(NomenclatureBasedDocument.nextWorkingDate(today));
 		ApplicationHoreca.getInstance().setShippingDate(today);
 		Calendar c = ApplicationHoreca.getInstance().getShippingDate();
-		c.setTimeZone(TimeZone.getTimeZone("GMT+00:00" ));
+		c.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 		long t = c.getTime().getTime();
 		otgruzkaNaDatu.value((double)t);//((double) ApplicationHoreca.getInstance().getShippingDate().getTime().getTime()));
 	}
@@ -152,6 +153,7 @@ public class Activity_Route_2 extends Activity{
 
 		addUpperFields();
 		addRouteGrid();
+		refreshGridDayTitles();
 		addBottomButtons();
 		popup = new WebRender(this);
 		addPopUp();
@@ -196,7 +198,7 @@ public class Activity_Route_2 extends Activity{
 						showPrePopUpPage();
 					}
 				})
-				.labelText.is("←" )
+				.labelText.is("←")
 				.hidden().is(hidePopUp)
 				.left().is(0.5 * Auxiliary.tapSize)//
 				.top().is(layoutless.height().property.minus(2.5 * Auxiliary.tapSize))
@@ -207,7 +209,7 @@ public class Activity_Route_2 extends Activity{
 						showNextPopUpPage();
 					}
 				})
-				.labelText.is("→" )
+				.labelText.is("→")
 				.hidden().is(hidePopUp)
 				.left().is(layoutless.width().property.minus(1.5 * Auxiliary.tapSize))//
 				.top().is(layoutless.height().property.minus(2.5 * Auxiliary.tapSize))//
@@ -218,7 +220,7 @@ public class Activity_Route_2 extends Activity{
 						hidePopUp.value(true);
 					}
 				})
-				.labelText.is("✕" )
+				.labelText.is("✕")
 				.hidden().is(hidePopUp)
 				.left().is(layoutless.width().property.minus(1.5 * Auxiliary.tapSize))
 				.top().is(0.5 * Auxiliary.tapSize)//
@@ -266,7 +268,7 @@ public class Activity_Route_2 extends Activity{
 		}, true);
 		layoutless.child(new RedactToggle(this)//
 				.yes.is(tolkoZaDatu)//
-				.labelText.is("Только за" )//
+				.labelText.is("Только за")//
 				.left().is(0.5 * Auxiliary.tapSize)//
 				.top().is(0)//
 				.width().is(2 * Auxiliary.tapSize)//
@@ -274,14 +276,14 @@ public class Activity_Route_2 extends Activity{
 		);
 		layoutless.child(new RedactDate(this)//
 				.date.is(zaDatu)//
-				.format.is("dd.MM.yyyy" )//
+				.format.is("dd.MM.yyyy")//
 				.left().is(2.5 * Auxiliary.tapSize)//
 				.top().is(0)//
 				.width().is(2.5 * Auxiliary.tapSize)//
 				.height().is(Auxiliary.tapSize)//
 		);
 		layoutless.child(new Decor(this)//
-				.labelText.is("Дата отгрузки" )//
+				.labelText.is("Дата отгрузки")//
 				.labelAlignRightCenter()//
 				.left().is(4.7 * Auxiliary.tapSize)//
 				.top().is(0)//
@@ -290,7 +292,7 @@ public class Activity_Route_2 extends Activity{
 		);
 		layoutless.child(new RedactDate(this)//
 				.date.is(otgruzkaNaDatu)//
-				.format.is("dd.MM.yyyy" )//
+				.format.is("dd.MM.yyyy")//
 				.left().is(7 * Auxiliary.tapSize)//
 				.top().is(0)//
 				.width().is(2.5 * Auxiliary.tapSize)//
@@ -318,6 +320,36 @@ public class Activity_Route_2 extends Activity{
 		);
 	}
 
+	void refreshGridDayTitles(){
+		String filterAgent = "";
+		if(Cfg.isChangedHRC()){
+			filterAgent = " join Polzovateli pz on pz._idrref=m.agent and trim(pz.kod)='" + Cfg.selectedOrDbHRC() + "'";
+		}else{
+			//
+		}
+		String sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=1 group by OsnovnoyKlientTorgovoyTochki";
+		System.out.println("refreshGridDayTitles "+sql);
+		Bough data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
+		columnPn.title.is("Пн/"+data.children.size());
+		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=2 group by OsnovnoyKlientTorgovoyTochki";
+		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
+		columnVt.title.is("Вт/"+data.children.size());
+		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=3 group by OsnovnoyKlientTorgovoyTochki";
+		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
+		columnSr.title.is("Ср/"+data.children.size());
+		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=4 group by OsnovnoyKlientTorgovoyTochki";
+		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
+		columnCh.title.is("Чт/"+data.children.size());
+		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=5 group by OsnovnoyKlientTorgovoyTochki";
+		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
+		columnPt.title.is("Пт/"+data.children.size());
+		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=6 group by OsnovnoyKlientTorgovoyTochki";
+		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
+		columnSb.title.is("Сб/"+data.children.size());
+		//columnPn.header(this);
+		//columnPn.header(this)
+	}
+
 	void addRouteGrid(){
 		dataGrid = new DataGrid2(this).center.is(true)//
 				.headerHeight.is(1 * Auxiliary.tapSize)
@@ -342,21 +374,30 @@ public class Activity_Route_2 extends Activity{
 		layoutless.child(dataGrid//
 				.headerHeight.is(0.5 * Auxiliary.tapSize)//
 				.columns(new Column[]{//
-						columnKod.title.is("Код" ).width.is(1.5 * Auxiliary.tapSize)
-						, columnClient.title.is("Контрагент" ).width.is(Auxiliary.screenWidth(this) - 5.5 * Auxiliary.tapSize)
-						, columnPn.title.is("Пн" ).width.is(0.5 * Auxiliary.tapSize)
-						, columnVt.title.is("Вт" ).width.is(0.5 * Auxiliary.tapSize)
-						, columnSr.title.is("Ср" ).width.is(0.5 * Auxiliary.tapSize)
-						, columnCh.title.is("Чт" ).width.is(0.5 * Auxiliary.tapSize)
-						, columnPt.title.is("Пт" ).width.is(0.5 * Auxiliary.tapSize)
-						, columnSb.title.is("Сб" ).width.is(0.5 * Auxiliary.tapSize)
-						, columnMenu.title.is(" " ).width.is(1 * Auxiliary.tapSize)
+						columnKod.title.is("Код").width.is(1.5 * Auxiliary.tapSize)
+						, columnClient.title.is("Контрагент").width.is(Auxiliary.screenWidth(this) - 8.5 * Auxiliary.tapSize)
+						, columnPn.title.is("пн").width.is(1 * Auxiliary.tapSize)
+						, columnVt.title.is("вт").width.is(1 * Auxiliary.tapSize)
+						, columnSr.title.is("ср").width.is(1 * Auxiliary.tapSize)
+						, columnCh.title.is("чт").width.is(1 * Auxiliary.tapSize)
+						, columnPt.title.is("пт").width.is(1 * Auxiliary.tapSize)
+						, columnSb.title.is("ср").width.is(1 * Auxiliary.tapSize)
+						/*
+						, columnPn.title.is("Пн/"+cnt1 ).width.is(1 * Auxiliary.tapSize)
+						, columnVt.title.is("Вт/"+cnt2 ).width.is(1 * Auxiliary.tapSize)
+						, columnSr.title.is("Ср/"+cnt3 ).width.is(1 * Auxiliary.tapSize)
+						, columnCh.title.is("Чт/"+cnt4 ).width.is(1 * Auxiliary.tapSize)
+						, columnPt.title.is("Пт/"+cnt5 ).width.is(1 * Auxiliary.tapSize)
+						, columnSb.title.is("Сб/"+cnt6 ).width.is(1 * Auxiliary.tapSize)
+						*/
+						, columnMenu.title.is(" ").width.is(1 * Auxiliary.tapSize)
 				})//
 				.left().is(0)//
 				.top().is(1 * Auxiliary.tapSize)//
 				.width().is(layoutless.width().property)//
 				.height().is(layoutless.height().property.minus(2 * Auxiliary.tapSize))//
 		);
+
 	}
 
 	void addBottomButtons(){
@@ -380,7 +421,7 @@ public class Activity_Route_2 extends Activity{
 							public void doTask(){
 								if(vigruzitN.value() == 0){
 									final UploadTask task = new UploadTask(ApplicationHoreca.getInstance().getDataBase(), SystemHelper.getDiviceID(Activity_Route_2.this), getApplicationContext());
-									new Expect().status.is("Выгрузка визитов..." )//
+									new Expect().status.is("Выгрузка визитов...")//
 											.task.is(new Task(){
 										public void doTask(){
 											try{
@@ -418,7 +459,7 @@ public class Activity_Route_2 extends Activity{
 						}, null, null, null, null);
 					}
 				})//
-				.labelText.is("Выгрузить" )//
+				.labelText.is("Выгрузить")//
 				.left().is(0)//
 				.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 				.width().is(3 * Auxiliary.tapSize)//
@@ -451,7 +492,7 @@ public class Activity_Route_2 extends Activity{
 						}, null, null, null, null);
 					}
 				})//
-				.labelText.is("Документы" )//
+				.labelText.is("Документы")//
 				.left().is(3 * Auxiliary.tapSize)//
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 				.width().is(3 * Auxiliary.tapSize)//
@@ -465,7 +506,7 @@ public class Activity_Route_2 extends Activity{
 						startActivity(intent);
 					}
 				})//
-				.labelText.is("Отчёты" )//
+				.labelText.is("Отчёты")//
 				.left().is(6 * Auxiliary.tapSize)//
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 				.width().is(3 * Auxiliary.tapSize)//
@@ -480,7 +521,7 @@ public class Activity_Route_2 extends Activity{
 						startActivity(intent);
 					}
 				})//
-				.labelText.is("Статусы" )//
+				.labelText.is("Статусы")//
 				.left().is(9 * Auxiliary.tapSize)//
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 				.width().is(3 * Auxiliary.tapSize)//
@@ -495,7 +536,7 @@ public class Activity_Route_2 extends Activity{
 						startActivity(intent);
 					}
 				})//
-				.labelText.is("Статистика" )//
+				.labelText.is("Статистика")//
 				.left().is(12 * Auxiliary.tapSize)//
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 				.width().is(3 * Auxiliary.tapSize)//
@@ -515,7 +556,7 @@ public class Activity_Route_2 extends Activity{
 	}
 
 	void showNextPopUpPage(){
-		System.out.println("showNextPopUpPage" );
+		System.out.println("showNextPopUpPage");
 		//hidePopUp.value(true);
 		if(currentPopupIdx < popupList.children.size() - 1){
 			currentPopupIdx++;
@@ -526,7 +567,7 @@ public class Activity_Route_2 extends Activity{
 	}
 
 	void showPrePopUpPage(){
-		System.out.println("showPrePopUpPage" );
+		System.out.println("showPrePopUpPage");
 		//hidePopUp.value(true);
 		if(currentPopupIdx > 0){
 			currentPopupIdx--;
@@ -539,8 +580,8 @@ public class Activity_Route_2 extends Activity{
 		hidePopUp.value(false);
 		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 				+ "/hs/ObnovlenieInfo/КартинкаПриНачалеРаботы/"
-				+ popupList.children.get(currentPopupIdx).child("Номер" ).value.property.value()
-				+ "/" + popupList.children.get(currentPopupIdx).child("Дата" ).value.property.value();
+				+ popupList.children.get(currentPopupIdx).child("Номер").value.property.value()
+				+ "/" + popupList.children.get(currentPopupIdx).child("Дата").value.property.value();
 		popup.login.is(Cfg.whoCheckListOwner());
 		popup.password.is(Cfg.hrcPersonalPassword());
 		popup.go(url);
@@ -560,7 +601,7 @@ public class Activity_Route_2 extends Activity{
 			public void doTask(){
 				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					String txt = new String(b, "UTF-8" );
+					String txt = new String(b, "UTF-8");
 					//Bough rr = Bough.parseJSON(txt);
 					System.out.println("initPopUp " + txt);
 					//popupList.children = rr.children("Результат" );
@@ -573,21 +614,21 @@ public class Activity_Route_2 extends Activity{
 			@Override
 			public void doTask(){
 				Bough rr = Bough.parseJSON(popupdata.value());
-				popupList.children = rr.children("Результат" );
+				popupList.children = rr.children("Результат");
 				if(popupList.children.size() > 0){
 					if(needToShowPopUp(popupdata.value())){
 						showPopUpPage();
 					}
 				}
 			}
-		}).status.is("Подождите..." ).start(this);
+		}).status.is("Подождите...").start(this);
 	}
 
 	boolean needToShowPopUp(String data){
 		String now = Auxiliary.rusDate.format(new Date());
 		//String flag = now + data;
-		File culog = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/currentpopup.txt" );
-		File lastlog = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/lastpopup.txt" );
+		File culog = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/currentpopup.txt");
+		File lastlog = new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/lastpopup.txt");
 		Auxiliary.writeTextToFile(culog, now + data);
 		String curuse = Auxiliary.strings2text(Auxiliary.readTextFromFile(culog));
 		String lastuse = Auxiliary.strings2text(Auxiliary.readTextFromFile(lastlog));
@@ -604,32 +645,32 @@ public class Activity_Route_2 extends Activity{
 		//menuVigrusit = menu.add("Выгрузить");
 		//menuDocumenti = menu.add("Документы");
 		//menuGPSinformacia = menu.add("GPS информация" );
-		menuAnketi = menu.add("Анкеты заявок на новых клиентов" );
-		menuDannieMercury = menu.add("Данные Меркурий" );
-		menuZayavkaVnutrenneePeremechenie= menu.add("Заявка на внутреннее перемещение" );
-		menuZayavkaVozmehenie = menu.add("Заявки на возмещение" );
-		menuZayavkaNaPerevodVdosudebnye = menu.add("Заявка на вывод/перевод в СБ" );
-		menuDobavitKlientaVMarsgrut = menu.add("Заявки на добавление клиента в маршрут" );
-		menuPerebitNakladnuyu = menu.add("Заявки на изменение накладной" );
-		menuZayavkaNaPostavku = menu.add("Заявки на поставку" );
-		menuIskluchenieVizitov = menu.add("Исключение визитов" );
-		menuPoKassamDlyaTP = menu.add("Кассовые чеки" );
-		menuKontaktnayaInformacia = menu.add("Контактная информация" );
-		menuMatricaTP = menu.add("Матрицы ТП" );
-		menuVizitGroup = menu.add("Начать объединенный визит" );
-		menuMarshrutDogovora = menu.add("Обновить маршрут и договоры" );
-		menuOtchety = menu.add("Отчёты" );
-		menuPeredatIsprNakl = menu.add("Передать исправленную накладную" );
-		menuPlanObuchenia = menu.add("План обучения" );
+		menuAnketi = menu.add("Анкеты заявок на новых клиентов");
+		menuDannieMercury = menu.add("Данные Меркурий");
+		menuZayavkaVnutrenneePeremechenie = menu.add("Заявка на внутреннее перемещение");
+		menuZayavkaVozmehenie = menu.add("Заявки на возмещение");
+		menuZayavkaNaPerevodVdosudebnye = menu.add("Заявка на вывод/перевод в СБ");
+		menuDobavitKlientaVMarsgrut = menu.add("Заявки на добавление клиента в маршрут");
+		menuPerebitNakladnuyu = menu.add("Заявки на изменение накладной");
+		menuZayavkaNaPostavku = menu.add("Заявки на поставку");
+		menuIskluchenieVizitov = menu.add("Исключение визитов");
+		menuPoKassamDlyaTP = menu.add("Кассовые чеки");
+		menuKontaktnayaInformacia = menu.add("Контактная информация");
+		menuMatricaTP = menu.add("Матрицы ТП");
+		menuVizitGroup = menu.add("Начать объединенный визит");
+		menuMarshrutDogovora = menu.add("Обновить маршрут и договоры");
+		menuOtchety = menu.add("Отчёты");
+		menuPeredatIsprNakl = menu.add("Передать исправленную накладную");
+		menuPlanObuchenia = menu.add("План обучения");
 		//menuMap = menu.add("Положение на карте" );
-		menuDataCheck = menu.add("Проверка БД" );
-		menuRasporyazheniaNaOtgruzku = menu.add("Распоряжения на отгрузку" );
-		menuZapiski = menu.add("Служебные записки на договоры" );
-		menuChangeUser = menu.add("Сменить пользователя" );
-		menuFirebaseMesasages = menu.add("Сообщения" );
-		menuHelp = menu.add("Справочная документация" );
-		menuFinDocs = menu.add("Фин/Юр. документы" );
-		menuCheckDocs = menu.add("Чек-листы" );
+		menuDataCheck = menu.add("Проверка БД");
+		menuRasporyazheniaNaOtgruzku = menu.add("Распоряжения на отгрузку");
+		menuZapiski = menu.add("Служебные записки на договоры");
+		menuChangeUser = menu.add("Сменить пользователя");
+		menuFirebaseMesasages = menu.add("Сообщения");
+		menuHelp = menu.add("Справочная документация");
+		menuFinDocs = menu.add("Фин/Юр. документы");
+		menuCheckDocs = menu.add("Чек-листы");
 
 
 		//menuResetExchange = menu.add("Очистка БД");
@@ -644,11 +685,6 @@ public class Activity_Route_2 extends Activity{
 		// menuTONacenka = menu.add("Обновить показатели");
 
 
-
-
-
-
-
 		return true;
 	}
 
@@ -658,19 +694,19 @@ public class Activity_Route_2 extends Activity{
 		//System.out.println(url);
 		final Note n = new Note();
 		final Note statusText = new Note();
-		statusText.value("Обновление БД" );
-		n.value("Маршрут и договоры обновлены" );
+		statusText.value("Обновление БД");
+		n.value("Маршрут и договоры обновлены");
 		new Expect().task.is(new Task(){
 			@Override
 			public void doTask(){
 				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					System.out.println("DannyeMarshruta size: " + b.length);
-					String s = new String(b, "utf-8" );
-					String[] commands = s.split("\n" );
+					String s = new String(b, "utf-8");
+					String[] commands = s.split("\n");
 					System.out.println("commands.length: " + commands.length);
 					if(commands.length > 3){
-						ApplicationHoreca.getInstance().getDataBase().execSQL("delete from MarshrutyAgentov;" );
+						ApplicationHoreca.getInstance().getDataBase().execSQL("delete from MarshrutyAgentov;");
 						for(int i = 0; i < commands.length; i++){
 							String sql = commands[i].trim();
 							if(sql.length() > 1){
@@ -678,16 +714,16 @@ public class Activity_Route_2 extends Activity{
 								ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 								if(i % 300 == 0){
 									System.out.println("sql: " + i + ": " + sql);
-									statusText.value("Обновление " + (Math.round(100 * i / commands.length)) + "%" );
+									statusText.value("Обновление " + (Math.round(100 * i / commands.length)) + "%");
 								}
 							}
 						}
-						System.out.println("refreshDogovoryKontragentov_strip" );
+						System.out.println("refreshDogovoryKontragentov_strip");
 						UpdateTask.refreshDogovoryKontragentov_strip(ApplicationHoreca.getInstance().getDataBase());
 						UpdateTempTables.UpdateMarshrutyAgentovContracts(ApplicationHoreca.getInstance().getDataBase());
 					}else{
-						n.value("Нет доступа к данным. Проверьте интернет и повторите запрос." );
-						System.out.println("Empty list" );
+						n.value("Нет доступа к данным. Проверьте интернет и повторите запрос.");
+						System.out.println("Empty list");
 					}
 				}catch(Exception e){
 					e.printStackTrace();
@@ -698,8 +734,9 @@ public class Activity_Route_2 extends Activity{
 		}).afterDone.is(new Task(){
 			@Override
 			public void doTask(){
-				System.out.println("DannyeMarshruta done" );
+				System.out.println("DannyeMarshruta done");
 				resetGrid();
+
 				Auxiliary.warn("" + //
 						n.value(), Activity_Route_2.this);
 			}
@@ -709,7 +746,7 @@ public class Activity_Route_2 extends Activity{
 	void dataCheck(){
 		//System.out.println("integrity...");
 		final Note n = new Note();
-		n.value("Ошибка проверки БД" );
+		n.value("Ошибка проверки БД");
 		new Expect().task.is(new Task(){
 			@Override
 			public void doTask(){
@@ -739,7 +776,7 @@ public class Activity_Route_2 extends Activity{
 							;
 					Bough t = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 					for(int i = 0; i < t.children.size(); i++){
-						s = s + "\n" + t.children.get(i).child("tag" ).value.property.value() + ": " + t.children.get(i).child("nn" ).value.property.value();
+						s = s + "\n" + t.children.get(i).child("tag").value.property.value() + ": " + t.children.get(i).child("nn").value.property.value();
 					}
 				}
 				n.value(dbCheck + s);
@@ -750,7 +787,7 @@ public class Activity_Route_2 extends Activity{
 				Auxiliary.warn("Файл базы данных: " + //
 						n.value(), Activity_Route_2.this);
 			}
-		}).status.is("Проверка БД" ).start(this);
+		}).status.is("Проверка БД").start(this);
 	}
 
 	void mDBexecSQL(String sql){
@@ -763,8 +800,8 @@ public class Activity_Route_2 extends Activity{
 	}
 
 	void startResetExchange(){
-		final Note error = new Note().value("Перезайдите в приложение (обновление будет закачано заново)." );
-		new Expect().status.is("Подождите..." )//
+		final Note error = new Note().value("Перезайдите в приложение (обновление будет закачано заново).");
+		new Expect().status.is("Подождите...")//
 				.task.is(new Task(){
 			@Override
 			public void doTask(){
@@ -887,7 +924,7 @@ public class Activity_Route_2 extends Activity{
 					mDBexecSQL(sql);
 					//
 					//
-					File files = new File("/sdcard/horeca/reserve/delta/" );
+					File files = new File("/sdcard/horeca/reserve/delta/");
 					for(File file: files.listFiles()){
 						boolean b = file.delete();
 						//System.out.println(file.getAbsolutePath() + " deleted: " + b);
@@ -925,8 +962,8 @@ public class Activity_Route_2 extends Activity{
 
 	void doVizitGroup(){
 		//System.out.println("doVizitGroup");
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd" );
-		format.setTimeZone(TimeZone.getTimeZone("GMT+00:00" ));
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		format.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
 		String d = format.format(new java.util.Date());
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(zaDatu.value().longValue());
@@ -1059,25 +1096,25 @@ public class Activity_Route_2 extends Activity{
 
 	void replaceHRC(String newHRC){
 		ApplicationHoreca.getInstance().getCurrentAgent().setAgentName(newHRC);
-		ApplicationHoreca.getInstance().getDataBase().execSQL("update android set kod='" + newHRC + "' where trim(kod)!='12-';" );
-		ApplicationHoreca.getInstance().getDataBase().execSQL("update cur_users set name='" + newHRC + "' where type=2;" );
-		Bough rez = new Bough().name.is("config" );
-		rez.child("userKey" ).value.is(newHRC.trim());
-		rez.child("updateKey" ).value.is(newHRC.trim());
-		Auxiliary.writeTextToFile(new File("/sdcard/horeca/Horeca2.xml" ), "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + rez.dumpXML());
+		ApplicationHoreca.getInstance().getDataBase().execSQL("update android set kod='" + newHRC + "' where trim(kod)!='12-';");
+		ApplicationHoreca.getInstance().getDataBase().execSQL("update cur_users set name='" + newHRC + "' where type=2;");
+		Bough rez = new Bough().name.is("config");
+		rez.child("userKey").value.is(newHRC.trim());
+		rez.child("updateKey").value.is(newHRC.trim());
+		Auxiliary.writeTextToFile(new File("/sdcard/horeca/Horeca2.xml"), "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + rez.dumpXML());
 	}
 
 	void promptSelectUser(){
-		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/HorecaU.xml" )));
+		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(android.os.Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/HorecaU.xml")));
 		Bough configuration = Bough.parseXML(xml);
 		if(configuration != null){
-			Vector<Bough> list = configuration.children("user" );
+			Vector<Bough> list = configuration.children("user");
 			if(list.size() > 0){
 				final String[] hrcs = new String[list.size()];
 				final String[] labels = new String[list.size()];
 				for(int i = 0; i < hrcs.length; i++){
-					hrcs[i] = list.get(i).child("hrc" ).value.property.value();
-					labels[i] = hrcs[i] + " (" + list.get(i).child("label" ).value.property.value() + ")";
+					hrcs[i] = list.get(i).child("hrc").value.property.value();
+					labels[i] = hrcs[i] + " (" + list.get(i).child("label").value.property.value() + ")";
 				}
 				final Numeric sel = new Numeric();
 				Auxiliary.pickSingleChoice(this, labels, sel, null, new Task(){
@@ -1315,13 +1352,13 @@ public class Activity_Route_2 extends Activity{
 		RedactSingleChoice terr = new RedactSingleChoice(this);
 		terr.selection.is(territory);
 		for(int i = 0; i < Cfg.territory().children.size(); i++){
-			String s = Cfg.territory().children.get(i).child("territory" ).value.property.value()//
-					+ " (" + Cfg.territory().children.get(i).child("hrc" ).value.property.value().trim() + ")";
+			String s = Cfg.territory().children.get(i).child("territory").value.property.value()//
+					+ " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
 			terr.item(s);
 		}
 
 		Auxiliary.pick(this, "", new SubLayoutless(this)//
-						.child(new Decor(this).labelText.is("Исключение визитов" ).labelAlignLeftTop()//.background.is(0xff00ffff)
+						.child(new Decor(this).labelText.is("Исключение визитов").labelAlignLeftTop()//.background.is(0xff00ffff)
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(0.3 * Auxiliary.tapSize)
 								.width().is(Auxiliary.tapSize * 15 - Auxiliary.tapSize)
@@ -1331,27 +1368,27 @@ public class Activity_Route_2 extends Activity{
 								.top().is(Auxiliary.tapSize * 1.0)
 								.width().is(Auxiliary.tapSize * 15 - Auxiliary.tapSize)
 								.height().is(Auxiliary.tapSize * 0.7))//
-						.child(new RedactDate(this).date.is(dateFrom).format.is("dd.MM.yyyy" )
+						.child(new RedactDate(this).date.is(dateFrom).format.is("dd.MM.yyyy")
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 2.0)
 								.width().is(Auxiliary.tapSize * 6.5)
 								.height().is(Auxiliary.tapSize * 0.7))//
-						.child(new Decor(this).labelText.is("до" ).labelAlignCenterCenter()
+						.child(new Decor(this).labelText.is("до").labelAlignCenterCenter()
 								.left().is(Auxiliary.tapSize * 7)
 								.top().is(2 * Auxiliary.tapSize)
 								.width().is(Auxiliary.tapSize * 1)
 								.height().is(Auxiliary.tapSize * 0.7))//
-						.child(new RedactDate(this).date.is(dateTo).format.is("dd.MM.yyyy" )
+						.child(new RedactDate(this).date.is(dateTo).format.is("dd.MM.yyyy")
 								.left().is(Auxiliary.tapSize * 8.0)
 								.top().is(Auxiliary.tapSize * 2.0)
 								.width().is(Auxiliary.tapSize * 6.5)
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(new RedactSingleChoice(this).selection.is(num)
-								.item("Больничный" )
-								.item("Вакансии" )
+								.item("Больничный")
+								.item("Вакансии")
 								//.item("Отпуск" )
-								.item("Административный" )
-								.item("Не работает нетбук" )
+								.item("Административный")
+								.item("Не работает нетбук")
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 3.0)
 								.width().is(Auxiliary.tapSize * 15 - Auxiliary.tapSize)
@@ -1361,7 +1398,7 @@ public class Activity_Route_2 extends Activity{
 				, "Добавить", new Task(){
 					@Override
 					public void doTask(){
-						sendIskluchenieVizitov(false, dateFrom.value().longValue(), dateTo.value().longValue(), "" +  num.value().intValue(), territory.value().intValue());
+						sendIskluchenieVizitov(false, dateFrom.value().longValue(), dateTo.value().longValue(), "" + num.value().intValue(), territory.value().intValue());
 					}
 				}, "Удалить", new Task(){
 					@Override
@@ -1377,25 +1414,29 @@ public class Activity_Route_2 extends Activity{
 		new Expect().task.is(new Task(){
 			@Override
 			public void doTask(){
-				String num=num2;
-				if(num2.equals("0"))num="1";
-				if(num2.equals("1"))num="2";
-				if(num2.equals("2"))num="4";
-				if(num2.equals("3"))num="5";
+				String num = num2;
+				if(num2.equals("0"))
+					num = "1";
+				if(num2.equals("1"))
+					num = "2";
+				if(num2.equals("2"))
+					num = "4";
+				if(num2.equals("3"))
+					num = "5";
 				String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
 						+ "/hs/Employees/AdminOtpusk"
-						+ "/" + Cfg.territory().children.get(hrcNN).child("hrc" ).value.property.value().trim()
+						+ "/" + Cfg.territory().children.get(hrcNN).child("hrc").value.property.value().trim()
 						+ "/" + num
 						+ "/" + Auxiliary.short1cDate.format(new Date(from))
 						+ "/" + Auxiliary.short1cDate.format(new Date(to))
-						+ "/" + (udalit ? "Истина" : "Ложь" );
+						+ "/" + (udalit ? "Истина" : "Ложь");
 				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url
 							//,"bot28","Molgav1024"
 							, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword()
-							,"UTF-8"
+							, "UTF-8"
 					);
-					String txt = new String(b, "UTF-8" );
+					String txt = new String(b, "UTF-8");
 					result.value(txt);
 					System.out.println(txt);
 					//Bough rr = Bough.parseJSON(txt);
@@ -1411,7 +1452,7 @@ public class Activity_Route_2 extends Activity{
 			public void doTask(){
 				Auxiliary.warn(result.value(), Activity_Route_2.this);
 			}
-		}).status.is("Подождите..." ).start(this);
+		}).status.is("Подождите...").start(this);
 	}
 
 	void promptZayavkaNaPerevodVdosudebnye(){
@@ -1423,8 +1464,8 @@ public class Activity_Route_2 extends Activity{
 		final Vector<String> kods = new Vector<String>();
 		for(int i = 0; i < bough.children.size(); i++){
 			Bough row = bough.children.get(i);
-			names.add(bough.children.get(i).child("kod" ).value.property.value() + ": " + bough.children.get(i).child("naimenovanie" ).value.property.value());
-			kods.add(bough.children.get(i).child("kod" ).value.property.value());
+			names.add(bough.children.get(i).child("kod").value.property.value() + ": " + bough.children.get(i).child("naimenovanie").value.property.value());
+			kods.add(bough.children.get(i).child("kod").value.property.value());
 		}
 		final Numeric sel = new Numeric();
 		Auxiliary.pickFilteredChoice(this, names.toArray(new String[0]), sel//
@@ -1458,9 +1499,9 @@ public class Activity_Route_2 extends Activity{
 				//url="https://testservice.swlife.ru/okunev_hrc/hs/Planshet/CreateClientTransferRequest/277793";
 				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-					Bough rr = Bough.parseJSON(new String(b, "UTF-8" ));
+					Bough rr = Bough.parseJSON(new String(b, "UTF-8"));
 					//result.value(new String(b, "UTF-8"));
-					result.value(rr.child("Message" ).value.property.value());
+					result.value(rr.child("Message").value.property.value());
 				}catch(Throwable t){
 					t.printStackTrace();
 					result.value(t.getMessage());
@@ -1471,7 +1512,7 @@ public class Activity_Route_2 extends Activity{
 			public void doTask(){
 				Auxiliary.warn(result.value(), Activity_Route_2.this);
 			}
-		}).status.is("Подождите..." ).start(this);
+		}).status.is("Подождите...").start(this);
 	}
 
 	void doKontaktnayaInformacia(){
@@ -1486,10 +1527,10 @@ public class Activity_Route_2 extends Activity{
 					byte[] output = Auxiliary.loadFileFromPrivateURL(toURL, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					//byte[] output = Auxiliary.loadFileFromPrivateURL(toURL, "bot28", "28bot");
 					String s = new String(output);
-					result.child("result" ).children = Bough.parseJSON(s).children;
+					result.child("result").children = Bough.parseJSON(s).children;
 				}catch(Throwable t){
 					t.printStackTrace();
-					result.child("error" ).value.is(t.getMessage());
+					result.child("error").value.is(t.getMessage());
 				}
 			}
 		}).afterDone.is(new Task(){
@@ -1497,7 +1538,7 @@ public class Activity_Route_2 extends Activity{
 			public void doTask(){
 				promptKontaktnayaInformacia(result);
 			}
-		}).status.is("Подождите..." ).start(Activity_Route_2.this);
+		}).status.is("Подождите...").start(Activity_Route_2.this);
 	}
 
 	void updateKontaktnayaInformacia(final String fio, final String tel, final String email){
@@ -1512,10 +1553,10 @@ public class Activity_Route_2 extends Activity{
 					System.out.println(text);
 					Bough tt = Auxiliary.loadTextFromPrivatePOST(toURL, text, 30 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					//Bough tt=Auxiliary.loadTextFromPrivatePOST(toURL, text, 30*1000, "UTF-8", "bot28", "28bot");
-					result.child("result" ).children = tt.children;
+					result.child("result").children = tt.children;
 				}catch(Throwable t){
 					t.printStackTrace();
-					result.child("error2" ).value.is(t.getMessage());
+					result.child("error2").value.is(t.getMessage());
 				}
 			}
 		}).afterDone.is(new Task(){
@@ -1523,11 +1564,11 @@ public class Activity_Route_2 extends Activity{
 			public void doTask(){
 				System.out.println(result.dumpXML());
 				Auxiliary.warn("Отправлено "
-								+ " \n" + result.child("result" ).child("message" ).value.property.value()
-								+ " \n" + result.child("result" ).child("raw" ).value.property.value()
+								+ " \n" + result.child("result").child("message").value.property.value()
+								+ " \n" + result.child("result").child("raw").value.property.value()
 						, Activity_Route_2.this);
 			}
-		}).status.is("Подождите..." ).start(Activity_Route_2.this);
+		}).status.is("Подождите...").start(Activity_Route_2.this);
 	}
 
 	void promptKontaktnayaInformacia(final Bough result){
@@ -1541,7 +1582,7 @@ I/System.out: 		<Mail>cherkasova@swlife.nnov.ru</Mail>
 I/System.out: 	</result>
 I/System.out: </>
 		*/
-		Auxiliary.pick(this, Cfg.whoCheckListOwner() + " " + result.child("error" ).value.property.value(), new SubLayoutless(this)//
+		Auxiliary.pick(this, Cfg.whoCheckListOwner() + " " + result.child("error").value.property.value(), new SubLayoutless(this)//
 						/*
 												.child(new Decor(this).labelText.is("ФИО").labelAlignRightBottom()
 														.left().is(Auxiliary.tapSize * 0).top().is(Auxiliary.tapSize * 0.5)
@@ -1550,28 +1591,28 @@ I/System.out: </>
 														.left().is(Auxiliary.tapSize * 2.5).top().is(Auxiliary.tapSize * 0.5)
 														.width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.7))//
 						*/
-						.child(new Decor(this).labelText.is("e-mail" ).labelAlignRightBottom()
+						.child(new Decor(this).labelText.is("e-mail").labelAlignRightBottom()
 								.left().is(Auxiliary.tapSize * 0).top().is(Auxiliary.tapSize * 0.5)
 								.width().is(Auxiliary.tapSize * 2.0).height().is(Auxiliary.tapSize * 0.7))//
-						.child(new Decor(this).labelText.is(result.child("result" ).child("Mail" ).value.property).labelAlignLeftBottom()
+						.child(new Decor(this).labelText.is(result.child("result").child("Mail").value.property).labelAlignLeftBottom()
 								.left().is(Auxiliary.tapSize * 2.5).top().is(Auxiliary.tapSize * 0.5)
 								.width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.7))//
 
 
-						.child(new Decor(this).labelText.is("ФИО" ).labelAlignRightBottom()
+						.child(new Decor(this).labelText.is("ФИО").labelAlignRightBottom()
 								.left().is(Auxiliary.tapSize * 0).top().is(Auxiliary.tapSize * 1.5)
 								.width().is(Auxiliary.tapSize * 2.0).height().is(Auxiliary.tapSize * 0.7))//
 						.child(new RedactText(this)
-								.text.is(result.child("result" ).child("FIO" ).value.property)
+								.text.is(result.child("result").child("FIO").value.property)
 								.left().is(Auxiliary.tapSize * 2.5).top().is(Auxiliary.tapSize * 1.5)
 								.width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.7))//
 
 
-						.child(new Decor(this).labelText.is("тел." ).labelAlignRightBottom()
+						.child(new Decor(this).labelText.is("тел.").labelAlignRightBottom()
 								.left().is(Auxiliary.tapSize * 0).top().is(Auxiliary.tapSize * 2.5)
 								.width().is(Auxiliary.tapSize * 2.0).height().is(Auxiliary.tapSize * 0.7))//
 						.child(new RedactText(this)
-								.text.is(result.child("result" ).child("Phone" ).value.property)
+								.text.is(result.child("result").child("Phone").value.property)
 								.left().is(Auxiliary.tapSize * 2.5).top().is(Auxiliary.tapSize * 2.5)
 								.width().is(Auxiliary.tapSize * 6).height().is(Auxiliary.tapSize * 0.7))//
 
@@ -1581,14 +1622,14 @@ I/System.out: </>
 					@Override
 					public void doTask(){
 						//System.out.println(result.dumpXML());
-						String Phone = result.child("result" ).child("Phone" ).value.property.value().trim();
-						String FIO = result.child("result" ).child("FIO" ).value.property.value();
+						String Phone = result.child("result").child("Phone").value.property.value().trim();
+						String FIO = result.child("result").child("FIO").value.property.value();
 						if(Phone.length() != 11){
 							Auxiliary.warn("Тел. номер должен быть 11 символов", Activity_Route_2.this);
 						}else{
 							updateKontaktnayaInformacia(FIO
 									, Phone
-									, result.child("result" ).child("Mail" ).value.property.value()
+									, result.child("result").child("Mail").value.property.value()
 							);
 						}
 					}
@@ -1602,7 +1643,7 @@ I/System.out: </>
 		Auxiliary.pick(this, "Номер и дата накладной", new SubLayoutless(this)//
 						.child(new RedactText(this).text.is(nomerNakladnoy)
 								.left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.7))//
-						.child(new RedactDate(this).date.is(dataNakladnoy).format.is("dd.MM.yyyy" )
+						.child(new RedactDate(this).date.is(dataNakladnoy).format.is("dd.MM.yyyy")
 								.left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 1.5).width().is(Auxiliary.tapSize * 7).height().is(Auxiliary.tapSize * 0.7))//
 						.width().is(Auxiliary.tapSize * 9)//
 						.height().is(Auxiliary.tapSize * 6)//
@@ -1639,7 +1680,7 @@ I/System.out: </>
 							public void doTask(){
 								Auxiliary.warn(res.value(), Activity_Route_2.this);
 							}
-						}).status.is("Подождите..." ).start(Activity_Route_2.this);
+						}).status.is("Подождите...").start(Activity_Route_2.this);
 					}
 				}, null, null, null, null);
 
@@ -1767,7 +1808,7 @@ I/System.out: </>
 
 	String formatDayToggle(String val){
 		String r = "?";
-		if(val.trim().equals("1" )){
+		if(val.trim().equals("1")){
 			r = "✔";
 		}else{
 			r = "";
@@ -1783,28 +1824,28 @@ I/System.out: </>
 
 		for(int i = 0; i < gridData.children.size(); i++){
 			Bough row = gridData.children.get(i);
-			final String kk = row.child("Kontragent" ).value.property.value();
+			final String kk = row.child("Kontragent").value.property.value();
 			Task tapTask = new Task(){
 				public void doTask(){
 					Intent intent = new Intent();
 					intent.setClass(Activity_Route_2.this, Activity_BidsContractsEtc_2.class);
-					intent.putExtra(sweetlife.android10.consts.IExtras.CLIENT_ID, "x'" + kk + "'" );
+					intent.putExtra(sweetlife.android10.consts.IExtras.CLIENT_ID, "x'" + kk + "'");
 					intent.putExtra(sweetlife.android10.consts.IExtras.CHOOSED_DAY, new java.util.Date().getTime());
 					startActivityForResult(intent, 0);
 				}
 			};
-			double KolichestvoOtkrytykhDogovorov = Numeric.string2double(row.child("KolichestvoOtkrytykhDogovorov" ).value.property.value());
-			double KolichestvoDogovorov = Numeric.string2double(row.child("KolichestvoDogovorov" ).value.property.value());
+			double KolichestvoOtkrytykhDogovorov = Numeric.string2double(row.child("KolichestvoOtkrytykhDogovorov").value.property.value());
+			double KolichestvoDogovorov = Numeric.string2double(row.child("KolichestvoDogovorov").value.property.value());
 			int clientBG = 0xffffffff;
 			int kodBG = clientBG;
 			String dogovor = "Все договора открыты";
-			String name = row.child("Naimenovanie" ).value.property.value();
+			String name = row.child("Naimenovanie").value.property.value();
 			int dayColor = 0xffff0000;
 			//String lastVizitDate = row.child("lastVizitDate").value.property.value();
-			String lastVizitTime = row.child("lastVizitTime" ).value.property.value();
-			String vizitActivity = row.child("lastVizitStatus" ).value.property.value();
-			String lastVizitEnd = row.child("lastVizitEnd" ).value.property.value();
-			String shirota = row.child("shirota" ).value.property.value();
+			String lastVizitTime = row.child("lastVizitTime").value.property.value();
+			String vizitActivity = row.child("lastVizitStatus").value.property.value();
+			String lastVizitEnd = row.child("lastVizitEnd").value.property.value();
+			String shirota = row.child("shirota").value.property.value();
 			String vizitInfo = "";
 			int bg1 = clientBG;
 			int bg2 = clientBG;
@@ -1813,7 +1854,7 @@ I/System.out: </>
 			int bg5 = clientBG;
 			int bg6 = clientBG;
 			String description = "";
-			if(name.startsWith("(не в маршруте)" )){
+			if(name.startsWith("(не в маршруте)")){
 				clientBG = 0x11000000;
 				kodBG = clientBG;
 				dogovor = "";
@@ -1844,7 +1885,7 @@ I/System.out: </>
 				String endDate = "";
 
 				if(lastVizitTime.length() > 5){
-					endDate = Auxiliary.tryReFormatDate(lastVizitEnd, "yyyy-MM-dd", "dd.MM.yy" );
+					endDate = Auxiliary.tryReFormatDate(lastVizitEnd, "yyyy-MM-dd", "dd.MM.yy");
 				}
 				/*
 				String startTime = "";
@@ -1855,7 +1896,7 @@ I/System.out: </>
 				if (lastVizitDate.length() > 1) {
 					startDate = Auxiliary.tryReFormatDate(lastVizitDate, "yyyy-MM-dd", "dd.MM.yy");
 				}*/
-				String todayDate = Auxiliary.tryReFormatDate(Auxiliary.sqliteDate.format(new Date()), "yyyy-MM-dd", "dd.MM.yy" );
+				String todayDate = Auxiliary.tryReFormatDate(Auxiliary.sqliteDate.format(new Date()), "yyyy-MM-dd", "dd.MM.yy");
 				//if (lastVizitDate.length() < 3) {
 				//if (lastVizitDate.length() < 3) {
 				if(lastVizitTime.length() < 5){
@@ -1882,37 +1923,37 @@ I/System.out: </>
 				description = dogovor + ", " + vizitInfo;
 				int dayWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 				if(dayWeek == 2){
-					if(row.child("Den1" ).value.property.value().trim().equals("1" )){
+					if(row.child("Den1").value.property.value().trim().equals("1")){
 						bg1 = dayColor;
 						kodBG = dayColor;
 					}
 				}
 				if(dayWeek == 3){
-					if(row.child("Den2" ).value.property.value().trim().equals("1" )){
+					if(row.child("Den2").value.property.value().trim().equals("1")){
 						bg2 = dayColor;
 						kodBG = dayColor;
 					}
 				}
 				if(dayWeek == 4){
-					if(row.child("Den3" ).value.property.value().trim().equals("1" )){
+					if(row.child("Den3").value.property.value().trim().equals("1")){
 						bg3 = dayColor;
 						kodBG = dayColor;
 					}
 				}
 				if(dayWeek == 5){
-					if(row.child("Den4" ).value.property.value().trim().equals("1" )){
+					if(row.child("Den4").value.property.value().trim().equals("1")){
 						bg4 = dayColor;
 						kodBG = dayColor;
 					}
 				}
 				if(dayWeek == 6){
-					if(row.child("Den5" ).value.property.value().trim().equals("1" )){
+					if(row.child("Den5").value.property.value().trim().equals("1")){
 						bg5 = dayColor;
 						kodBG = dayColor;
 					}
 				}
 				if(dayWeek == 0){
-					if(row.child("Den6" ).value.property.value().trim().equals("1" )){
+					if(row.child("Den6").value.property.value().trim().equals("1")){
 						bg6 = dayColor;
 						kodBG = dayColor;
 					}
@@ -1922,20 +1963,20 @@ I/System.out: </>
 					description = "Координаты не зафиксированны! " + description;
 				}
 			}
-			columnKod.cell(row.child("Kod" ).value.property.value(), kodBG, tapTask);
+			columnKod.cell(row.child("Kod").value.property.value(), kodBG, tapTask);
 			columnClient.cell(name, clientBG, tapTask, description);
-			columnPn.cell(formatDayToggle(row.child("Den1" ).value.property.value()), bg1, tapTask);
-			columnVt.cell(formatDayToggle(row.child("Den2" ).value.property.value()), bg2, tapTask);
-			columnSr.cell(formatDayToggle(row.child("Den3" ).value.property.value()), bg3, tapTask);
-			columnCh.cell(formatDayToggle(row.child("Den4" ).value.property.value()), bg4, tapTask);
-			columnPt.cell(formatDayToggle(row.child("Den5" ).value.property.value()), bg5, tapTask);
-			columnSb.cell(formatDayToggle(row.child("Den6" ).value.property.value()), bg6, tapTask);
+			columnPn.cell(formatDayToggle(row.child("Den1").value.property.value()), bg1, tapTask);
+			columnVt.cell(formatDayToggle(row.child("Den2").value.property.value()), bg2, tapTask);
+			columnSr.cell(formatDayToggle(row.child("Den3").value.property.value()), bg3, tapTask);
+			columnCh.cell(formatDayToggle(row.child("Den4").value.property.value()), bg4, tapTask);
+			columnPt.cell(formatDayToggle(row.child("Den5").value.property.value()), bg5, tapTask);
+			columnSb.cell(formatDayToggle(row.child("Den6").value.property.value()), bg6, tapTask);
 			columnMenu.cell("...", new Task(){
 				public void doTask(){
 
 					Auxiliary.pickConfirm(Activity_Route_2.this, "Распоряжение на отгрузку", "Создать", new Task(){
 						public void doTask(){
-							pickRaspOt("x'" + kk + "'" );
+							pickRaspOt("x'" + kk + "'");
 						}
 					});
 				}
@@ -2032,7 +2073,7 @@ I/System.out: </>
 				+ limitSQL.value()//
 				+ "  		) a" + sortDay//
 				;
-		System.out.println("gridSQL "+req);
+		System.out.println("gridSQL " + req);
 		return req;
 	}
 /*
@@ -2139,6 +2180,7 @@ I/System.out: </>
 		//System.out.println("after flip gridOffset "+this.gridOffset.value());
 		//this.gridOffset.value(lastGridOffset+60);
 		//System.out.println("before refresh gridOffset "+this.gridOffset.value()+"/"+this.dataGrid.currentPage);
+		//refreshGridDayTitles();
 		dataGrid.refresh();
 		//System.out.println("after refresh gridOffset "+this.gridOffset.value()+"/"+this.dataGrid.currentPage);
 		//dataGrid.currentPage=0;
@@ -2224,7 +2266,7 @@ I/System.out: </>
 		final String tpFIO = Cfg.polzovatelFIO(Cfg.whoCheckListOwner());
 		final UploadTask task = new UploadTask(ApplicationHoreca.getInstance().getDataBase(), SystemHelper.getDiviceID(Activity_Route_2.this), getApplicationContext());
 		System.out.println("tryGPS " + tpCode + ": " + tpFIO);
-		new Expect().status.is("Выгрузка координат (" + tpFIO + ")..." ).task.is(new Task(){
+		new Expect().status.is("Выгрузка координат (" + tpFIO + ")...").task.is(new Task(){
 			public void doTask(){
 				try{
 					task.UploadGPSPoints(tpCode);
@@ -2247,7 +2289,7 @@ I/System.out: </>
 	@Override
 	protected void onResume(){
 		super.onResume();
-		System.out.println("route resume start" );
+		System.out.println("route resume start");
 		/*
 		if (gridScroll > 0) {
 			int backOffset = gridOffset.value().intValue() + gridScroll;// -gridPageSize*1;
@@ -2296,7 +2338,7 @@ I/System.out: </>
 		}else{
 			//System.out.println("skip upload GPS");
 		}
-		System.out.println("route resume done" );
+		System.out.println("route resume done");
 	}
 
 	@Override
@@ -2342,8 +2384,8 @@ I/System.out: </>
 		ters[0] = "[все]";
 		final Numeric nn = new Numeric().value(0);
 		for(int i = 0; i < Cfg.territory().children.size(); i++){
-			String s = Cfg.territory().children.get(i).child("territory" ).value.property.value()//
-					+ " (" + Cfg.territory().children.get(i).child("hrc" ).value.property.value().trim() + ")";
+			String s = Cfg.territory().children.get(i).child("territory").value.property.value()//
+					+ " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
 			ters[i + 1] = s;
 		}
 		System.out.println(Cfg.territory().dumpXML());
@@ -2353,15 +2395,15 @@ I/System.out: </>
 				String newName = ters[0];
 				//ApplicationHoreca.getInstance().currentHRCmarshrut = "";
 				if(nn.value() > 0){
-					newName = Cfg.territory().children.get(nn.value().intValue() - 1).child("hrc" ).value.property.value().trim();
+					newName = Cfg.territory().children.get(nn.value().intValue() - 1).child("hrc").value.property.value().trim();
 					//ApplicationHoreca.getInstance().currentHRCmarshrut = newName;
 					//ApplicationHoreca.getInstance().currentIDmarshrut = Cfg.territory().children.get(nn.value().intValue() - 1).child("polzovatelID").value.property.value().trim();
 					//ApplicationHoreca.getInstance().currentKodPodrazdelenia = Cfg.territory().children.get(nn.value().intValue() - 1).child("kod").value.property.value().trim();
 					//Cfg.setKodPodrazdelenia(Cfg.territory().children.get(nn.value().intValue() - 1).child("kod").value.property.value().trim());
 					Cfg.resetHRCmarshrut(
 							newName
-							, Cfg.territory().children.get(nn.value().intValue() - 1).child("polzovatelID" ).value.property.value().trim()
-							, Cfg.territory().children.get(nn.value().intValue() - 1).child("kod" ).value.property.value().trim()
+							, Cfg.territory().children.get(nn.value().intValue() - 1).child("polzovatelID").value.property.value().trim()
+							, Cfg.territory().children.get(nn.value().intValue() - 1).child("kod").value.property.value().trim()
 					);
 					/*
 					String sql = "select otd.EdinicaPlanirovaniya as info from Polzovateli usr" //
@@ -2378,7 +2420,7 @@ I/System.out: </>
 					//ApplicationHoreca.getInstance().currentIDmarshrut = "";
 					//ApplicationHoreca.getInstance().currentKodPodrazdelenia = "";
 					//Cfg.setKodPodrazdelenia("");
-					Cfg.resetHRCmarshrut("", "", "" );
+					Cfg.resetHRCmarshrut("", "", "");
 				}
 				//System.out.println("newName " + newName);
 				//currentHRCName = newName;

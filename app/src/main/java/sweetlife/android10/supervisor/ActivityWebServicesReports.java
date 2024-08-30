@@ -2492,6 +2492,10 @@ public class ActivityWebServicesReports extends Activity{
 		if(preKey.length() < 1){
 			return;
 		}
+		if(!preReport.canUseXLS()){
+			Auxiliary.warn("Сертификаты можно получить только в .pdf или .html",this);
+			return;
+		}
 		final String seed = "" + Math.round(Math.random() * 10000);
 		//final String name = preReport.getMenuLabel();
 		//final String name = preReport.getFileName();
@@ -2614,6 +2618,10 @@ public class ActivityWebServicesReports extends Activity{
 			return;
 		}
 		if(preKey.length() < 1){
+			return;
+		}
+		if(!preReport.canUseXLS()){
+			Auxiliary.warn("Сертификаты можно получить только в .pdf или .html",this);
 			return;
 		}
 		//final String seed = "" + Math.round(Math.random() * 10000);

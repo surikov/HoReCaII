@@ -16,7 +16,7 @@ public interface IExtras {
 	String IS_EDITABLE                 = "is_editable";
 	String CHOOSED_DAY                 = "day";
 	String CHOOSED_STORE               = "store";
-	String BID                         = "ZayavkaPokupatelya";
+	//String BIDZayavkaPokupatelya                         = "ZayavkaPokupatelya";
 	String RETURNS_BID                 = "ZayavkaNaVozvrat";
 	String FIXED_PRICES_BID            = "ZayavkaNaSkidki";
 	String DISPOSAL                    = "RasporyazhenieNaOtgruzku";

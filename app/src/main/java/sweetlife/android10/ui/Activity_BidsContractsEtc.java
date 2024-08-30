@@ -624,7 +624,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 		intent.putExtra(CLIENT_ID, mAppInstance.getClientInfo().getID());
 		intent.putExtra(AVAILABLE_AMOUNT, mAvailableAmount - Request_Bids.getBidsAmount(mDB, DateTimeHelper.SQLDateString(Calendar.getInstance().getTime())));
 		if (bid != null) {
-			intent.putExtra(BID, bid);
+			intent.putExtra("ZayavkaPokupatelya",bid);//BIDZayavkaPokupatelya, bid);
 			if (!mIsEditable || bid.isProveden()) {
 				intent.putExtra(IS_EDITABLE, false);
 			}

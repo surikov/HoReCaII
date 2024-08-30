@@ -204,15 +204,17 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		Auxiliary.createAbsolutePathForFile(name);
 		Auxiliary.writeTextToFile(new File(name), txt, "utf-8");
 	}
-
+/*
 	void showUploadResult(String msg, Bough result){
-		buildDialogResult(this, msg, result);
+		buildDialogResult(this, msg, result,null,null);
 	}
+
 	public static void buildDialogResult(Context activity, String msg, Bough result){
-		buildDialogResultAndClose(activity, msg, result,null);
-	}
-	public static void buildDialogResultAndClose(Context activity, String msg, Bough result,Activity activityToClose){
-		System.out.println("buildDialogResult");
+		buildDialogResultAndClose(activity, msg, result,null,null);
+	}*/
+	public static void buildDialogResultAndClose(Context activity, String msg, Bough result,Activity activityToClose//,Task onAddAnalog
+	){
+		System.out.println("buildDialogResultAndClose");
 		System.out.println("msg " + msg);
 		System.out.println("result " + result.dumpXML());
 		if(result.child("Сообщение").value.property.value().length() > 0){
@@ -220,7 +222,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		}
 		ColumnDescription zakazyNomenklatura = new ColumnDescription();
 		final ColumnDescription kolichestvo = new ColumnDescription();
-		Vector<Bough> danniePoZkzm = result.children("ДанныеПоЗаказам");
+		Vector<Bough> danniePoZakazam = result.children("ДанныеПоЗаказам");
 		String tableName = "";
 		Vector<String> newArtikuls = new Vector<String>();
 		Vector<String> oldOrders = new Vector<String>();
@@ -229,32 +231,35 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		Vector<String> newClients = new Vector<String>();
 		int dataRowCounter = 0;
 		int gridCounter = 0;
-		for(int ii = 0; ii < danniePoZkzm.size(); ii++){
-			Bough row = danniePoZkzm.get(ii);
-			double rowStatus = Numeric.string2double(row.child("Статус").value.property.value());
-			String vneshniyNomer = row.child("ВнешнийНомер").value.property.value();
+		for(int ii = 0; ii < danniePoZakazam.size(); ii++){
+			Bough row_DanniePoZakazam = danniePoZakazam.get(ii);
+			double rowStatus = Numeric.string2double(row_DanniePoZakazam.child("Статус").value.property.value());
+			String vneshniyNomer = row_DanniePoZakazam.child("ВнешнийНомер").value.property.value();
 			String sql = "select ka.kod as kod,ka._idrref as _idrref,ka.naimenovanie as naimenovanie,DataOtgruzki as dataOtgruzki"
 					+ " from ZayavkaPokupatelyaIskhodyaschaya zpi"
 					+ " join Kontragenty ka on ka._idrref=zpi.kontragent"
 					+ " where zpi.nomer='" + vneshniyNomer + "';";
 			Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+			System.out.println("vneshniyNomer " + vneshniyNomer+"/"+sql);
+			System.out.println("data " + data.dumpXML());
 			String kontragent = data.child("row").child("naimenovanie").value.property.value();
 			String kod = data.child("row").child("kod").value.property.value();
 			String dataOtgruzki = data.child("row").child("dataOtgruzki").value.property.value();
 			msg = msg + vneshniyNomer + ": " + kontragent + "\n";
-			if(row.child("Сообщение").value.property.value().length() > 0){
-				msg = msg + row.child("Сообщение").value.property.value().trim() + "\n";
+			if(row_DanniePoZakazam.child("Сообщение").value.property.value().length() > 0){
+				msg = msg + row_DanniePoZakazam.child("Сообщение").value.property.value().trim() + "\n";
 			}
 			zakazyNomenklatura.cell(kontragent, 0x110000ff, "дата отгрузки " + Auxiliary.tryReFormatDate(dataOtgruzki, "yyyy-MM-dd", "dd.MM.yyyy"));
 			kolichestvo.cell("", 0x110000ff, "");
 			gridCounter++;
-			Vector<Bough> zakazy = row.children("Заказы");
-			for(int ff = 0; ff < zakazy.size(); ff++){
-				String nomer = zakazy.get(ff).child("Номер").value.property.value();
-				String zakazSoobshenie = zakazy.get(ff).child("Сообщение").value.property.value().trim();
+			Vector<Bough> danniePoZkzm_Zakazy = row_DanniePoZakazam.children("Заказы");
+			for(int ff = 0; ff < danniePoZkzm_Zakazy.size(); ff++){
+				Bough odinZakaz=danniePoZkzm_Zakazy.get(ff);
+				String nomer = odinZakaz.child("Номер").value.property.value();
+				String zakazSoobshenie = odinZakaz.child("Сообщение").value.property.value().trim();
 				msg = msg + nomer + ": " + zakazSoobshenie + "\n";
 
-				Vector<Bough> nepodtverjdenniePosisii = zakazy.get(ff).children("НеПодтвержденныеПозиции");
+				Vector<Bough> nepodtverjdenniePosisii = odinZakaz.children("НеПодтвержденныеПозиции");
 				for(int nn = 0; nn < nepodtverjdenniePosisii.size(); nn++){
 					Bough one = nepodtverjdenniePosisii.get(nn);
 					String[] nomenklatura = one.child("Номенклатура").value.property.value().split(",");
@@ -323,8 +328,8 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 										//+ "\n 	limit 77"//
 										+ "\n 	;";
 								Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-								//System.out.println(sql);
-								//System.out.println(data.dumpXML());
+								System.out.println(sql);
+								System.out.println("result "+data.dumpXML());
 								String dataOtgruzki = data.child("row").child("dataOtgruzki").value.property.value();
 								String clientID = "x'" + data.child("row").child("kontragent_idrref").value.property.value() + "'";
 
@@ -389,6 +394,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 								};
 								long ms = 0;
 								try{
+									System.out.println("dataOtgruzki "+dataOtgruzki);
 									ms = Auxiliary.sqliteDate.parse(dataOtgruzki).getTime();
 								}catch(Throwable t){
 									t.printStackTrace();
@@ -432,7 +438,14 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 			buttonAction = new Task(){
 				@Override
 				public void doTask(){
-					createZakazAnalog(activity, newArtikuls, newCounts, newPrices, newClients, oldOrders);
+					/*if(onAddAnalog==null){
+						createZakazAnalog(activity, newArtikuls, newCounts, newPrices, newClients, oldOrders);
+					}else{
+						onAddAnalog.doTask();
+					}*/
+					//createZakazAnalog(activity, newArtikuls, newCounts, newPrices, newClients, oldOrders);
+					newCreateZakazAnalog(activity,"","");
+
 				}
 			};
 		}
@@ -487,9 +500,22 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 		brwsr.go("file://" + page);
 	}
 
+	public static void editAndAddAnalog(String documentNumber,String documentDate,Context context){
+		EditOrderViaWeb.requestItemsChangeNew(documentNumber,documentDate,context,null,null);
+	}
+	public static void newCreateZakazAnalog(Context context,String documentNumber,String documentDate){
+		//documentNumber="12-1854443";
+		//documentDate="29.09.2024";
+		EditOrderViaWeb.requestItemsChangeNew(documentNumber,documentDate,context,new Task(){
+			public  void doTask(){
+				System.out.println("done newCreateZakazAnalog");
+			}
+		},null);
+	}
 	public static void createZakazAnalog(Context activity, Vector<String> newArtikuls, Vector<Double> newCounts, Vector<Double> newPrices, Vector<String> newClients, Vector<String> oldOrders){
 		HashMap<String, BidData> orders = new HashMap<String, BidData>();
 		for(int ii = 0; ii < newArtikuls.size(); ii++){
+			System.out.println("createZakazAnalog: "+newArtikuls.get(ii).trim()+": "+newCounts.get(ii));
 			if(newCounts.get(ii) > 0){
 				BidData bidData = orders.get(oldOrders.get(ii));
 				if(bidData == null){
@@ -579,6 +605,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 				);
 			}
 		}
+		System.out.println("created "+orders.size());
 		BidData createdBidData = null;
 		for(Map.Entry<String, BidData> entry: orders.entrySet()){
 			createdBidData = entry.getValue();
@@ -865,7 +892,8 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 							String msg = "Выгрузка (" + result.child("result").child("code").value.property.value()
 									+ ", " + result.child("result").child("message").value.property.value() + "):\n"
 									+ bb.child("Сообщение").value.property.value();
-							showUploadResult(msg, bb);
+							//showUploadResult(msg, bb);
+							buildDialogResultAndClose(Activity_UploadBids.this,msg, bb,null);
 							/*
 							Vector<Bough> forOrders = bb.children("ДанныеПоЗаказам");
 							for (int rr = 0; rr < forOrders.size(); rr++) {

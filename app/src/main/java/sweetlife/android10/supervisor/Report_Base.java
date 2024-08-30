@@ -401,7 +401,9 @@ public abstract class Report_Base {
 			t.printStackTrace();
 		}
 	}
-
+public boolean canUseXLS(){
+		return true;
+}
 	public void exportPDF(String to, Context context) {
 		try {
 			String pdfrequest = composeRequest();

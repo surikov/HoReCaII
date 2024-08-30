@@ -146,7 +146,8 @@ public class ReportVzaioraschetySpokupatelem extends Report_Base {
 	public String composeGetQuery(int queryKind) {
 		//int i = territory.value().intValue();
 		//String hrc = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
-		Bough kontragenty = Cfg.kontragentyForSelectedMarshrut();
+		//Bough kontragenty = Cfg.kontragentyForSelectedMarshrut();
+		Bough kontragenty = Cfg.kontragentyByKod("hrc00");
 		/*
         Bough kontragenty = Cfg.kontragenty();
         if (ApplicationHoreca.getInstance().currentKodPodrazdelenia.length() > 0) {
@@ -217,8 +218,9 @@ public class ReportVzaioraschetySpokupatelem extends Report_Base {
 			kontr.selection.is(whoPlus1);
 			//kontr.item("[Все контрагенты]");
 
-			Bough kontragenty = Cfg.kontragentyForSelectedMarshrut();
-			System.out.println("kontragentyForSelectedMarshrut "+kontragenty.dumpXML());
+			//Bough kontragenty = Cfg.kontragentyForSelectedMarshrut();
+			Bough kontragenty = Cfg.kontragentyByKod("hrc00");
+			System.out.println("kontragenty "+kontragenty.dumpXML());
 			/*
             Bough kontragenty = Cfg.kontragenty();
             if (ApplicationHoreca.getInstance().currentKodPodrazdelenia.length() > 0) {

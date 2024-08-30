@@ -795,7 +795,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		mIsOrderEditable = extras.getBoolean(IS_EDITABLE, true);
 		Calendar choosedDay = (Calendar)mAppInstance.getShippingDate().clone();
 		mBidData.setChoosedDay(choosedDay);
-		ZayavkaPokupatelya bid = extras.getParcelable(BID);
+		ZayavkaPokupatelya bid = extras.getParcelable("ZayavkaPokupatelya");//BIDZayavkaPokupatelya);
 
 		nomerDokumenta1C = Auxiliary.activityExatras(this).child("nomerDokumenta1C").value.property.value();
 		nomerDokumentaTablet = Auxiliary.activityExatras(this).child("nomerDokumentaTablet").value.property.value();
@@ -2968,6 +2968,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		ZayavkaPokupatelya bid = mBidData.getBid();
 		Vector<Vector<String>> rows = new Vector<Vector<String>>();
 		int cnt = mBidData.getFoodStuffs().getCount();
+		String lastArt="";
 		for(int ii = 0; ii < cnt; ii++){
 			Vector<String> item = new Vector<String>();
 			String s = mBidData.getFoodStuffs().getFoodstuff(ii).getNomenklaturaNaimenovanie();
@@ -2977,13 +2978,17 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			s = s.replaceAll(" \\(склад 14\\)", "");
 			s = s.replaceAll(" \\(склад 17\\)", "");
 			s = s.replaceAll(" \\(склад \\?\\)", "");
+			s = s.replaceAll("СТМ: ", "");
 			item.add(mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul());
 			item.add(s);
 			item.add(mBidData.getFoodStuffs().getFoodstuff(ii).getEdinicaIzmereniyaName());
 			item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getMinNorma());
 			item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getKoefMest());
 			item.add("" + mBidData.getFoodStuffs().getFoodstuff(ii).getCenaSoSkidkoy());
-			rows.add(item);
+			if(!lastArt.equals(mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul())){
+				rows.add(item);
+			}
+			lastArt=mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul();
 			String sql = "select n.naimenovanie as n1,s.naimenovanie as n2,g.naimenovanie as n3"//
 					+ " from nomenklatura n"//
 					+ " left join nomenklatura s on n.roditel=s._idrref"//

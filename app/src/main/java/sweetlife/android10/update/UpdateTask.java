@@ -1054,7 +1054,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 	}
 
 	public static void refreshProdazhi_last(SQLiteDatabase mDB){
-		refreshProdazhi_last(mDB, "" );
+		refreshProdazhi_last(mDB, "x'00'" );
 	}
 
 	static String lastKontragent_idrref = "";

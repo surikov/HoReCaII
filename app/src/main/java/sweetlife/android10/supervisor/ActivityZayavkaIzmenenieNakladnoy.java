@@ -503,6 +503,7 @@ public class ActivityZayavkaIzmenenieNakladnoy extends Activity{
 			//intent.putExtra("ZayavkaNaSkidki" , null);
 			intent.putExtra("change" , change);
 			intent.putExtra("prices" , prices);
+		intent.putExtra("nachalo" , datReal.value().longValue());
 			startActivity(intent, null);
 		//}else{
 		//	Auxiliary.warn( "Не найден контрагент с кодом " + kodKlienta.value().trim(),this);

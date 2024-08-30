@@ -158,7 +158,9 @@ public class ReportTovarnieNakladmie extends Report_Base{
 		q = q + tagForFormat(queryKind);
 
 		if(kind.value().intValue() == 3){
-			q = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/GetCertificates/"
+			q = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+					//"https://testservice.swlife.ru/shatov"
+					+ "/hs/Planshet/GetCertificates/"
 					+ naklNumber.value().trim()
 					+ "/" + dataNa
 					+ "?param=0"
@@ -169,7 +171,24 @@ public class ReportTovarnieNakladmie extends Report_Base{
 		System.out.println("composeGetQuery " + q);
 		return q;
 	}
-
+	/*@Override
+	public void exportXLS(String to, Context context) {
+		System.out.println("exportXLS "+to);
+		Auxiliary.warn("Сертификаты можно получить только в .xls или .html",context);
+		if(kind.value().intValue() == 3){
+			Auxiliary.warn("Сертификаты можно получить только в .xls или .html",context);
+		}else{
+			super.exportXLS(to,context);
+		}
+	}*/
+	@Override
+	public boolean canUseXLS(){
+		if(kind.value().intValue() == 3){
+			return false;
+		}else{
+			return true;
+		}
+	}
 	@Override
 	public SubLayoutless getParametersView(Context context){
 		if(propertiesForm == null){

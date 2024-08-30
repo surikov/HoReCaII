@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import android.content.*;
 import android.graphics.*;
-import android.os.Bundle;
+import android.os.*;
 
 import java.io.*;
 
@@ -17,6 +17,7 @@ import sweetlife.android10.Settings;
 import sweetlife.android10.supervisor.*;
 import tee.binding.task.*;
 import tee.binding.*;
+import tee.binding.it.*;
 
 public class ActivityPhoto extends Activity{
 	Layoutless layoutless;
@@ -67,7 +68,47 @@ public class ActivityPhoto extends Activity{
 		//return txt;
 	}
 
-	void showInfoPhoto(){
+	void loadInfoAndShowPhoto(String artikul){
+		final Note url = new Note().value(
+				Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				//"https://testservice.swlife.ru/shatov"
+						+ "/hs/Planshet/DataGK/" + artikul
+		);
+		final Note result = new Note();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					byte[] b = Auxiliary.loadFileFromPrivateURL(url.value(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String txt = new String(b, "UTF-8");
+					java.util.Vector<Bough> data = Bough.parseJSON(txt).children("Data");
+					//System.out.println("result "+data.dumpXML());
+					result.value("<ul>");
+					for(int ii = 0; ii < data.size(); ii++){
+						result.value(result.value() + "<li>"
+								+ data.get(ii).child("Пункт").value.property.value()
+								+ ": " + data.get(ii).child("ЗначениеРесурса").value.property.value()
+								.replace("&", "&amp;").replace("<", "&lt;")
+								+ "</li>");
+					}
+					result.value(result.value() + "<ul>");
+				}catch(Throwable t){
+					t.printStackTrace();
+					result.value(t.getMessage() + "\n" + url.value());
+				}
+
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				//System.out.println("result " + result.dumpXML());
+				showCatInfoPhoto(result.value());
+			}
+		}).status.is("Подождите").start(this)
+		;
+	}
+
+	void showCatInfoPhoto(String globalCat){
 		if(bm != null){
 			layoutless.child(new Decor(ActivityPhoto.this).bitmap.is(bm)//
 					.width().is(bm.getWidth()).height().is(bm.getHeight())
@@ -86,15 +127,15 @@ public class ActivityPhoto extends Activity{
 				.left().is(layoutless.width().property.divide(2))//
 				.top().is(Auxiliary.tapSize * 0.5)//
 		);
-		brwsr = new WebRender(this).afterLink.is(new Task() {
+		brwsr = new WebRender(this).afterLink.is(new Task(){
 			@Override
-			public void doTask() {
-				try {
+			public void doTask(){
+				try{
 					final android.net.Uri uri = android.net.Uri.parse(brwsr.url.property.value());
 					System.out.println(uri);
 					Intent openUrlIntent = new Intent(Intent.ACTION_VIEW, uri);
 					ActivityPhoto.this.startActivity(openUrlIntent);
-				} catch (Throwable t) {
+				}catch(Throwable t){
 					t.printStackTrace();
 				}
 			}
@@ -102,40 +143,56 @@ public class ActivityPhoto extends Activity{
 		layoutless.child(brwsr//
 				.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 0.7))//
 				.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 1.2))//
-				.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize *0.1))//
-				.top().is(Auxiliary.tapSize*0.6)//
+				.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize * 0.1))//
+				.top().is(Auxiliary.tapSize * 0.6)//
 		);
 
 		String description = "<html><body>";
-		description = description + "<p><i>Производитель:</i> <b>" + proizvoditel + "</b></p>";
-		description = description + "<p><i>Срок годности:</i> " + SrokGodnosti + "</p>";
-		description = description + "<p><i>Квант:</i> " + EdinicyIzmereniyaNaimenovanie + "</p>";
-		description = description + "<p><i>Состав:</i> " + Nabor + "</p>";
-		description = description + "<p><i>Описание:</i> " + kommentariy.replace("\n", "<br/>") + "</p>";
-		java.util.Vector<Bough> all = managers.children("Ответственные");
-		description = description + "<p>Ответственные:</p>";
-		description = description + "<ul>";
-		for(int ii = 0; ii < all.size(); ii++){
-			description = description + "<li>" + all.get(ii).child("ФИО").value.property.value()
-					+ ", " + all.get(ii).child("Должность").value.property.value();
-			java.util.Vector<Bough> kontakts = all.get(ii).children("Контакты");
-			String delimtr = ": <i>";
-			for(int kk = 0; kk < kontakts.size(); kk++){
-				if(kontakts.get(kk).child("Контакт").value.property.value().length() > 3){
-					String vid = kontakts.get(kk).child("ВидКонтакта").value.property.value().trim();
-					String znach = kontakts.get(kk).child("Контакт").value.property.value().trim();
-					description = description + delimtr + vid;
-					if(isemail(znach)){
-						description = description + ": <a href='mailto:" + znach + "'>" + znach + "</a>";
-					}else{
-						description = description + ": " + znach + "";
-					}
-					delimtr = ", ";
-				}
-			}
-			description = description + "</i></li>";
+		if(proizvoditel.trim().length() > 0){
+			description = description + "<p><i>Производитель:</i> <b>" + proizvoditel + "</b></p>";
 		}
-		description = description + "</ul>";
+		if(SrokGodnosti.trim().length() > 0){
+			description = description + "<p><i>Срок годности:</i> " + SrokGodnosti + "</p>";
+		}
+		if(EdinicyIzmereniyaNaimenovanie.trim().length() > 0){
+			description = description + "<p><i>Квант:</i> " + EdinicyIzmereniyaNaimenovanie + "</p>";
+		}
+		if(Nabor.trim().length() > 0){
+			description = description + "<p><i>Состав:</i> " + Nabor + "</p>";
+		}
+		if(kommentariy.trim().length() > 0){
+			description = description + "<p><i>Описание:</i> " + kommentariy.replace("\n", "<br/>") + "</p>";
+		}
+
+		java.util.Vector<Bough> all = managers.children("Ответственные");
+		if(all.size() > 0){
+			description = description + "<p>Ответственные:</p>";
+			description = description + "<ul>";
+			for(int ii = 0; ii < all.size(); ii++){
+				description = description + "<li>" + all.get(ii).child("ФИО").value.property.value()
+						+ ", " + all.get(ii).child("Должность").value.property.value();
+				java.util.Vector<Bough> kontakts = all.get(ii).children("Контакты");
+				String delimtr = ": <i>";
+				for(int kk = 0; kk < kontakts.size(); kk++){
+					if(kontakts.get(kk).child("Контакт").value.property.value().length() > 3){
+						String vid = kontakts.get(kk).child("ВидКонтакта").value.property.value().trim();
+						String znach = kontakts.get(kk).child("Контакт").value.property.value().trim();
+						description = description + delimtr + vid;
+						if(isemail(znach)){
+							description = description + ": <a href='mailto:" + znach + "'>" + znach + "</a>";
+						}else{
+							description = description + ": " + znach + "";
+						}
+						delimtr = ", ";
+					}
+				}
+				description = description + "</i></li>";
+			}
+			description = description + "</ul>";
+		}
+		if(globalCat.trim().length() > 0){
+			description = description + "<p><i>Глобальный каталог:</i> " + globalCat.replace("\n", "<br/>") + "</p>";
+		}
 		description = description + "</body></html>";
 		/*
 		layoutless.child(new HTMLBox(ActivityPhoto.this)//.background.is(0xffccff99)//
@@ -145,7 +202,7 @@ public class ActivityPhoto extends Activity{
 				.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize / 2))//
 				.top().is(Auxiliary.tapSize)//
 		);*/
-		String page = Cfg.workFolder+"artikul.html";
+		String page = Cfg.workFolder + "artikul.html";
 		File html = new File(page);
 		Auxiliary.writeTextToFile(html, description, "utf-8");
 		brwsr.go("file://" + page);
@@ -211,7 +268,7 @@ public class ActivityPhoto extends Activity{
 		}).afterDone.is(new Task(){
 			@Override
 			public void doTask(){
-				showInfoPhoto();
+				loadInfoAndShowPhoto(a);
 			}
 		}).afterCancel.is(new Task(){
 			@Override

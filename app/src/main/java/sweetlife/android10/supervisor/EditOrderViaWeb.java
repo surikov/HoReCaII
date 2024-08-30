@@ -202,7 +202,7 @@ void promptRasporyajenieNaOtgruzku(){
 			@Override
 			public void doTask() {
 				//Auxiliary.warn(result.value(), context);
-				Activity_UploadBids.buildDialogResult(context,"Проведение заказов по наценке", b);
+				Activity_UploadBids.buildDialogResultAndClose(context,"Проведение заказов по наценке", b,null);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		};
@@ -247,7 +247,11 @@ void promptRasporyajenieNaOtgruzku(){
 							promptSendDelete();
 						}
 						if (nn.value().intValue() == 2) {
-							requestItemsChangeNew();
+							requestItemsChangeNew(documentNumber,documentDate,context,new Task(){
+								public  void doTask(){
+									me.needRefresh = true;
+								}
+							},null);
 						}
 						if (nn.value().intValue() == 3) {
 							promptChangeDate();
@@ -386,7 +390,7 @@ void promptRasporyajenieNaOtgruzku(){
 					@Override
 					public void doTask() {
 						//Auxiliary.warn(b.child("result" ).value.property.value(), context);
-						Activity_UploadBids.buildDialogResult(context,"Смена контрагента", b);
+						Activity_UploadBids.buildDialogResultAndClose(context,"Смена контрагента", b,null);
 						me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 					}
 				});
@@ -419,7 +423,7 @@ void promptRasporyajenieNaOtgruzku(){
 				+ "	limit 100;";
 		System.out.println("promptDogovorTipOplaty " + sql);
 		bb = Auxiliary.fromCursor(mDB.rawQuery(sql, null));
-		System.out.println(bb.dumpXML());
+		//System.out.println(bb.dumpXML());
 		Vector<String> labels = new Vector<String>();
 		final Vector<String> kods = new Vector<String>();
 		final Vector<String> tips = new Vector<String>();
@@ -430,8 +434,8 @@ void promptRasporyajenieNaOtgruzku(){
 			double podrazdelenie = Numeric.string2double(row.child("podrazdelenie" ).value.property.value());
 			double procent = Numeric.string2double(row.child("procent" ).value.property.value());
 			if ((podrazdelenie == 0) && (procent == 0)) {
-				System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " нал" );
-				System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " товчек" );
+				//System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " нал" );
+				//System.out.println(kod + "/" + podrazdelenie + "/" + procent + "/" + name + " товчек" );
 				labels.add(name + ", нал." );
 				kods.add(kod);
 				tips.add("0" );
@@ -467,7 +471,7 @@ void promptRasporyajenieNaOtgruzku(){
 			Auxiliary.pickSingleChoice(context, list, idx);
 			idx.afterChange(new Task() {
 				public void doTask() {
-					System.out.println(list[idx.value().intValue()]);
+					//System.out.println(list[idx.value().intValue()]);
 					sendDogovorTipOplaty(documentNumber
 							, Auxiliary.tryReFormatDate(shipDate, "dd.MM.yyyy", "yyyyMMdd" )
 
@@ -514,7 +518,7 @@ void promptRasporyajenieNaOtgruzku(){
 		}).afterDone.is(new Task() {
 			@Override
 			public void doTask() {
-				Activity_UploadBids.buildDialogResult(context,"Смена договора или типа оплаты", b);
+				Activity_UploadBids.buildDialogResultAndClose(context,"Смена договора или типа оплаты", b,null );
 				/*Bough bb = Bough.parseJSONorThrow(response);
 				if(bb.children.size() > 0){
 					String msg = "Выгрузка (" + result.child("result").child("code").value.property.value()
@@ -594,14 +598,15 @@ void promptRasporyajenieNaOtgruzku(){
 			@Override
 			public void doTask() {
 				//Auxiliary.warn(b.child("result" ).value.property.value(), context);
-				Activity_UploadBids.buildDialogResult(context,"Пересчёт цен", b);
+				Activity_UploadBids.buildDialogResultAndClose(context,"Пересчёт цен", b,null);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		});
 		expect.start(context);
 	}
 
-	void requestItemsChangeNew() {
+	public static void requestItemsChangeNew(String documentNumber,String documentDate,final Context context,Task task,Bough danniyeTovari) {
+		System.out.println("requestItemsChangeNew "+documentNumber+", "+documentDate+(danniyeTovari==null?", null":", "+(danniyeTovari.dumpXML())));
 		final Bough bb = new Bough();
 
 		Expect expect = new Expect().status.is("Подождите" ).task.is(new Task() {
@@ -637,7 +642,7 @@ void promptRasporyajenieNaOtgruzku(){
 			@Override
 			public void doTask() {
 				if (bb.child("raw" ).child("Сообщение" ).value.property.value().trim().length() > 0) {
-					Auxiliary.warn(bb.child("raw" ).child("Сообщение" ).value.property.value(), me);
+					Auxiliary.warn(bb.child("raw" ).child("Сообщение" ).value.property.value(), context);
 				} else {
 					//createUpdatableOrder(b.child("raw"));
 					String client_id = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(
@@ -656,11 +661,11 @@ void promptRasporyajenieNaOtgruzku(){
 									+ bb.child("raw" ).child("Данные" ).child("КодДоговора" ).value.property.value().trim() + "';"
 							, null)).child("row" ).child("id" ).value.property.value();
 					if (client_id.trim().length() < 1) {
-						Auxiliary.warn("Не найден клиент " + bb.child("raw" ).child("Данные" ).child("КодКонтрагента" ).value.property.value().trim(), me);
+						Auxiliary.warn("Не найден клиент " + bb.child("raw" ).child("Данные" ).child("КодКонтрагента" ).value.property.value().trim(), context);
 						return;
 					}
 					if (dogovor_idrref.trim().length() < 1) {
-						Auxiliary.warn("Не найден договор " + bb.child("raw" ).child("Данные" ).child("КодДоговора" ).value.property.value().trim(), me);
+						Auxiliary.warn("Не найден договор " + bb.child("raw" ).child("Данные" ).child("КодДоговора" ).value.property.value().trim(), context);
 						return;
 					}
 					try {
@@ -682,10 +687,23 @@ void promptRasporyajenieNaOtgruzku(){
 						intent.putExtra("dateShip", "" + dateShip.value());
 						intent.putExtra("nomerDokumenta1C", bb.child("raw" ).child("Данные" ).child("НомерДокумента" ).value.property.value().trim());
 						intent.putExtra("nomerDokumentaTablet", bb.child("raw" ).child("Данные" ).child("ВнешнийНомер" ).value.property.value().trim());
+
+
+if(danniyeTovari!=null){
+	bb.child("raw").children.add(danniyeTovari);
+}
 						String raw = bb.child("raw" ).dumpXML();
 						intent.putExtra("raw_data", "" + raw);
+
+
+						//System.out.println("requestItemsChangeNew "+raw);
+
+
 						Activity_Bid.unLockCreateNewOrder();
-						me.needRefresh = true;
+						//me.needRefresh = true;
+						if(task!=null){
+							task.doTask();
+						}
 						context.startActivity(intent);
 					} catch (Throwable ttt) {
 						ttt.printStackTrace();
@@ -1152,7 +1170,7 @@ void promptRasporyajenieNaOtgruzku(){
 					}
 				}
 				*/
-				Activity_UploadBids.buildDialogResult(context,"Сохранение заказа", b);
+				Activity_UploadBids.buildDialogResultAndClose(context,"Сохранение заказа", b,null);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		}).afterCancel.is(new Task() {
@@ -1224,7 +1242,7 @@ void promptRasporyajenieNaOtgruzku(){
 						Auxiliary.warn("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), context);
 					}
 				}*/
-				Activity_UploadBids.buildDialogResult(context,"Сохранение заказа", b);
+				Activity_UploadBids.buildDialogResultAndClose(context,"Сохранение заказа", b,null);
 				me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
 			}
 		}).afterCancel.is(new Task() {

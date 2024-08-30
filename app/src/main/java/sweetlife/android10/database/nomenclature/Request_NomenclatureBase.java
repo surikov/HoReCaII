@@ -1049,7 +1049,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		}*/
 		sql = sql + "\n limit " + limit + " offset " + offset;
 		//System.out.println("stmOnly "+stmOnly);
-		System.out.println( "composeSQLall_Old: " + sql);
+		//System.out.println( "composeSQLall_Old: " + sql);
 		return sql;
 	}
 
@@ -1059,13 +1059,14 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 
 	static void refreshPointData(String dataOtgruzki, String kontragentID, String polzovatelID){
 		//static void refreshTovariGeroiDay(String dataOtgruzki) {
-		//System.out.println("refreshTovariGeroiDay "+dataOtgruzki);
+
 		if(dataOtgruzki.equals(dataOtgruzkiTovariGeroiDay)
 				&& kontragentID.equals(kontragentIDcurrent)
 				&& polzovatelID.equals(polzovatelIDcurrent)
 		){
-			//
+			System.out.println("skip refreshPointData " + dataOtgruzki + ", " + kontragentID + ", " + polzovatelID);
 		}else{
+			System.out.println("do refreshPointData " + dataOtgruzki + ", " + kontragentID + ", " + polzovatelID);
 			dataOtgruzkiTovariGeroiDay = dataOtgruzki;
 			kontragentIDcurrent = kontragentID;
 			polzovatelIDcurrent = polzovatelID;
@@ -1136,6 +1137,48 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 			ApplicationHoreca.getInstance().getDataBase().execSQL("	CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Cena on CenyNomenklaturySklada_last(Cena);	" );
 			*/
 			System.out.println("CenyNomenklaturySklada_last " + dataOtgruzki);
+
+
+/*
+select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena
+	from Polzovateli po
+		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie
+		left join Podrazdeleniya p2 on p2._idrref=p1.roditel
+		left join Podrazdeleniya p3 on p3._idrref=p2.roditel
+		left join Podrazdeleniya p4 on p4._idrref=p3.roditel
+		left join Podrazdeleniya p5 on p5._idrref=p4.roditel
+		join CenyNomenklaturyPoPodrazdeleniu cc on
+			(cc.podrazdelenie=p1._idrref or cc.podrazdelenie=p2._idrref or cc.podrazdelenie=p3._idrref or cc.podrazdelenie=p4._idrref or cc.podrazdelenie=p5._idrref)
+				or cc.podrazdelenie=x'00'
+		join nomenklatura nn on nn._idrref=cc.nomenklatura
+	 where  po.kod='hrc682' and cc.zapret=x'01'
+		and nn.artikul=90924
+	group by cc.nomenklatura,cc.zapret
+	--order by cc.nomenklatura,cc.period
+;*/
+
+/*
+select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,cc.podrazdelenie as Podrazdelenie,cc.sklad as Sklad
+from CenyNomenklaturyPoPodrazdeleniu cc
+group by cc.nomenklatura,cc.podrazdelenie,cc.sklad
+order by cc.sklad
+*/
+
+			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE TABLE if not exists CenyNomenklatury_SLICE (	"
+					+ "		_id integer primary key asc autoincrement,[Period] date null,[Registrator] blob null	"
+					+ "		,[Nomenklatura] blob null,[Sklad] blob null,[Cena] numeric null	"
+					+ "		,[Podrazdelenie] blob null,[Zapret] blob null	"
+					+ "		);");
+			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from CenyNomenklatury_SLICE;");
+			sql = "insert into CenyNomenklatury_SLICE (Period,Nomenklatura,Cena,Podrazdelenie,Sklad,Zapret,Registrator)"
+					+"	select max(cc.period) as Period"
+					+ " 	,cc.nomenklatura as Nomenklatura,cc.cena as Cena,cc.podrazdelenie as Podrazdelenie,cc.sklad as Sklad,cc.zapret as Zapret,cc.registrator as Registrator"
+					+ " from CenyNomenklaturyPoPodrazdeleniu cc"
+					+ " where cc.period<='" + dataOtgruzki + "'"
+					+ " group by cc.nomenklatura,cc.podrazdelenie,cc.sklad"
+					+ " order by cc.sklad";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
 			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE TABLE if not exists CenyNomenklaturySklada_last (	"
 					+ "		_id integer primary key asc autoincrement,[Period] date null,[Registrator] blob null,[NomerStroki] numeric null,[Aktivnost] blob null	"
 					+ "		,[TipCen] blob null,[Nomenklatura] blob null,[Sklad] blob null,[Valyuta] blob null,[Cena] numeric null,[EdinicaIzmereniya] blob null	"
@@ -1146,12 +1189,201 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE INDEX if not exists IX_CenyNomenklaturySklada_last_Cena on CenyNomenklaturySklada_last(Cena);");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from CenyNomenklaturySklada_last;");
 
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,x'00' as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=x'00'"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena=0"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p1._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p1._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena=0"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p2._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p2._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena=0"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p3._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p3._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena=0"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p4._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "\n		left join Podrazdeleniya p4 on p4._idrref=p3.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p4._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena=0"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p5._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "\n		left join Podrazdeleniya p4 on p4._idrref=p3.roditel"
+					+ "\n		left join Podrazdeleniya p5 on p5._idrref=p4.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p5._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena=0"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,cc.sklad as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=x'00'"
+					+ "\n		join Kontragenty kk on kk.VidDostavki=cc.sklad and kk._idrref=" + kontragentID
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena=0"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
+
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,cc.sklad as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=x'00'"
+					+ "\n		join Kontragenty kk on kk.VidDostavki=cc.sklad and kk._idrref=" + kontragentID
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena>0"
+					+ "\n		and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last xsts where xsts.period >= cc.Period)"// and xsts.Registrator=cc.sklad)"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p1._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p1._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena>0"
+					+ "\n		and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last xsts where xsts.period >= cc.Period)"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p2._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p2._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena>0"
+					+ "\n		and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last xsts where xsts.period >= cc.Period)"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p3._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p3._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena>0"
+					+ "\n		and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last xsts where xsts.period >= cc.Period)"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p4._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "\n		left join Podrazdeleniya p4 on p4._idrref=p3.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p4._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena>0"
+					+ "\n		and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last xsts where xsts.period >= cc.Period)"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,p5._idrref as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join Podrazdeleniya p1 on p1._idrref=po.podrazdelenie"
+					+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"
+					+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"
+					+ "\n		left join Podrazdeleniya p4 on p4._idrref=p3.roditel"
+					+ "\n		left join Podrazdeleniya p5 on p5._idrref=p4.roditel"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=p5._idrref"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena>0"
+					+ "\n		and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last xsts where xsts.period >= cc.Period)"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena,Registrator)"
+					+ "\n select max(cc.period) as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena,x'00' as Registrator"
+					+ "\n	from Polzovateli po"
+					+ "\n		left join CenyNomenklatury_SLICE cc on cc.podrazdelenie=x'00'"
+					+ "\n	 where  po._idrref=" + polzovatelID
+					+ "\n		and cc.period<='" + dataOtgruzki + "'"
+					+ "\n		and cc.cena>0"
+					+ "\n		and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last xsts where xsts.period >= cc.Period)"
+					+ "\n	group by cc.nomenklatura;";
+			System.out.println(sql);
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+
+
+
+
+
+
+/*
 			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
 					+ "	select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
 					+ "	from CenyNomenklaturyPoPodrazdeleniu cc"
 					+ "	join Kontragenty kk on kk.VidDostavki=cc.sklad and kk._idrref=" + kontragentID + " and cc.period<='" + dataOtgruzki + "'; ";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+
 			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
 					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
 					+ "		from Polzovateli po"
@@ -1160,6 +1392,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+
 			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
 					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
 					+ "		from Polzovateli po"
@@ -1169,6 +1402,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+
 			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
 					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
 					+ "		from Polzovateli po"
@@ -1179,6 +1413,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+
 			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
 					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
 					+ "		from Polzovateli po"
@@ -1190,15 +1425,18 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 					+ "		where cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+
 			sql = "insert into CenyNomenklaturySklada_last ( Period,Nomenklatura,Cena)"
 					+ "		select cc.period as Period,cc.nomenklatura as Nomenklatura,cc.cena as Cena"
 					+ "		from CenyNomenklaturyPoPodrazdeleniu cc"
 					+ "		where cc.podrazdelenie=x'00' and cc.nomenklatura not in (select nomenklatura from CenyNomenklaturySklada_last) and cc.period<='" + dataOtgruzki + "';";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+*/
 			sql = "delete from CenyNomenklaturySklada_last where not (cena>0);";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+
 			sql = "insert into CenyNomenklaturySklada_last (Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki)	"
 					+ "		select 	"
 					+ "			Period,Registrator,NomerStroki,Aktivnost,TipCen,Nomenklatura,Sklad,Valyuta,Cena,EdinicaIzmereniya,ProcentSkidkiNacenki	"
@@ -1209,6 +1447,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 					+ "		group by nomenklatura	;";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 			System.out.println(sql);
+
 			System.out.println("CenyNomenklaturySklada_last" + new Date());
 
 		}

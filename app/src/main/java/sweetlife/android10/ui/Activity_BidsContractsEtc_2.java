@@ -1058,7 +1058,7 @@ I/System.out: </>
 				+ Settings.selectedBase1C() + "/hs/ObnovlenieInfo/Istoriya?klient=" //
 				+ kod.trim();
 		//final String url = Settings.getInstance().getBaseURL() + "GolovaNew/hs/ObnovlenieInfo/DannyeMarshruta?hrc=" + mAppInstance.getCurrentAgent().getAgentName().trim();
-		System.out.println(url);
+		//System.out.println(url);
 		final Numeric cntr = new Numeric();
 		new Expect().task.is(new Task(){
 			@Override
@@ -1146,7 +1146,9 @@ I/System.out: </>
 		//System.out.println("showVzaimoraschety "+curKod);
 		//ActivityWebServicesReports.goLastPageTempName = "who";
 		int nn = 0;
-		Bough kk = Cfg.kontragentyForSelectedMarshrut();
+		//Bough kk = Cfg.kontragentyForSelectedMarshrut();
+		Bough kk = Cfg.kontragentyByKod("hrc00");
+
 		for(int ii = 0; ii < kk.children.size(); ii++){
 			Bough row = kk.children.get(ii);
 			String rowKod = row.child("kod").value.property.value().trim();

@@ -164,10 +164,19 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 		if(mZayavka == null){
 			mZayavka = new ZayavkaNaSkidki(mClient.getID(), mDB);
 		}
-		mFromPeriod = Calendar.getInstance();
-		mFromPeriod.setTime(mZayavka.getVremyaNachalaSkidkiPhiksCen());
-		mToPeriod = Calendar.getInstance();
-		mToPeriod.setTime(mZayavka.getVremyaOkonchaniyaSkidkiPhiksCen());
+		long fromMs=extras.getLong("nachalo");
+		if(fromMs>0){
+			mFromPeriod = Calendar.getInstance();
+			mFromPeriod.setTimeInMillis(fromMs);
+			mToPeriod = Calendar.getInstance();
+			mToPeriod.setTimeInMillis(fromMs);
+		}else{
+			mFromPeriod = Calendar.getInstance();
+			mFromPeriod.setTime(mZayavka.getVremyaNachalaSkidkiPhiksCen());
+			mToPeriod = Calendar.getInstance();
+			mToPeriod.setTime(mZayavka.getVremyaOkonchaniyaSkidkiPhiksCen());
+		}
+
 
 		UpdateDate();
 	}

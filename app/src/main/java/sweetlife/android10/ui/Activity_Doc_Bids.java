@@ -82,7 +82,7 @@ public class Activity_Doc_Bids extends Activity_BasePeriod {
 				intent.setClass(Activity_Doc_Bids.this, Activity_Bid.class);
 				intent.putExtra(CLIENT_ID, Request_Bids.getKontragentID(cursor));
 				intent.putExtra(IS_EDITABLE, is_editable);
-				intent.putExtra(BID, bid);
+				intent.putExtra("ZayavkaPokupatelya",bid);//BIDZayavkaPokupatelya, bid);
 				startActivityForResult(intent, ORDER_UPDATE);
 			}
 		});

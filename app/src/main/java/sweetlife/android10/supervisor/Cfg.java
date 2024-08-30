@@ -680,7 +680,7 @@ public class Cfg{
 		kontragentyDogovorCache = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 	}*/
 	private static void fillKontragentyCacheByKod(String kod){
-		//System.out.println("Cfg.fillKontragentyCache " + kod);
+		System.out.println("Cfg.fillKontragentyCache " + kod);
 		podrazdeleniaKod = kod;
 		String sql = "select p1.kod as k1,p2.kod as k2,p3.kod as k3, Kontragenty._idrref as _idrref"//
 				+ "\n		,kontragenty.kod as kod,kontragenty.naimenovanie as naimenovanie"//
@@ -690,7 +690,9 @@ public class Cfg{
 				+ "\n		left join Podrazdeleniya p2 on p2._idrref=p1.roditel"//
 				+ "\n		left join Podrazdeleniya p3 on p3._idrref=p2.roditel"//
 				;
-		if(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase().equals("hrc00")){
+		//if(ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toLowerCase().equals("hrc00")){
+		/*
+		if(kod.equals("hrc00")){
 			//
 		}else{
 			if(podrazdeleniaKod.length() > 0){
@@ -698,10 +700,11 @@ public class Cfg{
 				;
 			}
 		}
+		*/
 		sql = sql + "\n	group by kontragenty.kod"//
 				+ "\n	order by kontragenty.naimenovanie"//
 		;
-		//System.out.println(sql);
+		System.out.println(sql);
 		kontragentyCache = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		//System.out.println("done kontragentyCache");
 	}
@@ -741,7 +744,7 @@ public class Cfg{
 	}
 
 	public static Bough kontragentyByKod(String kod){
-		if(kontragentyCache == null || (!kod.equals(podrazdeleniaKod))){
+		if(kontragentyCache == null ){//|| (!kod.equals(podrazdeleniaKod))){
 			fillKontragentyCacheByKod(kod);
 		}
 		return kontragentyCache;
