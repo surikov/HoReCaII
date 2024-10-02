@@ -19,7 +19,7 @@ import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.UIHelper;
 import sweetlife.android10.utils.DialogTask.IDialogTaskAction;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.AlertDialog;
 import android.database.Cursor;

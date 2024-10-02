@@ -107,6 +107,7 @@ public class ApplicationHoreca
 		System.out.println(defr.format(nn));
 		*/
 		//test();
+		//System.out.println("firebase test start");
 	}
 	String hx(int n) {
 		if (n == 0) {
@@ -182,6 +183,7 @@ public class ApplicationHoreca
 		}
 	}*/
 	void readAgentConfig() {
+		System.out.println("readAgentConfig");
 		//try {
 		//String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/Horeca2.xml")));
 		try {
@@ -193,6 +195,7 @@ public class ApplicationHoreca
 				mDB.execSQL("update android set kod='" + updateKey + "' where trim(kod)!='12-';");
 				mDB.execSQL("update cur_users set name='" + userKey + "' where type=2;");
 			}
+			System.out.println("readAgentConfig "+userKey+"/"+updateKey);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -410,7 +413,7 @@ public class ApplicationHoreca
 	public void setClientInfo(ClientInfo n) {
 
 		mClient = n;
-		Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod());
+		Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod()," date( 'now' ) ");
 	}
 	void testOptimization() {
 		//System.out.println("testOptimization");

@@ -15,7 +15,7 @@ import sweetlife.android10.utils.DialogTask.IDialogTaskAction;
 import android.os.Bundle;
 import android.widget.CheckBox;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class Activity_ReportOrderState extends Activity_ReportBase implements IReportConsts, IDialogTaskAction {
 	private CheckBox mCheckOnlyCompleted;

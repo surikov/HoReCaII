@@ -232,7 +232,7 @@ public class Activity_DannieMercuryOne extends Activity {
 				;
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
-
+/*
 	void doPhoto() throws Exception {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -242,7 +242,7 @@ public class Activity_DannieMercuryOne extends Activity {
 			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 			startActivityForResult(takePictureIntent, RETURN_FROM_PHOTO);
 		}
-	}
+	}*/
 
 	@Override
 	public void onStop() {

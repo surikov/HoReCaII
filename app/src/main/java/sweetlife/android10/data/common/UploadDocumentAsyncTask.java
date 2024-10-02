@@ -15,7 +15,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
-import sweetlife.android10.R;
+//import sweetlife.android10.*;
 
 public class UploadDocumentAsyncTask extends ManagedAsyncTask<String> {
 
@@ -74,7 +74,7 @@ public class UploadDocumentAsyncTask extends ManagedAsyncTask<String> {
 
 					if (request.Execute(requestString) != HttpStatus.SC_OK) {
 
-						resultString.append(mResources.getString(R.string.bad_server_responce)).append("\n");
+						resultString.append(mResources.getString(sweetlife.android10.R.string.bad_server_responce)).append("\n");
 
 						//Temporary
 						try {
@@ -95,7 +95,7 @@ public class UploadDocumentAsyncTask extends ManagedAsyncTask<String> {
 					ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
 					ErrorReporter.getInstance().handleSilentException(e);
 
-					resultString.append(mResources.getString(R.string.bad_server_responce)).append("\n");
+					resultString.append(mResources.getString(sweetlife.android10.R.string.bad_server_responce)).append("\n");
 
 					continue;
 				}
@@ -120,7 +120,7 @@ public class UploadDocumentAsyncTask extends ManagedAsyncTask<String> {
 
 					ErrorReporter.getInstance().putCustomData("handled", mParser.getClass().getName());
 					ErrorReporter.getInstance().handleSilentException(e);
-					resultString.append(mResources.getString(R.string.bad_server_responce))
+					resultString.append(mResources.getString(sweetlife.android10.R.string.bad_server_responce))
 							.append("\n");
 
 					continue;

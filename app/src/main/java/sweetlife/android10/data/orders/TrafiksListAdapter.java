@@ -6,7 +6,7 @@ import sweetlife.android10.data.common.ZoomListArrayAdapter;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.util.TypedValue;
 import android.view.LayoutInflater;

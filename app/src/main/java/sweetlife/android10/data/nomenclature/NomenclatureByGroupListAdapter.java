@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import sweetlife.android10.Settings;
 import java.util.*;
 

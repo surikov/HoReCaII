@@ -4,7 +4,7 @@ import sweetlife.android10.data.common.NomenclatureBasedItem;
 import sweetlife.android10.data.common.ZoomListArrayAdapter;
 import sweetlife.android10.ui.Activity_Bid;
 import sweetlife.android10.utils.DecimalFormatHelper;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import sweetlife.android10.Settings;
 
 import android.graphics.Color;

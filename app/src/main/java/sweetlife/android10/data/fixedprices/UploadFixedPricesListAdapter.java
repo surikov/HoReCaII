@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class UploadFixedPricesListAdapter extends ZoomListCursorAdapter {
 

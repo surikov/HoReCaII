@@ -58,6 +58,8 @@ public class WebRender extends WebView implements Rake {
 		if (initialized) {
 			return;
 		}
+		getSettings().setAllowContentAccess(true);
+		getSettings().setAllowFileAccess(true);
 		getSettings().setJavaScriptEnabled(true);
 		getSettings().setSaveFormData(true);
 		getSettings().setBuiltInZoomControls(true);

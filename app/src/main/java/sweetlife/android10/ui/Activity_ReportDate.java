@@ -9,7 +9,7 @@ import sweetlife.android10.utils.DialogTask.IDialogTaskAction;
 
 import android.os.Bundle;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 
 public class Activity_ReportDate extends Activity_ReportBase implements IReportConsts, IDialogTaskAction {

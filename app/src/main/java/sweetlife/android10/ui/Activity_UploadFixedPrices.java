@@ -18,7 +18,7 @@ import sweetlife.android10.log.LogHelper;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.ManagedAsyncTask;
 import sweetlife.android10.utils.SystemHelper;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import sweetlife.android10.data.fixedprices.*;
 import sweetlife.android10.supervisor.*;
 

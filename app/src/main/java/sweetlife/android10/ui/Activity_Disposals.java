@@ -21,7 +21,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class Activity_Disposals extends Activity_BasePeriod {
 	private SQLiteDatabase mDB;

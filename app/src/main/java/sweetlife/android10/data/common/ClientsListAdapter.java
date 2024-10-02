@@ -2,7 +2,7 @@ package sweetlife.android10.data.common;
 
 import sweetlife.android10.database.Request_ClientsList;
 
-import sweetlife.android10.R;
+//import sweetlife.android10.*;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -33,7 +33,7 @@ public class ClientsListAdapter extends CursorAdapter {
 
 		LayoutInflater inflater = LayoutInflater.from(context);
 
-		View row = inflater.inflate(R.layout.list_element, parent, false);
+		View row = inflater.inflate(sweetlife.android10.R.layout.list_element, parent, false);
 
 		ClientHolder holder = new ClientHolder(row);
 
@@ -48,7 +48,7 @@ public class ClientsListAdapter extends CursorAdapter {
 
 		ClientHolder(View row) {
 
-			textName = (TextView) row.findViewById(R.id.text);
+			textName = (TextView) row.findViewById(sweetlife.android10.R.id.text);
 		}
 
 		void populateFrom(Cursor cursor) {

@@ -1,6 +1,6 @@
 package sweetlife.android10.utils;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import sweetlife.android10.Settings;
 import sweetlife.android10.log.LogHelper;
 

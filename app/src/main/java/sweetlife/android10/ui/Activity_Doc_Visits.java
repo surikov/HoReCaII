@@ -10,7 +10,7 @@ import sweetlife.android10.database.Request_Visits;
 import sweetlife.android10.gps.UploadTask;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.SystemHelper;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.task.*;
 
 import android.content.Context;

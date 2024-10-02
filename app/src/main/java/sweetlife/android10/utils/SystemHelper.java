@@ -16,13 +16,13 @@ public class SystemHelper {
 
 	public static String getDiviceID(Context context) {
 		String deviceID = "None";
-		try {
+		/*try {
 			TelephonyManager tManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 			//System.out.println("tManager.getDeviceId() "+tManager.getDeviceId());
 			deviceID = ""+tManager.getDeviceId();
 		} catch(Throwable t) {
 			deviceID = ""+t.getMessage();
-		}
+		}*/
 		return deviceID;
 	}
 

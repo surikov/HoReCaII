@@ -282,7 +282,9 @@ public class Activity_NomenclatureNew extends Activity{
 			public void doTask(){
 				requestPriceNew();
 			}
-		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+		})
+				.locked().is(true)
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("Сертификат").afterTap.is(new Task(){
 			public void doTask(){
 				openCertificate();
@@ -472,6 +474,7 @@ public class Activity_NomenclatureNew extends Activity{
 					, filterStmStarRecomendaciaKorzina.value() == 5
 					, false
 			);
+
 			itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		}else{
 			int searchBy = sweetlife.android10.database.nomenclature.ISearchBy.SEARCH_ARTICLE;
@@ -530,7 +533,7 @@ public class Activity_NomenclatureNew extends Activity{
 						, filterStmStarRecomendaciaKorzina.value() == 5
 						, false
 				);
-				//System.out.println("Activity_NomenclatureNew.requeryGridData" + sql);
+				System.out.println("Activity_NomenclatureNew.requeryGridData" + sql);
 				itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 				//}
 			}else{

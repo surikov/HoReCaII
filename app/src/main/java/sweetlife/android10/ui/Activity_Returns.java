@@ -46,7 +46,7 @@ import reactive.ui.*;
 
 
 public class Activity_Returns extends Activity_Base implements ITableColumnsNames, IRemoveItem{
-
+	static File lastCameraFile=null;
 	//private EditText mEditShippingDate;
 	MenuItem menuDelete;
 	MenuItem menuClearFiles;
@@ -122,7 +122,8 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 				return;
 			}*/
 			//if(mIsEditable)
-			startCameraTakePicture();
+			//startCameraTakePicture();
+			lastCameraFile=Auxiliary.startCamera(Activity_Returns.this,GET_CAMERA_PICTURE);
 		}
 	};
 	private OnClickListener mGalleryClick = new OnClickListener(){
@@ -516,10 +517,15 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 					sendFile(filePath);
 					break;
 				case GET_CAMERA_PICTURE:
+					/*
 					mCameraHelper.galleryAddPic(this);
 					//mZayavka.setAktPretenziyPath(mCameraHelper.getCurrentPhotoPath());
 					//mEditAktPretenziyPath.setText(mCameraHelper.getCurrentPhotoPath());
 					sendFile(mCameraHelper.getCurrentPhotoPath());
+					*/
+					if(lastCameraFile!=null){
+						sendFile(lastCameraFile.getAbsolutePath());
+					}
 					break;
 			}
 		}
@@ -677,7 +683,7 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 	}
 
 
-
+/*
 	@SuppressWarnings("deprecation")
 	private void startCameraTakePicture(){
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -688,5 +694,5 @@ public class Activity_Returns extends Activity_Base implements ITableColumnsName
 			return;
 		}
 		startActivityForResult(takePictureIntent, GET_CAMERA_PICTURE);
-	}
+	}*/
 }

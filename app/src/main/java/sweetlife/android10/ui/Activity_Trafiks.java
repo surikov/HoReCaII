@@ -33,7 +33,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.TabHost.OnTabChangeListener;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class Activity_Trafiks extends Activity_Base implements ITableColumnsNames, OnTabChangeListener, ISearchBy {
 

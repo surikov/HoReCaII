@@ -5,7 +5,7 @@ import sweetlife.android10.ui.Popup_EditReturnNomenclature;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.widgets.BetterPopupWindow.OnCloseListener;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.util.TypedValue;
 import android.view.LayoutInflater;

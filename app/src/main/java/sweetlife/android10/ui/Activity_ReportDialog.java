@@ -2,7 +2,7 @@ package sweetlife.android10.ui;
 
 import sweetlife.android10.reports.IReportConsts;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -26,7 +26,7 @@ import sweetlife.android10.database.nomenclature.Request_Search;
 import sweetlife.android10.supervisor.Report_Base;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.*;
 import android.content.Context;

@@ -2,16 +2,19 @@ package sweetlife.android10.gps;
 
 import java.util.Iterator;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
-import android.location.GpsSatellite;
-import android.location.GpsStatus;
+//import android.location.GpsSatellite;
+//import android.location.GpsStatus;
+import android.location.GnssStatus;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationProvider;
+//import android.location.LocationProvider;
 import android.os.Bundle;
 
-class GeneralLocationListener implements LocationListener, GpsStatus.Listener{
+class GeneralLocationListener implements LocationListener
+		//, GpsStatus.Listener
+{
 
 	private static SWLifeGpsService gpsLoggingService;
 
@@ -19,7 +22,8 @@ class GeneralLocationListener implements LocationListener, GpsStatus.Listener{
 
 		gpsLoggingService = service;
 	}
-@Override
+
+	@Override
 	public void onLocationChanged(Location loc){
 		//System.out.println("GeneralLocationListener.onLocationChanged "+loc);
 		try{
@@ -42,21 +46,23 @@ class GeneralLocationListener implements LocationListener, GpsStatus.Listener{
 
 		gpsLoggingService.StartGPSStatusListener();
 	}
-/*
-	public void onStatusChanged(String provider, int status, Bundle extras){
 
-		if(status == LocationProvider.OUT_OF_SERVICE){
+	/*
+		public void onStatusChanged(String provider, int status, Bundle extras){
 
-			//gpsLoggingService.SetStatus("Установка соединения со спутниками...", SWLifeGpsService.YELLOW_COLOR);
-			gpsLoggingService.LocationNotAvailable();
+			if(status == LocationProvider.OUT_OF_SERVICE){
+
+				//gpsLoggingService.SetStatus("Установка соединения со спутниками...", SWLifeGpsService.YELLOW_COLOR);
+				gpsLoggingService.LocationNotAvailable();
+			}
+
+			if(status == LocationProvider.AVAILABLE){
+
+				//gpsLoggingService.SetStatus("GPS сервис запущен. Соединение со спутниками установлено:", SWLifeGpsService.GREEN_COLOR);
+			}
 		}
-
-		if(status == LocationProvider.AVAILABLE){
-
-			//gpsLoggingService.SetStatus("GPS сервис запущен. Соединение со спутниками установлено:", SWLifeGpsService.GREEN_COLOR);
-		}
-	}
-*/
+	*/
+	/*
 	public void onGpsStatusChanged(int event){
 
 		switch(event){
@@ -95,5 +101,5 @@ class GeneralLocationListener implements LocationListener, GpsStatus.Listener{
 				break;
 
 		}
-	}
+	}*/
 }

@@ -11,7 +11,7 @@ import sweetlife.android10.utils.DialogTask.IDialogTaskAction;
 import android.os.Bundle;
 import android.widget.RadioButton;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class Activity_ReportTrafiks extends Activity_ReportBase implements IReportConsts, IDialogTaskAction {
 

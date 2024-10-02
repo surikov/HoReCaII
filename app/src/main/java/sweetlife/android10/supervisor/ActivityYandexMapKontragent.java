@@ -4,7 +4,7 @@ import android.app.*;
 
 import reactive.ui.*;
 import sweetlife.android10.ApplicationHoreca;
-import sweetlife.android10.R;
+//import sweetlife.android10.*;
 import sweetlife.android10.Settings;
 import sweetlife.android10.gps.GPSInfo;
 import tee.binding.Bough;
@@ -55,15 +55,15 @@ public class ActivityYandexMapKontragent extends Activity {
 		//this.setTitle("Доставка на карте");
 		MapKitFactory.setApiKey(Cfg.MAPKIT_API_KEY);
 		MapKitFactory.initialize(this);
-		setContentView(R.layout.activity_client_yandex_map);
+		setContentView( sweetlife.android10.R.layout.activity_client_yandex_map);
 
-		mapview = (MapView) findViewById(R.id.clientmapview);
+		mapview = (MapView) findViewById( sweetlife.android10.R.id.clientmapview);
 		/*mapview.getMap().move(
 				new CameraPosition(clientPoint, mapZoom, 0.0f, 0.0f),
 				new Animation(Animation.Type.SMOOTH, 0),
 				null);*/
 
-		Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.red_flag);
+		Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),  sweetlife.android10.R.drawable.red_flag);
 		Bitmap bm = Bitmap.createScaledBitmap(imageBitmap, 100, 100, false);
 		clientPplacemarkMapObject = mapview.getMap().getMapObjects().addPlacemark(clientPoint, ImageProvider.fromBitmap(bm));
 		clientPplacemarkMapObject.setGeometry(clientPoint);

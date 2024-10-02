@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.content.Context;
 import android.content.Intent;

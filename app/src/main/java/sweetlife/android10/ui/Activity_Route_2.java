@@ -79,6 +79,7 @@ public class Activity_Route_2 extends Activity{
 	MenuItem menuMatricaTP;
 	//MenuItem menuMap;
 	//MenuItem menuLimit;
+	//MenuItem menuTest;
 	MenuItem menuAnketi;
 	MenuItem menuHelp;
 	MenuItem menuPlanObuchenia;
@@ -328,24 +329,24 @@ public class Activity_Route_2 extends Activity{
 			//
 		}
 		String sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=1 group by OsnovnoyKlientTorgovoyTochki";
-		System.out.println("refreshGridDayTitles "+sql);
-		Bough data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
-		columnPn.title.is("Пн/"+data.children.size());
+		System.out.println("refreshGridDayTitles " + sql);
+		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		columnPn.title.is("Пн/" + data.children.size());
 		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=2 group by OsnovnoyKlientTorgovoyTochki";
-		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
-		columnVt.title.is("Вт/"+data.children.size());
+		data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		columnVt.title.is("Вт/" + data.children.size());
 		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=3 group by OsnovnoyKlientTorgovoyTochki";
-		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
-		columnSr.title.is("Ср/"+data.children.size());
+		data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		columnSr.title.is("Ср/" + data.children.size());
 		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=4 group by OsnovnoyKlientTorgovoyTochki";
-		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
-		columnCh.title.is("Чт/"+data.children.size());
+		data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		columnCh.title.is("Чт/" + data.children.size());
 		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=5 group by OsnovnoyKlientTorgovoyTochki";
-		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
-		columnPt.title.is("Пт/"+data.children.size());
+		data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		columnPt.title.is("Пт/" + data.children.size());
 		sql = "select count(k.OsnovnoyKlientTorgovoyTochki) as cc from MarshrutyAgentov m join Kontragenty k on k._idrref=m.kontragent" + filterAgent + " where DenNedeli=6 group by OsnovnoyKlientTorgovoyTochki";
-		data=Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql,null));
-		columnSb.title.is("Сб/"+data.children.size());
+		data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		columnSb.title.is("Сб/" + data.children.size());
 		//columnPn.header(this);
 		//columnPn.header(this)
 	}
@@ -420,7 +421,9 @@ public class Activity_Route_2 extends Activity{
 						}, vigruzitN, "Выгрузить", new Task(){
 							public void doTask(){
 								if(vigruzitN.value() == 0){
-									final UploadTask task = new UploadTask(ApplicationHoreca.getInstance().getDataBase(), SystemHelper.getDiviceID(Activity_Route_2.this), getApplicationContext());
+									final UploadTask task = new UploadTask(ApplicationHoreca.getInstance().getDataBase()
+											, SystemHelper.getDiviceID(Activity_Route_2.this)
+											, getApplicationContext());
 									new Expect().status.is("Выгрузка визитов...")//
 											.task.is(new Task(){
 										public void doTask(){
@@ -645,6 +648,7 @@ public class Activity_Route_2 extends Activity{
 		//menuVigrusit = menu.add("Выгрузить");
 		//menuDocumenti = menu.add("Документы");
 		//menuGPSinformacia = menu.add("GPS информация" );
+		//menuTest = menu.add("Do test");
 		menuAnketi = menu.add("Анкеты заявок на новых клиентов");
 		menuDannieMercury = menu.add("Данные Меркурий");
 		menuZayavkaVnutrenneePeremechenie = menu.add("Заявка на внутреннее перемещение");
@@ -1288,6 +1292,11 @@ public class Activity_Route_2 extends Activity{
 			this.startActivityForResult(intent, 0);
 			return true;
 		}*/
+/*
+		if(item == menuTest){
+			doTest();
+			return true;
+		}*/
 		if(item == menuAnketi){
 			Intent intent = new Intent();
 			intent.setClass(this, ActivityVseAnketi.class);
@@ -1341,7 +1350,117 @@ public class Activity_Route_2 extends Activity{
 
 		return super.onOptionsItemSelected(item);
 	}
+/*
+	void doTest(){
+		String testData = "<raw>\n" +
+				"\t<Статус>1</Статус>\n" +
+				"\t<Сообщение></Сообщение>\n" +
+				"\t<ДанныеПоЗаказам>\n" +
+				"\t\t<ВнешнийНомер>HRC682-0829123639817</ВнешнийНомер>\n" +
+				"\t\t<Статус>1</Статус>\n" +
+				"\t\t<Сообщение></Сообщение>\n" +
+				"\t\t<Заказы>\n" +
+				"\t\t\t<Номер>12-1855056</Номер>\n" +
+				"\t\t\t<Тип>Заказ покупателя</Тип>\n" +
+				"\t\t\t<Статус>2</Статус>\n" +
+				"\t\t\t<Сообщение></Сообщение>\n" +
+				"\t\t\t<НеПодтвержденныеПозиции>\n" +
+				"\t\t\t\t<Номенклатура>79580, Майонез Печагин 67%Professional ведро 940 мл/880 гр</Номенклатура>\n" +
+				"\t\t\t\t<КоличествоЗаказано>24</КоличествоЗаказано>\n" +
+				"\t\t\t\t<КоличествоДефицит>23</КоличествоДефицит>\n" +
+				"\t\t\t\t<КоличествоПодтверждено>1</КоличествоПодтверждено>\n" +
+				"\t\t\t\t<ДатаПоступления>20240829</ДатаПоступления>\n" +
+				"\t\t\t\t<Текст>с 06/06 повышение на масло  5-10,5%</Текст>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>79581</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин Экстра 67% ведро 3 л/2,82 кг</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>143</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>79805</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин оливковый 67% 940 мл/880 гр</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>60</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>83674</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин провансаль дой-пак 67% 420 мл/395 гр</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>154</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>83173</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин 56% Professional 930 мл/880 гр</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>30</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>110540</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Efko Food Веганез 56% 3л</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>2</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t</НеПодтвержденныеПозиции>\n" +
+				"\t\t</Заказы>\n" +
+				"\t</ДанныеПоЗаказам>\n" +
+				"\t<ДанныеПоЗаказам>\n" +
+				"\t\t<ВнешнийНомер>HRC682-0829125920686</ВнешнийНомер>\n" +
+				"\t\t<Статус>1</Статус>\n" +
+				"\t\t<Сообщение></Сообщение>\n" +
+				"\t\t<Заказы>\n" +
+				"\t\t\t<Номер>12-1855058</Номер>\n" +
+				"\t\t\t<Тип>Заказ покупателя</Тип>\n" +
+				"\t\t\t<Статус>2</Статус>\n" +
+				"\t\t\t<Сообщение></Сообщение>\n" +
+				"\t\t\t<НеПодтвержденныеПозиции>\n" +
+				"\t\t\t\t<Номенклатура>110540, Майонез Efko Food Веганез 56% 3л</Номенклатура>\n" +
+				"\t\t\t\t<КоличествоЗаказано>24</КоличествоЗаказано>\n" +
+				"\t\t\t\t<КоличествоДефицит>22</КоличествоДефицит>\n" +
+				"\t\t\t\t<КоличествоПодтверждено>2</КоличествоПодтверждено>\n" +
+				"\t\t\t\t<ДатаПоступления></ДатаПоступления>\n" +
+				"\t\t\t\t<Текст></Текст>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>79580</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин 67%Professional ведро 940 мл/880 гр</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>0</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>79581</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин Экстра 67% ведро 3 л/2,82 кг</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>143</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>79805</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин оливковый 67% 940 мл/880 гр</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>60</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>83173</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Печагин 56% Professional 930 мл/880 гр</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>30</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>116235</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Юг Profi Провансаль 67% 5л</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>82</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>116661</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез Pechagin Professional Profi 67% 5л Ведро</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>130</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t\t<Аналоги>\n" +
+				"\t\t\t\t\t<Артикул>110535</Артикул>\n" +
+				"\t\t\t\t\t<Наименование>Майонез EFKO FOOD Professional универсальный 67% 10л/9,34кг</Наименование>\n" +
+				"\t\t\t\t\t<ДоступноеКоличество>83</ДоступноеКоличество>\n" +
+				"\t\t\t\t</Аналоги>\n" +
+				"\t\t\t</НеПодтвержденныеПозиции>\n" +
+				"\t\t</Заказы>\n" +
+				"\t</ДанныеПоЗаказам>\n" +
+				"</raw>";
+		Intent intent = new Intent();
+		intent.setClass(this, UploadOrderResult.class);
+		intent.putExtra("data", testData);
+		this.startActivityForResult(intent, UploadOrderResult.UploadDialogResult);
 
+	}
+*/
 	void promptIskluchenieVizitov(){
 		Numeric territory = new Numeric();
 

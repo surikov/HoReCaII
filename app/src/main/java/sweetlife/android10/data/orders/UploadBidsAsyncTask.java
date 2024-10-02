@@ -21,7 +21,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.*;
 
 public class UploadBidsAsyncTask extends ManagedAsyncTask<String> {

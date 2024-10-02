@@ -20,7 +20,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 //import java.net.*;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.Bough;
 
 public class Activity_ReportShowReport extends Activity_Base implements IReportConsts

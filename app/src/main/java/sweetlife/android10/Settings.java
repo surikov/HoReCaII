@@ -111,7 +111,12 @@ public class Settings {
 		//ReadXMLFile(TABLET_WORKING_DIR + SETTINGS_XML_NAME);
 		loadConfig();
 	}
-
+	/*
+public static sweetlife.android10.R Rres(){
+	sweetlife.android10.R rr= sweetlife.android10.R;
+	return rr;
+}
+*/
 	public static Bough check_1C_access() {
 		Bough result = new Bough();
 		try {

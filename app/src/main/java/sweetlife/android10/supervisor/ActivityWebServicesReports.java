@@ -1883,6 +1883,10 @@ public class ActivityWebServicesReports extends Activity{
 								}else{
 									if(nn == 7){
 										promptFixPriceNumber(num, art);
+									}else{
+										if(nn == 8){
+											promptFixPriceNumber2(num, art);
+										}
 									}
 								}
 							}
@@ -1902,7 +1906,8 @@ public class ActivityWebServicesReports extends Activity{
 				, "Комментировать заявку №" + num
 				, "Утвердить всё найденное"
 				, "Утвердить всё с таким же контрагентом"
-				, "Указать цену"
+				, "Указать согласованную цену"
+				, "Указать запрошенную цену"
 		};
 		final Numeric nn = new Numeric();
 		Auxiliary.pickSingleChoice(this, titles, nn, null, new Task(){
@@ -1925,13 +1930,24 @@ public class ActivityWebServicesReports extends Activity{
 					}
 				});
 	}
-
+	void promptFixPriceNumber2(final String num, final String art){
+		final Numeric price = new Numeric();
+		Auxiliary.pickNumber(ActivityWebServicesReports.this//
+				, "Заявка " + num + ", арт. " + art //
+				, price//
+				, "Отправить запрошенную цену", new Task(){
+					@Override
+					public void doTask(){
+						sendNewFixPrice2(num, art, price.value());
+					}
+				}, null, null);
+	}
 	void promptFixPriceNumber(final String num, final String art){
 		final Numeric price = new Numeric();
 		Auxiliary.pickNumber(ActivityWebServicesReports.this//
 				, "Заявка " + num + ", арт. " + art //
 				, price//
-				, "Отправить", new Task(){
+				, "Отправить согласованную цену", new Task(){
 					@Override
 					public void doTask(){
 						sendNewFixPrice(num, art, price.value());
@@ -1970,7 +1986,38 @@ public class ActivityWebServicesReports extends Activity{
 		});
 		expect.start(ActivityWebServicesReports.this);
 	}
-
+	void sendNewFixPrice2(final String num, final String art, final double price){
+		final Bough b = new Bough();
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					//https://service.swlife.ru/hrc120107/hs/ZayavkiNaFiksCeny/IzmZenuTP/номерДокумента/арт/цена/ТП
+					String url = //"http://10.10.5.2/lednev_hrc/"
+							Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ZayavkiNaFiksCeny/IzmZenuTP/"
+									+ URLEncoder.encode(num, "utf-8")//
+									+ "/" + URLEncoder.encode(art, "utf-8")//
+									+ "/" + URLEncoder.encode("" + price, "utf-8")//
+							;
+					Report_Base.startPing();
+					Bough result = new Bough();
+					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					b.child("result").value.is(new String(bytes, "UTF-8"));
+					preReport.writeCurrentPage();
+				}catch(Throwable t){
+					t.printStackTrace();
+					b.child("result").value.is(t.toString());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Auxiliary.warn(b.child("result").value.property.value(), ActivityWebServicesReports.this);
+				tapInstance2(preReport.getFolderKey(), preKey);
+			}
+		});
+		expect.start(ActivityWebServicesReports.this);
+	}
 	void allFixApprove(){
 		Auxiliary.pickConfirm(this, "Утвердить все найденные документы?", "Утвердить", new Task(){
 			@Override

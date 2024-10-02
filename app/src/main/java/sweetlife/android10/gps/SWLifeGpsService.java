@@ -1,13 +1,13 @@
 package sweetlife.android10.gps;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
+import android.annotation.*;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationManager;
+import android.location.*;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -20,10 +20,11 @@ public class SWLifeGpsService extends Service{
 	private static ILocationChange mLocationChangeClient;
 	private GeneralLocationListener mGPSLocationListener;
 	private LocationManager mGPSLocationManager;
-	private static int mPeriod;
+	//private static int mPeriod;
 	public static int GREEN_COLOR = Color.rgb(0, 251, 51);
 	public static int RED_COLOR = Color.rgb(204, 0, 51);
 	public static int YELLOW_COLOR = Color.rgb(255, 204, 0);
+	public static GnssStatus.Callback gnssStatusCallback = null;
 
 	//public static long lastSavedGPSms = 0;
 	//public static long whenSavedGPSms = 0;
@@ -122,20 +123,39 @@ public class SWLifeGpsService extends Service{
 	}
 
 	private void SetPeriod(Intent intent){
-		if(intent != null){
+		/*if(intent != null){
 			Bundle extras = intent.getExtras();
 			if(extras != null)
 				mPeriod = extras.getInt("period", 20 * 1000);
 		}else{
 			mPeriod = 20 * 1000;
-		}
+		}*/
 	}
 
 	public void StartGPSStatusListener(){
 		CheckGpsStatus();
 		if(Session.isGpsEnabled()){
-			mGPSLocationManager.addGpsStatusListener(mGPSLocationListener);
+
+			gnssStatusCallback = new GnssStatus.Callback(){
+				public void onStarted(){
+					//System.out.println("gnssStatusCallback.onStarted");
+				}
+
+				public void onStopped(){
+					//System.out.println("gnssStatusCallback.onStopped");
+				}
+
+				public void onFirstFix(int ttffMillis){
+					//System.out.println("gnssStatusCallback.onFirstFix");
+				}
+
+				public void onSatelliteStatusChanged(GnssStatus status){
+					//System.out.println("gnssStatusCallback.onSatelliteStatusChanged");
+				}
+			};
+			//mGPSLocationManager.addGpsStatusListener(mGPSLocationListener);
 			//SetStatus("Установка соединения со спутниками!", YELLOW_COLOR);
+			mGPSLocationManager.registerGnssStatusCallback(gnssStatusCallback, null);
 			Session.setUsingGps(true);
 		}else{
 		}
@@ -145,8 +165,8 @@ public class SWLifeGpsService extends Service{
 		mGPSLocationListener = new GeneralLocationListener(this);
 		mGPSLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		mGPSLocationManager.removeUpdates(mGPSLocationListener);
-		mGPSLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mGPSLocationListener);
-		mGPSLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mGPSLocationListener);
+		mGPSLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30*1000, 0, mGPSLocationListener);
+		mGPSLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 30*1000, 0, mGPSLocationListener);
 		//		mGPSLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
 		//				1000, 0,
 		//				mGPSLocationListener);
@@ -156,6 +176,8 @@ public class SWLifeGpsService extends Service{
 		if(mGPSLocationListener != null){
 			mGPSLocationManager.removeUpdates(mGPSLocationListener);
 			//			mGPSLocationManager.removeUpdates(mGPSLocationListener);
+
+			mGPSLocationManager.unregisterGnssStatusCallback(gnssStatusCallback);
 		}
 	}
 
@@ -167,7 +189,7 @@ public class SWLifeGpsService extends Service{
 
 	public void StopGPSStatusListener(){
 		if(mGPSLocationListener != null){
-			mGPSLocationManager.removeGpsStatusListener(mGPSLocationListener);
+			//mGPSLocationManager.removeGpsStatusListener(mGPSLocationListener);
 		}
 		Session.setUsingGps(false);
 		//SetStatus("GPS провайдеры недоступны.", RED_COLOR);
@@ -226,7 +248,7 @@ public class SWLifeGpsService extends Service{
 		//whenSavedGPSms = System.currentTimeMillis();
 		//Session.setCurrentLocationInfo(loc);
 		if(mLocationChangeClient != null){
-			mLocationChangeClient.newLocationPoint(loc, "±" + loc.getAccuracy()+"м");
+			mLocationChangeClient.newLocationPoint(loc, "±" + loc.getAccuracy() + "м");
 		}
 	}
 

@@ -5,7 +5,7 @@ import sweetlife.android10.consts.ITableColumnsNames;
 import sweetlife.android10.data.common.ZoomListCursorAdapter;
 import sweetlife.android10.database.nomenclature.Request_NomenclatureBase;
 import sweetlife.android10.utils.DecimalFormatHelper;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import sweetlife.android10.Settings;
 import android.content.Context;
 import android.database.Cursor;

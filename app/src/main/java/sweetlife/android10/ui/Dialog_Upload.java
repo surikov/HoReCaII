@@ -11,7 +11,7 @@ import sweetlife.android10.utils.SystemHelper;
 import sweetlife.android10.utils.UIHelper;
 
 import sweetlife.android10.ApplicationHoreca;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.content.Intent;
 import android.os.Bundle;

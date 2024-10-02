@@ -463,6 +463,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 			, boolean no_assortiment
 	){
 
+
 		//refreshTovariGeroiDay(dataOtgruzki);
 		adjustTekuschieCenyOstatkovPartiy_strip(kontragentID);
 
@@ -478,6 +479,8 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 
 		refreshPointData(dataOtgruzki, kontragentID, polzovatelID);
 		UpdateTask.refreshProdazhi_last(ApplicationHoreca.getInstance().getDataBase(), kontragentID);
+
+
 
 		int zapretOtgruzokOtvetsvennogo = getZapretOtgruzokOtvetsvennogo(kontragentID, polzovatelID);
 		boolean letuchka = dataOtgruzki.equals(DateTimeHelper.SQLDateString(new Date()));
@@ -628,7 +631,15 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		if(uchetnayaCena(kontragentID) || podrazdeleniya_NeIspolzovatCR(polzovatelID)){
 			sql = sql + "\n 	,0 as MinCena ";
 		}else{
-			sql = sql + "\n 	,case when ifnull(newSkidki.price,0)>0 and (newSkidki.comment='Индивидуальная' or newSkidki.comment='Фикс.цена') ";
+			sql = sql + "\n 	,case when ifnull(newSkidki.price,0)>0 and (newSkidki.comment='Индивидуальная' or newSkidki.comment='Фикс.цена') then 0";
+			sql = sql + "\n 		when ifnull(hero1.Cena,0)>0 then hero1.Cena when ifnull(n1.MinCena,0)>0 then n1.MinCena when ifnull(n1.zapret,x'00')=x'01' then 0 when ifnull(n1.nacenka,0)>0 then round(1000*(1.000+n1.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero2.Cena,0)>0 then hero2.Cena when ifnull(n2.MinCena,0)>0 then n2.MinCena when ifnull(n2.zapret,x'00')=x'01' then 0 when ifnull(n2.nacenka,0)>0 then round(1000*(1.000+n2.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero3.Cena,0)>0 then hero3.Cena when ifnull(n3.MinCena,0)>0 then n3.MinCena when ifnull(n3.zapret,x'00')=x'01' then 0 when ifnull(n3.nacenka,0)>0 then round(1000*(1.000+n3.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero4.Cena,0)>0 then hero4.Cena when ifnull(n4.MinCena,0)>0 then n4.MinCena when ifnull(n4.zapret,x'00')=x'01' then 0 when ifnull(n4.nacenka,0)>0 then round(1000*(1.000+n4.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero5.Cena,0)>0 then hero5.Cena when ifnull(n5.MinCena,0)>0 then n5.MinCena when ifnull(n5.zapret,x'00')=x'01' then 0 when ifnull(n5.nacenka,0)>0 then round(1000*(1.000+n5.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		else 0";
+			sql = sql + "\n 		end as MinCena";
+			/*sql = sql + "\n 	,case when ifnull(newSkidki.price,0)>0 and (newSkidki.comment='Индивидуальная' or newSkidki.comment='Фикс.цена') ";
 			sql = sql + "\n 	        then 0 "//
 
 					+ "\n 			when ifnull(hero1.Cena,0)>0 then hero1.Cena"//
@@ -661,7 +672,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 					+ "\n 				    )/1000    ,2 "//
 					+ "\n 			    ) "//
 					+ "\n 		    end as MinCena "//
-			;
+			;*/
 		}
 		//sql = sql + "\n 	,(select 1.1*c.Cena from CenyNomenklaturySklada c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as MaxCena "//
 		sql = sql + "\n 	,(select 1.2*c.Cena from CenyNomenklaturySklada_last c where date(c.period)<=date(parameters.dataOtgruzki) and c.nomenklatura=n._idrref order by c.period desc limit 1) as MaxCena "//
@@ -1449,6 +1460,12 @@ order by cc.sklad
 			System.out.println(sql);
 
 			System.out.println("CenyNomenklaturySklada_last" + new Date());
+
+
+			System.out.println("start refreshSkidkiKontragent "+ApplicationHoreca.getInstance().getClientInfo().getKod()+"/"+dataOtgruzki);
+			Cfg.refreshSkidkiKontragent(
+					ApplicationHoreca.getInstance().getClientInfo().getKod()
+					,"date('"+dataOtgruzki+"')");
 
 		}
 

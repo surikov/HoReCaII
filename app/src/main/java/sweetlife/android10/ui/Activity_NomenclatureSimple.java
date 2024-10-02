@@ -31,7 +31,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ListView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 
 public class Activity_NomenclatureSimple extends Activity_Base implements ITableColumnsNames, OnTabChangeListener {

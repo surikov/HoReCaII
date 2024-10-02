@@ -77,7 +77,7 @@ public class Request_Contracts {
 				+ clientID// 
 				+ " group by dk.[Kod] order by dk.[Naimenovanie] "//
 		;
-		//System.out.println(s);
+		System.out.println("RequestString "+clientID+": "+s);
 		return s;
 	}
 	private void AddContract(Cursor cursor) {

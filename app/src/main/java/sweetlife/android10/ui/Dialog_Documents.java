@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 
 public class Dialog_Documents extends Activity {

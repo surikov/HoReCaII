@@ -23,7 +23,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.*;
 
 public class UploadTask extends ManagedAsyncTask<String> implements ITableColumnsNames{
@@ -39,7 +39,8 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 	}
 
 	public EParserResult UploadGPSPoints(String tpCode){
-		String sql = "select _id,BeginTime,latitude,longitude from GPSPoints where Upload=0 order by _id limit 100";
+		String sql = "select _id,BeginTime,latitude,longitude from GPSPoints where Upload=0 order by _id limit 333";
+		System.out.println("UploadGPSPoints " + tpCode + " " + sql);
 		Cursor c;
 		int biggestID = 0;
 		TimeZone cuTZ = TimeZone.getDefault();
@@ -67,11 +68,12 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 			}
 			c.close();
 			jsonBody = jsonBody + "\n]";
+			System.out.println("jsonBody " + jsonBody);
 			if(biggestID >= 0){
 				mResultString = "";
 				logAndPublishProgress("выгрузка GPS за " + BeginTime);
 				String url = Settings.getInstance().getBaseURL() + Settings.getInstance().selectedBase1C() + "/hs/GPS/ZagruzkaGPS/" + Cfg.whoCheckListOwner() + "/" + tpCode;
-				//System.out.println(url);
+				System.out.println(url);
 				//System.out.println(jsonBody);
 				byte[] bytes = {};
 				try{
@@ -87,7 +89,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 					mResultString = "Точки GPS не выгружены, повторите выгрузку\n\n(" + raw.child("Сообщение").value.property.value() + ")\n";
 					return EParserResult.EError;
 				}
-				mResultString = "Точки GPS выгружены: " + raw.child("Сообщение").value.property.value()+"\n";
+				mResultString = "Точки GPS выгружены: " + raw.child("Сообщение").value.property.value() + "\n";
 				String upd = "update GPSPoints set Upload=1 where Upload=0 and _id<=" + biggestID;
 				mDB.execSQL(upd);
 			}
@@ -218,6 +220,60 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 		mResultString = resultString.toString();
 		return EParserResult.EComplete;
 	}*/
+
+	public EParserResult __UploadVizits(){
+		try{
+			String mUserKod = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
+			String sql = "select * from Vizits where Upload = 0";
+			Cursor cursor = mDB.rawQuery(sql, null);
+			System.out.println(Auxiliary.fromCursor(mDB.rawQuery(sql, null)).dumpXML());
+			if(!cursor.moveToFirst()){
+				mResultString = mResultString + "\nВизиты: нет невыгруженных.";
+				return EParserResult.EComplete;
+			}else{
+				TimeZone cuTZ = TimeZone.getDefault();
+				String poyas = "" + Math.round(cuTZ.getOffset(new Date().getTime()) / (1000 * 60 * 60));
+				String person = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
+				String json = "[";
+				String dlmtr = "";
+				do{
+					String activity = null;
+					String beginTime = cursor.getString(cursor.getColumnIndex("BeginTime"));
+					String endTime = cursor.getString(cursor.getColumnIndex("EndTime"));
+					String client = cursor.getString(cursor.getColumnIndex("Client"));
+					if(endTime == null){
+						endTime = "";
+					}
+					if((endTime.length() > 0)){
+						activity = cursor.getString(cursor.getColumnIndex("Activity"));
+					}else{
+						endTime = beginTime;
+						activity = "Начало визита";
+					}
+					json = json + dlmtr + "{";
+					json = json + "\"Extnumber\":\"" + mDeviceID + "\"";
+					json = json + ",\"Client\":\"" + client + "\"";
+					json = json + ",\"Begin\":\"" + beginTime + "\"";
+					json = json + ",\"End\":\"" + endTime + "\"";
+					json = json + ",\"Poyas\":\"" + poyas + "\"";
+					json = json + ",\"Activity\":\"" + activity + "\"";
+					json = json + ",\"Person\":\"" + person + "\"";
+					json = json + "}";
+					dlmtr = ",";
+				}while(cursor.moveToNext());
+				json = json + "]";
+				System.out.println("UploadVizits " + json);
+				mResultString = mResultString + "\nВизиты: загружены.";
+			}
+			if(cursor != null && !cursor.isClosed()){
+				cursor.close();
+				cursor = null;
+			}
+		}catch(Throwable t){
+			mResultString = mResultString + "\nВизиты: " + t.getMessage();
+		}
+		return EParserResult.EComplete;
+	}
 
 	public EParserResult UploadVizits(){
 		//mDB.execSQL("delete from Vizits where date(BeginTime)>date('now','+1 days');");

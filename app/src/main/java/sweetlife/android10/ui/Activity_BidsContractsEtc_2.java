@@ -1176,7 +1176,7 @@ I/System.out: </>
 		setContentView(layoutless);
 		readExtras();
 		resetTitle();
-		Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod());
+		//Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod());
 		Cfg.refreshArtikleCount();
 		Cfg.refreshNomenklatureGroups(ApplicationHoreca.getInstance().getDataBase());
 
@@ -1981,7 +1981,7 @@ I/System.out: </>
 					+ Auxiliary.tryReFormatDate3(b.child("row").child("BeginTime").value.property.value(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss")
 					+ "\nдо "
 					+ userTime.format(now)
-					+ "\nпрошло только " + coarse + " мин.", Activity_BidsContractsEtc_2.this);
+					+ "\nпрошло меньше " + coarse + " мин.", Activity_BidsContractsEtc_2.this);
 			return false;
 		}
 		long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());

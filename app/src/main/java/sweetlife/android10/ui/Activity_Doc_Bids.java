@@ -7,7 +7,7 @@ import sweetlife.android10.data.orders.ZayavkaPokupatelya;
 import sweetlife.android10.database.Request_Bids;
 import sweetlife.android10.utils.DateTimeHelper;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.content.Context;
 import android.content.Intent;

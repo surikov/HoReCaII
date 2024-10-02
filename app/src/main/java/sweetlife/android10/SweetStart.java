@@ -45,7 +45,8 @@ public class SweetStart extends BroadcastReceiver {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, SweetStart.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent
+				, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         alarmMgr.cancel(alarmIntent);
         alarmIntent.cancel();
 /*
@@ -55,7 +56,7 @@ public class SweetStart extends BroadcastReceiver {
         alarmIntent.cancel();
 */
         intent = new Intent(context, SweetStart.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.set(Calendar.HOUR_OF_DAY, 6);

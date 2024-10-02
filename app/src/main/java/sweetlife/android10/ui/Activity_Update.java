@@ -11,7 +11,7 @@ import sweetlife.android10.utils.ManagedAsyncTask;
 import sweetlife.android10.utils.UIHelper;
 import sweetlife.android10.utils.UIHelper.IMessageBoxCallbackInteger;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -48,6 +48,7 @@ public class Activity_Update extends Activity_Base {
 			//Activity_UploadBids.logToFile("Activity_Update.catch.txt", t.getMessage());
 		}
 		//Activity_UploadBids.logToFile("updateCreate.done.txt", "done Activity_Update.onCreate");
+		Cfg.requeryFirebaseToken(this);
 	}
 
 	@Override

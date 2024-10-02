@@ -17,7 +17,7 @@ import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.ManagedAsyncTask;
 import sweetlife.android10.utils.SystemHelper;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

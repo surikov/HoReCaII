@@ -32,10 +32,19 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.*;
 import tee.binding.it.*;
 import tee.binding.task.Task;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+//import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
+
+import androidx.activity.result.contract.*;
+
+import androidx.activity.result.*;
 
 public class Activity_Login extends Activity{
 	Layoutless layoutless;
@@ -138,14 +147,23 @@ public class Activity_Login extends Activity{
 	}
 
 	void checkPermissionAndPrepare(){
+		System.out.println("checkPermissionAndPrepare");
+		System.out.println(":"+android.content.pm.PackageManager.PERMISSION_GRANTED);
+		System.out.println(this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION));
+		System.out.println(this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+		System.out.println(this.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION));
+		System.out.println(this.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS));
 		if(this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
 				|| this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
 				|| this.checkSelfPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED
+				|| this.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED
 		){
+			System.out.println("requestPermissions");
 			this.requestPermissions(new String[]{
 					Manifest.permission.ACCESS_COARSE_LOCATION
 					, Manifest.permission.ACCESS_FINE_LOCATION
 					, Manifest.permission.ACCESS_BACKGROUND_LOCATION
+					, Manifest.permission.POST_NOTIFICATIONS
 			}, this.ResultFromPermission);
 		}
 		/*System.out.println("checkPermissionsOrLogin");
@@ -169,7 +187,7 @@ public class Activity_Login extends Activity{
 
 		}
 	}
-
+/*
 	void _____reinstall(Activity activity) throws Exception{
 		System.out.println("reinstall");
 
@@ -227,7 +245,7 @@ public class Activity_Login extends Activity{
 		session.close();
 		System.out.println("done");
 	}
-
+*/
 	void appLogin(){
 
 		appLoginNext();
@@ -255,6 +273,9 @@ public class Activity_Login extends Activity{
 			promptReplaceDB();
 		}else{
 			if(stopUpdate.value()){
+				//System.out.println("test startUpdateFirebaseToken");
+				//startUpdateFirebaseToken();
+
 				adjustVipTerritoryParent();
 				Intent intent = new Intent();
 				intent.setClass(Activity_Login.this, Activity_Route_2.class);
@@ -262,10 +283,11 @@ public class Activity_Login extends Activity{
 				startActivity(intent);
 
 			}else{
-				startUpdateFirebaseToken();
+
 				Intent intent = new Intent();
 				intent.setClass(Activity_Login.this, Activity_Update.class);
 				startActivity(intent);
+
 			}
 			sweetlife.android10.SweetStart ss = new sweetlife.android10.SweetStart();
 			ss.initSchedule(this);
@@ -273,11 +295,11 @@ public class Activity_Login extends Activity{
 		}
 	}
 
-	void startUpdateFirebaseToken(){
-		if(new java.util.Date().getDay()==1){
-			Cfg.requeryFirebaseToken(this);
-		}
-	}
+	//void startUpdateFirebaseToken(Context cc){
+		//if(new java.util.Date().getDay()==1){
+			//Cfg.requeryFirebaseToken(cc);
+		//}
+	//}
 
 	void promptReplaceDB(){
 		Auxiliary.pickConfirm(Activity_Login.this, "Скачать новую базу?\n\nВнимание!\nВся информация и имеющиеся заказы будут удалены.", "Удалить и скачать", new Task(){
@@ -455,7 +477,7 @@ void cachePassword(String newPass){
 			if(apkReinstallStatus.equals("0")){
 				Auxiliary.warn("Установлена новая версия приложения", this);
 			}else{
-				Auxiliary.warn("Ощибка установки: " + apkReinstallStatus, this);
+				Auxiliary.warn("Ошибка установки: " + apkReinstallStatus, this);
 			}
 		}
 

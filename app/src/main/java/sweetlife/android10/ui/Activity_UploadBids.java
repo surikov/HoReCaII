@@ -33,7 +33,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import sweetlife.android10.widgets.*;
 import tee.binding.*;
 import tee.binding.it.Numeric;
@@ -212,7 +212,7 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	public static void buildDialogResult(Context activity, String msg, Bough result){
 		buildDialogResultAndClose(activity, msg, result,null,null);
 	}*/
-	public static void buildDialogResultAndClose(Context activity, String msg, Bough result,Activity activityToClose//,Task onAddAnalog
+	public static void __________buildDialogResultAndClose(Context activity, String msg, Bough result,Activity activityToClose//,Task onAddAnalog
 	){
 		System.out.println("buildDialogResultAndClose");
 		System.out.println("msg " + msg);
@@ -884,16 +884,41 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 						Bough bb = Bough.parseJSONorThrow(response);
 						//Bough b = Bough.parseJSON(result.child("result").child("raw").value.property.value());
 						//System.out.println("result is "+result);
-						System.out.println("bb is " + bb.dumpXML());
+						//System.out.println("bb is " + bb.dumpXML());
 						if(bb.children.size() > 0){
 
+							Vector<Bough> danniypozakazam = bb.children("ДанныеПоЗаказам");
+							for(int ii = 0; ii < danniypozakazam.size(); ii++){
+								Bough danniypozakazam1 = danniypozakazam.get(ii);
+								if(danniypozakazam1.child("Статус").value.property.value().equals("1")){
+									String vneshniyNomer=danniypozakazam1.child("ВнешнийНомер").value.property.value().trim();
+									String sql = "update ZayavkaPokupatelyaIskhodyaschaya set proveden=x'01' where nomer='" + vneshniyNomer + "';";
+									System.out.println(sql);
+									ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+								}
+							}
 							//Vector<Bough> forOrders = bb.children("ДанныеПоЗаказам");
-
+/*
 							String msg = "Выгрузка (" + result.child("result").child("code").value.property.value()
 									+ ", " + result.child("result").child("message").value.property.value() + "):\n"
 									+ bb.child("Сообщение").value.property.value();
+							*/
 							//showUploadResult(msg, bb);
-							buildDialogResultAndClose(Activity_UploadBids.this,msg, bb,null);
+							//buildDialogResultAndClose(Activity_UploadBids.this,msg, bb,null);
+							/*
+							Intent intent = new Intent();
+							intent.setClass(Activity_UploadBids.this, UploadOrderResult.class);
+							intent.putExtra("data", response);
+							Activity_UploadBids.this.startActivityForResult(intent, UploadOrderResult.UploadDialogResult);
+*/
+							UploadOrderResult.startUploadResultDialog(Activity_UploadBids.this,response);
+
+
+
+
+
+
+
 							/*
 							Vector<Bough> forOrders = bb.children("ДанныеПоЗаказам");
 							for (int rr = 0; rr < forOrders.size(); rr++) {

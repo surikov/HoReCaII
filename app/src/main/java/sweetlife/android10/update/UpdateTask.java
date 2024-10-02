@@ -39,7 +39,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.Bough;
 
 //
@@ -1246,6 +1246,40 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 				+ "\n	;	";
 		//System.out.println(sql);
 		mDB.execSQL(sql);
+
+
+
+		 sql = "	insert into DogovoryKontragentov_strip (	"//
+				+ "\n [_IDRRef],[_Version],[PometkaUdaleniya],[Predopredelennyy],[Vladelec],[Roditel],[EtoGruppa] "//
+				+ " ,[Kod],[Naimenovanie],[Data],[Nomer],[ValyutaVzaimoraschetov],[VedenieVzaimoraschetov] "//
+				+ " ,[VidVzaimoraschetov],[VidUsloviyDogovora],[DerzhatRezervBezOplatyOgranichennoeVremya] "//
+				+ " ,[DopustimayaSummaZadolzhennosti],[DopustimoeChisloDneyZadolzhennosti],[Kommentariy] "//
+				+ " ,[KontrolirovatSummuZadolzhennosti],[KontrolirovatChisloDneyZadolzhennosti],[ObosoblennyyUchetTovarovPoZakazamPokupateley] "//
+				+ " ,[Organizaciya],[ProcentKomissionnogoVoznagrazhdeniya],[ProcentPredoplaty] "//
+				+ " ,[SposobRaschetaKomissionnogoVoznagrazhdeniya],[UdalitTipSkidkiNacenki],[TipCen_0] "//
+				+ " ,[TipCen_1],[TipCen_2],[ChisloDneyRezervaBezOplaty],[VidDogovora] "//
+				+ " ,[UchetAgentskogoNDS],[VidAgentskogoDogovora],[KontrolirovatDenezhnyeSredstvaKomitenta] "//
+				+ " ,[RaschetyVUslovnykhEdinicakh],[Podrazdelenie],[GruppaDogovorov],[DataOkonchaniya] "//
+				+ " ,[Zakryt],[ZadolzhennostVBankDnyakh],[ReytingPoOplate],[BespalletnayaPostavka] "//
+				+ " ,[Khoreka_VidOplaty],[OtdelnayaPoslednyayaOplachennayaNakladnaya],[PhormaDogovora]  "//
+				+ " ,[Dostavka] "//
+				+ "\n		)	"//
+				+ "\n		select "//
+				+ "\n		d2.[_IDRRef],d2.[_Version],d2.[PometkaUdaleniya],d2.[Predopredelennyy],d2.[Vladelec],d2.[Roditel],d2.[EtoGruppa],d2.[Kod],d2.[Naimenovanie],d2.[Data],d2.[Nomer] "//
+				+ "\n		,d2.[ValyutaVzaimoraschetov],d2.[VedenieVzaimoraschetov],d2.[VidVzaimoraschetov],d2.[VidUsloviyDogovora],d2.[DerzhatRezervBezOplatyOgranichennoeVremya] "//
+				+ "\n		,d2.[DopustimayaSummaZadolzhennosti],d2.[DopustimoeChisloDneyZadolzhennosti],d2.[Kommentariy],d2.[KontrolirovatSummuZadolzhennosti] "//
+				+ "\n		,d2.[KontrolirovatChisloDneyZadolzhennosti],d2.[ObosoblennyyUchetTovarovPoZakazamPokupateley],d2.[Organizaciya],d2.[ProcentKomissionnogoVoznagrazhdeniya] "//
+				+ "\n		,d2.[ProcentPredoplaty],d2.[SposobRaschetaKomissionnogoVoznagrazhdeniya],d2.[UdalitTipSkidkiNacenki],d2.[TipCen_0],d2.[TipCen_1],d2.[TipCen_2] "//
+				+ "\n		,d2.[ChisloDneyRezervaBezOplaty],d2.[VidDogovora],d2.[UchetAgentskogoNDS],d2.[VidAgentskogoDogovora],d2.[KontrolirovatDenezhnyeSredstvaKomitenta] "//
+				+ "\n		,d2.[RaschetyVUslovnykhEdinicakh],d2.[Podrazdelenie],d2.[GruppaDogovorov],d2.[DataOkonchaniya],d2.[Zakryt],d2.[ZadolzhennostVBankDnyakh],d2.[ReytingPoOplate] "//
+				+ "\n		,d2.[BespalletnayaPostavka],d2.[Khoreka_VidOplaty],d2.[OtdelnayaPoslednyayaOplachennayaNakladnaya],d2.[PhormaDogovora],d2.[Dostavka] "//
+				+ "\n		from DogovoryKontragentov d2 "//
+				+ "\n			join kontragenty k2 on d2.vladelec=k2._idrref and k2._idrref not in (select kontragent from MarshrutyAgentov) "
+				+ "\n	;	";
+		System.out.println("refreshDogovoryKontragentov_strip "+sql);
+		mDB.execSQL(sql);
+
+
 		/*if (upd != null) {
 			upd.logAndPublishProcess("Индексирование БД - Договоры контрагентов");
 		}*/

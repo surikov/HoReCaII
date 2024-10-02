@@ -6,7 +6,7 @@ import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.Hex;
 
 import sweetlife.android10.ApplicationHoreca;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.content.Intent;
 import android.database.Cursor;

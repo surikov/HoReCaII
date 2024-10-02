@@ -2,7 +2,7 @@ package sweetlife.android10.reports;
 
 import sweetlife.android10.database.Request_ClientsList;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.content.Context;
 import android.database.Cursor;

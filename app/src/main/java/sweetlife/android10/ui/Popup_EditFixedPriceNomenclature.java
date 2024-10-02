@@ -16,7 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class Popup_EditFixedPriceNomenclature extends BetterPopupWindow {
 

@@ -2,11 +2,12 @@ package sweetlife.android10.data.disposal;
 
 import org.w3c.dom.Document;
 
+import sweetlife.android10.*;
 import sweetlife.android10.net.ParserBase;
 
 import android.content.res.Resources;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class DisposalsXMLParser extends ParserBase {
 
@@ -27,7 +28,7 @@ public class DisposalsXMLParser extends ParserBase {
 		switch (mParserResult) {
 
 			case EComplete:
-				return res.getString(R.string.disposal_uploaded_successful);
+				return res.getString(sweetlife.android10.R.string.disposal_uploaded_successful);
 
 			case EError:
 				return res.getString(R.string.disposal_not_uploaded);

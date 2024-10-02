@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import sweetlife.android10.R;
+//import sweetlife.android10.*;
 
 public class DisposalsListAdapter extends ZoomListCursorAdapter {
 
@@ -33,7 +33,7 @@ public class DisposalsListAdapter extends ZoomListCursorAdapter {
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup view) {
 
-		View row = LayoutInflater.from(context).inflate(R.layout.row_disposals, view, false);
+		View row = LayoutInflater.from(context).inflate(sweetlife.android10.R.layout.row_disposals, view, false);
 
 		DisposalsHolder holder = new DisposalsHolder(row);
 
@@ -53,12 +53,12 @@ public class DisposalsListAdapter extends ZoomListCursorAdapter {
 
 		DisposalsHolder(View row) {
 
-			mImageUploaded = (ImageView) row.findViewById(R.id.image_uploaded);
-			mTextNumber = (TextView) row.findViewById(R.id.text_number);
-			mTextDate = (TextView) row.findViewById(R.id.text_date);
-			mTextComment = (TextView) row.findViewById(R.id.text_comment);
-			mTextKontragent = (TextView) row.findViewById(R.id.text_kontragent);
-			mTextAmount = (TextView) row.findViewById(R.id.text_amount);
+			mImageUploaded = (ImageView) row.findViewById(sweetlife.android10.R.id.image_uploaded);
+			mTextNumber = (TextView) row.findViewById(sweetlife.android10.R.id.text_number);
+			mTextDate = (TextView) row.findViewById(sweetlife.android10.R.id.text_date);
+			mTextComment = (TextView) row.findViewById(sweetlife.android10.R.id.text_comment);
+			mTextKontragent = (TextView) row.findViewById(sweetlife.android10.R.id.text_kontragent);
+			mTextAmount = (TextView) row.findViewById(sweetlife.android10.R.id.text_amount);
 		}
 
 		void populateFrom(Cursor cursor, float rowTextFontSize) {

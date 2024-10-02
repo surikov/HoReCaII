@@ -62,7 +62,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TableLayout.LayoutParams;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.*;
 import tee.binding.it.*;
 import tee.binding.task.*;
@@ -888,7 +888,7 @@ public class Activity_BidsContractsEtc extends Activity_Base implements IDialogT
 									, result);
 							if (!mWantExit) {
 								UIHelper.quickWarning(getString(R.string.vizit_complete), Activity_BidsContractsEtc.this);
-								//Toast.makeText(getApplicationContext(), getString(R.string.vizit_complete), 
+								//Toast.makeText(getApplicationContext(), getString(R.string.vizit_complete),
 								//		Toast.LENGTH_SHORT).show();
 								dialog.dismiss();
 							} else {

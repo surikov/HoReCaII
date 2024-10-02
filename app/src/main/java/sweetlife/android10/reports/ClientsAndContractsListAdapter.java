@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class ClientsAndContractsListAdapter extends BaseExpandableListAdapter {
 

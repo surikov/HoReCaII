@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class FilesListAdapter extends ZoomListArrayAdapter {
 
@@ -46,7 +46,7 @@ public class FilesListAdapter extends ZoomListArrayAdapter {
 
 		if (convertView == null) {
 
-			convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_files, null);
+			convertView = LayoutInflater.from(parent.getContext()).inflate(sweetlife.android10.R.layout.row_files, null);
 
 			holder = new FilesViewHolder(convertView);
 
@@ -67,7 +67,7 @@ public class FilesListAdapter extends ZoomListArrayAdapter {
 
 		FilesViewHolder(View row) {
 
-			mTextFileName = (TextView) row.findViewById(R.id.text_file_name);
+			mTextFileName = (TextView) row.findViewById(sweetlife.android10.R.id.text_file_name);
 		}
 
 		void SetValues(String file) {

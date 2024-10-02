@@ -3,7 +3,7 @@ package sweetlife.android10.data.orders;
 import java.util.ArrayList;
 
 import sweetlife.android10.log.*;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import sweetlife.android10.supervisor.Cfg;
 
 import android.content.Context;

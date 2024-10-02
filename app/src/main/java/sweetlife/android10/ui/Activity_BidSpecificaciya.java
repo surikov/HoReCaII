@@ -754,7 +754,7 @@ public class Activity_BidSpecificaciya extends Activity {
 						//r.url.is(Settings.getInstance().getBaseURL()+"RequestForSpecifictest.1cws")//
 						.xml.is(soapXML);
 				Report_Base.startPing();
-
+				//r.startNow("hrc270", "mU8zocan");
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 			}
 		}).afterDone.is(new Task() {

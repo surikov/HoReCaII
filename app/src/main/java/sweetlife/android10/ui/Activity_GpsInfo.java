@@ -10,7 +10,7 @@ import sweetlife.android10.gps.IGpsLoggerServiceClient;
 import sweetlife.android10.gps.SWLifeGpsService;
 import sweetlife.android10.gps.Session;
 import sweetlife.android10.gps.Utilities;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.Activity;
 import android.location.Location;

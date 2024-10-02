@@ -80,7 +80,11 @@ public class Activity_FireBaseMessages extends Activity {
 		folder.mkdirs();
 		deleteOldFiles(folder);
 		File[] files = folder.listFiles();
-		java.util.Arrays.sort(files);
+		java.util.Arrays.sort(files,new java.util.Comparator<File>(){
+			public int compare(File a, File b)			{
+				return (int)(a.lastModified() - b.lastModified());
+			}
+		});
 		SimpleDateFormat frmt = new SimpleDateFormat("dd.MM.yy HH:mm");
 		for (int i = 0; i < files.length; i++) {
 			File f = files[files.length - 1 - i];
@@ -90,61 +94,61 @@ public class Activity_FireBaseMessages extends Activity {
 			java.util.Date date = new java.util.Date((long) dd);
 
 			String title = frmt.format(date);
-			String ur = "!";
-			String dateEndTxt = null;
-			java.util.Date dateEnd = null;
+			//String ur = "!";
+			//String dateEndTxt = null;
+			//java.util.Date dateEnd = null;
 			//f.getAbsolutePath()
 			String bdy = Auxiliary.strings2text(Auxiliary.readTextFromFile(f));
-			String[] parts1 = bdy.split("~");
-			if (parts1.length > 0) {
-				String[] parts2 = parts1[0].split(":");
-				if (parts2.length > 1) {
-					dateEndTxt = Auxiliary.tryReFormatDate(parts2[0], "yyyyMMdd", "dd.MM.yyyy");
+			String[] parts = bdy.split("~");
+			String msgTitle = "";
+			String bodyNum = "";
+			String bodyDate = "";
+			String bodyCaption = "";
+			String bodyURL = "";
+			if(parts.length > 0)
+				msgTitle = parts[0].trim();
+			if(parts.length > 1)
+				bodyNum = parts[1].trim();
+			if(parts.length > 2)
+				bodyDate = parts[2].trim();
+			if(parts.length > 3)
+				bodyCaption = parts[3].trim();
+			if(parts.length > 4)
+				bodyURL = parts[4].trim();
+			java.util.Date dateEnd=null;
+			if (parts.length > 0) {
+				//String[] parts2 = parts1[0].split(":");
+				if (bodyDate.length() > 1) {
+					String dateEndTxt = Auxiliary.tryReFormatDate(bodyDate, "dd.MM.yyyy", "dd.MM.yyyy");
 					SimpleDateFormat endfrmt = new SimpleDateFormat("dd.MM.yyyy");
 					try {
-						dateEnd = endfrmt.parse(dateEndTxt);
-
+						dateEnd = endfrmt.parse(bodyDate);
 						dateEnd.setHours(23);
 						dateEnd.setMinutes(59);
 					} catch (Throwable t) {
 						t.printStackTrace();
 					}
-					title = frmt.format(date) + " (до " + dateEndTxt + ") " + parts2[1];
+					title = frmt.format(date) + " (до " + dateEndTxt + ") " + title;
 				} else {
-					title = frmt.format(date) + " " + parts1[0];
+					title = frmt.format(date) + " " + title;
 				}
-				if (parts1.length > 1) {
+				/*if (parts1.length > 1) {
 					bdy = parts1[1];
 					if (parts1.length > 2) {
 						ur = parts1[2];
 					}
-				}
+				}*/
 			}
-            /*if (parts1.length > 0) {
-                title = frmt.format(date) + " " + parts1[0];
-                if (parts1.length > 1) {
-                    bdy = parts1[1];
-                    String[] p2 = bdy.split("\\{");
-                    if (p2.length > 1) {
-                        bdy = p2[0];
-                        ur = p2[1];
-                    }
-                    String[] p3 = ur.split("\\}");
-                    if (p3.length > 1) {
-                        ur = p3[0];
-                    }
-                }
-            }*/
 			if (dateEnd != null && dateEnd.before(new java.util.Date())) {
 				System.out.println("delete message " + f.getAbsolutePath());
 				f.delete();
 			} else {
-				final String tourl = ur.replace("%ПользовательКод%", Cfg.whoCheckListOwner());
-				final String totitle = title;
+				final String tourl = bodyURL.replace("%ПользовательКод%", Cfg.whoCheckListOwner());
+				final String totitle = msgTitle;
 				Task tap = new Task() {
 					@Override
 					public void doTask() {
-						if (tourl.equals("!")) {
+						if (tourl.length()<1) {
 							System.out.println("no url");
 						} else {
 							System.out.println("go " + tourl);
@@ -158,7 +162,7 @@ public class Activity_FireBaseMessages extends Activity {
 						}
 					}
 				};
-				kod.cell(title, tap, bdy);
+				kod.cell(title, tap, bodyCaption);
 			}
 		}
 		grid.refresh();

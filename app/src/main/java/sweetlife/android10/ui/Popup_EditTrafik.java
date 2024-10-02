@@ -7,7 +7,7 @@ import sweetlife.android10.data.orders.ZayavkaPokupatelya_Trafik;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.widgets.BetterPopupWindow;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.DatePickerDialog;
 import android.content.Context;

@@ -14,7 +14,7 @@ import sweetlife.android10.data.fixedprices.FixedPricesNomenclatureListAdapter;
 import sweetlife.android10.data.fixedprices.ZayavkaNaSkidki;
 import sweetlife.android10.log.LogHelper;
 import sweetlife.android10.widgets.BetterPopupWindow.OnCloseListener;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.Bough;
 import tee.binding.it.*;
 import tee.binding.task.Task;

@@ -8,7 +8,7 @@ import sweetlife.android10.reports.ReportKpiInfo;
 import sweetlife.android10.reports.ReportKpiXMLSerializer;
 import sweetlife.android10.utils.DateTimeHelper;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;

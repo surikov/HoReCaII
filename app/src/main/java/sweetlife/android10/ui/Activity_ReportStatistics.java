@@ -23,7 +23,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class Activity_ReportStatistics extends Activity_ReportBase {
 	private EditText mEditBeginOrder;

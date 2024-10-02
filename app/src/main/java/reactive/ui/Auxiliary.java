@@ -1403,8 +1403,8 @@ public class Auxiliary{
 								.width().is(Auxiliary.tapSize * 14)
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(grid.noHead.is(true).columns(new Column[]{
-								lines.title.is("data").width.is(Auxiliary.tapSize * 14)
-						})
+										lines.title.is("data").width.is(Auxiliary.tapSize * 14)
+								})
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 1.0)
 								.width().is(Auxiliary.tapSize * 14)
@@ -1627,11 +1627,11 @@ public class Auxiliary{
 								.width().is(Auxiliary.tapSize * 10)
 								.height().is(Auxiliary.tapSize * 0.7))//
 						.child(grid.noHead.is(true).columns(
-								new Column[]{
-										lines.title.is("data").width.is(Auxiliary.tapSize * 8.5)
-										, stateUp.noVerticalBorder.is(true).title.is("up").width.is(Auxiliary.tapSize * 0.5)
-										, stateDown.noVerticalBorder.is(true).title.is("down").width.is(Auxiliary.tapSize * 1)
-								})
+										new Column[]{
+												lines.title.is("data").width.is(Auxiliary.tapSize * 8.5)
+												, stateUp.noVerticalBorder.is(true).title.is("up").width.is(Auxiliary.tapSize * 0.5)
+												, stateDown.noVerticalBorder.is(true).title.is("down").width.is(Auxiliary.tapSize * 1)
+										})
 								.left().is(Auxiliary.tapSize * 0.5)
 								.top().is(Auxiliary.tapSize * 1.0)
 								.width().is(Auxiliary.tapSize * 10)
@@ -2327,7 +2327,7 @@ public class Auxiliary{
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent pendingIntent = PendingIntent.getActivity(packageContext, 0 // Request code
 				, intent,
-				PendingIntent.FLAG_ONE_SHOT);
+				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
 		String channelId = "swtestchan";//getString(R.string.default_notification_channel_id);
 		Uri defaultSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION);
@@ -2355,6 +2355,52 @@ public class Auxiliary{
 
 		notificationManager.notify(0 // ID of notification
 				, notificationBuilder.build());
+
+	}
+
+	public static File createImageFile() throws IOException{
+		String albumName = "Horeca3";
+		String dcim = "/dcim/";
+		File storageDir = null;
+		File getAlbumStorageDir = new File(Environment.getExternalStorageDirectory() + dcim + albumName);
+		if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())){
+			storageDir = getAlbumStorageDir;
+			if(storageDir != null){
+				if(!storageDir.mkdirs()){
+					if(!storageDir.exists()){
+
+						//
+
+					}
+				}
+			}
+		}
+		String timeStamp = new SimpleDateFormat("yyyyMMdd").format(new Date());
+		String imageFileName = "photo" + timeStamp + "_";
+		File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+		return image;
+	}
+
+	public static java.io.File startCamera(Activity aa, final int resultID){
+		//https://www.howtodoandroid.com/capture-image-android/
+		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		try{
+			java.io.File imFile = Auxiliary.createImageFile();
+			System.out.println("camera file " + imFile.getAbsolutePath());
+			//Uri ff = Uri.fromFile(imFile);
+			//System.out.println("Uri " + ff.toString());
+			Uri uri = androidx.core.content.FileProvider.getUriForFile(aa, "sweetlife.android10.fileprovider", imFile);
+			System.out.println("Uri2 " + uri.toString());
+			//takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, ff);
+			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+			aa.startActivityForResult(takePictureIntent, resultID);
+			return imFile;
+		}catch(IOException e){
+			e.printStackTrace();
+			return null;
+		}
+
 
 	}
 

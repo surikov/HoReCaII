@@ -19,7 +19,7 @@ import sweetlife.android10.net.IParserBase;
 
 import android.content.res.Resources;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class ReturnsXMLParser extends DefaultHandler implements IParserBase {
 

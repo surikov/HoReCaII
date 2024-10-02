@@ -11,7 +11,7 @@ import sweetlife.android10.data.common.IZoomList;
 import sweetlife.android10.log.LogHelper;
 import sweetlife.android10.utils.AsyncTaskManager;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.app.Activity;
 import android.app.AlertDialog;

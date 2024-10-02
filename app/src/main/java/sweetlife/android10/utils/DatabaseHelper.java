@@ -137,19 +137,21 @@ public class DatabaseHelper {
 				+ ",[Zapret] blob null"//
 				+ ");"//
 		);
+		/*
 		try {
 			mDB.execSQL("alter table CenyNomenklaturyPoPodrazdeleniu add column sklad text;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}
-
+*/
+		/*
 		try {
 			System.out.println("alter table GPSPoints add column comment text;");
 			mDB.execSQL("alter table GPSPoints add column comment text;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
 		}
-
+*/
 		
 		LogHelper.debug("recept tables");
 		mDB.execSQL("create table if not exists Receptii ("//
@@ -206,17 +208,17 @@ System.out.println("create RecommendationAndBasket1221");
 		mDB.execSQL("create index if not exists IX_stars_artikul on stars(artikul);");
 
 		//
-		try {
+		/*try {
 			mDB.execSQL("alter table Nomenklatura add column Mark blob;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
-		}
+		}*/
 
-		try {
+		/*try {
 			mDB.execSQL("alter table TekuschieCenyOstatkovPartiy add column VidDostavki blob;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
-		}
+		}*/
 
 		mDB.execSQL("create table if not exists Brand ("//
 				+ "_id integer primary key asc"//
@@ -228,11 +230,11 @@ System.out.println("create RecommendationAndBasket1221");
 		mDB.execSQL("create index if not exists IX_Brand_idrref on Brand(_idrref);");
 		mDB.execSQL("create index if not exists IX_Brand_stm on Brand(stm);");
 
-		try {
+		/*try {
 			mDB.execSQL("alter table Nomenklatura add column Brand blob;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
-		}
+		}*/
 		mDB.execSQL("create index if not exists IX_Nomenklatura_Brand on Nomenklatura(Brand);");
 
 
@@ -250,25 +252,25 @@ System.out.println("create RecommendationAndBasket1221");
 			System.out.println(t.getMessage());
 		}*/
 
-		try {
+		/*try {
 			mDB.execSQL("alter table AnketaKlienta add column DogovorEDO number;");
 			mDB.execSQL("alter table AnketaKlienta add column OGRN text;");
 			mDB.execSQL("alter table AnketaKlienta add column OsnovaniePodpisi number;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
-		}
+		}*/
 
-		try {
+		/*try {
 			mDB.execSQL("alter table nomenklatura add column Tegi text;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
-		}
-		try {
+		}*/
+		/*try {
 			mDB.execSQL("alter table MatricaRowsX add column deleteComment text;");
 			mDB.execSQL("alter table MatricaRowsX add column deletePath text;");
 		} catch (Throwable t) {
 			System.out.println(t.getMessage());
-		}
+		}*/
 
 		mDB.execSQL("create index if not exists IX_nomenklatura_Product on nomenklatura(Product);");
 		LogHelper.debug("Skidki adjust");

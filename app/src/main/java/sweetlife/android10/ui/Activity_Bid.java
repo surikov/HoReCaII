@@ -46,7 +46,7 @@ import sweetlife.android10.supervisor.Report_Base;
 import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.widgets.BetterPopupWindow.OnCloseListener;
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 import tee.binding.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
@@ -4666,7 +4666,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 												+ ", " + result.child("result").child("message").value.property.value() + "):\n"
 												+ bb.child("Сообщение").value.property.value();
 										//Activity_UploadBids.buildDialogResult( Activity_Bid.this,"Отправка заказа", bb);
-										Activity_UploadBids.buildDialogResultAndClose( Activity_Bid.this,"Отправка заказа", bb,Activity_Bid.this);
+										//Activity_UploadBids.buildDialogResultAndClose( Activity_Bid.this,"Отправка заказа", bb,Activity_Bid.this);
+										UploadOrderResult.startUploadResultDialog( Activity_Bid.this,bb.name.is("root"));
 										//Activity_Bid.this.finish();
 									}else{
 										System.out.println("Empty " + result.dumpXML());

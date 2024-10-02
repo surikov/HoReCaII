@@ -16,8 +16,9 @@ public class UpdateApk extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		System.out.println("UpdateApk onStartCommand flags:" + flags + ", startId:" + startId + ", intent:" + intent);
 		//int t=PackageInstaller.STATUS_PENDING_USER_ACTION;
+		System.out.println("extras "+Auxiliary.bundle2bough(intent.getExtras()).dumpXML());
 		int status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, -999);
-		System.out.println("status:" + status);
+		System.out.println("PackageInstaller.EXTRA_STATUS:" + status);
 		if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
 			System.out.println("PackageInstaller.STATUS_PENDING_USER_ACTION " + status);
 			Intent confirmationIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
@@ -40,7 +41,7 @@ public class UpdateApk extends Service {
 		return START_NOT_STICKY;
 	}
 	void relogin(int status){
-		System.out.println("relogin status " + status);
+		System.out.println("UpdateApk relogin status " + status);
 		Intent intent = new Intent();
 		intent.setClass(this, Activity_Login.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

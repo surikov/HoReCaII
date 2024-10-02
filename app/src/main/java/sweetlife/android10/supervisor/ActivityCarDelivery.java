@@ -7,7 +7,7 @@ import android.os.Bundle;
 //import android.support.v7.widget.*;
 import android.view.*;
 
-import sweetlife.android10.R;
+//import sweetlife.android10.*;
 
 import android.app.Activity;
 
@@ -74,15 +74,15 @@ public class ActivityCarDelivery extends //AppCompatActivity {
         //this.setTitle("Доставка на карте");
         MapKitFactory.setApiKey(Cfg.MAPKIT_API_KEY);
         MapKitFactory.initialize(this);
-        setContentView(R.layout.activity_car_delivery);
+        setContentView( sweetlife.android10.R.layout.activity_car_delivery);
 
-        mapview = (MapView) findViewById(R.id.mapview);
+        mapview = (MapView) findViewById( sweetlife.android10.R.id.mapview);
         mapview.getMap().move(
                 new CameraPosition(TARGET_LOCATION, 15.0f, 0.0f, 0.0f),
                 new Animation(Animation.Type.SMOOTH, 0),
                 null);
         //Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),getResources().getIdentifier(drawableName, "drawable", getPackageName()));
-        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.svlogoshadow);
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(),  sweetlife.android10.R.drawable.svlogoshadow);
         Bitmap bm = Bitmap.createScaledBitmap(imageBitmap, 100, 100, false);
         //mapview.getMap().getMapObjects().addPlacemark(TARGET_LOCATION, ImageProvider.fromResource(this, R.drawable.swltruck));
         placemarkMapObject = mapview.getMap().getMapObjects().addPlacemark(TARGET_LOCATION, ImageProvider.fromBitmap(bm));

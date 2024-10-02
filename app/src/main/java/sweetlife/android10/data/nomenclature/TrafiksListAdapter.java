@@ -13,7 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
+import sweetlife.android10.*;
 
 public class TrafiksListAdapter extends ZoomListCursorAdapter implements ITableColumnsNames {
 

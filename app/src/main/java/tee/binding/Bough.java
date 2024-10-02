@@ -420,7 +420,7 @@ public class Bough {
 		if (current.value().children.size() > 0) {
 			return current.value().children.get(0);
 		} else {
-			return null;
+			return  null;
 		}
 	}
 

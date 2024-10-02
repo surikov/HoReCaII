@@ -25,7 +25,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public abstract class Activity_ReportBase extends Activity_BasePeriod implements IReportConsts, IDialogTaskAction {
 	private final int TIMEOUT = 300 * 1000;

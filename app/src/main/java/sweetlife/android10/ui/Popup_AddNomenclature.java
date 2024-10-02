@@ -8,7 +8,7 @@ import sweetlife.android10.database.nomenclature.Request_Search;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.widgets.BetterPopupWindow;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 import android.content.Context;
 import android.content.res.Resources;

@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class FixedPricesNomenclatureListAdapter extends ZoomListArrayAdapter {
 
@@ -44,7 +44,7 @@ public class FixedPricesNomenclatureListAdapter extends ZoomListArrayAdapter {
 
 		if (convertView == null) {
 
-			convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_fixed_prices_nomenclatura, null );
+			convertView = LayoutInflater.from(parent.getContext()).inflate(sweetlife.android10.R.layout.row_fixed_prices_nomenclatura, null );
 			
 			holder = new FixedPricesNomenclatureViewHolder( convertView );
 
@@ -73,10 +73,10 @@ public class FixedPricesNomenclatureListAdapter extends ZoomListArrayAdapter {
 		FixedPricesNomenclatureViewHolder( View row ) {
 
 			mTextNumber = (TextView)row.findViewById(R.id.text_n);
-			mTextArticle = (TextView)row.findViewById(R.id.text_article);
-			mTextNomenclature = (TextView)row.findViewById(R.id.text_nomenclature);
-			mTextCena = (TextView)row.findViewById(R.id.text_cena);
-			mTextTovarooborot = (TextView)row.findViewById(R.id.text_tovarooborot);	
+			mTextNomenclature = (TextView)row.findViewById(sweetlife.android10.R.id.text_nomenclature);
+			mTextCena = (TextView)row.findViewById(sweetlife.android10.R.id.text_cena);
+			mTextTovarooborot = (TextView)row.findViewById(sweetlife.android10.R.id.text_tovarooborot);
+			mTextArticle=(TextView)row.findViewById(R.id.text_article);
 		}
 
 		void SetValues( ZayavkaNaSkidki_TovaryPhiksCen tovar ) {
@@ -84,8 +84,8 @@ public class FixedPricesNomenclatureListAdapter extends ZoomListArrayAdapter {
 			mTextNumber.setText( String.valueOf(tovar.getNomerStroki()) );
 			mTextNumber.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
-
 			mTextArticle.setText( tovar.getArtikul() );
+
 			mTextArticle.setTextSize(TypedValue.COMPLEX_UNIT_PX, getRowTextFontSize());
 
 			mTextNomenclature.setText( tovar.getNomenklaturaNaimenovanie() );

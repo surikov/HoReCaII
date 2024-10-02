@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Observable;
 import java.util.Observer;
 
+import reactive.ui.*;
 import sweetlife.android10.Settings;
 import sweetlife.android10.data.common.ClientInfo;
 import sweetlife.android10.data.common.ClientsListAdapter;
@@ -22,7 +23,7 @@ import sweetlife.android10.utils.DateTimeHelper;
 import sweetlife.android10.utils.DecimalFormatHelper;
 import sweetlife.android10.utils.ManagedAsyncTask;
 import sweetlife.android10.utils.SystemHelper;
-
+import java.io.*;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -48,7 +49,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import sweetlife.android10.R;
+import sweetlife.android10.*;
 
 public class Dialog_EditDisposal extends Activity_Base implements Observer {
 	private RasporyazhenieNaOtgruzku mDisposal;
@@ -68,6 +69,7 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 	private AlertDialog mClientsDialog;
 	private CameraCaptureHelper mCameraHelper;
 	String hexKlient = null;
+	static File lastCameraFile=null;
 
 	public Dialog_EditDisposal() {
 		mClientsRequestHelper = new Request_ClientsList();
@@ -377,20 +379,33 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 
 	@SuppressWarnings("deprecation")
 	private void startCameraTakePicture() {
+		/*
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 		try {
-			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCameraHelper.createImageFile()));
+			java.io.File imFile=mCameraHelper.createImageFile();
+			System.out.println("camera file "+imFile.getAbsolutePath());
+			Uri ff=Uri.fromFile(imFile);
+			System.out.println("Uri "+ff.toString());
+			takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, ff);
 		} catch (IOException e) {
+			e.printStackTrace();
 			showDialog(IDD_WORKING_WITH_CAMERA_ERROR);
 			return;
 		}
+		System.out.println("GET_CAMERA_PICTURE "+GET_CAMERA_PICTURE);
 		startActivityForResult(takePictureIntent, GET_CAMERA_PICTURE);
+		*/
+		lastCameraFile=Auxiliary.startCamera(this,GET_CAMERA_PICTURE);
 	}
 
 	private void startMediaGallery() {
+		/*
 		Intent intent = new Intent(Intent.ACTION_PICK);
 		intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.CONTENT_TYPE);
 		startActivityForResult(intent, GET_GALLERY_PICTURE2);
+		*/
+		Auxiliary.startMediaGallery(this,GET_GALLERY_PICTURE2);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -448,6 +463,10 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		System.out.println("onActivityResult");
+		System.out.println(requestCode);
+		System.out.println(resultCode);
+		System.out.println(data);
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
 				case GET_GALLERY_PICTURE2:
@@ -464,9 +483,14 @@ public class Dialog_EditDisposal extends Activity_Base implements Observer {
 					mFilesListAdapter.notifyDataSetChanged();
 					break;
 				case GET_CAMERA_PICTURE:
-					mCameraHelper.galleryAddPic(this);
-					mDisposal.addFile(mCameraHelper.getCurrentPhotoPath());
-					mFilesListAdapter.notifyDataSetChanged();
+					System.out.println("lastCameraFile "+lastCameraFile);
+					if(lastCameraFile!=null){
+						//mCameraHelper.galleryAddPic(this);
+						//mDisposal.addFile(mCameraHelper.getCurrentPhotoPath());
+						mDisposal.addFile(lastCameraFile.getAbsolutePath());
+						mFilesListAdapter.notifyDataSetChanged();
+						//
+					}
 					break;
 			}
 		}
