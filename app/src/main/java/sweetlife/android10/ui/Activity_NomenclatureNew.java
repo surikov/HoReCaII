@@ -3,6 +3,7 @@ package sweetlife.android10.ui;
 import android.app.*;
 import android.content.Context;
 import android.content.Intent;
+import android.net.*;
 import android.os.*;
 import android.util.Base64;
 import android.view.*;
@@ -23,7 +24,7 @@ import sweetlife.android10.consts.IExtras;
 import sweetlife.android10.data.nomenclature.NomenclatureCountHelper;
 import sweetlife.android10.database.Requests;
 import sweetlife.android10.database.nomenclature.*;
-import sweetlife.android10.supervisor.Cfg;
+import sweetlife.android10.supervisor.*;
 import sweetlife.android10.utils.*;
 import tee.binding.task.*;
 import tee.binding.*;
@@ -32,7 +33,7 @@ import tee.binding.it.*;
 
 public class Activity_NomenclatureNew extends Activity{
 
-	private boolean stopBackgroundActions=true;
+	private boolean stopBackgroundActions = true;
 
 	public static String lastSelectedArtikul = null;
 	static Numeric gridOffset = new Numeric();
@@ -107,7 +108,7 @@ public class Activity_NomenclatureNew extends Activity{
 		public void doTask(){
 			System.out.println("doRefreshData mode " + mode.value());
 			if(Activity_NomenclatureNew.this.stopBackgroundActions){
-				System.out.println("doRefreshData stopBackgroundActions "+Activity_NomenclatureNew.this.stopBackgroundActions);
+				System.out.println("doRefreshData stopBackgroundActions " + Activity_NomenclatureNew.this.stopBackgroundActions);
 			}
 			if(mode.value() == ShowViewNomenklatura){
 				refreshCategotyGrid();
@@ -135,7 +136,7 @@ public class Activity_NomenclatureNew extends Activity{
 	public void onCreate(Bundle savedInstanceState){
 		System.out.println("Activity_NomenclatureNew.onCreate");
 		super.onCreate(savedInstanceState);
-		Activity_NomenclatureNew.this.stopBackgroundActions=false;
+		Activity_NomenclatureNew.this.stopBackgroundActions = false;
 		buildUI();
 		doRefreshData.start();
 	}
@@ -235,56 +236,66 @@ public class Activity_NomenclatureNew extends Activity{
 			tipTochki.item(tipTochkiData.children.get(i).child("naimenovanie").value.property.value());
 		}
 		layoutless.child(new Knob(this).labelText.is("Поиск").locked().is(mode.equals(ShowViewPoisk)).afterTap.is(new Task(){
-			@Override
-			public void doTask(){
-				//System.out.println("knobViewPoisk");
-				mode.value(ShowViewPoisk);
-			}
-		}).left().is(layoutless.width().property.multiply(0.0 / 3))//
+					@Override
+					public void doTask(){
+						//System.out.println("knobViewPoisk");
+						mode.value(ShowViewPoisk);
+					}
+				}).left().is(layoutless.width().property.multiply(0.0 / 3))//
 				.top().is(0).width().is(layoutless.width().property.divide(3)).height().is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("Номенклатура").locked().is(mode.equals(ShowViewNomenklatura)).afterTap.is(new Task(){
-			@Override
-			public void doTask(){
-				//System.out.println("knobViewNomenklatura");
-				mode.value(ShowViewNomenklatura);
-			}
-		}).left().is(layoutless.width().property.multiply(1.0 / 3))//
+					@Override
+					public void doTask(){
+						//System.out.println("knobViewNomenklatura");
+						mode.value(ShowViewNomenklatura);
+					}
+				}).left().is(layoutless.width().property.multiply(1.0 / 3))//
 				.top().is(0).width().is(layoutless.width().property.divide(3)).height().is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("История").locked().is(mode.equals(ShowViewIstoria)).afterTap.is(new Task(){
-			@Override
-			public void doTask(){
-				//System.out.println("knobViewIstoria");
-				mode.value(ShowViewIstoria);
-			}
-		}).left().is(layoutless.width().property.multiply(2.0 / 3))//
+					@Override
+					public void doTask(){
+						//System.out.println("knobViewIstoria");
+						mode.value(ShowViewIstoria);
+					}
+				}).left().is(layoutless.width().property.multiply(2.0 / 3))//
 				.top().is(0).width().is(layoutless.width().property.divide(3)).height().is(1 * Auxiliary.tapSize));
 
 
 		layoutless.child(new Knob(this).labelText.is("Добавить").afterTap.is(new Task(){
-			public void doTask(){
-				returnSelectedRow();
-			}
-		})
+					public void doTask(){
+						returnSelectedRow();
+					}
+				})
 				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 1))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
 				.width().is(Auxiliary.tapSize * 2.5).height()
 				.is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("Фото").afterTap.is(new Task(){
-			public void doTask(){
-				openFoto();
-			}
-		})
+					public void doTask(){
+						openFoto();
+					}
+				})
 				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 2))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
 				.width().is(Auxiliary.tapSize * 2.5)
 				.height().is(1 * Auxiliary.tapSize));
+		/*
 		layoutless.child(new Knob(this).labelText.is("Запрос цен").afterTap.is(new Task(){
-			public void doTask(){
-				requestPriceNew();
-			}
-		})
+					public void doTask(){
+						requestPriceNew();
+					}
+				})
 				.locked().is(true)
 				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+		*/
+		layoutless.child(new Knob(this).labelText.is("Обратн.связь").afterTap.is(new Task(){
+					public void doTask(){
+						promptObratnaya();
+					}
+				})
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+
+
 		layoutless.child(new Knob(this).labelText.is("Сертификат").afterTap.is(new Task(){
 			public void doTask(){
 				openCertificate();
@@ -449,7 +460,7 @@ public class Activity_NomenclatureNew extends Activity{
 	void requeryGridData(){
 
 		//searchWeb();
-		System.out.println("requeryGridData mode " + mode.value()+"/"+searchWord.value());
+		System.out.println("requeryGridData mode " + mode.value() + "/" + searchWord.value());
 		if(mode.value() == ShowViewIstoria){
 			String sql = Request_NomenclatureBase.composeSQLall_Old(//.composeSQLall(//
 					DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
@@ -480,7 +491,7 @@ public class Activity_NomenclatureNew extends Activity{
 			int searchBy = sweetlife.android10.database.nomenclature.ISearchBy.SEARCH_ARTICLE;
 			if(mode.value() == ShowViewPoisk){
 				String filter = searchWord.value();
-				if(searchMode.value() == 3 && searchWord.value().trim().length()>0){
+				if(searchMode.value() == 3 && searchWord.value().trim().length() > 0){
 					filter = searchWeb();
 					if(filter.equals("")){
 						searchBy = ISearchBy.SEARCH_NAME;
@@ -489,10 +500,10 @@ public class Activity_NomenclatureNew extends Activity{
 						searchBy = ISearchBy.SEARCH_CUSTOM;
 					}
 				}else{
-					if(searchMode.value() == 1 || searchWord.value().trim().length()==0){
+					if(searchMode.value() == 1 || searchWord.value().trim().length() == 0){
 						searchBy = ISearchBy.SEARCH_NAME;
 					}
-					if(searchMode.value() == 2 ){
+					if(searchMode.value() == 2){
 						searchBy = ISearchBy.SEARCH_VENDOR;
 					}
 				}
@@ -647,7 +658,18 @@ public class Activity_NomenclatureNew extends Activity{
 			Activity_NomenclatureNew.this.startActivity(intent);
 		}
 	}
-
+	void promptObratnaya(){
+		if(selectedRow != null){
+			String artikul=selectedRow.child("Artikul").value.property.value();
+			String name=selectedRow.child("Naimenovanie").value.property.value();
+			String kodKlienta=ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
+			String clientName=ApplicationHoreca.getInstance().getClientInfo().getName().trim();
+			ActivityWebServicesReports.promptObratnayaSvyazKlient(this,artikul, name, kodKlienta,clientName);
+		}else{
+			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
+		}
+	}
+	/*
 	void requestPriceNew(){
 		if(selectedRow != null){
 			Vector<String> artikuls = new Vector<String>();
@@ -663,7 +685,7 @@ public class Activity_NomenclatureNew extends Activity{
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
 		}
 	}
-
+*/
 	/*
 		void toggleStarFilter() {
 			filterByStar.value(!filterByStar.value());
@@ -1045,7 +1067,7 @@ public class Activity_NomenclatureNew extends Activity{
 	protected void onPause(){
 		super.onPause();
 		System.out.println("Activity_NomenclatureNew.onPause");
-		Activity_NomenclatureNew.this.stopBackgroundActions=true;
+		Activity_NomenclatureNew.this.stopBackgroundActions = true;
 		me = null;
 		double newOffset = Math.floor(gridOffset.value() + this.gridItems.scrollView.getScrollY() / Auxiliary.tapSize);
 		if(newOffset < 0){
@@ -1061,8 +1083,39 @@ public class Activity_NomenclatureNew extends Activity{
 	protected void onResume(){
 		super.onResume();
 		System.out.println("Activity_NomenclatureNew.onResume");
-		Activity_NomenclatureNew.this.stopBackgroundActions=false;
+		Activity_NomenclatureNew.this.stopBackgroundActions = false;
 		me = this;
 		//doRefreshData.start();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+		System.out.println("requestCode "+requestCode+", resultCode "+resultCode);
+		String filePath = null;
+		Uri uri = null;
+		if(intent != null){
+			System.out.println("intent.getData() "+intent.getData());
+			switch(requestCode){
+				case ActivityWebServicesReports.etiketkaIDPicture:
+					uri = intent.getData();
+					filePath = Auxiliary.pathForMediaURI(this, uri);
+					if(filePath == null){
+						Auxiliary.warn("Не удалось прочитать этикетку " + uri, Activity_NomenclatureNew.this);
+						return;
+					}
+					ActivityWebServicesReports.etiketkaObratnayaSvyazKlient.value(filePath);
+					break;
+				case ActivityWebServicesReports.tovarIDPicture:
+					uri = intent.getData();
+					filePath = Auxiliary.pathForMediaURI(this, uri);
+					if(filePath == null){
+						Auxiliary.warn("Не удалось прочитать фото " + uri, Activity_NomenclatureNew.this);
+						return;
+					}
+					ActivityWebServicesReports.tovarObratnayaSvyazKlient.value(filePath);
+					break;
+			}
+		}
+		super.onActivityResult(requestCode, resultCode, intent);
 	}
 }

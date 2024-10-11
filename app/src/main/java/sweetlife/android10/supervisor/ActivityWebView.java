@@ -14,6 +14,7 @@ public class ActivityWebView  extends Activity  {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+		Auxiliary.inform("Ожидайте загрузки страницы...",this);
         layoutless = new Layoutless(this);
         setContentView(layoutless);
         int winW = Auxiliary.screenWidth(this);

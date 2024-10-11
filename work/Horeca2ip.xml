@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<primary>10.10.5.2</primary>
+	<secondary>10.10.5.2</secondary>
+	<base1C>obch_hrc</base1C>
+	<wsdlDiff>Obuch</wsdlDiff>
+	<!--
+	<primary>89.109.7.162</primary>
+	<secondary>95.79.111.216</secondary>
+	<base1C>hrc120107</base1C>
+	<wsdlDiff></wsdlDiff>
+	-->
+</config>

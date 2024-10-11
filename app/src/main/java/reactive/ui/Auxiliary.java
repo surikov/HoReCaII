@@ -2405,6 +2405,7 @@ public class Auxiliary{
 	}
 
 	public static void startMediaGallery(Activity aa, final int resultID){
+		System.out.println("startMediaGallery "+resultID);
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("*/*");
 		intent.addCategory(Intent.CATEGORY_OPENABLE);

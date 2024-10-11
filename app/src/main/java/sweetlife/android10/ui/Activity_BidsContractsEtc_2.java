@@ -221,9 +221,10 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 			return true;
 		}
 		/*if(item == menuObratnayaSvyazKlient){
-			promptObratnayaSvyazKlient(this);
+//			promptObratnayaSvyazKlient(this);
 			return true;
 		}*/
+
 /*
 		if (item == menuZayavkaNaPerevodVdosudebnye) {
 			promptZayavkaNaPerevodVdosudebnye();

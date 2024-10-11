@@ -163,10 +163,9 @@ public class ReportStatusyZakazov extends Report_Base {
 			t.printStackTrace();
 			serviceName = t.getMessage();
 		}
-		String q = Settings.getInstance().getBaseURL()//
-				//+ "GolovaNew"//
-				//+"cehan_hrc"//
-				+ Settings.selectedBase1C()//
+		String q =
+				Settings.getInstance().getBaseURL()				+ Settings.selectedBase1C()
+				//"https://testservice.swlife.ru/dbutenko_hrc"
 				+ "/hs/Report/"//
 				+ serviceName + "/" //
 				+hrc//
@@ -324,7 +323,7 @@ public class ReportStatusyZakazov extends Report_Base {
 				String kname = extract(strings[i + 2], '>', '<');
 				//System.out.println(" - "+num+": "+dat+" - "+ship+" - "+kname);
 				String[] partsNum = kname.split(":");
-				if (num.length() > 2 && dat.trim().length() == 10 && ship.trim().length() == 10 && partsNum.length > 1) {
+				if (num.length() > 2 && dat.trim().length() > 9 && ship.trim().length() == 10 && partsNum.length > 1) {
 					String[] partsRemn = kname.split("/");
 					if (partsRemn.length > 1) {
 						//System.out.println(strings[i]);
@@ -342,11 +341,19 @@ public class ReportStatusyZakazov extends Report_Base {
 						String dogOplName = partsRemn[1].trim() + ", " + partsRemn[2].trim();
 						//FIELDKlientKod
 						//System.out.println(line);
+						String dataOnly=dat;
+						try{
+							dataOnly = dat.split(" ")[0];
+						}catch(Throwable tt){
+							tt.printStackTrace();
+							dat=tt.getMessage();
+						}
+						System.out.println(dat+" -> "+dataOnly );
 						line = line.substring(0, start)//
 								+ "№<a href=\"hook"//
 								+ "?kind=" + HOOKReportOrderState//
 								+ "&" + FIELDDocumentNumber + "=" + num //
-								+ "&" + FIELDDocumentDate + "=" + dat//
+								+ "&" + FIELDDocumentDate + "=" + dataOnly//
 								+ "&" + FIELDShipDate + "=" + ship//
 								//+ "&" + FIELDKlientKod + "=" + klientName//
 								//+ "&" + FIELDKontragent + "=" + klientName//

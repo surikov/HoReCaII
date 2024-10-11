@@ -74,6 +74,7 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 	Note textNDS = new Note();
 	Note valNDS = new Note();
 	Note textFilledDocs = new Note();
+	Note textGolovnoyKontragent = new Note();
 
 	Note osobennosti = new Note();
 	Note KommentariiPropusk = new Note();
@@ -133,6 +134,13 @@ public class ActivityKlientPeople extends Activity implements ITableColumnsNames
 				.width().is(layoutless.width().property.divide(2))//
 				//.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 				.height().is(5 * Auxiliary.tapSize)//
+		);
+		layoutless.child(new Decor(this).labelText.is(textGolovnoyKontragent) //
+				.labelAlignLeftBottom()
+				.left().is(layoutless.width().property.divide(2))
+				.top().is(Auxiliary.tapSize * 5)//
+				.width().is(layoutless.width().property.divide(2))//
+				.height().is(layoutless.height().property.minus(7.5 * Auxiliary.tapSize))//
 		);
 		layoutless.child(new Decor(this).labelText.is(textFilledDocs) //
 				.labelAlignLeftBottom()
@@ -960,6 +968,12 @@ I/System.out: 		</ВремяРаботы>
 	public void loadData(){
 		ActivityKlientPeople.this.rows.removeAllElements();
 		String kod = ApplicationHoreca.getInstance().getClientInfo().getKod();
+		String sql="select prnt.naimenovanie as golov from kontragenty chld join kontragenty prnt on prnt._idrref=chld.GolovnoyKontragent where chld.kod="+kod+";";
+
+		textGolovnoyKontragent.value("Головной контрагент: "
+				+ Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null))
+				.child("row").child("golov").value.property.value()
+		);
 		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ContactInfo/" + kod;
 		//final String url = "https://testservice.swlife.ru/simutkin_hrc/hs/ContactInfo/" + kod;
 
@@ -1018,6 +1032,7 @@ I/System.out: 		</ВремяРаботы>
 						//System.out.println(people.get(i).dumpXML());
 					}
 					textFilledDocs.value("Наличие документов: ");
+
 
 					Bough eldocs=b.child("КонтактныеЛица").child("ЭлектронныеДокументы");
 					//System.out.println(eldocs.dumpXML());

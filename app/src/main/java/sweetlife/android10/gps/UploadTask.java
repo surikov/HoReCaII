@@ -221,12 +221,13 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 		return EParserResult.EComplete;
 	}*/
 
-	public EParserResult __UploadVizits(){
+	public EParserResult UploadVizits(){
 		try{
 			String mUserKod = Cfg.findFizLicoKod(Cfg.whoCheckListOwner());
 			String sql = "select * from Vizits where Upload = 0";
 			Cursor cursor = mDB.rawQuery(sql, null);
-			System.out.println(Auxiliary.fromCursor(mDB.rawQuery(sql, null)).dumpXML());
+			//System.out.println(Auxiliary.fromCursor(mDB.rawQuery(sql, null)).dumpXML());
+			Bough raw = new Bough();
 			if(!cursor.moveToFirst()){
 				mResultString = mResultString + "\nВизиты: нет невыгруженных.";
 				return EParserResult.EComplete;
@@ -253,8 +254,8 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 					json = json + dlmtr + "{";
 					json = json + "\"Extnumber\":\"" + mDeviceID + "\"";
 					json = json + ",\"Client\":\"" + client + "\"";
-					json = json + ",\"Begin\":\"" + beginTime + "\"";
-					json = json + ",\"End\":\"" + endTime + "\"";
+					json = json + ",\"Begin\":\"" + Auxiliary.tryReFormatDate(beginTime, "yyyy-MM-dd'T'HH:mm:ss", "yyyyMMddHHmmss") + "\"";
+					json = json + ",\"End\":\"" + Auxiliary.tryReFormatDate(endTime, "yyyy-MM-dd'T'HH:mm:ss", "yyyyMMddHHmmss") + "\"";
 					json = json + ",\"Poyas\":\"" + poyas + "\"";
 					json = json + ",\"Activity\":\"" + activity + "\"";
 					json = json + ",\"Person\":\"" + person + "\"";
@@ -262,20 +263,39 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 					dlmtr = ",";
 				}while(cursor.moveToNext());
 				json = json + "]";
+				String url = Settings.getInstance().getBaseURL() + Settings.getInstance().selectedBase1C()
+						+ "/hs/GPS/ZagruzkaVizit/"
+						+ Cfg.whoCheckListOwner()
+						+ "/" + person;
+				System.out.println("UploadVizits " + url);
 				System.out.println("UploadVizits " + json);
-				mResultString = mResultString + "\nВизиты: загружены.";
+				byte[] bytes = {};
+				try{
+					bytes = json.getBytes("UTF-8");
+				}catch(Throwable t){
+					t.printStackTrace();
+				}
+				Bough resp = Auxiliary.loadTextFromPrivatePOST(url, bytes, 180000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+				raw.children = Bough.parseJSON(resp.child("raw").value.property.value()).children;
+				if(!raw.child("Статус").value.property.value().equals("0")){
+					mResultString = mResultString + "Визиты: \n\n(" + raw.child("Сообщение").value.property.value() + ")\n";
+					return EParserResult.EError;
+				}
+				mResultString = mResultString + "Визиты: " + raw.child("Сообщение").value.property.value() + "\n";
+				//mResultString = mResultString + "\nВизиты: загружены.";
 			}
 			if(cursor != null && !cursor.isClosed()){
 				cursor.close();
 				cursor = null;
 			}
+			GPS.getGPSInfo().setUploadVisits();
 		}catch(Throwable t){
 			mResultString = mResultString + "\nВизиты: " + t.getMessage();
 		}
 		return EParserResult.EComplete;
 	}
 
-	public EParserResult UploadVizits(){
+	public EParserResult __UploadVizits(){
 		//mDB.execSQL("delete from Vizits where date(BeginTime)>date('now','+1 days');");
 
 		//System.out.println("UploadVizits start");
@@ -390,7 +410,7 @@ public class UploadTask extends ManagedAsyncTask<String> implements ITableColumn
 			ErrorReporter.getInstance().handleSilentException(ex);
 			mProgressDialogMessage = mResources.getString(R.string.msg_upload_visits_fail);
 			mResultString = mProgressDialogMessage + " \n" + ex.getMessage() + "\n";
-			;
+
 			return EParserResult.EError;
 		}finally{
 			if(cursor != null && !cursor.isClosed()){

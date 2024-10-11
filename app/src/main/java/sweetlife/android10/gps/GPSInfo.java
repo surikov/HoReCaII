@@ -231,10 +231,11 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 	}
 
 	public void setUploadVisits(){
-		//System.out.println("setUploadVisits");
+		System.out.println("setUploadVisits");
 		ContentValues updateValues = new ContentValues();
 		updateValues.put(UPLOAD, TRUE);
 		DatabaseHelper.updateInTranzaction(mDB, VizitsTableName, updateValues, "Upload = 0 and EndTime is not null", null);
+
 	}
 
 	public synchronized void insertGpsPoint(Calendar time, double lat, double lon, String comment){

@@ -48,6 +48,8 @@ public class Activity_Route_2 extends Activity{
 	ColumnText columnSb;
 	ColumnText columnMenu;
 
+	Note clientNameFilterText = new Note();
+	//String lastFilter = "";
 
 	WebRender popup;
 
@@ -226,6 +228,7 @@ public class Activity_Route_2 extends Activity{
 				.left().is(layoutless.width().property.minus(1.5 * Auxiliary.tapSize))
 				.top().is(0.5 * Auxiliary.tapSize)//
 				.width().is(1 * Auxiliary.tapSize).height().is(1 * Auxiliary.tapSize));
+
 		popup.afterLink.is(new Task(){
 			@Override
 			public void doTask(){
@@ -238,6 +241,8 @@ public class Activity_Route_2 extends Activity{
 				}
 			}
 		});
+
+
 	}
 
 	void addUpperFields(){
@@ -319,6 +324,29 @@ public class Activity_Route_2 extends Activity{
 				.width().is(layoutless.width().property)//
 				.height().is(0.5 * Auxiliary.tapSize)//
 		);
+
+		layoutless.child(new Decor(this)//
+				.labelText.is("🔎")//
+				.labelAlignRightCenter()//
+				.left().is(layoutless.width().property.minus(3.5 * Auxiliary.tapSize))//
+				.top().is(0)//
+				.width().is(0.5 * Auxiliary.tapSize)//
+				.height().is(Auxiliary.tapSize)//
+		);
+		layoutless.child(new RedactText(this)//
+				.text.is(clientNameFilterText)
+				.left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
+				.top().is(0)//
+				.width().is(2.5 * Auxiliary.tapSize)//
+				.height().is(Auxiliary.tapSize)//
+		);
+		clientNameFilterText.afterChange(new Task(){
+			public void doTask(){
+				System.out.println("clientNameFilterText [" + clientNameFilterText.value() + "]");
+				resetGrid();
+			}
+		}, true);
+
 	}
 
 	void refreshGridDayTitles(){
@@ -426,22 +454,22 @@ public class Activity_Route_2 extends Activity{
 											, getApplicationContext());
 									new Expect().status.is("Выгрузка визитов...")//
 											.task.is(new Task(){
-										public void doTask(){
-											try{
-												task.UploadGPSPoints(code);
-												System.out.println("task.mResultString " + task.mResultString);
-												task.UploadVizits();
-												System.out.println("task.mResultString " + task.mResultString);
-											}catch(Throwable t){
-												t.printStackTrace();
-											}
-										}
-									})
+												public void doTask(){
+													try{
+														task.UploadGPSPoints(code);
+														System.out.println("task.mResultString " + task.mResultString);
+														task.UploadVizits();
+														System.out.println("task.mResultString " + task.mResultString);
+													}catch(Throwable t){
+														t.printStackTrace();
+													}
+												}
+											})
 											.afterDone.is(new Task(){
-										public void doTask(){
-											Auxiliary.warn(task.mResultString, Activity_Route_2.this);
-										}
-									}).start(Activity_Route_2.this);
+												public void doTask(){
+													Auxiliary.warn(task.mResultString, Activity_Route_2.this);
+												}
+											}).start(Activity_Route_2.this);
 								}
 								if(vigruzitN.value() == 1){
 									Intent intent = new Intent();
@@ -807,151 +835,151 @@ public class Activity_Route_2 extends Activity{
 		final Note error = new Note().value("Перезайдите в приложение (обновление будет закачано заново).");
 		new Expect().status.is("Подождите...")//
 				.task.is(new Task(){
-			@Override
-			public void doTask(){
-				try{
-					String sql = "delete from GPSPoints";// where date(BeginTime)<date('now','-1 days') or Upload>0;";
-					mDBexecSQL(sql);
-					sql = "delete from ZapretOtgruzokOtvetsvennogo";
-					mDBexecSQL(sql);
-					sql = "delete from SyncLog";
-					mDBexecSQL(sql);
-					//sql = "delete from Vizits;";
-					//mDB.execSQL(sql);
-					sql = "delete from Polzovateli where PometkaUdaleniya=X'01'";
-					mDBexecSQL(sql);
-					sql = "delete from RasporyazhenieNaOtgruzku";
-					mDBexecSQL(sql);
-					sql = "delete from RasporyazhenieNaOtgruzku_Phayly";
-					mDBexecSQL(sql);
-					sql = "delete from ZakazPokupatelya";
-					mDBexecSQL(sql);
-					sql = "delete from ZakazPokupatelya_Tovary";
-					mDBexecSQL(sql);
-					sql = "delete from ZakazPokupatelya_Uslugi";
-					mDBexecSQL(sql);
-					sql = "delete from Zapiski";
-					mDBexecSQL(sql);
-					sql = "delete from ZapiskiFiles";
-					mDBexecSQL(sql);
-					sql = "delete from ZapretOtgruzokOtvetsvennogo";
-					mDBexecSQL(sql);
-					sql = "delete from ZapretSkidokProizv";
-					mDBexecSQL(sql);
-					sql = "delete from ZapretSkidokTov";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaDegustaciu";
-					mDBexecSQL(sql);
-					sql = "delete from ZapretyNaOtguzku";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaDegustaciuNomenklatura";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaSkidki";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaSkidki_TovaryPhiksCen";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaSpecifikasia";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaSpecifikasiaNomenklatura";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaVozvrat";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaNaVozvrat_Tovary";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaPokupatelyaIskhodyaschaya";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Smvz";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Tovary";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Traphiki";
-					mDBexecSQL(sql);
-					sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Uslugi";
-					mDBexecSQL(sql);
-					sql = "delete from Prodazhi";
-					mDBexecSQL(sql);
-					sql = "delete from AdresaPoSkladam where _id not in (select"//
-							+ " _id"//
-							+ " from AdresaPoSkladam a1"//
-							+ " where a1.period = (select max(period) from AdresaPoSkladam a2"//
-							+ " where a1.nomenklatura = a2.nomenklatura"//
-							+ " and a1.baza = a2.baza) and a1.sklad <> X'00000000000000000000000000000000' and a1.sklad <> X'00'"//
-							+ " group by a1.baza, a1.sklad, a1.nomenklatura)"//
-					;
-					mDBexecSQL(sql);
-					sql = "delete from Cur_Limity";
-					mDBexecSQL(sql);
-					sql = "delete from TekuschieCenyOstatkovPartiy";
-					mDBexecSQL(sql);
-					sql = "delete from Vizits";
-					mDBexecSQL(sql);
-					sql = "delete from DlyaRaschetaNacenkiVNetbuke where period < date('now','-2 month')";
-					mDBexecSQL(sql);
-					sql = "delete from GruppyDogovorov where _idrref in"//
-							+ " (select GruppyDogovorov._idrref from GruppyDogovorov"//
-							+ " join DogovoryKontragentov on DogovoryKontragentov.GruppaDogovorov=GruppyDogovorov._idrref"//
-							+ " join Kontragenty on Kontragenty._idrref=DogovoryKontragentov.vladelec"//
-							+ " and Kontragenty.PometkaUdaleniya=x'01')";
-					mDBexecSQL(sql);
-					sql = "delete from DogovoryKontragentov where _idrref in"//
-							+ " (select DogovoryKontragentov._idrref from DogovoryKontragentov"//
-							+ " join Kontragenty on Kontragenty._idrref=DogovoryKontragentov.vladelec" //
-							+ " and Kontragenty.PometkaUdaleniya=x'01')";
-					mDBexecSQL(sql);
-					sql = "delete from Kontragenty where PometkaUdaleniya=x'01'";
-					mDBexecSQL(sql);
-					sql = "delete from FiksirovannyeCeny where DataOkonchaniya<date('now','-1 day')";
-					mDBexecSQL(sql);
-					sql = "delete from Limity where _id not in"//
-							+ " (select _id from ("//
-							+ " select _id,max(period) from Limity group by SpisokDogovorov"//
-							+ " ))";
-					mDBexecSQL(sql);
-					sql = "delete from NakopitelnyeSkidki where DataOkonchaniya<date('now','-1 day')";
-					mDBexecSQL(sql);
-					//System.out.println(sql);
-					//sql = "delete from Nomenklatura where _idrref not in (select nomenklatura from AdresaPoSkladam) and etoGruppa=x'01'";
-					//mDBexecSQL(sql);
-					sql = "delete from EdinicyIzmereniya where vladelec_2 not in (select _idrref from nomenklatura)";
-					mDBexecSQL(sql);
-					sql = "delete from VelichinaKvantovNomenklatury where nomenklatura not in (select _idrref from nomenklatura)";
-					mDBexecSQL(sql);
-					sql = "delete from MatricaX;";
-					mDBexecSQL(sql);
-					sql = "delete from MatricaRowsX;";
-					mDBexecSQL(sql);
-					sql = "delete from MatricaSvodX;";
-					mDBexecSQL(sql);
-					sql = "delete from AnketaKlienta;";
-					mDBexecSQL(sql);
-					sql = "delete from AnketaKlientaContacts;";
-					mDBexecSQL(sql);
-					//
-					//
-					File files = new File("/sdcard/horeca/reserve/delta/");
-					for(File file: files.listFiles()){
-						boolean b = file.delete();
-						//System.out.println(file.getAbsolutePath() + " deleted: " + b);
+					@Override
+					public void doTask(){
+						try{
+							String sql = "delete from GPSPoints";// where date(BeginTime)<date('now','-1 days') or Upload>0;";
+							mDBexecSQL(sql);
+							sql = "delete from ZapretOtgruzokOtvetsvennogo";
+							mDBexecSQL(sql);
+							sql = "delete from SyncLog";
+							mDBexecSQL(sql);
+							//sql = "delete from Vizits;";
+							//mDB.execSQL(sql);
+							sql = "delete from Polzovateli where PometkaUdaleniya=X'01'";
+							mDBexecSQL(sql);
+							sql = "delete from RasporyazhenieNaOtgruzku";
+							mDBexecSQL(sql);
+							sql = "delete from RasporyazhenieNaOtgruzku_Phayly";
+							mDBexecSQL(sql);
+							sql = "delete from ZakazPokupatelya";
+							mDBexecSQL(sql);
+							sql = "delete from ZakazPokupatelya_Tovary";
+							mDBexecSQL(sql);
+							sql = "delete from ZakazPokupatelya_Uslugi";
+							mDBexecSQL(sql);
+							sql = "delete from Zapiski";
+							mDBexecSQL(sql);
+							sql = "delete from ZapiskiFiles";
+							mDBexecSQL(sql);
+							sql = "delete from ZapretOtgruzokOtvetsvennogo";
+							mDBexecSQL(sql);
+							sql = "delete from ZapretSkidokProizv";
+							mDBexecSQL(sql);
+							sql = "delete from ZapretSkidokTov";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaDegustaciu";
+							mDBexecSQL(sql);
+							sql = "delete from ZapretyNaOtguzku";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaDegustaciuNomenklatura";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaSkidki";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaSkidki_TovaryPhiksCen";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaSpecifikasia";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaSpecifikasiaNomenklatura";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaVozvrat";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaNaVozvrat_Tovary";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaPokupatelyaIskhodyaschaya";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Smvz";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Tovary";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Traphiki";
+							mDBexecSQL(sql);
+							sql = "delete from ZayavkaPokupatelyaIskhodyaschaya_Uslugi";
+							mDBexecSQL(sql);
+							sql = "delete from Prodazhi";
+							mDBexecSQL(sql);
+							sql = "delete from AdresaPoSkladam where _id not in (select"//
+									+ " _id"//
+									+ " from AdresaPoSkladam a1"//
+									+ " where a1.period = (select max(period) from AdresaPoSkladam a2"//
+									+ " where a1.nomenklatura = a2.nomenklatura"//
+									+ " and a1.baza = a2.baza) and a1.sklad <> X'00000000000000000000000000000000' and a1.sklad <> X'00'"//
+									+ " group by a1.baza, a1.sklad, a1.nomenklatura)"//
+							;
+							mDBexecSQL(sql);
+							sql = "delete from Cur_Limity";
+							mDBexecSQL(sql);
+							sql = "delete from TekuschieCenyOstatkovPartiy";
+							mDBexecSQL(sql);
+							sql = "delete from Vizits";
+							mDBexecSQL(sql);
+							sql = "delete from DlyaRaschetaNacenkiVNetbuke where period < date('now','-2 month')";
+							mDBexecSQL(sql);
+							sql = "delete from GruppyDogovorov where _idrref in"//
+									+ " (select GruppyDogovorov._idrref from GruppyDogovorov"//
+									+ " join DogovoryKontragentov on DogovoryKontragentov.GruppaDogovorov=GruppyDogovorov._idrref"//
+									+ " join Kontragenty on Kontragenty._idrref=DogovoryKontragentov.vladelec"//
+									+ " and Kontragenty.PometkaUdaleniya=x'01')";
+							mDBexecSQL(sql);
+							sql = "delete from DogovoryKontragentov where _idrref in"//
+									+ " (select DogovoryKontragentov._idrref from DogovoryKontragentov"//
+									+ " join Kontragenty on Kontragenty._idrref=DogovoryKontragentov.vladelec" //
+									+ " and Kontragenty.PometkaUdaleniya=x'01')";
+							mDBexecSQL(sql);
+							sql = "delete from Kontragenty where PometkaUdaleniya=x'01'";
+							mDBexecSQL(sql);
+							sql = "delete from FiksirovannyeCeny where DataOkonchaniya<date('now','-1 day')";
+							mDBexecSQL(sql);
+							sql = "delete from Limity where _id not in"//
+									+ " (select _id from ("//
+									+ " select _id,max(period) from Limity group by SpisokDogovorov"//
+									+ " ))";
+							mDBexecSQL(sql);
+							sql = "delete from NakopitelnyeSkidki where DataOkonchaniya<date('now','-1 day')";
+							mDBexecSQL(sql);
+							//System.out.println(sql);
+							//sql = "delete from Nomenklatura where _idrref not in (select nomenklatura from AdresaPoSkladam) and etoGruppa=x'01'";
+							//mDBexecSQL(sql);
+							sql = "delete from EdinicyIzmereniya where vladelec_2 not in (select _idrref from nomenklatura)";
+							mDBexecSQL(sql);
+							sql = "delete from VelichinaKvantovNomenklatury where nomenklatura not in (select _idrref from nomenklatura)";
+							mDBexecSQL(sql);
+							sql = "delete from MatricaX;";
+							mDBexecSQL(sql);
+							sql = "delete from MatricaRowsX;";
+							mDBexecSQL(sql);
+							sql = "delete from MatricaSvodX;";
+							mDBexecSQL(sql);
+							sql = "delete from AnketaKlienta;";
+							mDBexecSQL(sql);
+							sql = "delete from AnketaKlientaContacts;";
+							mDBexecSQL(sql);
+							//
+							//
+							File files = new File("/sdcard/horeca/reserve/delta/");
+							for(File file: files.listFiles()){
+								boolean b = file.delete();
+								//System.out.println(file.getAbsolutePath() + " deleted: " + b);
+							}
+							//DatabaseHelper.forceUpperCase(mDB);
+						}catch(Throwable t){
+							error.value("Ошибка: " + t.toString());
+							t.printStackTrace();
+						}
 					}
-					//DatabaseHelper.forceUpperCase(mDB);
-				}catch(Throwable t){
-					error.value("Ошибка: " + t.toString());
-					t.printStackTrace();
-				}
-			}
-		})//
+				})//
 				.afterCancel.is(new Task(){
-			@Override
-			public void doTask(){
-				Auxiliary.warn("Ошибка: операция прервана.", Activity_Route_2.this);
-			}
-		})//
+					@Override
+					public void doTask(){
+						Auxiliary.warn("Ошибка: операция прервана.", Activity_Route_2.this);
+					}
+				})//
 				.afterDone.is(new Task(){
-			@Override
-			public void doTask(){
-				Auxiliary.warn(error.value(), Activity_Route_2.this);
-			}
-		})//
+					@Override
+					public void doTask(){
+						Auxiliary.warn(error.value(), Activity_Route_2.this);
+					}
+				})//
 				.start(this);
 	}
 
@@ -1350,117 +1378,118 @@ public class Activity_Route_2 extends Activity{
 
 		return super.onOptionsItemSelected(item);
 	}
-/*
-	void doTest(){
-		String testData = "<raw>\n" +
-				"\t<Статус>1</Статус>\n" +
-				"\t<Сообщение></Сообщение>\n" +
-				"\t<ДанныеПоЗаказам>\n" +
-				"\t\t<ВнешнийНомер>HRC682-0829123639817</ВнешнийНомер>\n" +
-				"\t\t<Статус>1</Статус>\n" +
-				"\t\t<Сообщение></Сообщение>\n" +
-				"\t\t<Заказы>\n" +
-				"\t\t\t<Номер>12-1855056</Номер>\n" +
-				"\t\t\t<Тип>Заказ покупателя</Тип>\n" +
-				"\t\t\t<Статус>2</Статус>\n" +
-				"\t\t\t<Сообщение></Сообщение>\n" +
-				"\t\t\t<НеПодтвержденныеПозиции>\n" +
-				"\t\t\t\t<Номенклатура>79580, Майонез Печагин 67%Professional ведро 940 мл/880 гр</Номенклатура>\n" +
-				"\t\t\t\t<КоличествоЗаказано>24</КоличествоЗаказано>\n" +
-				"\t\t\t\t<КоличествоДефицит>23</КоличествоДефицит>\n" +
-				"\t\t\t\t<КоличествоПодтверждено>1</КоличествоПодтверждено>\n" +
-				"\t\t\t\t<ДатаПоступления>20240829</ДатаПоступления>\n" +
-				"\t\t\t\t<Текст>с 06/06 повышение на масло  5-10,5%</Текст>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>79581</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин Экстра 67% ведро 3 л/2,82 кг</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>143</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>79805</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин оливковый 67% 940 мл/880 гр</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>60</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>83674</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин провансаль дой-пак 67% 420 мл/395 гр</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>154</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>83173</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин 56% Professional 930 мл/880 гр</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>30</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>110540</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Efko Food Веганез 56% 3л</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>2</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t</НеПодтвержденныеПозиции>\n" +
-				"\t\t</Заказы>\n" +
-				"\t</ДанныеПоЗаказам>\n" +
-				"\t<ДанныеПоЗаказам>\n" +
-				"\t\t<ВнешнийНомер>HRC682-0829125920686</ВнешнийНомер>\n" +
-				"\t\t<Статус>1</Статус>\n" +
-				"\t\t<Сообщение></Сообщение>\n" +
-				"\t\t<Заказы>\n" +
-				"\t\t\t<Номер>12-1855058</Номер>\n" +
-				"\t\t\t<Тип>Заказ покупателя</Тип>\n" +
-				"\t\t\t<Статус>2</Статус>\n" +
-				"\t\t\t<Сообщение></Сообщение>\n" +
-				"\t\t\t<НеПодтвержденныеПозиции>\n" +
-				"\t\t\t\t<Номенклатура>110540, Майонез Efko Food Веганез 56% 3л</Номенклатура>\n" +
-				"\t\t\t\t<КоличествоЗаказано>24</КоличествоЗаказано>\n" +
-				"\t\t\t\t<КоличествоДефицит>22</КоличествоДефицит>\n" +
-				"\t\t\t\t<КоличествоПодтверждено>2</КоличествоПодтверждено>\n" +
-				"\t\t\t\t<ДатаПоступления></ДатаПоступления>\n" +
-				"\t\t\t\t<Текст></Текст>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>79580</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин 67%Professional ведро 940 мл/880 гр</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>0</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>79581</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин Экстра 67% ведро 3 л/2,82 кг</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>143</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>79805</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин оливковый 67% 940 мл/880 гр</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>60</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>83173</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Печагин 56% Professional 930 мл/880 гр</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>30</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>116235</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Юг Profi Провансаль 67% 5л</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>82</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>116661</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез Pechagin Professional Profi 67% 5л Ведро</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>130</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t\t<Аналоги>\n" +
-				"\t\t\t\t\t<Артикул>110535</Артикул>\n" +
-				"\t\t\t\t\t<Наименование>Майонез EFKO FOOD Professional универсальный 67% 10л/9,34кг</Наименование>\n" +
-				"\t\t\t\t\t<ДоступноеКоличество>83</ДоступноеКоличество>\n" +
-				"\t\t\t\t</Аналоги>\n" +
-				"\t\t\t</НеПодтвержденныеПозиции>\n" +
-				"\t\t</Заказы>\n" +
-				"\t</ДанныеПоЗаказам>\n" +
-				"</raw>";
-		Intent intent = new Intent();
-		intent.setClass(this, UploadOrderResult.class);
-		intent.putExtra("data", testData);
-		this.startActivityForResult(intent, UploadOrderResult.UploadDialogResult);
 
-	}
-*/
+	/*
+		void doTest(){
+			String testData = "<raw>\n" +
+					"\t<Статус>1</Статус>\n" +
+					"\t<Сообщение></Сообщение>\n" +
+					"\t<ДанныеПоЗаказам>\n" +
+					"\t\t<ВнешнийНомер>HRC682-0829123639817</ВнешнийНомер>\n" +
+					"\t\t<Статус>1</Статус>\n" +
+					"\t\t<Сообщение></Сообщение>\n" +
+					"\t\t<Заказы>\n" +
+					"\t\t\t<Номер>12-1855056</Номер>\n" +
+					"\t\t\t<Тип>Заказ покупателя</Тип>\n" +
+					"\t\t\t<Статус>2</Статус>\n" +
+					"\t\t\t<Сообщение></Сообщение>\n" +
+					"\t\t\t<НеПодтвержденныеПозиции>\n" +
+					"\t\t\t\t<Номенклатура>79580, Майонез Печагин 67%Professional ведро 940 мл/880 гр</Номенклатура>\n" +
+					"\t\t\t\t<КоличествоЗаказано>24</КоличествоЗаказано>\n" +
+					"\t\t\t\t<КоличествоДефицит>23</КоличествоДефицит>\n" +
+					"\t\t\t\t<КоличествоПодтверждено>1</КоличествоПодтверждено>\n" +
+					"\t\t\t\t<ДатаПоступления>20240829</ДатаПоступления>\n" +
+					"\t\t\t\t<Текст>с 06/06 повышение на масло  5-10,5%</Текст>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>79581</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин Экстра 67% ведро 3 л/2,82 кг</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>143</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>79805</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин оливковый 67% 940 мл/880 гр</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>60</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>83674</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин провансаль дой-пак 67% 420 мл/395 гр</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>154</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>83173</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин 56% Professional 930 мл/880 гр</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>30</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>110540</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Efko Food Веганез 56% 3л</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>2</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t</НеПодтвержденныеПозиции>\n" +
+					"\t\t</Заказы>\n" +
+					"\t</ДанныеПоЗаказам>\n" +
+					"\t<ДанныеПоЗаказам>\n" +
+					"\t\t<ВнешнийНомер>HRC682-0829125920686</ВнешнийНомер>\n" +
+					"\t\t<Статус>1</Статус>\n" +
+					"\t\t<Сообщение></Сообщение>\n" +
+					"\t\t<Заказы>\n" +
+					"\t\t\t<Номер>12-1855058</Номер>\n" +
+					"\t\t\t<Тип>Заказ покупателя</Тип>\n" +
+					"\t\t\t<Статус>2</Статус>\n" +
+					"\t\t\t<Сообщение></Сообщение>\n" +
+					"\t\t\t<НеПодтвержденныеПозиции>\n" +
+					"\t\t\t\t<Номенклатура>110540, Майонез Efko Food Веганез 56% 3л</Номенклатура>\n" +
+					"\t\t\t\t<КоличествоЗаказано>24</КоличествоЗаказано>\n" +
+					"\t\t\t\t<КоличествоДефицит>22</КоличествоДефицит>\n" +
+					"\t\t\t\t<КоличествоПодтверждено>2</КоличествоПодтверждено>\n" +
+					"\t\t\t\t<ДатаПоступления></ДатаПоступления>\n" +
+					"\t\t\t\t<Текст></Текст>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>79580</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин 67%Professional ведро 940 мл/880 гр</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>0</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>79581</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин Экстра 67% ведро 3 л/2,82 кг</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>143</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>79805</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин оливковый 67% 940 мл/880 гр</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>60</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>83173</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Печагин 56% Professional 930 мл/880 гр</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>30</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>116235</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Юг Profi Провансаль 67% 5л</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>82</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>116661</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез Pechagin Professional Profi 67% 5л Ведро</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>130</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t\t<Аналоги>\n" +
+					"\t\t\t\t\t<Артикул>110535</Артикул>\n" +
+					"\t\t\t\t\t<Наименование>Майонез EFKO FOOD Professional универсальный 67% 10л/9,34кг</Наименование>\n" +
+					"\t\t\t\t\t<ДоступноеКоличество>83</ДоступноеКоличество>\n" +
+					"\t\t\t\t</Аналоги>\n" +
+					"\t\t\t</НеПодтвержденныеПозиции>\n" +
+					"\t\t</Заказы>\n" +
+					"\t</ДанныеПоЗаказам>\n" +
+					"</raw>";
+			Intent intent = new Intent();
+			intent.setClass(this, UploadOrderResult.class);
+			intent.putExtra("data", testData);
+			this.startActivityForResult(intent, UploadOrderResult.UploadDialogResult);
+
+		}
+	*/
 	void promptIskluchenieVizitov(){
 		Numeric territory = new Numeric();
 
@@ -1959,6 +1988,10 @@ I/System.out: </>
 			int kodBG = clientBG;
 			String dogovor = "Все договора открыты";
 			String name = row.child("Naimenovanie").value.property.value();
+			double gcnt = Numeric.string2double(row.child("gcnt").value.property.value());
+			if(gcnt > 1){
+				name = "<b>" +   name+"</b>";
+			}
 			int dayColor = 0xffff0000;
 			//String lastVizitDate = row.child("lastVizitDate").value.property.value();
 			String lastVizitTime = row.child("lastVizitTime").value.property.value();
@@ -2084,6 +2117,7 @@ I/System.out: </>
 			}
 			columnKod.cell(row.child("Kod").value.property.value(), kodBG, tapTask);
 			columnClient.cell(name, clientBG, tapTask, description);
+
 			columnPn.cell(formatDayToggle(row.child("Den1").value.property.value()), bg1, tapTask);
 			columnVt.cell(formatDayToggle(row.child("Den2").value.property.value()), bg2, tapTask);
 			columnSr.cell(formatDayToggle(row.child("Den3").value.property.value()), bg3, tapTask);
@@ -2136,6 +2170,15 @@ I/System.out: </>
 				sortDay = "\n	order by neMarshrut,[Poryadok],[Naimenovanie]";
 			}
 		}
+		String nameFilter = "";
+		if(clientNameFilterText.value().trim().length() > 0){
+			nameFilter = " and k.naimenovanie like \"%"
+					+ clientNameFilterText.value()
+					.trim()
+					.replace('"', '\'')
+					.replace('%', '\'')
+					+ "%\"";
+		}
 		String req = "select "//
 				+ "\n  	* "//
 				+ "\n  	,(select 1 from MarshrutyAgentov m2 where m2.DenNedeli=1 and a.Kontragent=m2.Kontragent) as Den1"//
@@ -2163,11 +2206,15 @@ I/System.out: </>
 				+ "\n  			,0 as neMarshrut"//
 				+ "\n  			,k.GeographicheskayaShirota as shirota"//
 				+ "\n  			,k.GeographicheskayaDolgota as dolgota"//
+				+ "\n  			,golov.gcnt as gcnt"//
 				+ "\n  		from MarshrutyAgentov m"//
-				+ "\n  			inner join Kontragenty k on k.[_IDRRef] = m.[Kontragent]"//
-				+ "\n  			inner join	Cur_MarshrutyAgentov_Dogovora mad on m.[Kontragent] = mad.[Kontragent]"//
+				+ "\n  			inner join Kontragenty k on k.[_IDRRef] = m.[Kontragent]";
+		req = req + nameFilter;
+		req = req + "\n  			inner join	Cur_MarshrutyAgentov_Dogovora mad on m.[Kontragent] = mad.[Kontragent]"//
 				+ filterAgent//
+				+ "\n  			left join (select count(golovnoykontragent) as gcnt,golovnoykontragent as gid from kontragenty group by golovnoykontragent) golov on k._idrref=gid"
 				+ whereDay//
+
 				+ "\n  		group by m.[Kontragent]"//
 				+ "\n  	   union"//
 				+ "\n  	   select"//
@@ -2181,17 +2228,21 @@ I/System.out: </>
 				+ "\n  				,1 as neMarshrut"//
 				+ "\n  			,0 as shirota"//
 				+ "\n  			,0 as dolgota"//
+				+ "\n  			,0 as gcnt"//
 				+ "\n  		from kontragenty k"//
 				+ "\n  		join (select golovnoykontragent"//
 				+ "\n  			from MarshrutyAgentov m"//
 				+ "\n  			join kontragenty k1 on k1._idrref=m.kontragent"//
 				+ "\n  			) k2 on k._idrref=k2.golovnoykontragent"//
-				+ "\n  		where k._idrref not in (select kontragent from MarshrutyAgentov group by kontragent)"//
-				+ "\n  		group by k._idrref"//
+				+ "\n  		where k._idrref not in (select kontragent from MarshrutyAgentov group by kontragent)";
+		req = req + nameFilter;
+		req = req + "\n  		group by k._idrref"//
 				+ sortDay//
 				+ limitSQL.value()//
-				+ "  		) a" + sortDay//
-				;
+				+ "  		) a";
+
+
+		req = req + sortDay;
 		System.out.println("gridSQL " + req);
 		return req;
 	}
