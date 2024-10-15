@@ -302,7 +302,7 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 			@Override
 			public void onClick(View v){
 				saveRow();
-				promptFixPrice();
+				promptFixPrice(mFoodstaff.getBasePrice());
 				dismiss(0);
 			}
 		});
@@ -323,7 +323,7 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 		}
 	}
 
-	void promptFixPrice(){
+	void promptFixPrice(double BASE_PRICE){
 		final Numeric cena = new Numeric();
 
 		Calendar today = java.util.Calendar.getInstance();
@@ -358,9 +358,20 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 		System.out.println("promptFixPrice " + today.getTimeInMillis()
 				+" / "+this.fixEndMs + " / " + fromMs.value().longValue() + " / " + toMs.value().longValue());
 		//final Numeric to = new Numeric().value((float)c.getTimeInMillis());
+		Note cenaLabel=new Note().value("Цена");
+		cena.afterChange(new Task(){
+			public void doTask(){
+				if(BASE_PRICE>0){
+					double nacenka = (100.0 * (cena.value() - BASE_PRICE) / BASE_PRICE);
+					cenaLabel.value("Цена (наценка " + String.format("%.2f", nacenka) + "%)");
+				}else{
+					cenaLabel.value("Цена (нет цены партий)");
+				}
+			}
+		});
 		Auxiliary.pick(anchor.getContext(), "Добавить в заявку на фикс. цену"
 				, new SubLayoutless(anchor.getContext())//
-						.child(new Decor(anchor.getContext()).labelText.is("Цена").left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 6 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
+						.child(new Decor(anchor.getContext()).labelText.is(cenaLabel).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 6 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
 						.child(new RedactNumber(anchor.getContext()).number.is(cena).left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 1.0).width().is(Auxiliary.tapSize * 6 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
 						.child(new Decor(anchor.getContext()).labelText.is("Начало действия").left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 2.0).width().is(Auxiliary.tapSize * 6 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
 						.child(new RedactDate(anchor.getContext()).date.is(fromMs).format.is("dd.MM.yyyy").left().is(Auxiliary.tapSize * 0.5).top().is(Auxiliary.tapSize * 2.5).width().is(Auxiliary.tapSize * 6 - Auxiliary.tapSize).height().is(Auxiliary.tapSize * 0.7))//
