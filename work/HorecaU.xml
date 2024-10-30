@@ -10,7 +10,7 @@
 <user><hrc>region3</hrc><label>Регионы 3</label></user><!--  /  /  / Регионы 3 -->
 <user><hrc>south</hrc><label>Юг</label></user><!--  /  /  / Юг -->
 <user><hrc>supermvz_hrc</hrc><label>Москва VIP Центр</label></user><!--  / Москва / Москва VIP Центр / Москва VIP Центр   -->
-<user><hrc>supervip_hrc</hrc><label>VIP и госзаказчики</label></user>
+<!--<user><hrc>supervip_hrc</hrc><label>VIP и госзаказчики</label></user>-->
 <user><hrc>spb</hrc><label>Санкт-Петербург</label></user>
 <user><hrc>tula</hrc><label>Тула</label></user>
 <user><hrc>region_c</hrc><label>VIP+Госзаказчики</label></user>

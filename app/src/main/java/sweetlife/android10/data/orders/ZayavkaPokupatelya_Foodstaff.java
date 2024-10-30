@@ -10,7 +10,7 @@ import android.content.ContentValues;
 import android.database.*;
 import android.database.sqlite.SQLiteDatabase;
 
-public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
+public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem{
 	private double mSumma;
 	private double mSummaSoSkidkoy;
 	private double mCena;
@@ -23,6 +23,8 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 	private double mLastPrice;
 	//private boolean isMustList;
 	public double lastves = 0;
+
+	public double smartProPrice = 0;
 
 	//public boolean CRbyHands=false;
 	public ZayavkaPokupatelya_Foodstaff(//
@@ -51,7 +53,8 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 										//, String skidkaProcent//
 										//, String skidkaNaimenovanie//
 										//,boolean crByHands
-	) {
+			, double smartPrice
+	){
 		super(_id, nomerStroki, nomenklaturaID, artikul, nomenklaturaNaimenovanie, zayavka, minNorma, koefMest, edinicaIzmereniyaID, edinicaIzmereniyaName, kolichestvo, New//
 				//,skidkaProcent
 				//,skidkaNaimenovanie
@@ -59,6 +62,7 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		//System.out.println(""+artikul+": lastPrice "+lastPrice+"/"+vidSkidki);
 		//CRbyHands=crByHands;
 		//isMustList=isml;
+		smartProPrice = smartPrice;
 		mSumma = summa;
 		mCena = cena;
 		mCenaSoSkidkoy = cenaSoSkidkoy;
@@ -68,7 +72,7 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		mVidSkidki = vidSkidki;
 		basePrice = sebestoimost;
 		mLastPrice = lastPrice;
-		if (summa == 0.00D) {
+		if(summa == 0.00D){
 			mSumma = mKolichestvo * mCena;
 		}
 		/*if (hasSale() || isCRAvailable()) {
@@ -79,11 +83,12 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		}*/
 		setSummaSoSkidkoy(mCenaSoSkidkoy * mKolichestvo);
 		//System.out.println("new ZayavkaPokupatelya_Foodstaff: "+nomenklaturaNaimenovanie);
-		lastves=0;
+		lastves = 0;
 		requestVes();
 	}
-	public  double requestVes(){
-		if(lastves==0){
+
+	public double requestVes(){
+		if(lastves == 0){
 			String artikul = this.mArtikul;
 			double ves = 0;
 			//String sql = "select ves from Nomenklatura_sorted n join EdinicyIzmereniya_strip eho on n.EdinicaKhraneniyaOstatkov = eho._IDRRef where artikul='" + artikul + "' limit 1";
@@ -99,10 +104,11 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		}
 		return lastves;
 	}
+
 	@Override
-	public void setToDataBase(SQLiteDatabase db) {
+	public void setToDataBase(SQLiteDatabase db){
 		ContentValues values = new ContentValues();
-		if (mNew) {
+		if(mNew){
 			values.put("NomerStroki", mNomerStroki);
 			values.put("EdinicaIzmereniya", Hex.decodeHexWithPrefix(mEdinicaIzmereniyaID));
 			values.put("Kolichestvo", new Double(mKolichestvo));
@@ -114,23 +120,24 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 			values.put("MaksimalnayaCena", mMaksimalnayaCena);
 			values.put("Skidka", mSkidka);
 			//System.out.println(">>>" + mVidSkidki + "<<<");
-			if (//mVidSkidki.compareTo(Sales.CR_ID) == 0
+			if(//mVidSkidki.compareTo(Sales.CR_ID) == 0
 					mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdOldCenovoyeReagirovanie + "'") == 0
 							|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdCenovoyeReagirovanie + "'") == 0
 							|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdAutoReagirovanie + "'") == 0
 							|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_Heroy + "'") == 0
 							|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_TGCR + "'") == 0
-			) {
+			){
 				values.put("VidSkidki", Hex.decodeHexWithPrefix(mVidSkidki));
-			} else {
+			}else{
 				values.put("VidSkidki", Hex.decodeHexWithPrefix(Sales.DEFAULT_ID));
 			}
 			values.put("Sebestoimost", basePrice);
 			values.put("_ZayavkaPokupatelyaIskhodyaschaya_IDRRef", Hex.decodeHexWithPrefix(mZayavka_IDRRef));
 			values.put("_KeyField", mLastPrice);
-			m_id = (int) db.insert("ZayavkaPokupatelyaIskhodyaschaya_Tovary", null, values);
+			values.put("nacenka", this.smartProPrice);
+			m_id = (int)db.insert("ZayavkaPokupatelyaIskhodyaschaya_Tovary", null, values);
 			mNew = false;
-		} else {
+		}else{
 			values.put("Kolichestvo", new Double(mKolichestvo));
 			values.put("Summa", mSummaSoSkidkoy);
 			values.put("CenaSoSkidkoy", mCenaSoSkidkoy);
@@ -143,24 +150,24 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 			//values.put("VidSkidki", Hex.decodeHexWithPrefix(mVidSkidki));
 			//if (mVidSkidki.compareTo(Sales.CR_ID) == 0) {
 			//System.out.println("mVidSkidki '"+mVidSkidki+"'");
-			if (mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdOldCenovoyeReagirovanie + "'") == 0
+			if(mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdOldCenovoyeReagirovanie + "'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdCenovoyeReagirovanie + "'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdAutoReagirovanie + "'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_Heroy + "'") == 0
 					|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_TGCR + "'") == 0
-			) {
+			){
 				//System.out.println("setToDataBase mVidSkidki '"+mVidSkidki+"'");
 				values.put("VidSkidki", Hex.decodeHexWithPrefix(mVidSkidki));
-			} else {
+			}else{
 				values.put("VidSkidki", Hex.decodeHexWithPrefix(Sales.DEFAULT_ID));
 			}
-
+			values.put("nacenka", this.smartProPrice);
 			db.update("ZayavkaPokupatelyaIskhodyaschaya_Tovary", values, "_id=" + String.valueOf(m_id), null);
 		}
 	}
 
 	@Override
-	public void setKolichestvo(Double kolichestvo) {
+	public void setKolichestvo(Double kolichestvo){
 		mKolichestvo = kolichestvo;
 		/*if (hasSale() || isCRAvailable()) {
 			mSummaSoSkidkoy = mCenaSoSkidkoy * mKolichestvo;
@@ -171,7 +178,7 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		mSummaSoSkidkoy = mCenaSoSkidkoy * mKolichestvo;
 		mSumma = mKolichestvo * mCena;
 		//System.out.println("setKolichestvo mSummaSoSkidkoy: " + mSummaSoSkidkoy);
-		lastves=0;
+		lastves = 0;
 		requestVes();
 	}
 
@@ -181,35 +188,35 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 	public void setMustList(boolean ml){
 		 isMustList=ml;
 	}*/
-	public Double getSumma() {
+	public Double getSumma(){
 		return mSumma;
 	}
 
-	public void setSumma(Double summa) {
+	public void setSumma(Double summa){
 		mSumma = summa;
 	}
 
-	public Double getCena() {
+	public Double getCena(){
 		return mCena;
 	}
 
-	public Double getCenaSoSkidkoy() {
+	public Double getCenaSoSkidkoy(){
 		return mCenaSoSkidkoy;
 	}
 
-	public void setCenaSoSkidkoy(double cenaSoSkidkoy) {
-		if (isCRAvailable()) {
-			if (mCenaSoSkidkoy != cenaSoSkidkoy) {
+	public void setCenaSoSkidkoy(double cenaSoSkidkoy){
+		if(isCRAvailable()){
+			if(mCenaSoSkidkoy != cenaSoSkidkoy){
 				mSkidka = 0.0D;
 
 				mCenaSoSkidkoy = cenaSoSkidkoy;
 				mSummaSoSkidkoy = mCenaSoSkidkoy * mKolichestvo;
-				if (
+				if(
 						(mVidSkidki.toUpperCase().equals(("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_Heroy + "'").toUpperCase()))
 								|| (mVidSkidki.toUpperCase().equals(("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_TGCR + "'").toUpperCase()))
-				) {
+				){
 					mVidSkidki = "x'" + sweetlife.android10.supervisor.Cfg.skidkaId_TGCR + "'";
-				} else {
+				}else{
 					mVidSkidki = "x'" + sweetlife.android10.supervisor.Cfg.skidkaIdCenovoyeReagirovanie + "'";//Sales.CR_ID;
 					/*
 					mSkidka = 0.0D;
@@ -225,77 +232,77 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		//System.out.println("setCenaSoSkidkoy mSummaSoSkidkoy: " + mSummaSoSkidkoy);
 	}
 
-	public double getMinimalnayaCena() {
+	public double getMinimalnayaCena(){
 
 		return mMinimalnayaCena;
 	}
 
-	public void setMinimalnayaCena(double minimalnayaCena) {
+	public void setMinimalnayaCena(double minimalnayaCena){
 
 		mMinimalnayaCena = minimalnayaCena;
 	}
 
-	public double getMaksimalnayaCena() {
+	public double getMaksimalnayaCena(){
 
 		return Math.round(100.0 * mMaksimalnayaCena) / 100.0;
 	}
 
-	public void setMaksimalnayaCena(double maksimalnayaCena) {
+	public void setMaksimalnayaCena(double maksimalnayaCena){
 
 		mMaksimalnayaCena = maksimalnayaCena;
 	}
 
-	public Double getSkidka() {
+	public Double getSkidka(){
 		return mSkidka;
 	}
 
-	public void setSkidka(Double skidka) {
+	public void setSkidka(Double skidka){
 		mSkidka = skidka;
 	}
 
-	public String getVidSkidki() {
+	public String getVidSkidki(){
 		//if (mVidSkidki.compareTo(Sales.CR_ID) == 0) {
 		//System.out.println("getVidSkidki "+mVidSkidki);
-		if (mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdOldCenovoyeReagirovanie + "'") == 0
+		if(mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdOldCenovoyeReagirovanie + "'") == 0
 				|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdCenovoyeReagirovanie + "'") == 0
 				|| mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaIdAutoReagirovanie + "'") == 0
-		) {
+		){
 			return Sales.CR_NAME;
-		} else {
-			if (mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_Heroy + "'") == 0) {
+		}else{
+			if(mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_Heroy + "'") == 0){
 				return Sales.hero_NAME;
-			} else {
-				if (mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_TGCR + "'") == 0) {
+			}else{
+				if(mVidSkidki.compareToIgnoreCase("x'" + sweetlife.android10.supervisor.Cfg.skidkaId_TGCR + "'") == 0){
 					return Sales.CR_hero_NAME;
-				} else {
+				}else{
 					return "";
 				}
 			}
 		}
 	}
 
-	public void setVidSkidki(String vidSkidki) {
+	public void setVidSkidki(String vidSkidki){
 		mVidSkidki = vidSkidki;
 	}
 
-	public Double getBasePrice() {
+	public Double getBasePrice(){
 		return basePrice;
 	}
 
-	public void setBasePrice(Double sebestoimost) {
+	public void setBasePrice(Double sebestoimost){
 		basePrice = sebestoimost;
 	}
 
-	public boolean isCRAvailable() {
+	public boolean isCRAvailable(){
 
-		if ((mMinimalnayaCena) != 0 && (mMinimalnayaCena <= mMaksimalnayaCena)) {
+		if((mMinimalnayaCena) != 0 && (mMinimalnayaCena <= mMaksimalnayaCena)){
 			return true;
 		}
 		return false;
 	}
 
-	public boolean wrongMinMax() {
-		if (mMinimalnayaCena > mMaksimalnayaCena) {
+	public boolean wrongMinMax(){
+		if(mMinimalnayaCena > mMaksimalnayaCena){
 			return true;
 		}
 		return false;
@@ -309,45 +316,45 @@ public class ZayavkaPokupatelya_Foodstaff extends NomenclatureBasedCountItem {
 		return true;
 	}*/
 
-	public Double getSummaSoSkidkoy() {
+	public Double getSummaSoSkidkoy(){
 		return mSummaSoSkidkoy;
 	}
 
-	public void setSummaSoSkidkoy(Double summaSoSkidkoy) {
+	public void setSummaSoSkidkoy(Double summaSoSkidkoy){
 		mSummaSoSkidkoy = summaSoSkidkoy;
 		//System.out.println("setSummaSoSkidkoy mSummaSoSkidkoy: "+mSummaSoSkidkoy);
 	}
 
-	public double getBasePriceAmount() {
+	public double getBasePriceAmount(){
 		//System.out.println("getBasePriceAmount: "+basePrice+" x "+mKolichestvo +" = "+(mKolichestvo * basePrice));
 		return mKolichestvo * basePrice;
 	}
 
-	public double getLastPrice() {
+	public double getLastPrice(){
 		return mLastPrice;
 	}
 
-	public Double getSummaSoSkidkoyForStore(String sklad) {
+	public Double getSummaSoSkidkoyForStore(String sklad){
 		//System.out.println(this.mNomenklaturaNaimenovanie);
-		try {
+		try{
 			String nn = mNomenklaturaNaimenovanie;
-			if (nn.endsWith("`")) {
+			if(nn.endsWith("`")){
 				nn = nn.substring(0, nn.length() - 1);
 				//System.out.println("ignore ` "+nn);
 
 			}
 			nn = nn.substring(nn.length() - 3, nn.length() - 1);
 			//System.out.println("'"+nn+"'");
-			if (nn.equals("14") && sklad.equals(ISklady.KAZAN_sklad_14)) {
+			if(nn.equals("14") && sklad.equals(ISklady.KAZAN_sklad_14)){
 				return mSummaSoSkidkoy;
 			}
-			if (nn.equals("10") && sklad.equals(ISklady.HORECA_sklad_10)) {
+			if(nn.equals("10") && sklad.equals(ISklady.HORECA_sklad_10)){
 				return mSummaSoSkidkoy;
 			}
-			if (nn.equals(" 8") && sklad.equals(ISklady.HORECA_sklad_8)) {
+			if(nn.equals(" 8") && sklad.equals(ISklady.HORECA_sklad_8)){
 				return mSummaSoSkidkoy;
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		return 0.0;

@@ -25,7 +25,7 @@ public class ReportVizity extends Report_Base {
     Numeric dateCreateTo = new Numeric();
 
     public static String menuLabel() {
-        return "Данные локализации (Визиты)";
+        return "Данные по локализации";
     }
 
     public static String folderKey() {
@@ -33,7 +33,7 @@ public class ReportVizity extends Report_Base {
     }
 
     public String getMenuLabel() {
-        return "Данные локализации (Визиты)";
+        return "Данные по локализации";
     }
 
     public String getFolderKey() {
@@ -137,8 +137,8 @@ public class ReportVizity extends Report_Base {
             e = t.getMessage();
         }
         //String serviceName="ВизитыТП";
-        String serviceName="ДанныеЛокализации";
-
+        //String serviceName="ДанныеЛокализации";
+		String serviceName="ДанныеПоЛокализации";
         try {
             serviceName = URLEncoder.encode(serviceName, "UTF-8");
         } catch (Throwable t) {

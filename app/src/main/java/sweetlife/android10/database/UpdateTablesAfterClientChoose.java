@@ -16,7 +16,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class UpdateTablesAfterClientChoose {
-	public static void UpdateAll(SQLiteDatabase db, String kontragentID, String date) {
+	/*public static void UpdateAll(SQLiteDatabase db, String kontragentID, String date) {
 		//sweetlife.horeca.log.LogHelper.debug("UpdateTablesAfterClientChoose.UpdateAll");
 		UpdateActualNomenclatura(db, date);
 		//sweetlife.horeca.log.LogHelper.debug("UpdateTablesAfterClientChoose UPDATE CUR TABLES end UpdateActualNomenclatura " + (new Long(System.currentTimeMillis())).toString());
@@ -36,7 +36,7 @@ public class UpdateTablesAfterClientChoose {
 		//sweetlife.horeca.log.LogHelper.debug("UpdateTablesAfterClientChoose UPDATE CUR TABLES end UpdateCurCenyNomenklaturyHistory " + (new Long(System.currentTimeMillis())).toString());
 		//sweetlife.horeca.log.LogHelper.debug("UpdateTablesAfterClientChoose UPDATE CUR TABLES end UpdateAll " + (new Long(System.currentTimeMillis())).toString());
 		getDolgiPoDocumentam();
-	}
+	}*/
 	public static void getDolgiPoDocumentam() {
 		//
 		String dolg = "?";
@@ -212,7 +212,8 @@ public class UpdateTablesAfterClientChoose {
 		DatabaseHelper.executeQueryInTranzaction(db, sqlCreate);
 		DatabaseHelper.executeQueryInTranzaction(db, sqlInsert);
 	}
-	public static void UpdateCurCenyNomenklaturyCR(SQLiteDatabase db) {
+	/*
+	public static void ____UpdateCurCenyNomenklaturyCR(SQLiteDatabase db) {
 		String sqlDrop = "drop table if exists CurNomenklaturaTovaryCR";
 		String sqlCreate = "create table CurNomenklaturaTovaryCR " + "(_id integer primary key asc autoincrement, _IDRRef blob, " + "Naimenovanie nvarchar (160), Artikul nvarchar (50), " + "OsnovnoyProizvoditel blob, ProizvoditelNaimenovanie nvarchar(50), " + "Cena numeric, BasePrice numeric, Skidka numeric, CenaSoSkidkoy numeric, " + "VidSkidki blob, EdinicyIzmereniyaNaimenovanie nvarchar(50), " + "MinNorma numeric, Koephphicient numeric, EdinicyIzmereniyaID blob, "
 				+ "Roditel blob, [MinCena] numeric, [MaxCena] numeric, " + "UpperName TEXT, LastPrice numeric  )";
@@ -248,6 +249,7 @@ public class UpdateTablesAfterClientChoose {
 		DatabaseHelper.executeQueryInTranzaction(db, "DROP INDEX if exists IX_CurNomenklaturaTovaryCR_IDRRef");
 		DatabaseHelper.executeQueryInTranzaction(db, "CREATE INDEX IX_CurNomenklaturaTovaryCR_IDRRef on CurNomenklaturaTovaryCR (_IDRRef)");
 	}
+	*/
 	public static void UpdateCurCenyNomenklaturyHistory(SQLiteDatabase db) {
 		String sqlDrop = "drop table if exists CurCenyNomenklaturyHistory";
 		String sqlCreate = "create table CurCenyNomenklaturyHistory " + "(_id integer primary key asc autoincrement, _IDRRef blob, " + "Naimenovanie nvarchar (160), Artikul nvarchar (50), " + "OsnovnoyProizvoditel blob, ProizvoditelNaimenovanie nvarchar(50), " + "Cena numeric, BasePrice numeric, Skidka numeric, CenaSoSkidkoy numeric, VidSkidki blob, EdinicyIzmereniyaNaimenovanie nvarchar(50), "

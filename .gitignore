@@ -14,6 +14,8 @@
 .cxx
 /app/build
 /app/release
+app/build
+app/release
 java_pid19584.hprof
 app/release/Horeca3.apk
 app/release/output-metadata.json

@@ -72,6 +72,7 @@ public class FoodstuffsData extends NomenclatureBasedDocumentItems {
 					//, ""//
 					//, ""//
 					//,Request_FoodStuffList.getByHand(cursor)
+					, cursor.getDouble(cursor.getColumnIndex("nacenka"))
 			);
 			mNomenclaureList.add(foodstaff);
 		}
@@ -101,6 +102,43 @@ public class FoodstuffsData extends NomenclatureBasedDocumentItems {
 			, double lastPrice//
 							 //, String skidkaProcent//
 							 //, String skidkaNaimenovanie//
+
+	) {
+		newFoodstuff( nomenklaturaID,  artikul//
+				,  nomenklaturaNaimenovanie//
+				,  edinicaIzmereniya//
+				,  edinicaIzmereniyaNaimenovanie//
+				,  kolichestvo//
+			,  cena//
+			,  cenaSoSkidkoy//
+			,  minimalnayaCena//
+			,  maksimalnayaCena//
+			,  skidka//
+			,  vidSkidki//
+			,  minNorma//
+			,  koefMest//
+			,  basePrice//
+			,  lastPrice//
+		,0);
+	}
+	public void newFoodstuff(String nomenklaturaID, String artikul//
+			, String nomenklaturaNaimenovanie//
+			, String edinicaIzmereniya//
+			, String edinicaIzmereniyaNaimenovanie//
+			, double kolichestvo//
+			, double cena//
+			, double cenaSoSkidkoy//
+			, double minimalnayaCena//
+			, double maksimalnayaCena//
+			, double skidka//
+			, String vidSkidki//
+			, double minNorma//
+			, double koefMest//
+			, double basePrice//
+			, double lastPrice//
+							 //, String skidkaProcent//
+							 //, String skidkaNaimenovanie//
+			,double smartPrice
 	) {
 		//System.out.println("newFoodstuff " + vidSkidki+"/"+minimalnayaCena+"/"+cenaSoSkidkoy+"/"+maksimalnayaCena);
 
@@ -135,6 +173,7 @@ public class FoodstuffsData extends NomenclatureBasedDocumentItems {
 				, maksimalnayaCena, skidka, vidSkidki, minNorma, koefMest, basePrice, lastPrice, true//, skidkaProcent
 				//, skidkaNaimenovanie
 				//,false
+				,smartPrice
 		));
 		//mFoodstaff.setCenaSoSkidkoy(Double.parseDouble(mEditPrice.getText().toString()));
 

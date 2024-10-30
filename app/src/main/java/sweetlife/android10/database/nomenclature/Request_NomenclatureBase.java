@@ -481,7 +481,6 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		UpdateTask.refreshProdazhi_last(ApplicationHoreca.getInstance().getDataBase(), kontragentID);
 
 
-
 		int zapretOtgruzokOtvetsvennogo = getZapretOtgruzokOtvetsvennogo(kontragentID, polzovatelID);
 		boolean letuchka = dataOtgruzki.equals(DateTimeHelper.SQLDateString(new Date()));
 		String defaultSklad = "";
@@ -631,7 +630,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		if(uchetnayaCena(kontragentID) || podrazdeleniya_NeIspolzovatCR(polzovatelID)){
 			sql = sql + "\n 	,0 as MinCena ";
 		}else{
-			sql = sql + "\n 	,case when ifnull(newSkidki.price,0)>0 and (newSkidki.comment='Индивидуальная' or newSkidki.comment='Фикс.цена') then 0";
+			sql = sql + "\n 	,case when ifnull(smartSkidki.price,0)>0 then 0";
 			sql = sql + "\n 		when ifnull(hero1.Cena,0)>0 then hero1.Cena when ifnull(n1.MinCena,0)>0 then n1.MinCena when ifnull(n1.zapret,x'00')=x'01' then 0 when ifnull(n1.nacenka,0)>0 then round(1000*(1.000+n1.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
 			sql = sql + "\n 		when ifnull(hero2.Cena,0)>0 then hero2.Cena when ifnull(n2.MinCena,0)>0 then n2.MinCena when ifnull(n2.zapret,x'00')=x'01' then 0 when ifnull(n2.nacenka,0)>0 then round(1000*(1.000+n2.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
 			sql = sql + "\n 		when ifnull(hero3.Cena,0)>0 then hero3.Cena when ifnull(n3.MinCena,0)>0 then n3.MinCena when ifnull(n3.zapret,x'00')=x'01' then 0 when ifnull(n3.nacenka,0)>0 then round(1000*(1.000+n3.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
@@ -761,7 +760,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		sql = sql + "\n 	,'' || Prodazhi.kolichestvo || '/' || Prodazhi.aktivnost || n.skladEdIzm as lastSellCount ";
 		sql = sql + "\n  	,stars.artikul as stars_artikul ";
 		sql = sql + "\n  	,newSkidki.datastart as datastart, newSkidki.dataend as dataend";
-		//sql = sql + "\n  	,Prodazhi.aktivnost as aktivnostMonth ";
+		sql = sql + "\n  	,smartSkidki.price as smartprice ";
 		sql = sql + "\n	from Nomenklatura_sorted n ";
 		sql = sql + "\n 	cross join Consts const ";
 		if(!no_assortiment){
@@ -819,6 +818,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 			sql = sql + "\n 	left join FlagmanTovar on  FlagmanTovar.Articul=n.Artikul'  ";
 		}*/
 		sql = sql + "\n  	left join SkidkiLast newSkidki on newSkidki.nomenklatura=n._idrref and date(newSkidki.datastart)<=date('" + dataOtgruzki + "') and date(newSkidki.dataend)>=date('" + dataOtgruzki + "')";
+		sql = sql + "\n  	left join SkidkiSmartPro smartSkidki on smartSkidki.nomenklatura=n._idrref and date(smartSkidki.datastart)<=date('" + dataOtgruzki + "') and date(smartSkidki.dataend)>=date('" + dataOtgruzki + "')";
 		sql = sql + "\n  	left join dopmotivaciya_cache top20 on top20.nomenklatura=n._idrref";
 		sql = sql + "\n 	left join TekuschieCenyOstatkovPartiy_strip TekuschieCenyOstatkovPartiy on TekuschieCenyOstatkovPartiy.nomenklatura=n.[_IDRRef] ";
 
@@ -1182,7 +1182,7 @@ order by cc.sklad
 					+ "		);");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from CenyNomenklatury_SLICE;");
 			sql = "insert into CenyNomenklatury_SLICE (Period,Nomenklatura,Cena,Podrazdelenie,Sklad,Zapret,Registrator)"
-					+"	select max(cc.period) as Period"
+					+ "	select max(cc.period) as Period"
 					+ " 	,cc.nomenklatura as Nomenklatura,cc.cena as Cena,cc.podrazdelenie as Podrazdelenie,cc.sklad as Sklad,cc.zapret as Zapret,cc.registrator as Registrator"
 					+ " from CenyNomenklaturyPoPodrazdeleniu cc"
 					+ " where cc.period<='" + dataOtgruzki + "'"
@@ -1462,10 +1462,10 @@ order by cc.sklad
 			System.out.println("CenyNomenklaturySklada_last" + new Date());
 
 
-			System.out.println("start refreshSkidkiKontragent "+ApplicationHoreca.getInstance().getClientInfo().getKod()+"/"+dataOtgruzki);
+			System.out.println("start refreshSkidkiKontragent " + ApplicationHoreca.getInstance().getClientInfo().getKod() + "/" + dataOtgruzki);
 			Cfg.refreshSkidkiKontragent(
 					ApplicationHoreca.getInstance().getClientInfo().getKod()
-					,"date('"+dataOtgruzki+"')");
+					, "date('" + dataOtgruzki + "')");
 
 		}
 

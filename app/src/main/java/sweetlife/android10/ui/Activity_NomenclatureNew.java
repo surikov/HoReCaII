@@ -582,13 +582,14 @@ public class Activity_NomenclatureNew extends Activity{
 								, false
 						);
 						itemsData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sqlString, null));
+
 					}else{
 						itemsData = new Bough();
 					}
 				}
 			}
 		}
-		System.out.println("requeryGridData done");
+		System.out.println("requeryGridData done " + itemsData.dumpXML());
 	}
 
 	Intent SetActivityResult(){
@@ -642,6 +643,7 @@ public class Activity_NomenclatureNew extends Activity{
 		resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.MIN_NORMA, Numeric.string2double(selectedRow.child("MinNorma").value.property.value()));
 		resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.BASE_PRICE, Numeric.string2double(selectedRow.child("BasePrice").value.property.value()));
 		resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.LAST_PRICE, Numeric.string2double(selectedRow.child("LastPrice").value.property.value()));
+		resultIntent.putExtra("smartPrice", Numeric.string2double(selectedRow.child("smartprice").value.property.value()));
 		return resultIntent;
 	}
 
@@ -658,17 +660,19 @@ public class Activity_NomenclatureNew extends Activity{
 			Activity_NomenclatureNew.this.startActivity(intent);
 		}
 	}
+
 	void promptObratnaya(){
 		if(selectedRow != null){
-			String artikul=selectedRow.child("Artikul").value.property.value();
-			String name=selectedRow.child("Naimenovanie").value.property.value();
-			String kodKlienta=ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
-			String clientName=ApplicationHoreca.getInstance().getClientInfo().getName().trim();
-			ActivityWebServicesReports.promptObratnayaSvyazKlient(this,artikul, name, kodKlienta,clientName);
+			String artikul = selectedRow.child("Artikul").value.property.value();
+			String name = selectedRow.child("Naimenovanie").value.property.value();
+			String kodKlienta = ApplicationHoreca.getInstance().getClientInfo().getKod().trim();
+			String clientName = ApplicationHoreca.getInstance().getClientInfo().getName().trim();
+			ActivityWebServicesReports.promptObratnayaSvyazKlient(this, artikul, name, kodKlienta, clientName);
 		}else{
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
 		}
 	}
+
 	/*
 	void requestPriceNew(){
 		if(selectedRow != null){
@@ -770,6 +774,7 @@ public class Activity_NomenclatureNew extends Activity{
 				, "yyyyMMdd'T'hh:mm:ss"
 				, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 		};
+
 		if(itemsData != null){
 			/*try{
 				System.out.println("start flipGrid");
@@ -810,6 +815,7 @@ public class Activity_NomenclatureNew extends Activity{
 				double MIN_CENA = Numeric.string2double(itemsData.children.get(ii).child("MinCena").value.property.value());
 				double MAX_CENA = Numeric.string2double(itemsData.children.get(ii).child("MaxCena").value.property.value());
 				double BASE_PRICE = Numeric.string2double(itemsData.children.get(ii).child("BasePrice").value.property.value());
+				double smartprice = Numeric.string2double(itemsData.children.get(ii).child("smartprice").value.property.value());
 				if(itemsData.children.get(ii).child("mustListId").value.property.value().trim().length() > 0){
 					naimenovanieBackGround = Settings.colorTop20;
 				}
@@ -857,11 +863,21 @@ public class Activity_NomenclatureNew extends Activity{
 								+ "/" + itemsData.children.get(ii).child("Koephphicient").value.property.value()
 						, tap
 						, itemsData.children.get(ii).child("EdinicyIzmereniyaNaimenovanie").value.property.value());
-				columnCena.cell(//Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("Cena").value.property.value(), "р")
-						cenaNacenka
-						, cenaBackground
-						, tap
-						, minCenaText + " - " + maxCenaText);
+				if(smartprice > 0){
+					//MIN_CENA=0;
+					columnCena.cell(//Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("Cena").value.property.value(), "р")
+							cenaNacenka
+							, Settings.colorSmartPro
+							, tap
+							, "" + smartprice + "р для SmartPro");
+				}else{
+					columnCena.cell(//Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("Cena").value.property.value(), "р")
+							cenaNacenka
+							, cenaBackground
+							, tap
+							, minCenaText + " - " + maxCenaText);
+				}
+
 				columnSkidka.cell(Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("Skidka").value.property.value(), "р")
 						, tap
 						, itemsData.children.get(ii).child("VidSkidki").value.property.value());
@@ -1090,11 +1106,11 @@ public class Activity_NomenclatureNew extends Activity{
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent){
-		System.out.println("requestCode "+requestCode+", resultCode "+resultCode);
+		System.out.println("requestCode " + requestCode + ", resultCode " + resultCode);
 		String filePath = null;
 		Uri uri = null;
 		if(intent != null){
-			System.out.println("intent.getData() "+intent.getData());
+			System.out.println("intent.getData() " + intent.getData());
 			switch(requestCode){
 				case ActivityWebServicesReports.etiketkaIDPicture:
 					uri = intent.getData();

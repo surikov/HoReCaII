@@ -29,6 +29,7 @@ public class Settings {
 	public static int colorOlder = 0xffff6666;
 	public static int colorSTM = 0xffff66ff;
 	public static int colorTransparent = 0x00000000;
+	public static int colorSmartPro = 0xff00ccff;
 	//private static String _primaryURL = "89.109.7.162";
 	//private  static String _secondaryURL = "95.79.111.216";
 

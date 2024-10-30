@@ -956,10 +956,11 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		*/
 
 
-		System.out.println("clear Skidki prilojenie,smartpro,internet" );
-		mDB.execSQL("delete from skidki where polzovatel=X'80610050568B3C6811E851EC0C38C23A'" );
-		mDB.execSQL("delete from skidki where polzovatel=X'BBC320677C60FED011ECB65846ED9A78'" );
-		mDB.execSQL("delete from skidki where polzovatel=X'8215002264FA89D811E111E6B52DD7BA'" );
+		//System.out.println("clear Skidki prilojenie,smartpro,internet" );
+		System.out.println("clear Skidki internet" );
+		//mDB.execSQL("delete from skidki where polzovatel=X'80610050568B3C6811E851EC0C38C23A'" );
+		//mDB.execSQL("delete from skidki where polzovatel=X'BBC320677C60FED011ECB65846ED9A78'" );
+		mDB.execSQL("delete from skidki where polzovatel=X'8215002264FA89D811E111E6B52DD7BA'" );//internet  (internet)
 
 
 		String cuHRC = ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod().trim().toUpperCase();

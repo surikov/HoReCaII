@@ -67,7 +67,7 @@ public class Request_FoodStuffList implements ITableColumnsNames {
 */
 
 
-
+				+", ifnull(zpt.nacenka, 0) [nacenka]  "
 
 				//Prodazhi.Stoimost/Prodazhi.kolichestvo
 				//+ "aux.byHand as byHand "// 

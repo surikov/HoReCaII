@@ -301,9 +301,11 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 		btnFixPrice.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v){
-				saveRow();
-				promptFixPrice(mFoodstaff.getBasePrice());
-				dismiss(0);
+				if(Cfg.noSmartPro(mFoodstaff.getArtikul(),anchor.getContext())){
+					saveRow();
+					promptFixPrice(mFoodstaff.getBasePrice());
+					dismiss(0);
+				}
 			}
 		});
 

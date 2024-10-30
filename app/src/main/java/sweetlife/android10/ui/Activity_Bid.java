@@ -91,8 +91,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	private static final int IDD_ALREADY_IN_LIST = 106;
 	public static boolean hideNacenkaStatus = true;
 
-	static final String Rstringfact_order="Наценка факт заказа";
-	static final String Rstringnot_available="Недоступно";
+	static final String Rstringfact_order = "Наценка факт заказа";
+	static final String Rstringnot_available = "Недоступно";
 
 	String nomerDokumenta1C = "";
 	String nomerDokumentaTablet = "";
@@ -536,7 +536,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 	void clearExtraChargeInfo(){
-		System.out.println("clearExtraChargeInfo "+hideNacenkaStatus);
+		System.out.println("clearExtraChargeInfo " + hideNacenkaStatus);
 		TextView textClientPlan = (TextView)findViewById(R.id.text_plan_client);
 		//textClientPlan.setText("");
 		textClientPlan.setText("пересчитывается...");
@@ -1422,7 +1422,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		//System.out.println("UpdateAvailableAmount start");
 		double orderAmount = mBidData.getFoodStuffs().getAmount() + mBidData.getServices().getAmount();
 		//double orderWeight = 0;//mBidData.getFoodStuffs().getWeight();
-		double orderWeight =mBidData.getFoodStuffs().getWeight();
+		double orderWeight = mBidData.getFoodStuffs().getWeight();
 		//mBidData.getFoodStuffs().
 		/*
 		for(NomenclatureBasedItem item: mBidData.getFoodStuffs().mNomenclaureList){
@@ -1763,6 +1763,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 								, data.getDoubleExtra(LAST_PRICE, 0.00D)//
 								//, data.getStringExtra(SKIDKA_PROCENT)//
 								//, data.getStringExtra(SKIDKA_NAIMENOVANIE)//
+								, data.getDoubleExtra("smartPrice", 0.00D)//
 						);
 						mShowEditCountAndPricePopup = true;
 						break;
@@ -2968,7 +2969,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 		ZayavkaPokupatelya bid = mBidData.getBid();
 		Vector<Vector<String>> rows = new Vector<Vector<String>>();
 		int cnt = mBidData.getFoodStuffs().getCount();
-		String lastArt="";
+		String lastArt = "";
 		for(int ii = 0; ii < cnt; ii++){
 			Vector<String> item = new Vector<String>();
 			String s = mBidData.getFoodStuffs().getFoodstuff(ii).getNomenklaturaNaimenovanie();
@@ -2988,7 +2989,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			if(!lastArt.equals(mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul())){
 				rows.add(item);
 			}
-			lastArt=mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul();
+			lastArt = mBidData.getFoodStuffs().getFoodstuff(ii).getArtikul();
 			String sql = "select n.naimenovanie as n1,s.naimenovanie as n2,g.naimenovanie as n3"//
 					+ " from nomenklatura n"//
 					+ " left join nomenklatura s on n.roditel=s._idrref"//
@@ -3704,8 +3705,6 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 	}
 
 
-
-
 	void fillClientHistoryPrompt(){
 		System.out.println("fillClientHistoryPrompt");
 		for(int i = 0; i < Cfg.kontragenty().children.size(); i++){
@@ -3842,7 +3841,8 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
                     , Auxiliary.cursorDouble(historyCursor, "SkidkaPartneraKarta")//
                     , Auxiliary.cursorDouble(historyCursor, "NakopitelnyeSkidki")//
             );*/
-
+			double smartprice = Auxiliary.cursorDouble(historyCursor, "smartprice");
+			//Numeric.string2double(itemsData.children.get(ii).child("smartprice").value.property.value());
 			double soSkidkoy = Request_NomenclatureBase.calculateCenaSoSkidkoy(
 					CENA
 					, testSkidka
@@ -3919,6 +3919,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 							, LAST_PRICE// data.getDoubleExtra(LAST_PRICE, 0.00D)//
 							//, data.getStringExtra(SKIDKA_PROCENT)//
 							//, data.getStringExtra(SKIDKA_NAIMENOVANIE)//
+							, smartprice
 					);
 
 					System.out.println("done add from history panel");
@@ -3986,8 +3987,15 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 			historyKolMest.cell("" + KOEPHICIENT, click);
 			historyEdIzm.cell(EdinicyIzmereniyaNaimenovanie, click);
 			historyCena.cell("" + CENA, cenaBackground, click);
-			historyRazmSkidki.cell(DecimalFormatHelper.format(SKIDKA), click);
-			historyVidSkidki.cell(VID_SKIDKI, click);
+
+			if(smartprice > 0){
+				historyVidSkidki.cell("SmartPro", Settings.colorSmartPro, click);
+				historyRazmSkidki.cell(DecimalFormatHelper.format(smartprice), Settings.colorSmartPro, click);
+			}else{
+				historyVidSkidki.cell(VID_SKIDKI, click);
+				historyRazmSkidki.cell(DecimalFormatHelper.format(SKIDKA), click);
+			}
+
 			historyPoslCena.cell(DecimalFormatHelper.format(LAST_PRICE), click, lastSellCount);
 
 			historyMinCena.cell("" + MIN_CENA, click);
@@ -4667,7 +4675,7 @@ public class Activity_Bid extends Activity_Base implements OnTabChangeListener, 
 												+ bb.child("Сообщение").value.property.value();
 										//Activity_UploadBids.buildDialogResult( Activity_Bid.this,"Отправка заказа", bb);
 										//Activity_UploadBids.buildDialogResultAndClose( Activity_Bid.this,"Отправка заказа", bb,Activity_Bid.this);
-										UploadOrderResult.startUploadResultDialog( Activity_Bid.this,bb.name.is("root"));
+										UploadOrderResult.startUploadResultDialog(Activity_Bid.this, bb.name.is("root"));
 										//Activity_Bid.this.finish();
 									}else{
 										System.out.println("Empty " + result.dumpXML());

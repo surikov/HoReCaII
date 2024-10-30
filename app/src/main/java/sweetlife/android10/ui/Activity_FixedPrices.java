@@ -13,6 +13,7 @@ import sweetlife.android10.data.fixedprices.FixedPricesNomenclatureData;
 import sweetlife.android10.data.fixedprices.FixedPricesNomenclatureListAdapter;
 import sweetlife.android10.data.fixedprices.ZayavkaNaSkidki;
 import sweetlife.android10.log.LogHelper;
+import sweetlife.android10.supervisor.*;
 import sweetlife.android10.widgets.BetterPopupWindow.OnCloseListener;
 import sweetlife.android10.*;
 import tee.binding.Bough;
@@ -132,7 +133,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	}
 
 	void promptClone(){
-		Auxiliary.pickConfirm(this, "Сделать копию заявки на фикс.цены" , "Копировать" , new Task(){
+		Auxiliary.pickConfirm(this, "Сделать копию заявки на фикс.цены", "Копировать", new Task(){
 			@Override
 			public void doTask(){
 				doClone();
@@ -142,7 +143,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 	}
 
 	void promptDelete(){
-		Auxiliary.pickConfirm(this, "Удаление заявки на фикс.цены" , "Удалить" , new Task(){
+		Auxiliary.pickConfirm(this, "Удаление заявки на фикс.цены", "Удалить", new Task(){
 			@Override
 			public void doTask(){
 				mDB.execSQL("delete from ZayavkaNaSkidki where _IDRRef=" + mZayavka.getIDRRef() + ";");
@@ -164,8 +165,8 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 		if(mZayavka == null){
 			mZayavka = new ZayavkaNaSkidki(mClient.getID(), mDB);
 		}
-		long fromMs=extras.getLong("nachalo");
-		if(fromMs>0){
+		long fromMs = extras.getLong("nachalo");
+		if(fromMs > 0){
 			mFromPeriod = Calendar.getInstance();
 			mFromPeriod.setTimeInMillis(fromMs);
 			mToPeriod = Calendar.getInstance();
@@ -181,11 +182,11 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 		UpdateDate();
 	}
 
-	void addArt(String art, String id, String name,double artprice){
+	void addArt(String art, String id, String name, double artprice){
 		if(mFixedPricesNomenclatureData.IsNomenclatureAlreadyInList(id)){
 			return;
 		}
-		mFixedPricesNomenclatureData.newFixedPriceNomenclatureWithPrice(id, art, name,artprice);
+		mFixedPricesNomenclatureData.newFixedPriceNomenclatureWithPrice(id, art, name, artprice);
 		mFixedPricesNomenclatureListAdapter.notifyDataSetChanged();
 		mHasChanges = true;
 	}
@@ -224,11 +225,11 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 				String sql = "select _idrref as irf,naimenovanie as name from nomenklatura where artikul='" + arts[ii].trim() + "';";
 				Bough bb = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 				if(bb.child("row").child("irf").value.property.value().length() > 0){
-					double artprice=Numeric.string2double(prices[ii].trim());
+					double artprice = Numeric.string2double(prices[ii].trim());
 					addArt(arts[ii].trim()
 							, "x'" + bb.child("row").child("irf").value.property.value() + "'"
 							, bb.child("row").child("name").value.property.value()
-							,artprice
+							, artprice
 					);
 				}
 			}
@@ -281,7 +282,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.confirm);
 				builder.setMessage(R.string.quest_delete);
-				builder.setPositiveButton("OK" , new DialogInterface.OnClickListener(){
+				builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick(DialogInterface dialog, int arg1){
 						mFixedPricesNomenclatureData.Remove(mListPositionForDelete);
@@ -340,9 +341,11 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 						CreateErrorDialog(R.string.msg_already_in_list).show();
 						return;
 					}
-					mFixedPricesNomenclatureData.newFixedPriceNomenclature(data.getStringExtra(NOMENCLATURE_ID), data.getStringExtra(ARTIKUL), data.getStringExtra(NAIMENOVANIE));
-					mFixedPricesNomenclatureListAdapter.notifyDataSetChanged();
-					mHasChanges = true;
+					if(Cfg.noSmartPro(data.getStringExtra(ARTIKUL),Activity_FixedPrices.this)){
+						mFixedPricesNomenclatureData.newFixedPriceNomenclature(data.getStringExtra(NOMENCLATURE_ID), data.getStringExtra(ARTIKUL), data.getStringExtra(NAIMENOVANIE));
+						mFixedPricesNomenclatureListAdapter.notifyDataSetChanged();
+						mHasChanges = true;
+					}
 					break;
 			}
 		}

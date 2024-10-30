@@ -58,7 +58,7 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 		} else {
 			convertView.setBackgroundColor(Color.TRANSPARENT);
 		}
-		holder.SetValues(foodstuff);
+		holder.SetFoodStuffValues(foodstuff);
 		return convertView;
 	}
 
@@ -116,7 +116,7 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 			return 19;
 		}
 
-		void SetValues(ZayavkaPokupatelya_Foodstaff foodstuff) {
+		void SetFoodStuffValues(ZayavkaPokupatelya_Foodstaff foodstuff) {
 			//System.out.println(this.getClass().getCanonicalName() + ": SetValues");
 			mTextNumber.setText(String.valueOf(foodstuff.getNomerStroki()));
 			mTextNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
@@ -183,7 +183,11 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 			mTextMinCount.setText(DecimalFormatHelper.format(foodstuff.getMinNorma()));
 			mTextMinCount.setTextSize(TypedValue.COMPLEX_UNIT_SP, getRowTextFontSize());
 			mTextSale.setText("" + foodstuff.getSkidka());
-			mTextSaleType.setText(foodstuff.getVidSkidki());
+			String vidSkidkiText=foodstuff.getVidSkidki();
+			if(foodstuff.smartProPrice>0){
+				vidSkidkiText=vidSkidkiText+"\n"+foodstuff.smartProPrice+"р. для SmartPro";
+			}
+			mTextSaleType.setText(vidSkidkiText);//foodstuff.getVidSkidki());
 			//System.out.println("row " + foodstuff.getArtikul() + ", [" + foodstuff.getSkidka() + "], [" + foodstuff.getVidSkidki() + "]");
 			if (foodstuff.getNomenklaturaNaimenovanie().endsWith("`")) {
 				mTextNumber.setBackgroundColor(Settings.colorTop20);
@@ -214,6 +218,9 @@ public class FoodStuffListAdapter extends ZoomListArrayAdapter {
 				mTextSale.setBackgroundColor(0xffe3e3e3);
 				//mTextSaleType.setBackgroundColor(0xffe3e3e3);
 				mTextSaleType.setBackgroundColor(0xffe3e3e3);
+			}
+			if(foodstuff.smartProPrice>0){
+				mTextSaleType.setBackgroundColor(Settings.colorSmartPro);
 			}
 			//mTextSaleType.setTextColor(0xff000000);
 
