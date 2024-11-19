@@ -3,8 +3,10 @@ package sweetlife.android10.ui;
 import android.app.*;
 import android.content.Context;
 import android.content.Intent;
+import android.database.*;
 import android.net.*;
 import android.os.*;
+import android.text.*;
 import android.util.Base64;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -21,6 +23,7 @@ import reactive.ui.*;
 
 import sweetlife.android10.*;
 import sweetlife.android10.consts.IExtras;
+import sweetlife.android10.data.common.*;
 import sweetlife.android10.data.nomenclature.NomenclatureCountHelper;
 import sweetlife.android10.database.Requests;
 import sweetlife.android10.database.nomenclature.*;
@@ -82,7 +85,7 @@ public class Activity_NomenclatureNew extends Activity{
 	DataGrid gridCategories;
 	ColumnText columnCategories = new ColumnText();
 	DataGrid2 gridItems = null;
-	ColumnText columnArtikul = new ColumnText();
+	ColumnDescription columnArtikul = new ColumnDescription();
 	ColumnText columnProizvoditel = new ColumnText();
 	ColumnText columnNomenklatura = new ColumnText();
 	ColumnDescription columnMinKolichestvo = new ColumnDescription();
@@ -222,6 +225,83 @@ public class Activity_NomenclatureNew extends Activity{
 		Auxiliary.warn(filename, this);
 	}
 
+	void requestOstatki(){
+		String artikuls = "[";
+		String dt = "";
+		if(itemsData != null){
+			for(int ii = 0; ii < itemsData.children.size(); ii++){
+				Bough row = itemsData.children.get(ii).createClone();
+				artikuls = artikuls + dt + "{\"Артикул\":\"" + row.child("Artikul").value.property.value() + "\"}";
+				dt = ",";
+			}
+		}
+		artikuls = artikuls + "]";
+		final String artikuly = artikuls;
+		//System.out.println("artikuly " + artikuly);
+		if(dt.equals("")){
+			Auxiliary.warn("Не выбрана номенклатура", this);
+			return;
+		}
+		final Bough data = new Bough();
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+							+ "/hs/ObnovlenieInfo/ПолучитьДоступноеКоличество/"
+							+ ApplicationHoreca.getInstance().getClientInfo().getKod();
+					//System.out.println("requestOstatki " + url);
+					Bough result = Auxiliary.loadTextFromPrivatePOST(url, artikuly, 21000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					//System.out.println("requestOstatki " + result.dumpXML());
+					data.child("message").value.is(result.child("message").value.property.value());
+					Bough raw = Bough.parseJSON(result.child("raw").value.property.value());
+					//System.out.println(raw.dumpXML());
+					data.child("Остатки").children = raw.children("Остатки");
+					data.child("Сообщение").value.is(raw.child("Сообщение").value.property.value());
+				}catch(Throwable t){
+					t.printStackTrace();
+					data.child("Сообщение").value.is(data.child("message").value.property.value() + " " + t.getMessage());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				//System.out.println(data.dumpXML());
+
+
+				for(int kk = 0; kk < itemsData.children.size(); kk++){
+					Bough gridRow = itemsData.children.get(kk);
+					//System.out.println(ii+" "+row.child("Artikul").value.property.value());
+					String ostatok = "";
+					String artikul = gridRow.child("Artikul").value.property.value().trim();
+					for(int ii = 0; ii < data.child("Остатки").children("Остатки").size(); ii++){
+						Bough ostatokRow = data.child("Остатки").children("Остатки").get(ii);
+
+						//System.out.println(ii+" "+art.child("Артикул").value.property.value()+": "+art.child("Остаток").value.property.value());
+						if(ostatokRow.child("Артикул").value.property.value().trim().equals(artikul)){
+							ostatok = "остаток: " + ostatokRow.child("Остаток").value.property.value();
+							//ostatok=ostatok+" "+row.child("EdinicyIzmereniyaNaimenovanie").value.property.value().trim();
+							artikul = ostatokRow.child("Артикул").value.property.value();
+							if(gridRow.child("stars_artikul").value.property.value().trim().length() > 0){
+								artikul = "★ " + artikul;
+							}
+							break;
+						}
+					}
+					//row.child("ostatok").value.is(ostatok);
+					HTMLText one = columnArtikul.cells.get(kk);
+					String html = "<p>" + artikul + "<br/><small>" + ostatok + " </small></p>";
+
+					one.html.is(Html.fromHtml(html));
+					System.out.println(html);
+				}
+				//System.out.println(itemsData.dumpXML());
+				Auxiliary.warn(data.child("message").value.property.value() + " " + data.child("Сообщение").value.property.value(), Activity_NomenclatureNew.this);
+			}
+		});
+		expect.start(this);
+	}
+
 	void buildUI(){
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
@@ -288,6 +368,14 @@ public class Activity_NomenclatureNew extends Activity{
 				.locked().is(true)
 				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
 		*/
+		layoutless.child(new Knob(this).labelText.is("Остатки").afterTap.is(new Task(){
+			public void doTask(){
+				requestOstatki();
+			}
+		})
+						.hidden().is(true)
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 5)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+
 		layoutless.child(new Knob(this).labelText.is("Обратн.связь").afterTap.is(new Task(){
 					public void doTask(){
 						promptObratnaya();
@@ -337,7 +425,7 @@ public class Activity_NomenclatureNew extends Activity{
 				.item("Корзина")
 				.item("Распродажа")
 				.selection.is(filterStmStarRecomendaciaKorzina)
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.5 * 4 + 5)))
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.5 * 5 + 5)))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
 				.width().is(5 * Auxiliary.tapSize)
 				.height().is(Auxiliary.tapSize)
@@ -408,7 +496,7 @@ public class Activity_NomenclatureNew extends Activity{
 						flipGrid();
 					}
 				}).columns(new Column[]{
-						columnArtikul.title.is("Артикул").width.is(1.5 * Auxiliary.tapSize)
+						columnArtikul.title.is("Артикул").width.is(2 * Auxiliary.tapSize)
 						, columnNomenklatura.title.is("Номенклатура").width.is(8 * Auxiliary.tapSize)
 						, columnProizvoditel.title.is("Пр-ль").width.is(2 * Auxiliary.tapSize)
 						, columnMinKolichestvo.title.is("Min/Квант").width.is(2 * Auxiliary.tapSize)
@@ -752,7 +840,9 @@ public class Activity_NomenclatureNew extends Activity{
 			ApplicationHoreca.getInstance().getDataBase().execSQL("insert into stars (artikul) values ('" + art + "');");
 			nartart = "★ " + art;
 		}
-		columnArtikul.cells.get(rowNum).labelText.is(nartart);
+		HTMLText one = columnArtikul.cells.get(rowNum);
+		one.html.is(Html.fromHtml("<p>" + nartart + "<br/><small> </small></p>"));
+		//columnArtikul.cells.get(rowNum).labelText.is(nartart);
 	}
 
 	void flipGrid(){
@@ -848,7 +938,8 @@ public class Activity_NomenclatureNew extends Activity{
 				}
 				columnArtikul.cell(artLabe
 						, artikulBackground
-						, arttap);
+						, arttap
+						, "");
 				columnNomenklatura.cell(itemsData.children.get(ii).child("Naimenovanie").value.property.value()
 						, naimenovanieBackGround
 						, tap);
@@ -894,7 +985,7 @@ public class Activity_NomenclatureNew extends Activity{
 			}
 			if(itemsData.children.size() < 10){
 				for(int ii = 0; ii < 10 - itemsData.children.size(); ii++){
-					columnArtikul.cell("", 0xffffffff, null);
+					columnArtikul.cell("", 0xffffffff, null, "");
 					columnNomenklatura.cell("", 0xffffffff, null);
 					columnProizvoditel.cell("", 0xffffffff, null);
 					columnMinKolichestvo.cell("", 0xffffffff, null, "");

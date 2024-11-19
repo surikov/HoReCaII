@@ -15,76 +15,76 @@ import android.content.*;
 /*
 https://service.swlife.ru/hrc120107/hs/Report/НакладныеНаКонтроле/region1?param={"ВариантОтчета":"НакладныеНаКонтролеДляПродаж","ДатаНачала":"20230601","ДатаОкончания":"20230615","Подразделение":"00768"}
 */
-public class ReportNakladnieNaKontrole extends Report_Base {
+public class ReportNakladnieNaKontrole extends Report_Base{
 	//Numeric queryDate = new Numeric();
 	Numeric docFrom = new Numeric();
 	Numeric docTo = new Numeric();
 	Numeric territory = new Numeric();
 
-	public ReportNakladnieNaKontrole(ActivityWebServicesReports p) {
+	public ReportNakladnieNaKontrole(ActivityWebServicesReports p){
 		super(p);
 	}
 
-	public static String menuLabel() {
+	public static String menuLabel(){
 		return "Накладные на контроле";
 	}
 
-	public static String folderKey() {
+	public static String folderKey(){
 		return "nakladnienakontrole";
 	}
 
-	public String getMenuLabel() {
+	public String getMenuLabel(){
 		return "Накладные на контроле";
 	}
 
-	public String getFolderKey() {
+	public String getFolderKey(){
 		return "nakladnienakontrole";
 	}
 
 	@Override
-	public String getShortDescription(String key) {
+	public String getShortDescription(String key){
 		Bough b = null;
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
-		try {
+		try{
 			b = Bough.parseXML(xml);
 			String dfrom = Cfg.formatMills(Numeric.string2double(b.child("docFrom").value.property.value()), "dd.MM.yyyy");
 			String dto = Cfg.formatMills(Numeric.string2double(b.child("docTo").value.property.value()), "dd.MM.yyyy");
 			return dfrom + " - " + dto;
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			//
 		}
 		return "?";
 	}
 
 	@Override
-	public String getOtherDescription(String key) {
+	public String getOtherDescription(String key){
 		Bough b = null;
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), key))));
 
-			try {
-				b = Bough.parseXML(xml);
-				int i = (int) Numeric.string2double(b.child("territory").value.property.value());
-				if (i > 0) {
-					String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
-					return s;
-				}
-			} catch (Throwable t) {
-				//
+		try{
+			b = Bough.parseXML(xml);
+			int i = (int)Numeric.string2double(b.child("territory").value.property.value());
+			if(i > 0){
+				String s = Cfg.territory().children.get(i).child("territory").value.property.value() + " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
+				return s;
+			}
+		}catch(Throwable t){
+			//
 
 		}
 		return "Все";
 	}
 
 	@Override
-	public void readForm(String instanceKey) {
+	public void readForm(String instanceKey){
 		Bough b = null;
 		String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Cfg.pathToXML(getFolderKey(), instanceKey))));
-		try {
+		try{
 			b = Bough.parseXML(xml);
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			//
 		}
-		if (b == null) {
+		if(b == null){
 			b = new Bough();
 		}
 		territory.value(Numeric.string2double(b.child("territory").value.property.value()));
@@ -93,7 +93,7 @@ public class ReportNakladnieNaKontrole extends Report_Base {
 	}
 
 	@Override
-	public void writeForm(String instanceKey) {
+	public void writeForm(String instanceKey){
 		Bough b = new Bough().name.is(getFolderKey());
 		//b.child("queryDate").value.is("" + new Date().getTime());
 		b.child("docFrom").value.is("" + docFrom.value());
@@ -104,7 +104,7 @@ public class ReportNakladnieNaKontrole extends Report_Base {
 	}
 
 	@Override
-	public void writeDefaultForm(String instanceKey) {
+	public void writeDefaultForm(String instanceKey){
 		Bough b = new Bough().name.is(getFolderKey());
 		long d = new Date().getTime();
 		Calendar from = Calendar.getInstance();
@@ -118,32 +118,38 @@ public class ReportNakladnieNaKontrole extends Report_Base {
 	}
 
 	@Override
-	public String composeRequest() {
+	public String composeRequest(){
 
 		return null;
 	}
 
 	@Override
-	public String composeGetQuery(int queryKind) {
+	public String composeGetQuery(int queryKind){
 		Calendar from = Calendar.getInstance();
 		from.setTimeInMillis(docFrom.value().longValue());
 		Calendar to = Calendar.getInstance();
 		to.setTimeInMillis(docTo.value().longValue());
-
-		String p = "НакладныеНаКонтроле/" + Cfg.whoCheckListOwner()//
+		String selectedHRC = Cfg.whoCheckListOwner();
+		if(territory.value() > 0){
+			int i=territory.value().intValue();
+			if(i >= 0 && i < Cfg.territory().children.size()){
+				selectedHRC = Cfg.territory().children.get(i).child("hrc").value.property.value().trim();
+			}
+		}
+		String p = "НакладныеНаКонтроле/" + selectedHRC//
 				+ "?param={\"ВариантОтчета\":\"НакладныеНаКонтролеДляПродаж\""
 				+ ",\"ДатаНачала\":\"" + Cfg.formatMills(from.getTimeInMillis(), "yyyyMMdd") + "\""
 				+ ",\"ДатаОкончания\":\"" + Cfg.formatMills(to.getTimeInMillis(), "yyyyMMdd") + "\"";
-		if (territory.value() > 0) {
+		/*if (territory.value() > 0) {
 			String kodPodr = Cfg.kodPodrazdeleni(territory.value().intValue() - 1);
 			p = p + ",\"Подразделение\":\"" + kodPodr + "\"";
-		}
+		}*/
 		p = p + "}"//
 		;
 		String e = "";
-		try {
+		try{
 			e = URLEncoder.encode(p, "UTF-8");
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 			e = t.getMessage();
 		}
@@ -159,13 +165,13 @@ public class ReportNakladnieNaKontrole extends Report_Base {
 	}
 
 	@Override
-	public SubLayoutless getParametersView(Context context) {
-		if (propertiesForm == null) {
+	public SubLayoutless getParametersView(Context context){
+		if(propertiesForm == null){
 			propertiesForm = new SubLayoutless(context);
 			RedactSingleChoice terr = new RedactSingleChoice(context);
 			terr.selection.is(territory);
 			terr.item("[Все]");
-			for (int i = 0; i < Cfg.territory().children.size(); i++) {
+			for(int i = 0; i < Cfg.territory().children.size(); i++){
 				String s = Cfg.territory().children.get(i).child("territory").value.property.value()//
 						+ " (" + Cfg.territory().children.get(i).child("hrc").value.property.value().trim() + ")";
 				terr.item(s);
@@ -178,9 +184,9 @@ public class ReportNakladnieNaKontrole extends Report_Base {
 			;
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("Обновить")//
-					.afterTap.is(new Task() {
+					.afterTap.is(new Task(){
 						@Override
-						public void doTask() {
+						public void doTask(){
 							expectRequery.start(activityReports);
 						}
 					})//
@@ -191,9 +197,9 @@ public class ReportNakladnieNaKontrole extends Report_Base {
 			);
 			propertiesForm.child(new Knob(context)//
 					.labelText.is("Удалить")//
-					.afterTap.is(new Task() {
+					.afterTap.is(new Task(){
 						@Override
-						public void doTask() {
+						public void doTask(){
 							//expectRequery.start(activityReports);
 							activityReports.promptDeleteRepoort(ReportNakladnieNaKontrole.this, currentKey);
 						}

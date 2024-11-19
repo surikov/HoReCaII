@@ -1631,7 +1631,7 @@ public class UpdateTask extends ManagedAsyncTask<Integer> implements IUpdaterCon
 		}
 	}
 
-	private void SendResponseXML(){
+	private void __SendResponseXML(){
 		DeletePreviousResponseXML();
 		logAndPublishProcess(mResources.getString(R.string.msg_upload_response));
 		DeltaData deltaData = mDeltaUpdater.getDeltaParser().getDeltaData();

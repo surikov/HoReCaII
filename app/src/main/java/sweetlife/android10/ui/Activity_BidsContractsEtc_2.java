@@ -3,7 +3,6 @@ package sweetlife.android10.ui;
 import android.app.*;
 //import android.app.Activity;
 import android.content.*;
-import android.net.*;
 import android.os.*;
 import android.view.*;
 
@@ -27,7 +26,6 @@ import android.database.sqlite.*;
 
 import java.text.*;
 import java.util.*;
-import java.io.*;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -37,8 +35,6 @@ import sweetlife.android10.*;
 public class Activity_BidsContractsEtc_2 extends Activity{
 
 	static String checkedTerritoryKod = null;
-
-
 
 
 	Layoutless layoutless;
@@ -51,6 +47,7 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 	//MenuItem menuKartaKlienta;
 	MenuItem menuObnoIstoria;
 	MenuItem menuAktSverki;
+	//MenuItem menuQRTest;
 	MenuItem menuShoMap;
 	//MenuItem menuRequestMailList;
 	MenuItem menuKlientPeople;
@@ -117,6 +114,7 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 
 
 		//menuZayavkaNaPerevodVdosudebnye = menu.add("Заявка на перевод в досудебные");
+		//menuQRTest = menu.add("menuQRTest");
 
 		return true;
 	}
@@ -220,6 +218,11 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 			promptRassylkaSchetovNaOplatu();
 			return true;
 		}
+		/*if(item == menuQRTest){
+			doQRTest();
+			return true;
+		}*/
+
 		/*if(item == menuObratnayaSvyazKlient){
 //			promptObratnayaSvyazKlient(this);
 			return true;
@@ -234,6 +237,33 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 
 
 		return false;
+	}
+
+	void showQRwarning(String action,String title){
+		System.out.println("doQRTest");
+		String link="https://portal.swlife-horeca.ru/account/checklists/checklist/"
+				+"?type=audit_territorii"
+				+"&action="+action
+				+"&client_id="+ApplicationHoreca.getInstance().getClientInfo().getKod()
+				+"&trader_id="+Cfg.whoCheckListOwner();
+		System.out.println("showQRwarning "+link);
+		SubLayoutless subLayoutless = new SubLayoutless(this);
+		subLayoutless
+				.child(new Decor(this)
+						//.labelText.is(title)
+						.sketch(new SketchQRcode()
+								.size.is(6 * Auxiliary.tapSize)
+								.text.is(link)
+						)
+						.left().is(1 * Auxiliary.tapSize)
+						.top().is(0.5 * Auxiliary.tapSize)
+						.width().is(6 * Auxiliary.tapSize)
+						.height().is(6 * Auxiliary.tapSize)
+				)
+				.width().is(Auxiliary.tapSize * 8)
+				.height().is(Auxiliary.tapSize * 9)
+		;
+		Auxiliary.pick(this, title, subLayoutless, null, null, null, null, null, null);
 	}
 
 	/*
@@ -367,38 +397,38 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 		Auxiliary.pickSingleChoice(this, listItems, defaultSelection, title, afterSelect, positiveButtonTitle, callbackPositiveBtn, null, null);
 	}
 
-/*
-	@SuppressWarnings("deprecation")
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data){
-		System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + data);
-		super.onActivityResult(requestCode, resultCode, data);
-		String filePath = null;
-		Uri uri = null;
-		if(resultCode == RESULT_OK){
-			switch(requestCode){
-				case System.out.println(data.dumpXML());:
-					uri = data.getData();
-					filePath = Auxiliary.pathForMediaURI(this, uri);
-					if(filePath == null){
-						Auxiliary.warn("Не удалось прочитать " + uri, Activity_BidsContractsEtc_2.this);
-						return;
-					}
-					etiketkaObratnayaSvyazKlient.value(filePath);
-					break;
-				case tovarIDPicture:
-					uri = data.getData();
-					filePath = Auxiliary.pathForMediaURI(this, uri);
-					if(filePath == null){
-						Auxiliary.warn("Не удалось прочитать " + uri, Activity_BidsContractsEtc_2.this);
-						return;
-					}
-					tovarObratnayaSvyazKlient.value(filePath);
-					break;
+	/*
+		@SuppressWarnings("deprecation")
+		@Override
+		public void onActivityResult(int requestCode, int resultCode, Intent data){
+			System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + data);
+			super.onActivityResult(requestCode, resultCode, data);
+			String filePath = null;
+			Uri uri = null;
+			if(resultCode == RESULT_OK){
+				switch(requestCode){
+					case System.out.println(data.dumpXML());:
+						uri = data.getData();
+						filePath = Auxiliary.pathForMediaURI(this, uri);
+						if(filePath == null){
+							Auxiliary.warn("Не удалось прочитать " + uri, Activity_BidsContractsEtc_2.this);
+							return;
+						}
+						etiketkaObratnayaSvyazKlient.value(filePath);
+						break;
+					case tovarIDPicture:
+						uri = data.getData();
+						filePath = Auxiliary.pathForMediaURI(this, uri);
+						if(filePath == null){
+							Auxiliary.warn("Не удалось прочитать " + uri, Activity_BidsContractsEtc_2.this);
+							return;
+						}
+						tovarObratnayaSvyazKlient.value(filePath);
+						break;
+				}
 			}
 		}
-	}
-*/
+	*/
 	void promptRassylkaSchetovNaOplatu(){
 		final Vector<Bough> items = new Vector<Bough>();
 		new Expect().task.is(new Task(){
@@ -856,7 +886,7 @@ I/System.out: </>
 		if(skladNum.equals("000000009")){
 			sel.value(1);
 		}
-		Auxiliary.pickSingleChoice(this, new String[]{"Только 8 склад", "8 и 17 склад" }, sel//
+		Auxiliary.pickSingleChoice(this, new String[]{"Только 8 склад", "8 и 17 склад"}, sel//
 				, "Склады отгрузок"//
 				, new Task(){
 					@Override
@@ -1200,11 +1230,11 @@ I/System.out: </>
 		);
 		knobZakazy = new Knob(this);
 		layoutless.child(knobZakazy.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						switchPage(0);
-					}
-				})//
+							@Override
+							public void doTask(){
+								switchPage(0);
+							}
+						})//
 						.labelText.is("Заказы").left().is(layoutless.width().property.multiply(0.0 / 5))//
 						.top().is(0)//
 						.width().is(layoutless.width().property.divide(5))//
@@ -1212,11 +1242,11 @@ I/System.out: </>
 		);
 		knobFixCena = new Knob(this);
 		layoutless.child(knobFixCena.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						switchPage(1);
-					}
-				})//
+							@Override
+							public void doTask(){
+								switchPage(1);
+							}
+						})//
 						.labelText.is("Фиксированные цены")
 						.left().is(layoutless.width().property.multiply(1.0 / 5))//
 						.top().is(0)//
@@ -1225,11 +1255,11 @@ I/System.out: </>
 		);
 		knobVozvrat = new Knob(this);
 		layoutless.child(knobVozvrat.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						switchPage(2);
-					}
-				})//
+							@Override
+							public void doTask(){
+								switchPage(2);
+							}
+						})//
 						.labelText.is("Возвраты").left().is(layoutless.width().property.multiply(2.0 / 5))//
 						.top().is(0)//
 						.width().is(layoutless.width().property.divide(5))//
@@ -1237,11 +1267,11 @@ I/System.out: </>
 		);
 		knobSpec = new Knob(this);
 		layoutless.child(knobSpec.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						switchPage(3);
-					}
-				})//
+							@Override
+							public void doTask(){
+								switchPage(3);
+							}
+						})//
 						.labelText.is("Спецификации").left().is(layoutless.width().property.multiply(3.0 / 5))//
 						.top().is(0)//
 						.width().is(layoutless.width().property.divide(5))//
@@ -1249,11 +1279,11 @@ I/System.out: </>
 		);
 		knobDegustacia = new Knob(this);
 		layoutless.child(knobDegustacia.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						switchPage(4);
-					}
-				})//
+							@Override
+							public void doTask(){
+								switchPage(4);
+							}
+						})//
 						.labelText.is("Дегустация").left().is(layoutless.width().property.multiply(4.0 / 5))//
 						.top().is(0)//
 						.width().is(layoutless.width().property.divide(5))//
@@ -1271,36 +1301,36 @@ I/System.out: </>
 				.height().is(layoutless.height().property.minus(2 * Auxiliary.tapSize))//
 		);
 		layoutless.child(new Knob(this).afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						if(gpsTimeExists60())
-							beginVizitButtonClick();
-					}
-				})//
+							@Override
+							public void doTask(){
+								if(gpsTimeExists60())
+									beginVizitButtonClick();
+							}
+						})//
 						.labelText.is("Начало визита").left().is(0)//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		layoutless.child(new Knob(this).afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						if(mojnoZakrytVizit()){
-							endVizitCasePrompt();
-						}
-					}
-				})//
+							@Override
+							public void doTask(){
+								if(mojnoZakrytVizit()){
+									endVizitCasePrompt();
+								}
+							}
+						})//
 						.labelText.is("Конец визита").left().is(3 * Auxiliary.tapSize)//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		layoutless.child(new Knob(this).afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						promptKlientPeople();
-					}
-				})//
+							@Override
+							public void doTask(){
+								promptKlientPeople();
+							}
+						})//
 						.labelText.is("Конт.инф.")
 						.left().is(layoutless.width().property.minus(9 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
@@ -1308,11 +1338,11 @@ I/System.out: </>
 						.height().is(1 * Auxiliary.tapSize)//
 		);
 		layoutless.child(new Knob(this).afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						zametkiClick();
-					}
-				})//
+							@Override
+							public void doTask(){
+								zametkiClick();
+							}
+						})//
 						.labelText.is("Заметки").left().is(layoutless.width().property.minus(6 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
@@ -1320,11 +1350,11 @@ I/System.out: </>
 		);
 		newZakaz = new Knob(this);
 		layoutless.child(newZakaz.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						addButtonClick();
-					}
-				})//
+							@Override
+							public void doTask(){
+								addButtonClick();
+							}
+						})//
 						.labelText.is("Новый заказ")
 						.left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
@@ -1333,11 +1363,11 @@ I/System.out: </>
 		);
 		newFixCena = new Knob(this);
 		layoutless.child(newFixCena.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						StartFixedPricesActivity(true, null);
-					}
-				})//
+							@Override
+							public void doTask(){
+								StartFixedPricesActivity(true, null);
+							}
+						})//
 						.labelText.is("Новая заявка").left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
@@ -1345,11 +1375,11 @@ I/System.out: </>
 		);
 		newVozvrat = new Knob(this);
 		layoutless.child(newVozvrat.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						StartReturnsActivity(true, null);
-					}
-				})//
+							@Override
+							public void doTask(){
+								StartReturnsActivity(true, null);
+							}
+						})//
 						.labelText.is("Новый возврат").left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
@@ -1357,11 +1387,11 @@ I/System.out: </>
 		);
 		newSpecificacia = new Knob(this);
 		layoutless.child(newSpecificacia.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						dobavitSpecificaciu();
-					}
-				})//
+							@Override
+							public void doTask(){
+								dobavitSpecificaciu();
+							}
+						})//
 						.labelText.is("Новая спец.").left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
@@ -1369,11 +1399,11 @@ I/System.out: </>
 		);
 		newDegustas = new Knob(this);
 		layoutless.child(newDegustas.afterTap.is(new Task(){
-					@Override
-					public void doTask(){
-						dobavitDegustaciu();
-					}
-				})//
+							@Override
+							public void doTask(){
+								dobavitDegustaciu();
+							}
+						})//
 						.labelText.is("Новая дег.").left().is(layoutless.width().property.minus(3 * Auxiliary.tapSize))//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
@@ -1849,6 +1879,7 @@ I/System.out: </>
 		//String timeString = mGPSInfo.getVizitTimeString();
 		mGPSInfo.BeginVizit(mAppInstance.getClientInfo().getKod());
 		Auxiliary.warn("Начало визита" + ": " + timeString, Activity_BidsContractsEtc_2.this);
+		//this.showQRwarning("open","Начало визита" + ": " + timeString);
 	}
 
 	void promptRepeatVizit(String lastVizitTime){
@@ -1892,8 +1923,8 @@ I/System.out: </>
 				});
 				*/
 				Auxiliary.warn("Удаление от контрагента " + distanceToClient
-						+ " метров. Запрещено открывать визиты дальше "+Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()+"м"
-						,this);
+								+ " метров. Запрещено открывать визиты дальше " + Settings.getInstance().getMAX_DISTANCE_TO_CLIENT() + "м"
+						, this);
 			}else{
 				//if (!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
 				String beginTime = mGPSInfo.findPreVizitTimeDaily(mAppInstance.getClientInfo().getKod());
@@ -2018,6 +2049,8 @@ I/System.out: </>
 				mGPSInfo.EndVisit(mAppInstance.getClientInfo().getKod()
 						, b.children.get(selection.value().intValue()).child("Naimenovanie").value.property.value()
 				);
+				//String timeString = Auxiliary.tryReFormatDate3(mGPSInfo.getVizitTimeString(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss");
+				//showQRwarning("close","Окончание визита" );
 			}
 		}, null, null, null, null);
 	}

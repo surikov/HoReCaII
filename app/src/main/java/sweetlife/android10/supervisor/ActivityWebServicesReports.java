@@ -1870,7 +1870,7 @@ void doHOOKObratnayaSviaz(String docNum){
 				}, null, null, null, null);
 	}
 
-	void doHOOKApproveFixAction(int nn, String art, String num, final String row){
+	void doHOOKApproveFixAction(int nn, String art, String num){
 		if(nn == 0){
 			promptDropWholeFix(num);
 		}else{
@@ -1908,7 +1908,7 @@ void doHOOKObratnayaSviaz(String docNum){
 		}
 	}
 
-	void doHOOKApproveFix(final String art, final String num, final String row){
+	void doHOOKApproveFix(final String art, final String num){
 		String[] titles = new String[]{
 				"Удалить всю заявку №" + num
 				, "Удалить арт." + art + " из заявки №" + num
@@ -1924,7 +1924,7 @@ void doHOOKObratnayaSviaz(String docNum){
 		Auxiliary.pickSingleChoice(this, titles, nn, null, new Task(){
 			public void doTask(){
 				System.out.println("selected " + nn.value());
-				doHOOKApproveFixAction(nn.value().intValue(), art, num, row);
+				doHOOKApproveFixAction(nn.value().intValue(), art, num);
 			}
 		}, null, null, null, null);
 	}
@@ -2258,8 +2258,8 @@ void doHOOKObratnayaSviaz(String docNum){
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKApproveFix)){
 					String art = brwsr.getQueryParameter(Report_Base.FIELDFixArt);
 					String num = brwsr.getQueryParameter(Report_Base.FIELDFixNum);
-					String row = brwsr.getQueryParameter(Report_Base.FIELDFixRow);
-					doHOOKApproveFix(art, num, row);
+					//String row = brwsr.getQueryParameter(Report_Base.FIELDFixRow);
+					doHOOKApproveFix(art, num);
 				}
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportReturnState)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);

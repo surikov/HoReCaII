@@ -102,7 +102,7 @@ public class Settings {
 	private String _SERVICE_CONTRACTS_CODES = "wsclientstatus/wsclientstatus12.1cws";
 	private long MINIMAL_FREE_SPACE = 536870912;
 	private int SPY_GPS_PERIOD = 15000;
-	private long MAX_DISTANCE_TO_CLIENT = 100;
+	private long MAX_DISTANCE_TO_CLIENT = 100;//123123;
 	private int PERIOD_CLEAR_GPS_DB_DATA = 604800000;
 	private int PERIOD_CLEAR_DB = 604800000;
 

@@ -15,8 +15,8 @@ android {
 		//targetSdkVersion 29
 		targetSdkVersion 33
 
-		versionCode 311145
-		versionName "3.11.145"
+		versionCode 311149
+		versionName "3.11.149"
 
 		//testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 	}

@@ -1136,7 +1136,7 @@ public class Cfg{
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiSmartPro_datastart on SkidkiSmartPro(datastart)");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiSmartPro_dataend on SkidkiSmartPro(dataend)");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiSmartPro_nomenklatura on SkidkiSmartPro(nomenklatura)");
-
+/*
 			sql = "insert into SkidkiSmartPro (datastart,dataend,nomenklatura,price,comment) "//
 					+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ns._idrref as nomenklatura,ss.Znachenie as price"//
 					+ "\n			,case "//
@@ -1145,11 +1145,21 @@ public class Cfg{
 					+ "\n			end as comment"//
 					+ "\n		from skidki ss"//
 					+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=" + dataDostavki//
-					+ "\n 	where ss.Polzovatel=X'" + polzovatelSmartProHEX + "' or ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "'"
+					+ "\n 	where (ss.Polzovatel=X'" + polzovatelSmartProHEX + "' or ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "')"
+					+ "\n			and ns._idrref not in (select nomenklatura from SkidkiSmartPro)"
+					+ "\n			and ss.podrazdelenie=x'" + p1 + "'"
 					+ "\n 	group by ss.nomenklatura;"
 			;
 			System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+*/
+
+			insertSkidkiSmartPro(p1, dataDostavki);
+			insertSkidkiSmartPro(p2, dataDostavki);
+			insertSkidkiSmartPro(p3, dataDostavki);
+			insertSkidkiSmartPro(p4, dataDostavki);
+			insertSkidkiSmartPro(p5, dataDostavki);
+			insertSkidkiSmartPro("00", dataDostavki);
 
 
 
@@ -1187,7 +1197,7 @@ public class Cfg{
 
 
 			sql = "insert into SkidkiLast (datastart,dataend,nomenklatura,price,comment) "//
-					+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ns._idrref as nomenklatura,ss.Znachenie as price"//
+					+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ss.nomenklatura as nomenklatura,ss.Znachenie as price"//
 					+ "\n			,case "//
 					/*
 					+ "\n				when VidSkidki=X'" + skidkaId_x_Gazeta + "' then 'Газета/листовка'"// no
@@ -1224,11 +1234,14 @@ public class Cfg{
 					+ "\n			end as comment"//
 					+ "\n		from skidki ss"//
 					//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=date('now')"//
-					+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=" + dataDostavki//
+					//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=" + dataDostavki//
 			;
 			//+ "\n			left join Kontragenty kk on kk._idrref=skidki.kontragent and kk.kod='" + kod + "' and DataOkonchaniya>=date('now')"//
 			sql = sql + "\n		where ss.kontragent=x'" + kontr_idrref + "' or ss.kontragent=x'" + golov_idrref + "'"
-					+ "\n			and ns._idrref not in (select nomenklatura from SkidkiLast)";
+					+ "\n			and ss.nomenklatura not in (select nomenklatura from SkidkiLast)"
+					//+ "\n			and ss.DataOkonchaniya>=" + dataDostavki//
+					+ "\n			and ss.DataOkonchaniya>=" + dataDostavki+" and ss.DataNachala<=" + dataDostavki
+			;
 			/*
 			sql = sql + "\n		    or ss.podrazdelenie=x'" + p1 + "'";
 			if(p2.length() > 3)
@@ -1264,11 +1277,27 @@ public class Cfg{
 			// System.out.println("done refreshPriceKontragent " + skidkiLastKontragentKod + "/" + skidkiLastHRC + "/" + (new Date()));
 		}
 	}
-
+	public static void insertSkidkiSmartPro(String podrazdeleniebin, String dataDostavki){
+		String sql = "insert into SkidkiSmartPro (datastart,dataend,nomenklatura,price,comment) "//
+				+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ss.nomenklatura as nomenklatura,ss.Znachenie as price"//
+				+ "\n			,case "//
+				+ skidkiLabelsPart()
+				+ "\n				else '' "//
+				+ "\n			end as comment"//
+				+ "\n		from skidki ss"//
+				+ "\n 	where (ss.Polzovatel=X'" + polzovatelSmartProHEX + "' or ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "')"
+				+ "\n			and ss.nomenklatura not in (select nomenklatura from SkidkiSmartPro)"
+				+ "\n			and ss.podrazdelenie=x'" + podrazdeleniebin + "'"
+				+ "\n			and ss.DataOkonchaniya>=" + dataDostavki+" and ss.DataNachala<=" + dataDostavki
+				+ "\n 	group by ss.nomenklatura;"
+		;
+		System.out.println(sql);
+		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+	}
 	public static void insertSkidkiLast(String podrazdeleniebin, String dataDostavki){
 
 		String sql = "insert into SkidkiLast (datastart,dataend,nomenklatura,price,comment) "//
-				+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ns._idrref as nomenklatura,ss.Znachenie as price"//
+				+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ss.nomenklatura as nomenklatura,ss.Znachenie as price"//
 				+ "\n			,case "//
 				/*
 				+ "\n				when ss.Polzovatel=X'" + polzovatelSmartProHEX + "' then '" + labelForSmartProPrilojene + "'"// no
@@ -1303,9 +1332,11 @@ public class Cfg{
 				+ "\n			end as comment"//
 				+ "\n		from skidki ss"//
 				//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataNachala<=date('now') and ss.DataOkonchaniya>=date('now')"//
-				+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataNachala<=" + dataDostavki + " and ss.DataOkonchaniya>=" + dataDostavki//
+				//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataNachala<=" + dataDostavki + " and ss.DataOkonchaniya>=" + dataDostavki//
 				+ "\n		where ss.podrazdelenie=x'" + podrazdeleniebin + "'"
-				+ "\n	and ns._idrref not in (select nomenklatura from SkidkiLast)";
+				+ "\n	and ss.nomenklatura not in (select nomenklatura from SkidkiLast)"
+				+ "\n	and ss.DataNachala<=" + dataDostavki + " and ss.DataOkonchaniya>=" + dataDostavki//
+				;
 		System.out.println("insertSkidkiLast " + sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}

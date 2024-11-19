@@ -153,6 +153,7 @@ public class ReportPokazateliKPI extends Report_Base {
 		String otgruzka=Cfg.formatMills(dateShip.value(), "yyyyMMdd");
 		String param="{\"Подразделение\":\""+kod+"\", \"Дата\":\""+now+"\", \"ДатаОтгрузки\":\""+otgruzka+"\"}";
 		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Report/ПоказателиПродаж/" + Cfg.whoCheckListOwner()+ "?param="+param;
+		url=url+tagForFormat( queryKind);
 		return url;
 	}
 

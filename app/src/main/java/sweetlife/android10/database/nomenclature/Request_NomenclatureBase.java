@@ -631,11 +631,11 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 			sql = sql + "\n 	,0 as MinCena ";
 		}else{
 			sql = sql + "\n 	,case when ifnull(smartSkidki.price,0)>0 then 0";
-			sql = sql + "\n 		when ifnull(hero1.Cena,0)>0 then hero1.Cena when ifnull(n1.MinCena,0)>0 then n1.MinCena when ifnull(n1.zapret,x'00')=x'01' then 0 when ifnull(n1.nacenka,0)>0 then round(1000*(1.000+n1.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
-			sql = sql + "\n 		when ifnull(hero2.Cena,0)>0 then hero2.Cena when ifnull(n2.MinCena,0)>0 then n2.MinCena when ifnull(n2.zapret,x'00')=x'01' then 0 when ifnull(n2.nacenka,0)>0 then round(1000*(1.000+n2.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
-			sql = sql + "\n 		when ifnull(hero3.Cena,0)>0 then hero3.Cena when ifnull(n3.MinCena,0)>0 then n3.MinCena when ifnull(n3.zapret,x'00')=x'01' then 0 when ifnull(n3.nacenka,0)>0 then round(1000*(1.000+n3.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
-			sql = sql + "\n 		when ifnull(hero4.Cena,0)>0 then hero4.Cena when ifnull(n4.MinCena,0)>0 then n4.MinCena when ifnull(n4.zapret,x'00')=x'01' then 0 when ifnull(n4.nacenka,0)>0 then round(1000*(1.000+n4.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
-			sql = sql + "\n 		when ifnull(hero5.Cena,0)>0 then hero5.Cena when ifnull(n5.MinCena,0)>0 then n5.MinCena when ifnull(n5.zapret,x'00')=x'01' then 0 when ifnull(n5.nacenka,0)>0 then round(1000*(1.000+n5.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero1.Cena,0)>0 then hero1.Cena when ifnull(n1.zapret,x'00')=x'01' then 0 when ifnull(n1.MinCena,0)>0 then n1.MinCena when ifnull(n1.nacenka,0)>0 then round(1000*(1.000+n1.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero2.Cena,0)>0 then hero2.Cena when ifnull(n2.zapret,x'00')=x'01' then 0 when ifnull(n2.MinCena,0)>0 then n2.MinCena when ifnull(n2.nacenka,0)>0 then round(1000*(1.000+n2.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero3.Cena,0)>0 then hero3.Cena when ifnull(n3.zapret,x'00')=x'01' then 0 when ifnull(n3.MinCena,0)>0 then n3.MinCena when ifnull(n3.nacenka,0)>0 then round(1000*(1.000+n3.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero4.Cena,0)>0 then hero4.Cena when ifnull(n4.zapret,x'00')=x'01' then 0 when ifnull(n4.MinCena,0)>0 then n4.MinCena when ifnull(n4.nacenka,0)>0 then round(1000*(1.000+n4.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
+			sql = sql + "\n 		when ifnull(hero5.Cena,0)>0 then hero5.Cena when ifnull(n5.zapret,x'00')=x'01' then 0 when ifnull(n5.MinCena,0)>0 then n5.MinCena when ifnull(n5.nacenka,0)>0 then round(1000*(1.000+n5.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
 			sql = sql + "\n 		else 0";
 			sql = sql + "\n 		end as MinCena";
 			/*sql = sql + "\n 	,case when ifnull(newSkidki.price,0)>0 and (newSkidki.comment='Индивидуальная' or newSkidki.comment='Фикс.цена') ";

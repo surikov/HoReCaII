@@ -5,9 +5,9 @@
 <user><hrc>moscow3</hrc><label>Москва  Юг</label></user><!--  /  / Москва / Москва  Юг -->
 <user><hrc>moscow2</hrc><label>Москва Север.</label></user>
 <user><hrc>oblast</hrc><label>Н.Новгород</label></user><!--  /  /  / Область -->
-<user><hrc>region1</hrc><label>Регионы 1</label></user><!--  /  /  / Регионы 1 -->
-<user><hrc>region2</hrc><label>Регионы 2</label></user><!--  /  /  / Регионы 2 -->
-<user><hrc>region3</hrc><label>Регионы 3</label></user><!--  /  /  / Регионы 3 -->
+<user><hrc>region1</hrc><label>Чувашия</label></user><!--  /  /  / Регионы 1 -->
+<user><hrc>region2</hrc><label>Саранск</label></user><!--  /  /  / Регионы 2 -->
+<user><hrc>region3</hrc><label>Владимир</label></user><!--  /  /  / Регионы 3 -->
 <user><hrc>south</hrc><label>Юг</label></user><!--  /  /  / Юг -->
 <user><hrc>supermvz_hrc</hrc><label>Москва VIP Центр</label></user><!--  / Москва / Москва VIP Центр / Москва VIP Центр   -->
 <!--<user><hrc>supervip_hrc</hrc><label>VIP и госзаказчики</label></user>-->
