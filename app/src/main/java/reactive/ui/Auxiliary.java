@@ -22,7 +22,10 @@ import android.content.res.*;
 import android.view.inputmethod.InputMethodManager;
 
 import sweetlife.android10.*;
+import sweetlife.android10.data.common.*;
+import sweetlife.android10.database.nomenclature.*;
 import sweetlife.android10.log.*;
+import sweetlife.android10.utils.*;
 import tee.binding.task.*;
 import tee.binding.it.*;
 import tee.binding.*;
@@ -49,6 +52,8 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
+
+import com.google.zxing.integration.android.*;
 
 
 //import com.google.firebase.messaging.FirebaseMessagingService;
@@ -767,7 +772,55 @@ public class Auxiliary{
 		return "com.android.providers.media.documents".equals(uri.getAuthority());
 	}
 
+	public static Bough postMIMEJSON(String url, String body, String bearerToken) throws Exception{
+		System.out.println("postMIMEJSON " + url);
+		System.out.println("body " + body);
+		System.out.println("bearerToken " + bearerToken);
+		Bough result = new Bough();
+		HttpURLConnection httpURLConnection = null;
+		URL link = new URL(url);
+		httpURLConnection = (HttpURLConnection)link.openConnection();
+		httpURLConnection.setRequestMethod("POST");
+		httpURLConnection.setConnectTimeout(3000);
+		httpURLConnection.setReadTimeout(3000);
+		httpURLConnection.setDoInput(true);
+		httpURLConnection.setDoOutput(true);
+		httpURLConnection.setChunkedStreamingMode(0);
+		httpURLConnection.setRequestProperty("Content-Type", "application/json");
+		httpURLConnection.setInstanceFollowRedirects(false);
+		if(bearerToken.length() > 0){
+			httpURLConnection.setRequestProperty("Authorization", "Bearer " + bearerToken);
+		}
+		httpURLConnection.connect();
+		if(body.length() > 0){
+			OutputStreamWriter writer = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8");
+			writer.write(body);
+			writer.close();
+		}
+		InputStream inputStream = httpURLConnection.getInputStream();
+		BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+		byte[] bytes = new byte[1024];
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		int intgr = bufferedInputStream.read(bytes);
+		while(intgr > -1){
+			byteArrayOutputStream.write(bytes, 0, intgr);
+			intgr = bufferedInputStream.read(bytes);
+		}
+		bufferedInputStream.close();
+		byte[] raw = byteArrayOutputStream.toByteArray();
+		result.child("data").children = Bough.parseJSON(new String(raw)).children;
+		//String rawData=new String(raw);
+		//System.out.println("output " +rawData);
+		result.child("status").value.property.value("" + httpURLConnection.getResponseCode());
+		result.child("message").value.property.value(httpURLConnection.getResponseMessage());
+		httpURLConnection.disconnect();
+		byteArrayOutputStream.close();
+		//String access_token = Bough.parseJSON(new String(raw)).child("access_token").value.property.value();
+		return result;
+	}
+
 	public static Bough loadTextFromPublicPOST(String pathurl, byte[] data, int timeout){
+		System.out.println("loadTextFromPublicPOST " + pathurl);
 		Bough r = new Bough().name.is("result");
 		try{
 			HttpURLConnection httpURLConnection = null;
@@ -810,6 +863,16 @@ public class Auxiliary{
 			t.printStackTrace();
 		}
 		return r;
+	}
+
+	public static Bough loadTextFromPrivatePOST(String pathurl, String data, String login, String password){
+		byte[] bytes = new byte[1];
+		try{
+			bytes = data.getBytes("UTF-8");
+		}catch(Throwable t){
+			t.printStackTrace();
+		}
+		return loadTextFromPrivatePOST(pathurl, bytes, 300 * 1000, login, password, true);
 	}
 
 	public static Bough loadTextFromPrivatePOST(String pathurl, byte[] data, int timeout, String login, String password){
@@ -2297,6 +2360,40 @@ public class Auxiliary{
 		Bundle extras = intent.getExtras();
 		return bundle2bough(extras);
 	}
+/*
+	public static String __vibratNomenklaturaRequest(String searchWord){
+		Date denOtgruzki = NomenclatureBasedDocument.nextWorkingDate(Calendar.getInstance());
+		String kontragentXhex = ApplicationHoreca.getInstance().getClientInfo().getID();
+		String torgoviyXhex = ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr();
+		int itemsMaxCount = 99;
+		String sql = Request_NomenclatureBase.composeSQLall_Old(
+				DateTimeHelper.SQLDateString(denOtgruzki)
+				, kontragentXhex
+				, torgoviyXhex
+				, null//DateTimeHelper.SQLDateString(fr)//
+				, null//DateTimeHelper.SQLDateString(to)//
+				, " n.artikul like '%" + searchWord.trim()
+						+ "%' or n.UpperName like '%" + searchWord.toUpperCase().trim()
+						+ "%' or n.tegi like '%" + searchWord.toUpperCase().trim() + "%' "//
+				, ISearchBy.SEARCH_CUSTOM
+				, false//
+				, false//history
+				, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()//
+				, itemsMaxCount//gridPageSize * 3//
+				//, gridHistory.dataOffset.property.value().intValue()//
+				, 0//
+				, false//
+				, false, null, null, false, false, null, null, null
+				, false//,filterBySTM.value()
+				, false
+				, false
+				, false
+				, false
+				, false
+		);
+		return sql;
+	}
+*/
 
 	public static Bough bundle2bough(Bundle bundle){
 		Bough bough = new Bough();
@@ -2321,7 +2418,10 @@ public class Auxiliary{
 	}
 
 	public static void sendNotification(String messageTitle, String messageBody, Context packageContext, Class<?> cls){
-		System.out.println("------------------sendNotification: " + messageBody);
+		System.out.println("HRCFirebaseMessagingService sendNotification: messageTitle: " + messageTitle);
+		System.out.println("HRCFirebaseMessagingService sendNotification: messageBody: " + messageBody);
+		System.out.println("HRCFirebaseMessagingService sendNotification: " + Build.VERSION.SDK_INT + " >= " + Build.VERSION_CODES.O);
+
 		//Intent intent = new Intent(this, MainActivity.class);
 		Intent intent = new Intent(packageContext, cls);
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -2329,7 +2429,7 @@ public class Auxiliary{
 				, intent,
 				PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
-		String channelId = "swtestchan";//getString(R.string.default_notification_channel_id);
+		String channelId = "swlifechannelid";//"swtestchan";//getString(R.string.default_notification_channel_id);
 		Uri defaultSoundUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION);
 		androidx.core.app.NotificationCompat.Builder notificationBuilder =
 				new androidx.core.app.NotificationCompat.Builder(packageContext, channelId)
@@ -2346,12 +2446,12 @@ public class Auxiliary{
 				(android.app.NotificationManager)packageContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		// Since android Oreo notification channel is needed.
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-			android.app.NotificationChannel channel = new android.app.NotificationChannel(channelId,
-					"Channel human readable title",
-					android.app.NotificationManager.IMPORTANCE_DEFAULT);
-			notificationManager.createNotificationChannel(channel);
-		}
+		//if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+		android.app.NotificationChannel channel = new android.app.NotificationChannel(channelId,
+				"Channel human readable title",
+				NotificationManager.IMPORTANCE_HIGH);
+		notificationManager.createNotificationChannel(channel);
+		//}
 
 		notificationManager.notify(0 // ID of notification
 				, notificationBuilder.build());
@@ -2405,7 +2505,7 @@ public class Auxiliary{
 	}
 
 	public static void startMediaGallery(Activity aa, final int resultID){
-		System.out.println("startMediaGallery "+resultID);
+		System.out.println("startMediaGallery " + resultID);
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("*/*");
 		intent.addCategory(Intent.CATEGORY_OPENABLE);

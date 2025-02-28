@@ -19,6 +19,8 @@ public abstract class Report_Base{
 	public final static String HOOKReportPoVoditelam = "HookReportPoVoditelam";
 	public final static String HOOKReportOrderState = "HookReportOrderState";
 	public final static String HOOKArtDocDateSent = "HOOKArtDocDateSent";
+	public final static String HOOKArtFavSmartPro = "HOOKArtFavSmartPro";
+	public final static String HOOKDeleteArtFavSmartPro = "HOOKDeleteArtFavSmartPro";
 	public final static String HOOKObratnayaSviaz = "HOOKObratnayaSviaz";
 	public final static String HOOKReportFixKoordinat = "HOOKReportFixKoordinat";
 	public final static String HOOKReportDeleteSpec = "HOOKReportDeleteSpec";
@@ -289,6 +291,7 @@ public abstract class Report_Base{
 				.child("m:Params").value.property.value());
 		try{
 			rez = new String(Base64.decode(s, Base64.DEFAULT), "UTF-8");
+			//rez = new String(Base64.decode(s, Base64.DEFAULT), "Windows-1251");
 			System.out.println("response size " + s.length() + "/" + rez.length());
 		}catch(Throwable t){
 			t.printStackTrace();

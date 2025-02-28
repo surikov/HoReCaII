@@ -66,7 +66,7 @@ public class Request_NomeclatureSimple implements ITableColumnsNames, ISearchBy 
 			}
 		}
 		sqlString = sqlString + " group by n._IDRRef";
-		//System.out.println("RequestNomenclatureBySearchString.Request " + sqlString);
+		System.out.println("RequestNomenclatureBySearchString.Request " + sqlString);
 		Cursor c = db.rawQuery(sqlString, null);
 		//System.out.println("RequestNomenclatureBySearchString.Request done");
 		return c;

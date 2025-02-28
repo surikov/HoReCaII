@@ -31,6 +31,7 @@ import androidx.core.app.ActivityCompat;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.regex.*;
 
 import sweetlife.android10.*;
 import tee.binding.*;
@@ -83,7 +84,7 @@ public class Activity_Login extends Activity{
 		}
 	};
 
-
+/*
 	void adjustVipTerritoryParent(){
 		if(Cfg.whoCheckListOwner().toLowerCase().trim().equals("supervip_hrc")){
 			String sql = "update Podrazdeleniya set roditel=x'A003002264FA89D811E08BB0690A5B4A' where kod='х0067';";
@@ -95,7 +96,7 @@ public class Activity_Login extends Activity{
 			}
 		}
 	}
-
+*/
 	void startPermissions(){
 		Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:sweetlife.android10"));
 		startActivityForResult(intent, ResultFromPermission);
@@ -276,7 +277,7 @@ public class Activity_Login extends Activity{
 				//System.out.println("test startUpdateFirebaseToken");
 				//startUpdateFirebaseToken();
 
-				adjustVipTerritoryParent();
+				//adjustVipTerritoryParent();
 				Intent intent = new Intent();
 				intent.setClass(Activity_Login.this, Activity_Route_2.class);
 				sweetlife.android10.utils.DatabaseHelper.adjustDataBase(ApplicationHoreca.getInstance().getDataBase());
@@ -468,7 +469,11 @@ void cachePassword(String newPass){
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		System.out.println("Activity_Login.onCreate " + Auxiliary.bundle2bough(savedInstanceState).dumpXML());
+		System.out.println("Activity_Login.onCreate savedInstanceState " + Auxiliary.bundle2bough(savedInstanceState).dumpXML());
+		System.out.println("Activity_Login.onCreate extras " + Auxiliary.bundle2bough(this.getIntent().getExtras()).dumpXML());
+
+
+
 		layoutless = new Layoutless(this);
 		setContentView(layoutless);
 		//SharedPreferences settings = getSharedPreferences(IAppConsts.PREFS_FILE_NAME, 0);
@@ -1033,8 +1038,8 @@ supernn_hrc - JRA61P
 					+ "/" + getString(R.string.app_name)//
 					//+ "  " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName
 					+ "  " + packageVersion
-					+ ", " + Settings.getInstance().getBaseIP()//
-					+ "/" + Settings.getInstance().selectedBase1C()//
+					+ ", " + Settings.getInstance().getBaseURL()//
+					+ "" + Settings.getInstance().selectedBase1C()//
 					+ " " + Settings.getInstance().selectedWSDL()//
 			);
 

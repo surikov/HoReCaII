@@ -82,7 +82,7 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 		mDB = ApplicationHoreca.getInstance().getDataBase();
 		ReadExtras();
 		setTitle("Заявка на фиксированные цены от  " + mClient.getName());
-		((TextView)findViewById(R.id.text_from_date)).setText(R.string.action_date_since);
+		((TextView)findViewById(R.id.text_from_date)).setText("Время действия с:");//R.string.action_date_since);
 		InitializeControls();
 	}
 
@@ -341,14 +341,31 @@ public class Activity_FixedPrices extends Activity_BasePeriod implements IExtras
 						CreateErrorDialog(R.string.msg_already_in_list).show();
 						return;
 					}
+
 					if(Cfg.noSmartPro(data.getStringExtra(ARTIKUL),Activity_FixedPrices.this)){
+						/*
 						mFixedPricesNomenclatureData.newFixedPriceNomenclature(data.getStringExtra(NOMENCLATURE_ID), data.getStringExtra(ARTIKUL), data.getStringExtra(NAIMENOVANIE));
 						mFixedPricesNomenclatureListAdapter.notifyDataSetChanged();
 						mHasChanges = true;
+						*/
+						checkAvailable(data);
 					}
 					break;
 			}
 		}
+	}
+	void checkAvailable(Intent data){
+		Cfg.checkFixValid(this, new Task(){
+					public void doTask(){
+						mFixedPricesNomenclatureData.newFixedPriceNomenclature(data.getStringExtra(NOMENCLATURE_ID), data.getStringExtra(ARTIKUL), data.getStringExtra(NAIMENOVANIE));
+						mFixedPricesNomenclatureListAdapter.notifyDataSetChanged();
+						mHasChanges = true;
+					}
+				}, data.getStringExtra(ARTIKUL)
+				, ApplicationHoreca.getInstance().getClientInfo().getKod()
+				, Auxiliary.short1cDate.format(mFromPeriod.getTime())
+				, Auxiliary.short1cDate.format(mToPeriod.getTime())
+		);
 	}
 
 	@SuppressWarnings("deprecation")

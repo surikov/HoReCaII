@@ -109,7 +109,7 @@ public abstract class Activity_Base extends Activity implements OnTouchListener,
 			setTitle(chOwner
 					+ "/" + getString(R.string.app_name)//
 					+ "  " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName
-					+ ", " + Settings.getInstance().getBaseIP()//
+					+ ", " + Settings.getInstance().getBaseURL()//
 					+ "/" + Settings.getInstance().selectedBase1C()//
 					+ " " + Settings.getInstance().selectedWSDL()//
 			);

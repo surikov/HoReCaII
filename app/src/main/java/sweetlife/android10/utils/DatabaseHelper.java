@@ -880,6 +880,17 @@ System.out.println("create RecommendationAndBasket1221");
 			System.out.println(t.getMessage());
 		}
 		*/
+/*
+		try {
+			mDB.execSQL("alter table ZayavkaPokupatelyaIskhodyaschaya add column nomerZakaza text;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}*/
+		try {
+			mDB.execSQL("alter table AnketaKlienta add column mercury text;");
+		} catch (Throwable t) {
+			System.out.println(t.getMessage());
+		}
 		mDB.execSQL("create table if not exists AnketaKlientaContacts ("//
 				+ "_id integer primary key asc autoincrement"//
 				+ ",anketaId integer"//
@@ -1199,11 +1210,12 @@ System.out.println("create RecommendationAndBasket1221");
             System.out.println(t.getMessage());
             //t.printStackTrace();
         }*/
-        /*try {
-            mDB.execSQL("alter table MarshrutyAgentov add column nedelya integer;");
+        try {
+            mDB.execSQL("alter table Vizits add column gpsbegin integer;");
+			mDB.execSQL("alter table Vizits add column gpsfinish integer;");
         } catch (Throwable t) {
             System.out.println(t.getMessage());
-        }*/
+        }
 		try {
 			//System.out.println("clear dopmotivaciya");
 			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");

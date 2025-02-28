@@ -64,9 +64,10 @@ public class ApplicationHoreca
 
 
 	//boolean firstPointInsert = false;
-	public static ApplicationHoreca getInstance() {
+	public static ApplicationHoreca getInstance(){
 		return mInstance;
 	}
+
 	/*public static String hrcSelectedRoute() {
 		if (currentHRCmarshrut.length() > 1) {
 			return currentHRCmarshrut;
@@ -76,7 +77,7 @@ public class ApplicationHoreca
 		}
 	}*/
 	@Override
-	public void onCreate() {
+	public void onCreate(){
 		//System.out.println(this.getClass().getCanonicalName() + ".onCreate");
 		//ACRA.init(this);
 		super.onCreate();
@@ -109,21 +110,23 @@ public class ApplicationHoreca
 		//test();
 		//System.out.println("firebase test start");
 	}
-	String hx(int n) {
-		if (n == 0) {
+
+	String hx(int n){
+		if(n == 0){
 			return "ff";
 		}
-		if (n == 1) {
+		if(n == 1){
 			return "99";
 		}
 		return "33";
 	}
-	void test() {
+
+	void test(){
 		int i = 0;
-		for (int r = 0; r < 3; r++) {
-			for (int g = 0; g < 3; g++) {
-				for (int b = 0; b < 3; b++) {
-					if (!(r == g && g == b)) {
+		for(int r = 0; r < 3; r++){
+			for(int g = 0; g < 3; g++){
+				for(int b = 0; b < 3; b++){
+					if(!(r == g && g == b)){
 						//System.out.println("else if (n == " + i + ")color = '#" + hx(r) + hx(g) + hx(b) + "';");
 						//System.out.println(hx(r) + hx(g) + hx(b));
 						i++;
@@ -132,9 +135,10 @@ public class ApplicationHoreca
 			}
 		}
 	}
-	public void InitializeDB() {
+
+	public void InitializeDB(){
 		//System.out.println(this.getClass().getCanonicalName() + ".InitializeDB");
-		if (mDB == null || !mDB.isOpen()) {
+		if(mDB == null || !mDB.isOpen()){
 			//System.out.println(Settings.getInstance().toString());
 			//System.out.println(Settings.getInstance().getTABLET_DATABASE_FILE());
 			//System.out.println("DataBaseOpenHelper " + DataBaseOpenHelper.DATABASE_NAME);
@@ -142,29 +146,33 @@ public class ApplicationHoreca
 			mDB = openHelper.getWritableDatabase();
 		}
 	}
-	public SQLiteDatabase getDataBase() {
-		if (mDB == null || !mDB.isOpen()) {
+
+	public SQLiteDatabase getDataBase(){
+		if(mDB == null || !mDB.isOpen()){
 			InitializeDB();
 		}
 		return mDB;
 	}
-	private void DestroyDatabase() {
-		if (mDB != null) {
-			if (mDB.isOpen()) {
+
+	private void DestroyDatabase(){
+		if(mDB != null){
+			if(mDB.isOpen()){
 				mDB.close();
 			}
 			mDB = null;
 		}
 	}
-	public Agent getCurrentAgent() {
-		if (mCurrentAgent == null) {
-			if (mAgents == null) {
+
+	public Agent getCurrentAgent(){
+		if(mCurrentAgent == null){
+			if(mAgents == null){
 				FillAgentsInfo();
 			}
 			return mAgents.get(0);
 		}
 		return mCurrentAgent;
 	}
+
 	/*
 	void fillTargetCondition() {
 		targetCondition = "";
@@ -182,21 +190,21 @@ public class ApplicationHoreca
 			LogHelper.debug(this.getClass().getCanonicalName() + " fillTargetCondition: " + t.getMessage());
 		}
 	}*/
-	void readAgentConfig() {
+	void readAgentConfig(){
 		System.out.println("readAgentConfig");
 		//try {
 		//String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/Horeca2.xml")));
-		try {
+		try{
 			//Bough b = Bough.parseXML(xml);
 			//System.out.println(b.dumpXML());
 			String userKey = Settings.cfg().child("userKey").value.property.value().trim();
 			String updateKey = Settings.cfg().child("updateKey").value.property.value().trim();
-			if (userKey.length() > 1 && updateKey.length() > 1) {
+			if(userKey.length() > 1 && updateKey.length() > 1){
 				mDB.execSQL("update android set kod='" + updateKey + "' where trim(kod)!='12-';");
 				mDB.execSQL("update cur_users set name='" + userKey + "' where type=2;");
 			}
-			System.out.println("readAgentConfig "+userKey+"/"+updateKey);
-		} catch (Throwable t) {
+			System.out.println("readAgentConfig " + userKey + "/" + updateKey);
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 		/*}
@@ -204,15 +212,15 @@ public class ApplicationHoreca
 			t.printStackTrace();
 		}*/
 	}
-	public void FillAgentsInfo() {
+
+	public void FillAgentsInfo(){
 		LogHelper.debug(this.getClass().getCanonicalName() + ".FillAgentsInfo");
-		try {
+		try{
 			readAgentConfig();
 			Requests.UpdateCurPolzovatelyVPodrazselenii(mDB);
-			if (mAgents != null) {
+			if(mAgents != null){
 				mAgents.clear();
-			}
-			else {
+			}else{
 				mAgents = new ArrayList<Agent>();
 			}
 			//Cursor cursor = mDB.rawQuery("select * from Cur_PolzovatelyVPodrazselenii", null);
@@ -241,7 +249,7 @@ public class ApplicationHoreca
 			Bough tb = Auxiliary.fromCursor(mDB.rawQuery("select kod as kod from android where trim(kod)!='12-';", null));
 			//System.out.println(tb.dumpXML());
 			String updateKey = "!";
-			if (tb.children.size() > 0) {
+			if(tb.children.size() > 0){
 				updateKey = tb.children.get(0).child("kod").value.property.value();
 			}
 			String sql = "select"//
@@ -258,8 +266,8 @@ public class ApplicationHoreca
 					;
 			//System.out.println(sql);
 			Cursor cursor = mDB.rawQuery(sql, null);
-			if (cursor.moveToFirst()) {
-				do {
+			if(cursor.moveToFirst()){
+				do{
 					Agent agent = new Agent();
 					agent.set_id(cursor.getInt(0));
 					agent.setAgentID(cursor.getBlob(1));
@@ -273,11 +281,11 @@ public class ApplicationHoreca
 					agent.setAgentSuperVisorStr(Hex.encodeHex(cursor.getBlob(7)));
 					agent.updateKod = updateKey;
 					//agent.skladPodrazdeleniya="x'00'";
-					try {
+					try{
 						agent.setSkladPodrazdeleniya(
 								//.skladPodrazdeleniya =
 								Hex.encodeHex(cursor.getBlob(cursor.getColumnIndex("skladPodrazdeleniya"))));
-					} catch (Throwable t) {
+					}catch(Throwable t){
 						agent.setPodrazdelenieIDstr("unknow");
 						//t.printStackTrace();
 						System.out.println("agent.setPodrazdelenieIDstr(\"unknow\");");
@@ -291,9 +299,8 @@ public class ApplicationHoreca
 					System.out.println("agent.getPodrazdelenieName(): " + agent.getPodrazdelenieName());
 					System.out.println("agent.getAgentSupervisorStr(): " + agent.getAgentSupervisorStr());
 				}
-				while (cursor.moveToNext());
-			}
-			else {
+				while(cursor.moveToNext());
+			}else{
 				//System.out.println("empty");
 				String s = "select trim(name) as n from Cur_Users where Type = 2";
 				Bough b = Auxiliary.fromCursor(mDB.rawQuery(s, null));
@@ -315,15 +322,16 @@ public class ApplicationHoreca
 			}
 			cursor.close();
 			cursor = null;
-			if (mAgents.size() < 1) {
+			if(mAgents.size() < 1){
 				Agent agent = new Agent();
 				agent.setAgentName("[error]");
 				mAgents.add(agent);
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			LogHelper.debug(this.getClass().getCanonicalName() + ".FillAgentsInfo " + t.getMessage());
 		}
 	}
+
 	/*
 	@Override
 	public void OnLocationUpdate(Location location) {
@@ -342,13 +350,15 @@ public class ApplicationHoreca
 		//}
 	}
 	*/
-	public boolean isCRdisabledFirstTimeShow() {
+	public boolean isCRdisabledFirstTimeShow(){
 
 		return mCRdisabledFirstTimeShow;
 	}
-	public void setCRdisabledFirstTimeShow(boolean cRdisabledFirstTimeShow) {
+
+	public void setCRdisabledFirstTimeShow(boolean cRdisabledFirstTimeShow){
 		mCRdisabledFirstTimeShow = cRdisabledFirstTimeShow;
 	}
+
 	/*private void InitializeLogs() {
 		System.out.println(this.getClass().getCanonicalName() + ".InitializeLogs");
 		if (mLogDB == null) {
@@ -389,7 +399,7 @@ public class ApplicationHoreca
 		}
 		return mLogDB;
 	}*/
-	public void CleanWhenExit() {
+	public void CleanWhenExit(){
 		//StopGPSLog();
 		//StopAndUnbindServiceIfRequired();
 		//mGPSInfo = null;
@@ -398,24 +408,38 @@ public class ApplicationHoreca
 		//DestroyLogs();
 		//sweetlife.horeca.monitor.SQLexec.end();
 	}
-	public Calendar getShippingDate() {
+
+	public Calendar getShippingDate(){
 		return mShippingDate;
 	}
-	public void setShippingDate(Calendar c) {
+
+	public void setShippingDate(Calendar c){
 		mShippingDate.setTime(c.getTime());
 	}
-	public void setShippingDate(int year, int month, int day) {
+
+	public void setShippingDate(int year, int month, int day){
 		mShippingDate.set(year, month, day, 0, 0, 2);
 	}
-	public ClientInfo getClientInfo() {
+
+	public ClientInfo getClientInfo(){
+		if(mClient == null){
+			String sql = "select _IDRRef as id, Kod, Naimenovanie from kontragenty join MarshrutyAgentov on MarshrutyAgentov.Kontragent=kontragenty._idrref order by kontragenty.Naimenovanie limit 1;";
+			Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+			//System.out.println(data.dumpXML());
+			String id = data.child("row").child("id").value.property.value();
+			ClientInfo clientInfo = new ClientInfo(ApplicationHoreca.getInstance().getDataBase(), "x'" + id + "'");
+			setClientInfo(clientInfo);
+		}
 		return mClient;
 	}
-	public void setClientInfo(ClientInfo n) {
+
+	public void setClientInfo(ClientInfo n){
 
 		mClient = n;
-		Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod()," date( 'now' ) ");
+		Cfg.refreshSkidkiKontragent(ApplicationHoreca.getInstance().getClientInfo().getKod(), " date( 'now' ) ");
 	}
-	void testOptimization() {
+
+	void testOptimization(){
 		//System.out.println("testOptimization");
 		String sql = " 	  select n._id 														 " //
 				+ " 	  	,n.[_IDRRef] 													 " //
@@ -586,14 +610,14 @@ public class ApplicationHoreca
 				//+"  and Prodazhi.kolichestvo > 0 "
 				//+ " 	  and 	skladHoreca is not null  and ifnull(zo1,x'00')<>x'01' and ifnull(zo2,x'00')<>x'01' and ifnull(zo3,x'00')<>x'01' and ifnull(zo4,x'00')<>x'01'													 " //
 				+ " 	  limit 275 offset 0														 ";
-		try {
+		try{
 			//System.out.println("1");
 			Cursor c = mDB.rawQuery(sql, null);
 			//System.out.println("2");
 			//System.out.println("first " + c.moveToFirst());
 			//tee.binding.Bough b = Auxiliary.fromCursor(c);
 			//System.out.println("3");
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
 	}

@@ -201,20 +201,20 @@ public class ActivityWebServicesReports extends Activity{
 		};*/
 		new Expect().status.is("Подождите")//
 				.task.is(new Task(){
-			@Override
-			public void doTask(){
-				Cfg.territory();
-			}
-		}).afterDone.is(new Task(){
-			@Override
-			public void doTask(){
-				createGUI();
-				bindData();
-				goLastPage();
-				//waitForLayout();
+					@Override
+					public void doTask(){
+						Cfg.territory();
+					}
+				}).afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						createGUI();
+						bindData();
+						goLastPage();
+						//waitForLayout();
 
-			}
-		}).start(this)//
+					}
+				}).start(this)//
 		;
 
 	}
@@ -347,6 +347,12 @@ public class ActivityWebServicesReports extends Activity{
 			report = new ReportSKUsOtgruzkami(this);
 		}
 
+		if(key.equals(ReportMelkieZakazy.folderKey())){
+			report = new ReportMelkieZakazy(this);
+		}
+		if(key.equals(ReportIzbrannoeSmartPro.folderKey())){
+			report = new ReportIzbrannoeSmartPro(this);
+		}
 		if(key.equals(ReportKlassifikaciaKlientov.folderKey())){
 			report = new ReportKlassifikaciaKlientov(this);
 		}
@@ -456,6 +462,9 @@ public class ActivityWebServicesReports extends Activity{
 
 		if(key.equals(ReportObratnaiaSvyazOtKlienta.folderKey())){
 			report = new ReportObratnaiaSvyazOtKlienta(this);
+		}
+		if(key.equals(ReportObratnaiaSvyazPoDogovoram.folderKey())){
+			report = new ReportObratnaiaSvyazPoDogovoram(this);
 		}
 
 
@@ -764,16 +773,23 @@ public class ActivityWebServicesReports extends Activity{
 
 		addReportMenu2(ReportZayavkiNaPerebitieNakladnih.folderKey(), ReportZayavkiNaPerebitieNakladnih.menuLabel());
 		addReportMenu2(ReportZayavkiNaUvelichenieLimita.folderKey(), ReportZayavkiNaUvelichenieLimita.menuLabel());
+
+		addReportMenu2(ReportIzbrannoeSmartPro.folderKey(), ReportIzbrannoeSmartPro.menuLabel());
+
 		addReportMenu2(ReportKlassifikaciaKlientov.folderKey(), ReportKlassifikaciaKlientov.menuLabel());
 		addReportMenu2(ReportKontragentyPortalaSmart.folderKey(), ReportKontragentyPortalaSmart.menuLabel());
 		addReportMenu2(ReportKontragentySPrilojeniem.folderKey(), ReportKontragentySPrilojeniem.menuLabel());
 		addReportMenu2(ReportLimity.folderKey(), ReportLimity.menuLabel());
 		//addReportMenu2(ReportLocalizasiaDlyaTP.folderKey(), ReportLocalizasiaDlyaTP.menuLabel());
 		addReportMenu2(ReportDostavkaPoMarshrutam.folderKey(), ReportDostavkaPoMarshrutam.menuLabel());
+
+		addReportMenu2(ReportMelkieZakazy.folderKey(), ReportMelkieZakazy.menuLabel());
+
 		addReportMenu2(ReportNakladnieNaKontrole.folderKey(), ReportNakladnieNaKontrole.menuLabel());
 		addReportMenu2(ReportNalichieSkanov.folderKey(), ReportNalichieSkanov.menuLabel());
 		addReportMenu2(ReportNSK.folderKey(), ReportNSK.menuLabel());
 		addReportMenu2(ReportObratnaiaSvyazOtKlienta.folderKey(), ReportObratnaiaSvyazOtKlienta.menuLabel());
+		addReportMenu2(ReportObratnaiaSvyazPoDogovoram.folderKey(), ReportObratnaiaSvyazPoDogovoram.menuLabel());
 		addReportMenu2(ReportObjedineniaKlientov.folderKey(), ReportObjedineniaKlientov.menuLabel());
 		//addReportMenu2(ReportOtchetPoKassamDlyaTP.folderKey(), ReportOtchetPoKassamDlyaTP.menuLabel());
 		addReportMenu2(ReportPechatSchetaNaOplatu.folderKey(), ReportPechatSchetaNaOplatu.menuLabel());
@@ -1089,6 +1105,151 @@ public class ActivityWebServicesReports extends Activity{
 		);
 	}
 
+	void sendDropSingleFavSmartPro(String kodKlienta, String art){
+		Context cc = this;
+		final Note result = new Note();
+		String artO = "[{\"article\":\"" + art + "\",\"status\":false}]";
+		System.out.println(artO);
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+							+ "/hs/smartpro/favourites/"
+							+ ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod()
+							+ "/" + kodKlienta;
+					System.out.println(artO);
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url
+							, artO.getBytes("UTF-8"), 30 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					Bough raw = Bough.parseJSON(b.child("raw").value.property.value());
+					result.value(raw.child("Сообщение").value.property.value());
+				}catch(Exception e){
+					e.printStackTrace();
+					result.value(e.getMessage());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+
+				tapInstanceReal(preReport.getFolderKey(), preKey, true);
+
+				Auxiliary.warn("Отправлено: " + result.value(), cc);
+			}
+		}).status.is("Отправка").start(this);
+	}
+
+	void promptDelFavSmartPro(String art, String kodKlienta){
+		Auxiliary.pickConfirm(this, "Удалить артикул " + art, "Удалить", new Task(){
+			public void doTask(){
+				sendDropSingleFavSmartPro(kodKlienta, art);
+			}
+		});
+	}
+
+	void sendFavSmartPro(String kodKlienta, String artLine){
+		Context cc = this;
+		final Note result = new Note();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+							+ "/hs/smartpro/favourites/"
+							+ ApplicationHoreca.getInstance().getCurrentAgent().getAgentKod()
+							+ "/" + kodKlienta;
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url
+							, artLine.getBytes("UTF-8"), 30 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					Bough raw = Bough.parseJSON(b.child("raw").value.property.value());
+					result.value(raw.child("Сообщение").value.property.value());
+				}catch(Exception e){
+					e.printStackTrace();
+					result.value(e.getMessage());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+
+				tapInstanceReal(preReport.getFolderKey(), preKey, true);
+
+				Auxiliary.warn("Отправлено: " + result.value(), cc);
+			}
+		}).status.is("Отправка").start(this);
+	}
+
+	void showArtDialog(Vector<String> arts, String kodKlienta){
+		Vector<String> preArts = new Vector<String>();
+		for(int ii = 0; ii < arts.size(); ii++){
+			preArts.add(arts.get(ii));
+		}
+		VibratNomenklatura dialog = new VibratNomenklatura();
+		dialog.showArtDialog(this, arts, new Task(){
+			public void doTask(){
+				String artline = "";
+				String dlmtr = "";
+				for(int ii = 0; ii < arts.size(); ii++){
+					if(arts.get(ii).trim().length() > 1){
+						artline = artline + dlmtr + "{\"article\":\"" + arts.get(ii).trim() + "\",\"status\":true}";
+						dlmtr = ", ";
+					}
+				}
+				for(int kk = 0; kk < preArts.size(); kk++){
+					boolean toDel=true;
+					for(int ii = 0; ii < arts.size(); ii++){
+						if(arts.get(ii).trim().equals(preArts.get(kk).trim())){
+							toDel=false;
+							break;
+						}
+					}
+					if(toDel){
+						artline = artline + dlmtr + "{\"article\":\"" + preArts.get(kk).trim() + "\",\"status\":false}";
+						dlmtr = ", ";
+					}
+				}
+				System.out.println("artline " + artline);
+				sendFavSmartPro(kodKlienta, "[" + artline + "]");
+			}
+		});
+	}
+
+	void promptReportFavSmartPro(String kodKlienta){
+
+		String sql = "select _idrref as _idrref from kontragenty where kod='" + kodKlienta + "';";
+		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		ApplicationHoreca.getInstance().setClientInfo(new ClientInfo(ApplicationHoreca.getInstance().getDataBase()
+				, "x'" + data.child("row").child("_idrref").value.property.value() + "'"));
+
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/smartpro/favourites/"
+				+ Cfg.selectedOrDbHRC()
+				+ "/" + kodKlienta;
+		//
+		final Bough result = new Bough();
+		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					byte[] bytes = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String msg = new String(bytes, "UTF-8");
+					result.children = Bough.parseJSON(msg).children;
+				}catch(Throwable t){
+					t.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Vector<String> arts = new Vector<String>();
+				Vector<Bough> lines = result.children("ТоварыИзбранное");
+				for(int ii = 0; ii < lines.size(); ii++){
+					arts.add(lines.get(ii).value.property.value());
+				}
+				showArtDialog(arts, kodKlienta);
+			}
+		});
+		expect.start(ActivityWebServicesReports.this);
+	}
+
 	void promptReportDeleteSpec(final String num, final String art){
 		final Numeric sel = new Numeric();
 		Auxiliary.pickSingleChoice(this, new String[]{"Удалить всю заявку №" + num, "Удалить артикул " + art + " из заявки"}, sel, "№" + num, new Task(){
@@ -1226,31 +1387,32 @@ public class ActivityWebServicesReports extends Activity{
 			}
 		});
 	}
-void doHOOKObratnayaSviaz(String docNum){
-	docNumObratnayaSvyazKlient.value(docNum);
-	getChatCurrent();
-}
-/*
-	void doHOOKHookArtDocDateSent(String docNum, String docDate, String docArt){
-		//System.out.println(docNum + "/" + docDate + "/" + docArt);
-		//Auxiliary.warn(docNum + "/" + docDate + "/" + docArt,this);
+
+	void doHOOKObratnayaSviaz(String docNum){
 		docNumObratnayaSvyazKlient.value(docNum);
-		artikulObratnayaSvyazKlient.value(docArt);
-		try{
-			dateObratnayaSvyazKlient.value((double)(Auxiliary.ddMMyyyy.parse(docDate).getTime()));
-			//promptObratnayaSvyazKlient(this);
-			getChatCurrent();
-		}catch(Throwable t){
-			Auxiliary.warn("Неверная дата " + docDate + " " + t.getMessage(), this);
-		}
+		getChatCurrent();
 	}
-*/
+
+	/*
+		void doHOOKHookArtDocDateSent(String docNum, String docDate, String docArt){
+			//System.out.println(docNum + "/" + docDate + "/" + docArt);
+			//Auxiliary.warn(docNum + "/" + docDate + "/" + docArt,this);
+			docNumObratnayaSvyazKlient.value(docNum);
+			artikulObratnayaSvyazKlient.value(docArt);
+			try{
+				dateObratnayaSvyazKlient.value((double)(Auxiliary.ddMMyyyy.parse(docDate).getTime()));
+				//promptObratnayaSvyazKlient(this);
+				getChatCurrent();
+			}catch(Throwable t){
+				Auxiliary.warn("Неверная дата " + docDate + " " + t.getMessage(), this);
+			}
+		}
+	*/
 	void getChatCurrent(){
 		//String url="https://service.swlife.ru/hrc120107/hs/FeedbackCustomer/receive/hrc221"；
 		final String url = Settings.getInstance().getBaseURL()
 				+ Settings.selectedBase1C() + "/hs/FeedbackCustomer/receive/" + Cfg.whoCheckListOwner()
-				+"/"+docNumObratnayaSvyazKlient.value()
-				;
+				+ "/" + docNumObratnayaSvyazKlient.value();
 		System.out.println("url " + url);
 		/*String body = "{"
 				+ "\n	\"DateNac\": \"" + Auxiliary.mssqlTime.format(new Date(dateObratnayaSvyazKlient.value().longValue())) + "\""
@@ -1296,12 +1458,12 @@ void doHOOKObratnayaSviaz(String docNum){
 
 	void promptChatArtMessages(Bough obratnayaSvyazOtKlienta){
 		//Auxiliary.warn(answer.dumpXML(),ActivityWebServicesReports.this);
-		System.out.println("promptChatArtMessages "+obratnayaSvyazOtKlienta.dumpXML());
+		System.out.println("promptChatArtMessages " + obratnayaSvyazOtKlienta.dumpXML());
 		Vector<Bough> items = obratnayaSvyazOtKlienta.children("Переписка");
 		//final String Nomer = obratnayaSvyazOtKlienta.child("Номер").value.property.value();
 		String chat = "";
 		for(int ii = 0; ii < items.size(); ii++){
-			Bough one = items.get(items.size()-ii-1);
+			Bough one = items.get(items.size() - ii - 1);
 			String line = Auxiliary.tryReFormatDate(one.child("Дата").value.property.value(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yy HH:mm:ss") + ": ";
 			line = line + one.child("Пользователь").value.property.value() + ": ";
 			line = line + one.child("Текст").value.property.value().trim() + "\n";
@@ -1370,7 +1532,7 @@ void doHOOKObratnayaSviaz(String docNum){
 		}).status.is("Отправка").start(this);
 	}
 
-	public static void promptObratnayaSvyazKlient(Activity activity,final String artikul,String name,final String kodKlienta,String clientName){
+	public static void promptObratnayaSvyazKlient(Activity activity, final String artikul, String name, final String kodKlienta, String clientName){
 
 		Auxiliary.pick(activity, "", new SubLayoutless(activity)//
 						.child(new Decor(activity).labelText.is("Обратная связь").top().is(Auxiliary.tapSize * 0.5).left().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
@@ -1427,7 +1589,7 @@ void doHOOKObratnayaSviaz(String docNum){
 					@Override
 					public void doTask(){
 						if(okObratnayaSvyazKlient(activity)){
-							sendObratnayaSvyazKlient(activity,artikul, kodKlienta);
+							sendObratnayaSvyazKlient(activity, artikul, kodKlienta);
 						}
 					}
 				}, null, null, null, null);
@@ -1457,17 +1619,17 @@ void doHOOKObratnayaSviaz(String docNum){
 		return true;
 	}
 
-	public static void sendObratnayaSvyazKlient(Activity activity,String artikul,String kodKlienta){
+	public static void sendObratnayaSvyazKlient(Activity activity, String artikul, String kodKlienta){
 		final String url = Settings.getInstance().getBaseURL()
 				+ Settings.selectedBase1C() + "/hs/FeedbackCustomer/Создать/" + Cfg.whoCheckListOwner();
 		System.out.println("url " + url);
-		String NumberDoc = artikul+"_"+kodKlienta;/*docNumObratnayaSvyazKlient.value()
+		String NumberDoc = artikul + "_" + kodKlienta;/*docNumObratnayaSvyazKlient.value()
 				+ "-" + Auxiliary.sqliteDate.format(new Date(dateObratnayaSvyazKlient.value().longValue()))
 				+ "-" + artikulObratnayaSvyazKlient.value();*/
 		String data = "{"
 				+ "\n	\"CodClient\": \"" + kodKlienta + "\""
-				+"\n	,\"Article\": \"" + artikul + "\""
-				+"\n	,\"DateNac\": \"\""
+				+ "\n	,\"Article\": \"" + artikul + "\""
+				+ "\n	,\"DateNac\": \"\""
 				+ "\n	,\"Comment\": \"" + commentObratnayaSvyazKlient.value() + "\""
 				+ "\n	\"Files\": [";
 		if(etiketkaObratnayaSvyazKlient.value().length() > 3){
@@ -1688,20 +1850,20 @@ void doHOOKObratnayaSviaz(String docNum){
 			public void doTask(){
 				r.url.is(Settings.getInstance().getBaseURL() + "UtvVozvrat.1cws")//
 						.xml.is("<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
-								+ "\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-								+ "\n	<soap:Body>"//
-								+ "\n		<Utv xmlns=\"http://ws.swl/UtvVozvrat\">"//
-								+ "\n			<Nomer>" + num + "</Nomer>"//
-								+ "\n			<Deistvie>" + (
-								approve
-										? "0"
-										: "1"
-						) + "</Deistvie>"//
-								+ "\n			<Polzovatel>" + Cfg.whoCheckListOwner() + "</Polzovatel>"//
-								+ "\n		</Utv>"//
-								+ "\n	</soap:Body>"//
-								+ "\n</soap:Envelope>"//
-				);
+										+ "\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
+										+ "\n	<soap:Body>"//
+										+ "\n		<Utv xmlns=\"http://ws.swl/UtvVozvrat\">"//
+										+ "\n			<Nomer>" + num + "</Nomer>"//
+										+ "\n			<Deistvie>" + (
+										approve
+												? "0"
+												: "1"
+								) + "</Deistvie>"//
+										+ "\n			<Polzovatel>" + Cfg.whoCheckListOwner() + "</Polzovatel>"//
+										+ "\n		</Utv>"//
+										+ "\n	</soap:Body>"//
+										+ "\n</soap:Envelope>"//
+						);
 				Report_Base.startPing();
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				preReport.writeCurrentPage();
@@ -1941,6 +2103,7 @@ void doHOOKObratnayaSviaz(String docNum){
 					}
 				});
 	}
+
 	void promptFixPriceNumber2(final String num, final String art){
 		final Numeric price = new Numeric();
 		Auxiliary.pickNumber(ActivityWebServicesReports.this//
@@ -1953,6 +2116,7 @@ void doHOOKObratnayaSviaz(String docNum){
 					}
 				}, null, null);
 	}
+
 	void promptFixPriceNumber(final String num, final String art){
 		final Numeric price = new Numeric();
 		Auxiliary.pickNumber(ActivityWebServicesReports.this//
@@ -1998,6 +2162,7 @@ void doHOOKObratnayaSviaz(String docNum){
 		});
 		expect.start(ActivityWebServicesReports.this);
 	}
+
 	void sendNewFixPrice2(final String num, final String art, final double price){
 		final Bough b = new Bough();
 		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
@@ -2032,6 +2197,7 @@ void doHOOKObratnayaSviaz(String docNum){
 		});
 		expect.start(ActivityWebServicesReports.this);
 	}
+
 	void allFixApprove(){
 		Auxiliary.pickConfirm(this, "Утвердить все найденные документы?", "Утвердить", new Task(){
 			@Override
@@ -2186,19 +2352,19 @@ void doHOOKObratnayaSviaz(String docNum){
 			public void doTask(){
 				r.url.is(Settings.getInstance().getBaseURL() + "WebPostlimit.1cws")//
 						.xml.is("<?xml version=\"1.0\" encoding=\"utf-8\"?>"//
-						+ "\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-						+ "\n	<soap:Body>"//
-						+ "\n		<priv xmlns=\"http://ws.swl/WebPostlimit\">"//
-						+ "\n			<Dom>" + num + "</Dom>"//
-						+ "\n			<Summa>" + summa + "</Summa>"//
-						+ "\n			<Dney>" + kolvo + "</Dney>"//
-						+ "\n			<otv>" + Cfg.whoCheckListOwner() + "</otv>"//
-						+ "\n			<planto>" + plan + "</planto>"//
-						+ "\n			<Kommentariy>" + comment + "</Kommentariy>"//
-						+ "\n		</priv>"//
-						+ "\n	</soap:Body>"//
-						+ "\n</soap:Envelope>"//
-				);
+								+ "\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
+								+ "\n	<soap:Body>"//
+								+ "\n		<priv xmlns=\"http://ws.swl/WebPostlimit\">"//
+								+ "\n			<Dom>" + num + "</Dom>"//
+								+ "\n			<Summa>" + summa + "</Summa>"//
+								+ "\n			<Dney>" + kolvo + "</Dney>"//
+								+ "\n			<otv>" + Cfg.whoCheckListOwner() + "</otv>"//
+								+ "\n			<planto>" + plan + "</planto>"//
+								+ "\n			<Kommentariy>" + comment + "</Kommentariy>"//
+								+ "\n		</priv>"//
+								+ "\n	</soap:Body>"//
+								+ "\n</soap:Envelope>"//
+						);
 				Report_Base.startPing();
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				preReport.writeCurrentPage();
@@ -2297,7 +2463,15 @@ void doHOOKObratnayaSviaz(String docNum){
 					String art = brwsr.getQueryParameter(Report_Base.FIELDArtikul);
 					promptReportDeleteSpec(num, art);
 				}
-
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKArtFavSmartPro)){
+					String kodKlienta = brwsr.getQueryParameter(Report_Base.FIELDKlientKod);
+					promptReportFavSmartPro(kodKlienta);
+				}
+				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKDeleteArtFavSmartPro)){
+					String kodKlienta = brwsr.getQueryParameter(Report_Base.FIELDKlientKod);
+					String art = brwsr.getQueryParameter(Report_Base.FIELDArtikul);
+					promptDelFavSmartPro(art, kodKlienta);
+				}
 
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportApproveTerrChange)){
 					String num = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
@@ -2348,75 +2522,75 @@ void doHOOKObratnayaSviaz(String docNum){
 				}
 				if(brwsr.getQueryParameter("kind").equals(Report_Base.HOOKReportPoVoditelam)){
 					new Expect().task.is(new Task(){
-						@Override
-						public void doTask(){
-							mapData = new Bough().name.is("mapData");
-							String documentNumber = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
-							String q = "ВЫБРАТЬ первые 19"//
-									+ " 		р1.Ссылка.номер,"//
-									+ " 		р1.Ссылка.Автомобиль.Api_key КАК apikey,"//
-									+ " 		р1.Ссылка.ДатаВыезда КАК ДатаВыезда,"//
-									+ " 		р2.Контрагент.Наименование КАК кнтргнт,"//
-									+ " 		р2.Ссылка.Автомобиль.ТипАвтомобиля.Наименование КАК авто,"//
-									+ " 		р2.Ссылка.Автомобиль.ГосНомер КАК авном,"//
-									+ " 		р2.Контрагент.ГеографическаяШирота КАК lt,"//
-									+ " 		р2.Контрагент.ГеографическаяДолгота КАК ln"//
-									+ " 	ИЗ"//
-									+ " 		Документ.Авто_ПутевойЛист.Реализации КАК р1"//
-									+ " 	внутреннее соединение"//
-									+ " 		Документ.Авто_ПутевойЛист.Реализации р2 по р1.ссылка=р2.ссылка"//
-									+ " 	ГДЕ"//
-									+ " 		р1.Реализация.Номер = \"" + documentNumber + "\""//
-									+ " 		И р1.Ссылка.ДатаВыезда > ДАТАВРЕМЯ(" + (1900 + new Date().getYear()) + ", " + (1 + new Date().getMonth()) + ", " + new Date().getDate() + ", 0, 0, 0)"//
-									+ " 	СГРУППИРОВАТЬ ПО"//
-									+ " 		р1.Ссылка.номер,"//
-									+ " 		р1.Ссылка.Автомобиль.Api_key,"//
-									+ " 		р1.Ссылка.ДатаВыезда,"//
-									+ " 		р2.Контрагент.Наименование,"//
-									+ " 		р2.Ссылка.Автомобиль.ТипАвтомобиля.Наименование,"//
-									+ " 		р2.Ссылка.Автомобиль.ГосНомер,"//
-									+ " 		р2.Контрагент.ГеографическаяШирота,"//
-									+ " 		р2.Контрагент.ГеографическаяДолгота";
-							Bough b = Auxiliary.loadTextFromPrivatePOST(Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/surikovquery/"
-									, q, 30 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
-							Bough raw = Bough.parseJSON(b.child("raw").value.property.value());
-							String carKey = raw.child("результат").child("apikey").value.property.value();
-							long ms = new Date().getTime();
-							String carOnlineURL = "http://api.car-online.ru/v2?get=gpslist&skey=" //
-									+ carKey//
-									+ "&begin=" + (ms - 10 * 60 * 1000)//
-									+ "&end=" + ms;
-							Vector<Bough> rr = raw.children("результат");
-							Bough autoData = null;
-							for(int i = 0; i < rr.size(); i++){
-								autoData = new Bough().name.is("client");
-								autoData.child("name").value.is(rr.get(i).child("кнтргнт").value.property.value());
-								autoData.child("latitude").value.is(rr.get(i).child("lt").value.property.value());
-								autoData.child("longitude").value.is(rr.get(i).child("ln").value.property.value());
-								mapData.children.add(autoData);
-							}
-							try{
-								byte[] bytes = Auxiliary.loadFileFromPublicURL(carOnlineURL);
-								String xml = new String(bytes, "UTF-8");
-								Bough data = Bough.parseXML(xml);
-								autoData = new Bough().name.is("car");
-								autoData.child("nomer").value.is(raw.child("результат").child("авном").value.property.value() + "/" + raw.child("результат").child("авто").value.property.value());
-								autoData.child("latitude").value.is(data.child("gps").child("latitude").value.property.value());
-								autoData.child("longitude").value.is(data.child("gps").child("longitude").value.property.value());
-								mapData.children.add(autoData);
-							}catch(Throwable t){
-								t.printStackTrace();
-							}
-						}
-					}).afterDone.is(new Task(){
-						@Override
-						public void doTask(){
-							Intent intent = new Intent();
-							intent.putExtra("route", mapData.dumpXML());
-							intent.setClass(ActivityWebServicesReports.this, sweetlife.android10.supervisor.ActivityGPSMap.class);
-							startActivity(intent);
-						}
-					})//
+								@Override
+								public void doTask(){
+									mapData = new Bough().name.is("mapData");
+									String documentNumber = brwsr.getQueryParameter(Report_Base.FIELDDocumentNumber);
+									String q = "ВЫБРАТЬ первые 19"//
+											+ " 		р1.Ссылка.номер,"//
+											+ " 		р1.Ссылка.Автомобиль.Api_key КАК apikey,"//
+											+ " 		р1.Ссылка.ДатаВыезда КАК ДатаВыезда,"//
+											+ " 		р2.Контрагент.Наименование КАК кнтргнт,"//
+											+ " 		р2.Ссылка.Автомобиль.ТипАвтомобиля.Наименование КАК авто,"//
+											+ " 		р2.Ссылка.Автомобиль.ГосНомер КАК авном,"//
+											+ " 		р2.Контрагент.ГеографическаяШирота КАК lt,"//
+											+ " 		р2.Контрагент.ГеографическаяДолгота КАК ln"//
+											+ " 	ИЗ"//
+											+ " 		Документ.Авто_ПутевойЛист.Реализации КАК р1"//
+											+ " 	внутреннее соединение"//
+											+ " 		Документ.Авто_ПутевойЛист.Реализации р2 по р1.ссылка=р2.ссылка"//
+											+ " 	ГДЕ"//
+											+ " 		р1.Реализация.Номер = \"" + documentNumber + "\""//
+											+ " 		И р1.Ссылка.ДатаВыезда > ДАТАВРЕМЯ(" + (1900 + new Date().getYear()) + ", " + (1 + new Date().getMonth()) + ", " + new Date().getDate() + ", 0, 0, 0)"//
+											+ " 	СГРУППИРОВАТЬ ПО"//
+											+ " 		р1.Ссылка.номер,"//
+											+ " 		р1.Ссылка.Автомобиль.Api_key,"//
+											+ " 		р1.Ссылка.ДатаВыезда,"//
+											+ " 		р2.Контрагент.Наименование,"//
+											+ " 		р2.Ссылка.Автомобиль.ТипАвтомобиля.Наименование,"//
+											+ " 		р2.Ссылка.Автомобиль.ГосНомер,"//
+											+ " 		р2.Контрагент.ГеографическаяШирота,"//
+											+ " 		р2.Контрагент.ГеографическаяДолгота";
+									Bough b = Auxiliary.loadTextFromPrivatePOST(Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/surikovquery/"
+											, q, 30 * 1000, "UTF-8", Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+									Bough raw = Bough.parseJSON(b.child("raw").value.property.value());
+									String carKey = raw.child("результат").child("apikey").value.property.value();
+									long ms = new Date().getTime();
+									String carOnlineURL = "http://api.car-online.ru/v2?get=gpslist&skey=" //
+											+ carKey//
+											+ "&begin=" + (ms - 10 * 60 * 1000)//
+											+ "&end=" + ms;
+									Vector<Bough> rr = raw.children("результат");
+									Bough autoData = null;
+									for(int i = 0; i < rr.size(); i++){
+										autoData = new Bough().name.is("client");
+										autoData.child("name").value.is(rr.get(i).child("кнтргнт").value.property.value());
+										autoData.child("latitude").value.is(rr.get(i).child("lt").value.property.value());
+										autoData.child("longitude").value.is(rr.get(i).child("ln").value.property.value());
+										mapData.children.add(autoData);
+									}
+									try{
+										byte[] bytes = Auxiliary.loadFileFromPublicURL(carOnlineURL);
+										String xml = new String(bytes, "UTF-8");
+										Bough data = Bough.parseXML(xml);
+										autoData = new Bough().name.is("car");
+										autoData.child("nomer").value.is(raw.child("результат").child("авном").value.property.value() + "/" + raw.child("результат").child("авто").value.property.value());
+										autoData.child("latitude").value.is(data.child("gps").child("latitude").value.property.value());
+										autoData.child("longitude").value.is(data.child("gps").child("longitude").value.property.value());
+										mapData.children.add(autoData);
+									}catch(Throwable t){
+										t.printStackTrace();
+									}
+								}
+							}).afterDone.is(new Task(){
+								@Override
+								public void doTask(){
+									Intent intent = new Intent();
+									intent.putExtra("route", mapData.dumpXML());
+									intent.setClass(ActivityWebServicesReports.this, sweetlife.android10.supervisor.ActivityGPSMap.class);
+									startActivity(intent);
+								}
+							})//
 							.status.is("Подождите.....")//
 							.start(ActivityWebServicesReports.this);
 				}
@@ -2557,7 +2731,7 @@ void doHOOKObratnayaSviaz(String docNum){
 			return;
 		}
 		if(!preReport.canUseXLS()){
-			Auxiliary.warn("Сертификаты можно получить только в .pdf или .html",this);
+			Auxiliary.warn("Сертификаты можно получить только в .pdf или .html", this);
 			return;
 		}
 		final String seed = "" + Math.round(Math.random() * 10000);
@@ -2685,7 +2859,7 @@ void doHOOKObratnayaSviaz(String docNum){
 			return;
 		}
 		if(!preReport.canUseXLS()){
-			Auxiliary.warn("Сертификаты можно получить только в .pdf или .html",this);
+			Auxiliary.warn("Сертификаты можно получить только в .pdf или .html", this);
 			return;
 		}
 		//final String seed = "" + Math.round(Math.random() * 10000);
@@ -2804,11 +2978,11 @@ void doHOOKObratnayaSviaz(String docNum){
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent){
-		System.out.println("requestCode "+requestCode+", resultCode "+resultCode);
+		System.out.println("requestCode " + requestCode + ", resultCode " + resultCode);
 		String filePath = null;
 		Uri uri = null;
 		if(intent != null){
-			System.out.println("intent.getData() "+intent.getData());
+			System.out.println("intent.getData() " + intent.getData());
 			switch(requestCode){
 				case FILE_SELECT_SKD_RESULT:{
 					if(resultCode == RESULT_OK){

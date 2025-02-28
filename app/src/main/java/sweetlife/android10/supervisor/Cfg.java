@@ -26,7 +26,9 @@ import sweetlife.android10.ApplicationHoreca;
 import sweetlife.android10.Settings;
 import sweetlife.android10.consts.IAppConsts;
 import sweetlife.android10.data.orders.*;
+import sweetlife.android10.database.nomenclature.*;
 import sweetlife.android10.ui.*;
+import sweetlife.android10.utils.*;
 import tee.binding.Bough;
 import tee.binding.it.Note;
 import tee.binding.it.Numeric;
@@ -155,19 +157,57 @@ public class Cfg{
 		}
 		return hrcPersonalLoginCached;
 	}*/
-	public static boolean noSmartPro(String art,Context context){
+	public static boolean noSmartPro(String art, Context context){
 		String sql = "select price as price"
-				+" from nomenklatura"
-				+" left join SkidkiSmartPro on SkidkiSmartPro.nomenklatura=nomenklatura._idrref"
-				+" where artikul='" + art + "';";
+				+ " from nomenklatura"
+				+ " left join SkidkiSmartPro on SkidkiSmartPro.nomenklatura=nomenklatura._idrref"
+				+ " where artikul='" + art + "';";
 		Bough bb = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-		if(Numeric.string2double(bb.child("row").child("price").value.property.value())>0){
+		if(Numeric.string2double(bb.child("row").child("price").value.property.value()) > 0){
 			Auxiliary.warn("На артикул " + art + " имеется скидка SmartPro. Фиксировать цены запрещено отделом закупок.", context);
 			return false;
 		}else{
 			return true;
 		}
 	}
+
+	public static void checkFixValid(Context c, Task task, String art, String clientKod, String startyyyyMMdd, String endyyyyMMdd){
+		//https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/BanOnFixedPrices/52494/290560/20241204/20241204
+		//Да
+		String url = "https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/BanOnFixedPrices/"
+				+ art + "/"
+				+ clientKod + "/"
+				+ startyyyyMMdd + "/"
+				+ endyyyyMMdd;
+		Note txt = new Note();
+		new Expect()
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						try{
+							byte[] raw = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+							txt.value(new String(raw, "UTF-8"));
+						}catch(Throwable t){
+							t.printStackTrace();
+							txt.value(t.getMessage());
+						}
+					}
+				})
+				.afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						System.out.println("checkFixValid " + url + ": " + txt.value());
+						if(txt.value().equals("Да")){
+							task.start();
+						}else{
+							Auxiliary.warn(txt.value(), c);
+						}
+					}
+				})
+				.status.is("Проверка...")
+				.start(c);
+	}
+
 	public static String hrcPersonalPassword(){
 		if(hrcPersonalPasswordCached.equals("")){
 			android.content.Context context = sweetlife.android10.ApplicationHoreca.getInstance().getApplicationContext();
@@ -483,7 +523,48 @@ public class Cfg{
 		return rr;
 	}
 
-	public static void sendRequestPriceNew(Activity activity, Vector<String> artikuls, int timeout, final Note resultMessage, final Task afterFinishOrCancel){
+	public static void sendRequestPriceNew(Activity activity, Vector<String> artikuls, final Note resultMessage, final Task afterFinishOrCancel){
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ObnovlenieInfo/GetPricesAndMarkupsForItems";
+		Expect expectRequery = new Expect()//
+				.status.is("Подождите.....")//
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						try{
+							String data = "[";
+							String dlmtr = "";
+							for(int ii = 0; ii < artikuls.size(); ii++){
+								data = data + dlmtr + "\"" + artikuls.get(ii).trim() + "\"";
+								dlmtr = ",";
+							}
+							data = data + "]";
+							Bough result = Auxiliary.loadTextFromPrivatePOST(url, data.getBytes("UTF-8"), 60 * 1000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+							//txt.value(new String(raw, "UTF-8"));
+							System.out.println("sendRequestPriceNew " + result.dumpXML());
+							String[] commands = result.child("raw").value.property.value().split("\n");
+							for(int ii = 0; ii < commands.length; ii++){
+								System.out.println("" + ii + ": " + commands[ii]);
+								ApplicationHoreca.getInstance().getDataBase().execSQL(commands[ii].trim());
+							}
+							Request_NomenclatureBase.refreshPointData("1000-01-01","x'00'","x'00'");
+							Request_NomenclatureBase.adjustTekuschieCenyOstatkovPartiy_strip("x'00'");
+						}catch(Throwable t){
+							t.printStackTrace();
+							resultMessage.value(resultMessage.value() + "\n" + t.getMessage());
+						}
+					}
+				}).afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						//System.out.println(txt.value());
+						resultMessage.value(resultMessage.value() + "\n" + "OK");
+						afterFinishOrCancel.start();
+					}
+				});
+		expectRequery.status.is("Обновление цен...").start(activity);
+	}
+
+	public static void sendRequestPriceNew34232352(Activity activity, Vector<String> artikuls, int timeout, final Note resultMessage, final Task afterFinishOrCancel){
 		final String soapXML = Cfg.composeXMLpriceRenew(artikuls);
 		final RawSOAP rr = new RawSOAP().timeout.is(timeout);
 		new Expect().status.is(resultMessage).task.is(new Task(){
@@ -1093,8 +1174,7 @@ public class Cfg{
 
 	public static void refreshSkidkiKontragent(String kod, String dataDostavki){
 		if(skidkiLastKontragentKod.equals(kod)
-				//&& skidkiLastHRC.equals(ApplicationHoreca.getInstance().hrcSelectedRoute())
-				&& skidkiLastHRC.equals(Cfg.selectedOrDbHRC())
+					&& skidkiLastHRC.equals(Cfg.selectedOrDbHRC())
 				&& skidkiLastDataDostavki.equals(dataDostavki)
 		){
 			System.out.println("skip refreshSkidkiKontragent " + kod + "/" + dataDostavki + "/" + Cfg.selectedOrDbHRC());
@@ -1111,19 +1191,13 @@ public class Cfg{
 					+ "\n 	left join Podrazdeleniya pdr3 on pdr3._idrref=pdr2.Roditel"
 					+ "\n 	left join Podrazdeleniya pdr4 on pdr4._idrref=pdr3.Roditel"
 					+ "\n 	left join Podrazdeleniya pdr5 on pdr5._idrref=pdr4.Roditel"
-					//+ "\n where plzvtl.kod='" + ApplicationHoreca.getInstance().hrcSelectedRoute() + "';";
-					+ "\n where plzvtl.kod='" + Cfg.selectedOrDbHRC() + "';";
-			//System.out.println( sql);
+						+ "\n where plzvtl.kod='" + Cfg.selectedOrDbHRC() + "';";
 			b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
-
-			//System.out.println( terr.dumpXML());
-
 			String p1 = b.child("row").child("p1").value.property.value();
 			String p2 = b.child("row").child("p2").value.property.value();
 			String p3 = b.child("row").child("p3").value.property.value();
 			String p4 = b.child("row").child("p4").value.property.value();
 			String p5 = b.child("row").child("p5").value.property.value();
-			//ApplicationHoreca.getInstance().getDataBase().execSQL("delete from skidki where DataOkonchaniya<date();");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create table if not exists SkidkiSmartPro ("//
 					+ "\n		_id integer primary key asc autoincrement"//
 					+ "\n		,datastart date null"//
@@ -1136,36 +1210,12 @@ public class Cfg{
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiSmartPro_datastart on SkidkiSmartPro(datastart)");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiSmartPro_dataend on SkidkiSmartPro(dataend)");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiSmartPro_nomenklatura on SkidkiSmartPro(nomenklatura)");
-/*
-			sql = "insert into SkidkiSmartPro (datastart,dataend,nomenklatura,price,comment) "//
-					+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ns._idrref as nomenklatura,ss.Znachenie as price"//
-					+ "\n			,case "//
-					+ skidkiLabelsPart()
-					+ "\n				else '' "//
-					+ "\n			end as comment"//
-					+ "\n		from skidki ss"//
-					+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=" + dataDostavki//
-					+ "\n 	where (ss.Polzovatel=X'" + polzovatelSmartProHEX + "' or ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "')"
-					+ "\n			and ns._idrref not in (select nomenklatura from SkidkiSmartPro)"
-					+ "\n			and ss.podrazdelenie=x'" + p1 + "'"
-					+ "\n 	group by ss.nomenklatura;"
-			;
-			System.out.println(sql);
-			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-*/
-
 			insertSkidkiSmartPro(p1, dataDostavki);
 			insertSkidkiSmartPro(p2, dataDostavki);
 			insertSkidkiSmartPro(p3, dataDostavki);
 			insertSkidkiSmartPro(p4, dataDostavki);
 			insertSkidkiSmartPro(p5, dataDostavki);
 			insertSkidkiSmartPro("00", dataDostavki);
-
-
-
-
-
-
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create table if not exists SkidkiLast ("//
 					+ "\n		_id integer primary key asc autoincrement"//
 					+ "\n		,datastart date null"//
@@ -1178,105 +1228,33 @@ public class Cfg{
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiLast_datastart on SkidkiLast(datastart)");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiLast_dataend on SkidkiLast(dataend)");
 			ApplicationHoreca.getInstance().getDataBase().execSQL("create index if not exists IX_SkidkiLast_nomenklatura on SkidkiLast(nomenklatura)");
-/*
-			sql = "insert into SkidkiLast (datastart,dataend,nomenklatura,price,comment) "//
-					+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ns._idrref as nomenklatura,ss.Znachenie as price"//
-					+ "\n			,case "//
-					+ skidkiLabelsPart()
-					+ "\n				else '' "//
-					+ "\n			end as comment"//
-					+ "\n		from skidki ss"//
-					+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=" + dataDostavki//
-					+ "\n 	where ss.Polzovatel=X'" + polzovatelSmartProHEX + "' or ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "'"
-					+ "\n 	group by ss.nomenklatura;"
-			;
-			System.out.println(sql);
-			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-*/
-			//System.out.println("73431 "+Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery("select * from skidkilast ss join nomenklatura nn on nn._idrref=ss.nomenklatura where nn.artikul=73431;",null)).dumpXML());
-
-
 			sql = "insert into SkidkiLast (datastart,dataend,nomenklatura,price,comment) "//
 					+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ss.nomenklatura as nomenklatura,ss.Znachenie as price"//
 					+ "\n			,case "//
-					/*
-					+ "\n				when VidSkidki=X'" + skidkaId_x_Gazeta + "' then 'Газета/листовка'"// no
-					+ "\n				when VidSkidki=X'" + skidkaIdNakopitelnaya + "' then 'Накопительная' "//
-					+ "\n				when VidSkidki=X'" + skidkaIdIndividualnaya + "' then 'Индивидуальная' "//over
-					+ "\n				when VidSkidki=X'" + skidkaIdRazovaya + "' then 'Разовая' "//
-					+ "\n				when VidSkidki=X'" + skidkaIdFixirovannaya + "' then 'Фикс.цена' "//over
-					+ "\n				when VidSkidki=X'" + skidkaIdCenovoyeReagirovanie + "' then 'ЦР'"//
-					+ "\n				when VidSkidki=X'" + skidkaId_Rasprodaja + "' then 'Распродажа'"//
-					//+ "\n				when VidSkidki=X'b6642d98b55a8d5e48c45c1c3731b72e' then 'Скидка по ответственному'"// no
-					+ "\n				when VidSkidki=X'" + skidkaId_x_Promokod + "' then 'Промокод' "// no
-					+ "\n				when VidSkidki=X'" + skidkaId_x_Targetnie + "' then 'Таргетные' "// no
-					+ "\n				when VidSkidki=X'" + skidkaIdPosummeRazovaya + "' then 'Разовая по сумме' "//
-					+ "\n				when VidSkidki=X'" + skidkaIdBonus + "' then 'Бонус' "//
-					*/
-					/*
-					+ "\n				when ss.Polzovatel=X'" + polzovatelSmartProHEX + "' then '" + labelForSmartProPrilojene + "'"// no
-					+ "\n				when ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "' then '" + labelForSmartProPrilojene + "'"// no
-
-					+ "\n				when VidSkidki=X'" + skidkaId_x_Gazeta + "' then '" + labelFor_x_Gazeta + "'"// no
-					+ "\n				when VidSkidki=X'" + skidkaIdNakopitelnaya + "' then '" + labelForNakopitelnaya + "' "//
-					+ "\n				when VidSkidki=X'" + skidkaIdIndividualnaya + "' then '" + labelForIndividualnaya + "' "//over
-					+ "\n				when VidSkidki=X'" + skidkaIdRazovaya + "' then '" + labelForRazovaya + "' "//
-					+ "\n				when VidSkidki=X'" + skidkaIdFixirovannaya + "' then '" + labelForFixirovannaya + "'"//over
-					+ "\n				when VidSkidki=X'" + skidkaIdCenovoyeReagirovanie + "' then 'ЦР'"//
-					+ "\n				when VidSkidki=X'" + skidkaId_Rasprodaja + "' then '" + labelForRasprodaja + "'"//
-					+ "\n				when VidSkidki=X'" + skidkaId_x_Promokod + "' then '" + labelForPromokod + "' "// no
-					+ "\n				when VidSkidki=X'" + skidkaId_x_Targetnie + "' then '" + labelForTargetnie + "' "// no
-					+ "\n				when VidSkidki=X'" + skidkaIdPosummeRazovaya + "' then '" + labelForPosummeRazovaya + "' "//
-					+ "\n				when VidSkidki=X'" + skidkaIdBonus + "' then '" + labelForBonus + "' "//
-					*/
 					+ skidkiLabelsPart()
 					+ "\n				else '' "//
 					+ "\n			end as comment"//
 					+ "\n		from skidki ss"//
-					//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=date('now')"//
-					//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataOkonchaniya>=" + dataDostavki//
 			;
-			//+ "\n			left join Kontragenty kk on kk._idrref=skidki.kontragent and kk.kod='" + kod + "' and DataOkonchaniya>=date('now')"//
 			sql = sql + "\n		where ss.kontragent=x'" + kontr_idrref + "' or ss.kontragent=x'" + golov_idrref + "'"
 					+ "\n			and ss.nomenklatura not in (select nomenklatura from SkidkiLast)"
-					//+ "\n			and ss.DataOkonchaniya>=" + dataDostavki//
-					+ "\n			and ss.DataOkonchaniya>=" + dataDostavki+" and ss.DataNachala<=" + dataDostavki
+					+ "\n			and ss.DataOkonchaniya>=" + dataDostavki + " and ss.DataNachala<=" + dataDostavki
 			;
-			/*
-			sql = sql + "\n		    or ss.podrazdelenie=x'" + p1 + "'";
-			if(p2.length() > 3)
-				sql = sql + "\n		    or ss.podrazdelenie=x'" + p2 + "'";
-			if(p3.length() > 3)
-				sql = sql + "\n		    or ss.podrazdelenie=x'" + p3 + "'";
-			if(p4.length() > 3)
-				sql = sql + "\n		    or ss.podrazdelenie=x'" + p4 + "'";
-			if(p5.length() > 3)
-				sql = sql + "\n		    or ss.podrazdelenie=x'" + p5 + "'";
-			sql = sql + "\n		;";
-			*/
-
 			System.out.println("refreshSkidkiKontragent " + kod + " / " + sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
-
 			insertSkidkiLast(p1, dataDostavki);
 			insertSkidkiLast(p2, dataDostavki);
 			insertSkidkiLast(p3, dataDostavki);
 			insertSkidkiLast(p4, dataDostavki);
 			insertSkidkiLast(p5, dataDostavki);
-
 			ApplicationHoreca.getInstance().getDataBase().execSQL("delete from SkidkiLast where nullif(comment,'') is null;");
 			skidkiLastKontragentKod = kod;
-			//skidkiLastHRC = ApplicationHoreca.getInstance().hrcSelectedRoute();
 			skidkiLastHRC = Cfg.selectedOrDbHRC();
 			skidkiLastDataDostavki = dataDostavki;
-
-			//System.out.println("skidkiLastKontragentKod " + skidkiLastKontragentKod + "/" + skidkiLastHRC + "/" + sql);
-			//System.out.println("refreshPriceKontragent " + skidkiLastKontragentKod + "/" + skidkiLastHRC + "/" + (new Date()));
 			refreshPriceKontragent();
-			//refreshArtikleCount();
-			// System.out.println("done refreshPriceKontragent " + skidkiLastKontragentKod + "/" + skidkiLastHRC + "/" + (new Date()));
 		}
 	}
+
 	public static void insertSkidkiSmartPro(String podrazdeleniebin, String dataDostavki){
 		String sql = "insert into SkidkiSmartPro (datastart,dataend,nomenklatura,price,comment) "//
 				+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ss.nomenklatura as nomenklatura,ss.Znachenie as price"//
@@ -1288,56 +1266,26 @@ public class Cfg{
 				+ "\n 	where (ss.Polzovatel=X'" + polzovatelSmartProHEX + "' or ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "')"
 				+ "\n			and ss.nomenklatura not in (select nomenklatura from SkidkiSmartPro)"
 				+ "\n			and ss.podrazdelenie=x'" + podrazdeleniebin + "'"
-				+ "\n			and ss.DataOkonchaniya>=" + dataDostavki+" and ss.DataNachala<=" + dataDostavki
-				+ "\n 	group by ss.nomenklatura;"
-		;
-		System.out.println(sql);
+				+ "\n			and ss.DataOkonchaniya>=" + dataDostavki + " and ss.DataNachala<=" + dataDostavki
+				+ "\n 	group by ss.nomenklatura;";
+		//System.out.println("insertSkidkiSmartPro "+sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
-	public static void insertSkidkiLast(String podrazdeleniebin, String dataDostavki){
 
+	public static void insertSkidkiLast(String podrazdeleniebin, String dataDostavki){
 		String sql = "insert into SkidkiLast (datastart,dataend,nomenklatura,price,comment) "//
 				+ "\n	select ss.DataNachala as datastart,ss.DataOkonchaniya as dataend,ss.nomenklatura as nomenklatura,ss.Znachenie as price"//
 				+ "\n			,case "//
-				/*
-				+ "\n				when ss.Polzovatel=X'" + polzovatelSmartProHEX + "' then '" + labelForSmartProPrilojene + "'"// no
-				+ "\n				when ss.Polzovatel=X'" + polzovatelPrilojeneHEX + "' then '" + labelForSmartProPrilojene + "'"// no
-
-				//+ "\n				when VidSkidki=X'" + skidkaId_x_Gazeta + "' then 'Газета/листовка'"// no
-				+ "\n				when VidSkidki=X'" + skidkaId_x_Gazeta + "' then '" + labelFor_x_Gazeta + "'"// no
-				//+ "\n				when VidSkidki=X'" + skidkaIdNakopitelnaya + "' then 'Накопительная' "//
-				+ "\n				when VidSkidki=X'" + skidkaIdNakopitelnaya + "' then '" + labelForNakopitelnaya + "' "//
-				//+ "\n				when VidSkidki=X'" + skidkaIdIndividualnaya + "' then 'Индивидуальная' "//over
-				+ "\n				when VidSkidki=X'" + skidkaIdIndividualnaya + "' then '" + labelForIndividualnaya + "' "//over
-				//+ "\n				when VidSkidki=X'" + skidkaIdRazovaya + "' then 'Разовая' "//
-				+ "\n				when VidSkidki=X'" + skidkaIdRazovaya + "' then '" + labelForRazovaya + "' "//
-				//+ "\n				when VidSkidki=X'" + skidkaIdFixirovannaya + "' then 'Фикс.цена' "//over
-				+ "\n				when VidSkidki=X'" + skidkaIdFixirovannaya + "' then '" + labelForFixirovannaya + "'"//over
-				//+ "\n				when VidSkidki=X'" + skidkaIdCenovoyeReagirovanie + "' then 'ЦР'"//
-				+ "\n				when VidSkidki=X'" + skidkaIdCenovoyeReagirovanie + "' then 'ЦР'"//
-				//+ "\n				when VidSkidki=X'" + skidkaId_Rasprodaja + "' then 'Распродажа'"//
-				+ "\n				when VidSkidki=X'" + skidkaId_Rasprodaja + "' then '" + labelForRasprodaja + "'"//
-				//+ "\n				when VidSkidki=X'b6642d98b55a8d5e48c45c1c3731b72e' then 'Скидка по ответственному'"// no
-				//+ "\n				when VidSkidki=X'" + skidkaId_x_Promokod + "' then 'Промокод' "// no
-				+ "\n				when VidSkidki=X'" + skidkaId_x_Promokod + "' then '" + labelForPromokod + "' "// no
-				//+ "\n				when VidSkidki=X'" + skidkaId_x_Targetnie + "' then 'Таргетные' "// no
-				+ "\n				when VidSkidki=X'" + skidkaId_x_Targetnie + "' then '" + labelForTargetnie + "' "// no
-				//+ "\n				when VidSkidki=X'" + skidkaIdPosummeRazovaya + "' then 'Разовая по сумме' "//
-				+ "\n				when VidSkidki=X'" + skidkaIdPosummeRazovaya + "' then '" + labelForPosummeRazovaya + "' "//
-				//+ "\n				when VidSkidki=X'" + skidkaIdBonus + "' then 'Бонус' "//
-				+ "\n				when VidSkidki=X'" + skidkaIdBonus + "' then '" + labelForBonus + "' "//
-				*/
 				+ skidkiLabelsPart()
 				+ "\n				else '' "//
 				+ "\n			end as comment"//
 				+ "\n		from skidki ss"//
-				//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataNachala<=date('now') and ss.DataOkonchaniya>=date('now')"//
-				//+ "\n			join Nomenklatura ns on ns._idrref=ss.nomenklatura and ss.DataNachala<=" + dataDostavki + " and ss.DataOkonchaniya>=" + dataDostavki//
 				+ "\n		where ss.podrazdelenie=x'" + podrazdeleniebin + "'"
+				//+ "\n	and ss.nomenklatura not in (select nomenklatura from SkidkiLast where comment != 'Распродажа')"
 				+ "\n	and ss.nomenklatura not in (select nomenklatura from SkidkiLast)"
 				+ "\n	and ss.DataNachala<=" + dataDostavki + " and ss.DataOkonchaniya>=" + dataDostavki//
 				;
-		System.out.println("insertSkidkiLast " + sql);
+		System.out.println("insertSkidkiLast "+sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 	}
 
@@ -1796,4 +1744,179 @@ public class Cfg{
             return "";
         }
     }*/
+
+
+	public static void showAnalogList(Task callback, Bough selectedAnalogRow, Activity activity, String art, String kontr, String data){
+		//Auxiliary.warn(data, aa);
+		Bough response = Bough.parseJSON(data);
+		Vector<Bough> analogi = response.children("Аналоги");
+		if(analogi.size() > 0){
+			Bough localRows = new Bough();
+			for(int i = 0; i < analogi.size() && i < 11; i++){
+				String sql = Request_NomenclatureBase.composeSQLall_Old(//.composeSQLall(//
+						DateTimeHelper.SQLDateString(ApplicationHoreca.getInstance().getShippingDate().getTime())//
+						, ApplicationHoreca.getInstance().getClientInfo().getID()//
+						, ApplicationHoreca.getInstance().getCurrentAgent().getAgentIDstr()//
+						, null//DateTimeHelper.SQLDateString(fr)//
+						, null//DateTimeHelper.SQLDateString(to)//
+						, analogi.get(i).child("Артикул").value.property.value()//searchHistoryByName.value()//
+						, ISearchBy.SEARCH_ARTICLE
+						, false//
+						, false//history
+						, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()//
+						, 1//itemsMaxCount//gridPageSize * 3//
+						//, gridHistory.dataOffset.property.value().intValue()//
+						, 0//gridOffset.value().intValue()//
+						, false//
+						, false, null, null, false, false, null, null, null
+						, false//filterStmStarRecomendaciaKorzina.value() == 1//,filterBySTM.value()
+						, false//filterStmStarRecomendaciaKorzina.value() == 2
+						, false//filterStmStarRecomendaciaKorzina.value() == 3
+						, false//filterStmStarRecomendaciaKorzina.value() == 4
+						, false//filterStmStarRecomendaciaKorzina.value() == 5
+						, false
+				);
+				Bough testdata = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+				System.out.println(testdata.dumpXML());
+				if(testdata.children.size() > 0){
+					localRows.children.add(testdata.children.get(0));
+				}
+			}
+			if(localRows.children.size() > 0){
+				String[] items = new String[localRows.children.size()];
+				for(int i = 0; i < localRows.children.size() && i < 11; i++){
+					items[i] = localRows.children.get(i).child("Artikul").value.property.value()
+							+ ": " + localRows.children.get(i).child("Naimenovanie").value.property.value();
+				}
+				Numeric selval = new Numeric();
+				Auxiliary.pickSingleChoice(activity, items, selval, null//response.child("Текст").value.property.value()
+						, new Task(){
+							public void doTask(){
+								//System.out.println(localRows.children.get(selval.value().intValue()).dumpXML());
+								selectedAnalogRow.children = localRows.children.get(selval.value().intValue()).children;
+								callback.start();
+								//selectedRow=localRows.children.get(selval.value().intValue());
+								//returnSelectedRow();
+								//addAnalog(aa, localRows.get(selval.value().intValue()).child("Артикул").value.property.value(), kontr);
+							}
+						}, null, null, null, null);
+			}
+		}else{
+			if(response.children("Текст").size() > 0){
+				Auxiliary.warn("Аналоги не найдены\n" + response.child("Текст").value.property.value(), activity);
+			}else{
+				Auxiliary.warn("Ошибка\n" + data, activity);
+			}
+		}
+	}
+
+
+	public static void sendAnalogFeedback(Activity activity, String vendor_code, String vendor_code_analog, String score){
+		Bough data = new Bough();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					data.children = Auxiliary.postMIMEJSON("https://horeka-prod-api.1221systems.ru/horeca/auth"
+							, "{\"username\":\"sweetlife\",\"password\":\"horeca\"}"
+							, "").children;
+					String access_token = data.child("data").child("access_token").value.property.value();
+					if(access_token.length() > 1){
+						data.children = Auxiliary.postMIMEJSON("https://horeka-prod-api.1221systems.ru/horeca/feedback/analog"
+										+ "?vendor_code=" + vendor_code
+										+ "&vendor_code_analog=" + vendor_code_analog
+										+ "&score=" + score
+								, "", access_token).children;
+					}else{
+						data.child("error").value.is("Empty access token");
+					}
+				}catch(Throwable t){
+					t.printStackTrace();
+					data.child("error").value.is(t.getMessage());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				System.out.println(data.dumpXML());
+				/*Auxiliary.warn(data.child("message").value.property.value()
+								+ "\n" + data.child("error").value.property.value()
+						, activity);*/
+			}
+		}).status.is("Отправка").start(activity);
+	}
+
+	public static void findAnalogList(Task callback, Activity activity, String art, String kontr){
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ZakaziPokupatelya/AnalogiTovarnihGrupp"
+				+ "/" + art
+				+ "/" + kontr;
+		final Note txt = new Note();
+		Expect expectRequery = new Expect()//
+				.status.is("Подождите.....")//
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						try{
+							byte[] raw = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+							txt.value(new String(raw, "UTF-8"));
+							//System.out.println("promptAnalog " + url + ": " + txt.value());
+							/*
+							txt.value("{\"Аналоги\": [{\"Артикул\": \"63604\",\"Наименование\": \"Бульон овощной Knorr 2 кг\",\"ДоступноеКоличество\": 26}"
+									+", {\"Артикул\": \"110161\",\"Наименование\": \"smaetana\",\"ДоступноеКоличество\": 8}"
+									+"],\"Текст\": \"12,09 и 13,09 буду вне офиса.\"}");
+							*/
+						}catch(Throwable t){
+							t.printStackTrace();
+							txt.value(t.getMessage());
+						}
+					}
+				}).afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						//showAnalogList(callback, selectedAnalogRow, activity, art, kontr, txt.value());
+						callback.doTask1(txt.value());
+					}
+				});
+		expectRequery.status.is("Артикул " + art + " выведен из ассортимента. Поиск аналогов...").start(activity);
+	}
+
+	public static void promptAnalog2563463456345(Task callback, Bough selectedAnalogRow, Activity activity, String art, String kontr){
+		System.out.println("promptAnalog " + art + "/" + kontr);
+		//Auxiliary.warn("Артикул " + art + " выведен из ассортимента. Поиск аналогов...", aa);
+		//kk https://service.swlife.ru/hrc120107/hs/ZakaziPokupatelya/AnalogiTovarnihGrupp/115419ggg/284099
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ZakaziPokupatelya/AnalogiTovarnihGrupp"
+				+ "/" + art
+				+ "/" + kontr;
+		final Note txt = new Note();
+		Expect expectRequery = new Expect()//
+				.status.is("Подождите.....")//
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						try{
+							byte[] raw = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+							txt.value(new String(raw, "UTF-8"));
+							System.out.println("promptAnalog " + url + ": " + txt.value());
+							/*
+							String test="{\"Аналоги\": [{\"Артикул\": \"63604\",\"Наименование\": \"Бульон овощной Knorr 2 кг\",\"ДоступноеКоличество\": 26}"
+									+", {\"Артикул\": \"110161\",\"Наименование\": \"smaetana\",\"ДоступноеКоличество\": 8}"
+									+"],\"Текст\": \"12,09 и 13,09 буду вне офиса.\"}";
+							txt.value(test);
+							*/
+						}catch(Throwable t){
+							t.printStackTrace();
+							txt.value(t.getMessage());
+						}
+					}
+				}).afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						showAnalogList(callback, selectedAnalogRow, activity, art, kontr, txt.value());
+					}
+				});
+		expectRequery.status.is("Артикул " + art + " выведен из ассортимента. Поиск аналогов...").start(activity);
+	}
+
 }

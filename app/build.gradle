@@ -15,8 +15,8 @@ android {
 		//targetSdkVersion 29
 		targetSdkVersion 33
 
-		versionCode 311149
-		versionName "3.11.149"
+		versionCode 9312185
+		versionName "3.12.185"
 
 		//testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 	}
@@ -90,6 +90,8 @@ dependencies {
 
 	implementation 'com.google.firebase:firebase-messaging'
 
+	//implementation 'com.google.firebase:firebase-messaging-directboot:20.2.0'
+
 	//implementation 'com.android.support:multidex:1.0.3'
 	implementation 'androidx.work:work-runtime:2.0.1-rc01'
 
@@ -102,5 +104,7 @@ dependencies {
 	implementation 'androidx.appcompat:appcompat:1.7.0'
 	//implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 	//compile 'com.google.firebase:firebase-inappmessaging-display:17.0.4'
+
+	implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
 
 }

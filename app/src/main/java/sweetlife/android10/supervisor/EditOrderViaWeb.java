@@ -55,15 +55,15 @@ public class EditOrderViaWeb{
 			public void doTask(){
 				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws")//
 						.xml.is("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"//
-						+ "\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-						+ "\n	<S:Body>"//
-						+ "\n		<Gat xmlns=\"http://ws.swl/ChangeOrders\">"//
-						+ "\n			<Namber>" + documentNumber + "</Namber>"//
-						+ "\n			<Date>" + ActivityWebServicesReports.reformatDate(documentDate) + "</Date>"//
-						+ "\n		</Gat>"//
-						+ "\n	</S:Body>"//
-						+ "\n</S:Envelope>"//
-				);
+								+ "\n<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
+								+ "\n	<S:Body>"//
+								+ "\n		<Gat xmlns=\"http://ws.swl/ChangeOrders\">"//
+								+ "\n			<Namber>" + documentNumber + "</Namber>"//
+								+ "\n			<Date>" + ActivityWebServicesReports.reformatDate(documentDate) + "</Date>"//
+								+ "\n		</Gat>"//
+								+ "\n	</S:Body>"//
+								+ "\n</S:Envelope>"//
+						);
 				Report_Base.startPing();
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				System.out.println("r.data " + r.data.dumpXML());
@@ -135,9 +135,11 @@ public class EditOrderViaWeb{
 					newCalendar.set(Calendar.YEAR, year);
 					newCalendar.set(Calendar.MONTH, monthOfYear);
 					newCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-					shipDate = from.format(newCalendar.getTime());
-
-					requestChangeOrderState("5");
+					//shipDate = from.format(newCalendar.getTime());
+					//requestChangeOrderState("5");
+					DateFormat df = new SimpleDateFormat("yyyyMMdd");
+					String DataOtgrYYYYMMDD=df.format(newCalendar.getTime());
+					sendMoveDate(DataOtgrYYYYMMDD);
 				}
 			}, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)//
 			).show();
@@ -150,11 +152,112 @@ public class EditOrderViaWeb{
 		Auxiliary.pickConfirm(context, "Пометить на удаление", "Удалить", new Task(){
 			@Override
 			public void doTask(){
-				requestChangeOrderState("2");
+				//requestChangeOrderState("2");
+				sendDeleteOrder();
 			}
 		});
 	}
 
+	void sendDeleteOrder(){
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ZakaziPokupatelya/UdalZakaz"
+				+ "/" + Cfg.whoCheckListOwner();
+		String currentDate=(new SimpleDateFormat("yyyyMMdd")).format(new Date());
+		String body = "{ \"Namber\": \"" + documentNumber + "\", \"Data\": \""
+				//+ ActivityWebServicesReports.reformatDate2(shipDate)
+				+currentDate
+				+ "\" }";
+		System.out.println(url);
+		System.out.println(body);
+		Note message = new Note();
+		new Expect()
+				.status.is("Подождите")
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						Bough result = Auxiliary.loadTextFromPrivatePOST(url, body, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+						System.out.println("result " + result.dumpXML());
+						String json = result.child("message").value.property.value().replace("OK / ", "");
+						message.value(Bough.parseJSON(json).child("Message").value.property.value());
+						me.preReport.writeCurrentPage();
+					}
+				})
+				.afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						Auxiliary.warn(message.value(), context);
+						me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
+					}
+				})
+				.start(context);
+	}
+	void sendApproveOrder(){
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ZakaziPokupatelya/ProvZakaz"
+				+ "/" + Cfg.whoCheckListOwner();
+		String currentDate=(new SimpleDateFormat("yyyyMMdd")).format(new Date());
+		String body = "{ \"Namber\": \"" + documentNumber + "\", \"Data\": \""
+				//+ ActivityWebServicesReports.reformatDate2(shipDate)
+				+currentDate
+				+ "\" }";
+		System.out.println(url);
+		System.out.println(body);
+		Note message = new Note();
+		new Expect()
+				.status.is("Подождите")
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						Bough result = Auxiliary.loadTextFromPrivatePOST(url, body, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+						System.out.println("result " + result.dumpXML());
+						String json = result.child("message").value.property.value().replace("OK / ", "");
+						message.value(Bough.parseJSON(json).child("Message").value.property.value());
+						me.preReport.writeCurrentPage();
+					}
+				})
+				.afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						Auxiliary.warn(message.value(), context);
+						me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
+					}
+				})
+				.start(context);
+	}
+	void sendMoveDate(String DataOtgrYYYYMMDD){
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/ZakaziPokupatelya/IzmDatuOtgruzki"
+				+ "/" + Cfg.whoCheckListOwner();
+		String currentDate=(new SimpleDateFormat("yyyyMMdd")).format(new Date());
+		String body = "{ \"Namber\": \"" + documentNumber + "\", \"Data\": \""
+				+currentDate
+				//+ ActivityWebServicesReports.reformatDate2(shipDate)
+				+ "\", \"DataOtgr\": \"" + DataOtgrYYYYMMDD
+				+ "\" }";
+		System.out.println(url);
+		System.out.println(body);
+		Note message = new Note();
+		new Expect()
+				.status.is("Подождите")
+				.task.is(new Task(){
+					@Override
+					public void doTask(){
+						Bough result = Auxiliary.loadTextFromPrivatePOST(url, body, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+						System.out.println("result " + result.dumpXML());
+						String json = result.child("message").value.property.value().replace("OK / ", "");
+						message.value(Bough.parseJSON(json).child("Message").value.property.value());
+						me.preReport.writeCurrentPage();
+					}
+				})
+				.afterDone.is(new Task(){
+					@Override
+					public void doTask(){
+						Auxiliary.warn(message.value(), context);
+						me.tapInstance2(me.preReport.getFolderKey(), me.preKey);
+					}
+				})
+				.start(context);
+	}
 	void promptRasporyajenieNaOtgruzku(){
 		Intent intent = new Intent();
 		intent.setClass(context, Dialog_EditDisposal.class);
@@ -244,7 +347,8 @@ public class EditOrderViaWeb{
 					@Override
 					public void doTask(){
 						if(nn.value().intValue() == 0){
-							requestChangeOrderState("1");
+							//requestChangeOrderState("1");
+							sendApproveOrder();
 						}
 						if(nn.value().intValue() == 1){
 							promptSendDelete();
@@ -613,6 +717,7 @@ public class EditOrderViaWeb{
 
 	public static void requestItemsChangeNew(String documentNumber, String documentDate, final Context context, Task task, Bough danniyeTovari){
 		System.out.println("requestItemsChangeNew " + documentNumber + ", " + documentDate + (danniyeTovari == null ? ", null" : ", " + (danniyeTovari.dumpXML())));
+
 		final Bough bb = new Bough();
 
 		Expect expect = new Expect().status.is("Подождите").task.is(new Task(){
@@ -1134,7 +1239,7 @@ public class EditOrderViaWeb{
 						+ "\n</S:Envelope>";
 				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws")//
 						.xml.is(xml//
-				);
+						);
 				Report_Base.startPing();
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				me.preReport.writeCurrentPage();
@@ -1188,7 +1293,7 @@ public class EditOrderViaWeb{
 		}).start(context);
 	}
 
-	void requestChangeOrderState(final String thatDone){
+	void requestChangeOrderState1212121212(final String thatDone){
 		final RawSOAP r = new RawSOAP();
 
 		new Expect().status.is("Выполнение...").task.is(new Task(){
@@ -1196,20 +1301,20 @@ public class EditOrderViaWeb{
 			public void doTask(){
 				r.url.is(Settings.getInstance().getBaseURL() + "ChangeOfOrders.1cws")//
 						.xml.is("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"//
-						+ "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
-						+ "	<S:Body>"//
-						+ "		<Change xmlns=\"http://ws.swl/ChangeOrders\">"//
-						+ "			<Docs>"//
-						+ "				<Head Namber=\"" + documentNumber + "\" Comment=\"\" ThatDone=\"" + thatDone + "\" Date=\"" + ActivityWebServicesReports.reformatDate(documentDate) + "\">"//
-						+ "					<Polzov>" + hrc + "</Polzov>"//
-						+ "					<DateOtgruz>" + ActivityWebServicesReports.reformatDate(shipDate) + "</DateOtgruz>"//
-						+ "				</Head>"//
-						+ "				<Table></Table>"//
-						+ "			</Docs>"//
-						+ "		</Change>"//
-						+ "	</S:Body>"//
-						+ "</S:Envelope>"//
-				);
+								+ "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"//
+								+ "	<S:Body>"//
+								+ "		<Change xmlns=\"http://ws.swl/ChangeOrders\">"//
+								+ "			<Docs>"//
+								+ "				<Head Namber=\"" + documentNumber + "\" Comment=\"\" ThatDone=\"" + thatDone + "\" Date=\"" + ActivityWebServicesReports.reformatDate(documentDate) + "\">"//
+								+ "					<Polzov>" + hrc + "</Polzov>"//
+								+ "					<DateOtgruz>" + ActivityWebServicesReports.reformatDate(shipDate) + "</DateOtgruz>"//
+								+ "				</Head>"//
+								+ "				<Table></Table>"//
+								+ "			</Docs>"//
+								+ "		</Change>"//
+								+ "	</S:Body>"//
+								+ "</S:Envelope>"//
+						);
 				Report_Base.startPing();
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 				me.preReport.writeCurrentPage();
@@ -1260,5 +1365,6 @@ public class EditOrderViaWeb{
 			}
 		}).start(context);
 	}
+
 }
 

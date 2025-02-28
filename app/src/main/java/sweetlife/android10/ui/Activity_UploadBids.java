@@ -55,7 +55,9 @@ public class Activity_UploadBids extends Activity_BasePeriod implements ImageVie
 	public static String composeUploadOrderString(String key, String vneshniyNomer){
 		SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
 		String request = "";
-		String sql = "select doc.Nomer as Nomer,doc.DataOtgruzki as DataOtgruzki,dgvr.Kod as Kod,kntr.kod as kntr,doc.tipOplaty as tipOplaty,doc.Kommentariy as kommentariy from"//
+		String sql = "select doc.Nomer as Nomer,doc.DataOtgruzki as DataOtgruzki,dgvr.Kod as Kod,kntr.kod as kntr"
+				+",doc.tipOplaty as tipOplaty,doc.Kommentariy as kommentariy"
+				+" from"//
 				+ "\n ZayavkaPokupatelyaIskhodyaschaya doc"//
 				+ "\n join DogovoryKontragentov_strip dgvr on dgvr._idrref=doc.DogovorKontragenta"//
 				+ "\n join Kontragenty kntr on kntr._idrref=doc.Kontragent"//

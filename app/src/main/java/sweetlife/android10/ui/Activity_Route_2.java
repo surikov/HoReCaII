@@ -23,6 +23,7 @@ import tee.binding.*;
 import reactive.ui.*;
 
 import java.io.*;
+import java.net.*;
 import java.text.*;
 import java.util.*;
 import java.util.TimeZone;
@@ -30,6 +31,9 @@ import java.util.Vector;
 
 import sweetlife.android10.gps.*;
 import sweetlife.android10.*;
+import sweetlife.android10.utils.*;
+
+import com.google.zxing.integration.android.*;
 
 public class Activity_Route_2 extends Activity{
 
@@ -47,9 +51,11 @@ public class Activity_Route_2 extends Activity{
 	ColumnText columnPt;
 	ColumnText columnSb;
 	ColumnText columnMenu;
-
+	final static int FILE_SELECT_RESULT123 = 847347384;
 	Note clientNameFilterText = new Note();
 	//String lastFilter = "";
+
+	public static Note lastQR = new Note();
 
 	WebRender popup;
 
@@ -72,6 +78,7 @@ public class Activity_Route_2 extends Activity{
 	//MenuItem menuNezakrVizit;
 	//MenuItem menuDocumenti;
 	//MenuItem menuGPSinformacia;
+	MenuItem menuAlternative;
 	MenuItem menuRasporyazheniaNaOtgruzku;
 	MenuItem menuPerebitNakladnuyu;
 	MenuItem menuZayavkaNaPostavku;
@@ -81,7 +88,7 @@ public class Activity_Route_2 extends Activity{
 	MenuItem menuMatricaTP;
 	//MenuItem menuMap;
 	//MenuItem menuLimit;
-	//MenuItem menuTest;
+	MenuItem menuPostKeyQR;
 	MenuItem menuAnketi;
 	MenuItem menuHelp;
 	MenuItem menuPlanObuchenia;
@@ -104,7 +111,7 @@ public class Activity_Route_2 extends Activity{
 
 	MenuItem menuKontaktnayaInformacia;
 	MenuItem menuIskluchenieVizitov;
-
+	MenuItem menuOtpravitDogovor;
 
 	Note currentHRCName = new Note().value("[все]");
 	Numeric zaDatu = new Numeric().value(0);
@@ -677,6 +684,12 @@ public class Activity_Route_2 extends Activity{
 		//menuDocumenti = menu.add("Документы");
 		//menuGPSinformacia = menu.add("GPS информация" );
 		//menuTest = menu.add("Do test");
+		menuAlternative = menu.add("Dispatch switch");
+		if(Settings.useAlternativeService){
+			menuAlternative.setTitle("Вернуть базовый адрес");
+		}else{
+			menuAlternative.setTitle("Альтернативный адрес");
+		}
 		menuAnketi = menu.add("Анкеты заявок на новых клиентов");
 		menuDannieMercury = menu.add("Данные Меркурий");
 		menuZayavkaVnutrenneePeremechenie = menu.add("Заявка на внутреннее перемещение");
@@ -691,12 +704,15 @@ public class Activity_Route_2 extends Activity{
 		menuMatricaTP = menu.add("Матрицы ТП");
 		menuVizitGroup = menu.add("Начать объединенный визит");
 		menuMarshrutDogovora = menu.add("Обновить маршрут и договоры");
+		menuOtpravitDogovor = menu.add("Отправить договор");
 		menuOtchety = menu.add("Отчёты");
 		menuPeredatIsprNakl = menu.add("Передать исправленную накладную");
 		menuPlanObuchenia = menu.add("План обучения");
 		//menuMap = menu.add("Положение на карте" );
+		menuPostKeyQR = menu.add("Почтовое отправление");
 		menuDataCheck = menu.add("Проверка БД");
 		menuRasporyazheniaNaOtgruzku = menu.add("Распоряжения на отгрузку");
+
 		menuZapiski = menu.add("Служебные записки на договоры");
 		menuChangeUser = menu.add("Сменить пользователя");
 		menuFirebaseMesasages = menu.add("Сообщения");
@@ -1017,14 +1033,16 @@ public class Activity_Route_2 extends Activity{
 		int t = 0;
 		final They<Integer> defaultSelection = new They<Integer>();
 		final Vector<String> ids = new Vector<String>();
+		Numeric distanceToClient = new Numeric();
 		while(c.moveToNext()){
 			double shirota = c.getDouble(0);
 			double dolgota = c.getDouble(1);
 			String kod = c.getString(3);
 			String name = c.getString(2);
-			long distanceToClient = GPSInfo.isTPNearClient(shirota, dolgota);
+			//long distanceToClient = GPSInfo.isTPNearClient(shirota, dolgota);
+			distanceToClient.value((float)GPSInfo.isTPNearClient(shirota, dolgota));
 			//System.out.println(name+": "+shirota+"x"+dolgota+": "+distanceToClient);
-			if(distanceToClient >= 0 && distanceToClient < Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+			if(distanceToClient.value() >= 0 && distanceToClient.value() < Settings.MAX_DISTANCE_TO_CLIENT){
 				v.add(kod + ": " + name);// + ": " + shirota + "x" + dolgota + ": " + distanceToClient + ": " + kod);
 				defaultSelection.insert(t, t);
 				ids.add(kod);
@@ -1046,7 +1064,7 @@ public class Activity_Route_2 extends Activity{
 					for(int i = 0; i < defaultSelection.size(); i++){
 						Integer n = defaultSelection.at(i);
 						//System.out.println("ok " + n + ": " + ids.get(n));
-						GPS.getGPSInfo().BeginVizit(ids.get(n));
+						GPS.getGPSInfo().BeginVizit(ids.get(n), distanceToClient.value().longValue());
 					}
 					//adapter = new RouteListAdapter(Activity_Route.this, clientsRequestHelper.Request(mDB, 0));
 					//mRouteList.setAdapter(adapter);
@@ -1267,6 +1285,13 @@ public class Activity_Route_2 extends Activity{
 			startActivity(intent);
 			return true;
 		}
+
+		if(item == menuPostKeyQR){
+			promptPochtaKod();
+			return true;
+		}
+
+
 		/*
 		if(item == menuGPSinformacia){
 			Intent intent = new Intent();
@@ -1298,6 +1323,11 @@ public class Activity_Route_2 extends Activity{
 			dataCheck();
 			return true;
 		}
+
+		if(item == menuOtpravitDogovor){
+			promptOtpravitDogovor();
+			return true;
+		}
         /*if (item == menuResetExchange) {
             resetExchange();
             return true;
@@ -1325,6 +1355,17 @@ public class Activity_Route_2 extends Activity{
 			doTest();
 			return true;
 		}*/
+
+		if(item == menuAlternative){
+
+			Settings.useAlternativeService = !Settings.useAlternativeService;
+			if(Settings.useAlternativeService){
+				menuAlternative.setTitle("Вернуть базовый адрес");
+			}else{
+				menuAlternative.setTitle("Альтернативный адрес");
+			}
+			return true;
+		}
 		if(item == menuAnketi){
 			Intent intent = new Intent();
 			intent.setClass(this, ActivityVseAnketi.class);
@@ -1379,6 +1420,46 @@ public class Activity_Route_2 extends Activity{
 		return super.onOptionsItemSelected(item);
 	}
 
+	void promptPochtaKod(){
+		Auxiliary.pickString(this, "Код почтового отправления", lastQR
+				, "Сканировать", new Task(){
+					@Override
+					public void doTask(){
+						startQRscan();
+					}
+				}, "Отправить", new Task(){
+					@Override
+					public void doTask(){
+						sendQR();
+					}
+				}
+				, null, null
+
+		);
+	}
+
+	void startQRscan(){
+		//REQUEST_CODE = 0x0000c0de - 49374
+		IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+		intentIntegrator.setPrompt("Наведите камеру на код");
+		intentIntegrator.setOrientationLocked(true);
+		intentIntegrator.initiateScan();
+	}
+/*
+	void doTest(){
+		System.out.println("do test");
+		new VibratNomenklatura().showArtDialog(this,new Vector<String>(),new Task(){
+			public void doTask(){
+				System.out.println("save selection");
+			}
+		});
+
+		/Auxiliary.vibratNomenklatura(this,new Task(){
+			public void doTask(){
+				System.out.println("save selection");
+			}
+		});/
+	}*/
 	/*
 		void doTest(){
 			String testData = "<raw>\n" +
@@ -1490,6 +1571,122 @@ public class Activity_Route_2 extends Activity{
 
 		}
 	*/
+
+	static Note dogovorComment = new Note();
+	static Note dogovorName = new Note();
+	static Vector<String> dogovorFiles = new Vector<String>();
+
+	void promptOtpravitDogovor(){
+
+		final RedactMultiChoice files = new RedactMultiChoice(this);
+		for(int i = 0; i < dogovorFiles.size(); i++){
+			files.item(dogovorFiles.get(i));
+			files.selection.insert(i, i);
+		}
+		Auxiliary.pick(this, "", new SubLayoutless(this)//
+
+						.child(new Decor(this).labelText.is("Отправка договора").top().is(Auxiliary.tapSize * 0.5).left().is(Auxiliary.tapSize * 0.5).width().is(Auxiliary.tapSize * 5.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("контрагент").labelAlignRightTop().top().is(Auxiliary.tapSize * 1.5).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(dogovorName).left().is(Auxiliary.tapSize * 3.0).top().is(Auxiliary.tapSize * 1.0).width().is(Auxiliary.tapSize * 11.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("комментарий").labelAlignRightTop().top().is(Auxiliary.tapSize * 2.5).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 1))//
+						.child(new RedactText(this).text.is(dogovorComment).left().is(Auxiliary.tapSize * 3.0).top().is(Auxiliary.tapSize * 2.0).width().is(Auxiliary.tapSize * 11.5).height().is(Auxiliary.tapSize * 1))//
+
+						.child(new Decor(this).labelText.is("файлы").labelAlignRightTop().top().is(Auxiliary.tapSize * 3.5).width().is(Auxiliary.tapSize * 2.5).height().is(Auxiliary.tapSize * 1))//
+						.child(files.left().is(Auxiliary.tapSize * 3.0).top().is(Auxiliary.tapSize * 3.0).width().is(Auxiliary.tapSize * 11.5).height().is(Auxiliary.tapSize * 1))//
+
+						.width().is(Auxiliary.tapSize * 15)//
+						.height().is(Auxiliary.tapSize * 7)//
+				, "Отправить", new Task(){
+					@Override
+					public void doTask(){
+						Vector<String> selectedFiles = new Vector<String>();
+						for(int kk = 0; kk < files.selection.size(); kk++){
+							int nn = files.selection.at(kk).intValue();
+							selectedFiles.add(dogovorFiles.get(nn));
+						}
+						if(selectedFiles.size() > 0){
+							if(dogovorName.value().length() > 3){
+								sendDogovorFiles(selectedFiles);
+							}else{
+								Auxiliary.warn("Не указано наименование контрагент", Activity_Route_2.this);
+							}
+						}else{
+							Auxiliary.warn("Не указаны файлы договора", Activity_Route_2.this);
+						}
+
+					}
+				}, "Добавить файл", new Task(){
+					@Override
+					public void doTask(){
+						promptDocFilePath();
+					}
+				}, null, null);
+	}
+
+	void promptDocFilePath(){
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		intent.setType("*/*");
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		try{
+			Intent chooser = Intent.createChooser(intent, "Выбрать файл");
+			startActivityForResult(chooser, FILE_SELECT_RESULT123);
+		}catch(Throwable ex){
+			ex.printStackTrace();
+		}
+	}
+
+	void sendDogovorFiles(Vector<String> selectedFiles){
+		final String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/FeedbackCustomer/Создать/" + Cfg.DBHRC();//Cfg.whoCheckListOwner();
+		String data = "{"
+				+ "\n	\"CodClient\": \"\""// + ApplicationHoreca.getInstance().getClientInfo().getKod() + "\""
+				+ "\n	,\"Article\": \"\""
+				+ "\n	,\"DateNac\": \"\""
+				+ "\n	,\"Comment\": \"" + dogovorComment.value() + "\""
+				+ "\n	,\"НаименованиеКонтрагента\": \"" + dogovorName.value() + "\""
+				+ "\n	\"Files\": [";
+		String delim = "";
+		for(int kk = 0; kk < selectedFiles.size(); kk++){
+			String filePath = selectedFiles.get(kk).trim();
+			String encodedFile = android.util.Base64.encodeToString(SystemHelper.readBytesFromFile(new File(filePath)), android.util.Base64.NO_WRAP);
+			String[] spl = filePath.split("\\.");
+			String rash = spl[spl.length - 1];
+			data = data + "\n		" + delim + "{\"File\": \"" + encodedFile + "\", \"rassh\": \"" + rash + "\"}";
+			delim = ",";
+		}
+		data = data + "\n	]"
+				+ "\n}"
+				+ "\n";
+		final String body = data;
+		System.out.println("body " + body);
+		final Note result = new Note();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					Bough b = Auxiliary.loadTextFromPrivatePOST(url, body.getBytes("UTF-8"), 33000, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(), true);
+					System.out.println(b.dumpXML());
+					Bough raw = Bough.parseJSON(b.child("raw").value.property.value());
+					result.value(raw.child("Сообщение").value.property.value());
+					if(raw.child("Сообщение").value.property.value().equals("0")){
+						dogovorComment = new Note();
+						dogovorFiles = new Vector<String>();
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Auxiliary.warn("Результат: " + result.value(), Activity_Route_2.this);
+
+			}
+		}).status.is("Отправка").start(this);
+	}
+
+
 	void promptIskluchenieVizitov(){
 		Numeric territory = new Numeric();
 
@@ -1938,9 +2135,70 @@ I/System.out: </>
 */
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data){
+		System.out.println("onActivityResult requestCode: " + requestCode + ", resultCode: " + resultCode);
+
+		if(resultCode == RESULT_OK){
+			switch(requestCode){
+				case FILE_SELECT_RESULT123:
+					Uri uri = data.getData();
+					String path = Auxiliary.pathForMediaURI(this, uri);
+					if(path != null && path.length() > 5){
+						dogovorFiles.add(path);
+					}else{
+						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
+					}
+					promptOtpravitDogovor();
+					break;
+				case IntentIntegrator.REQUEST_CODE:
+					System.out.println("IntentIntegrator");
+					IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+					if(intentResult != null){
+						if(intentResult.getContents() == null){
+							System.out.println("scan content null");
+						}else{
+							String content = intentResult.getContents();
+							String format = intentResult.getFormatName();
+							System.out.println("scan " + format + ": " + content);
+							//sendQR(content);
+							lastQR.value(content);
+							promptPochtaKod();
+						}
+					}else{
+						System.out.println("scan intentResult null");
+					}
+					break;
+			}
+		}else{
+			System.out.println("resultCode KO");
+		}
 		super.onActivityResult(requestCode, resultCode, data);
-		//ApplicationHoreca.getInstance().setCRdisabledFirstTimeShow(false);
-		//setShippingDayFromUI();
+		System.out.println("onActivityResult done");
+	}
+
+	void sendQR(){
+		//https://testservice.swlife.ru/postal_accounting/hs/Tablet/PodtverditPolucheniePochtovogoOtpravleniya?document_code=b9569a7d-eeb1-11ef-bbe5-000c29890e89
+		String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
+				+ "/hs/Tablet/PodtverditPolucheniePochtovogoOtpravleniya?document_code="
+				+ lastQR.value();
+		final Note res = new Note();
+		new Expect().task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					byte[] output = Auxiliary.loadFileFromPrivateURL(url, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+					String s = new String(output);
+					res.value(s);
+				}catch(Throwable t){
+					t.printStackTrace();
+					res.value(t.getMessage());
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				Auxiliary.warn("Отправлено: " + res.value(), Activity_Route_2.this);
+			}
+		}).status.is("Отправка").start(Activity_Route_2.this);
 	}
 
 	void requeryGridData(){
@@ -1990,14 +2248,19 @@ I/System.out: </>
 			String name = row.child("Naimenovanie").value.property.value();
 			double gcnt = Numeric.string2double(row.child("gcnt").value.property.value());
 			if(gcnt > 1){
-				name = "<b>" +   name+"</b>";
+				name = "<b>" + name + "</b>";
 			}
 			int dayColor = 0xffff0000;
 			//String lastVizitDate = row.child("lastVizitDate").value.property.value();
 			String lastVizitTime = row.child("lastVizitTime").value.property.value();
 			String vizitActivity = row.child("lastVizitStatus").value.property.value();
 			String lastVizitEnd = row.child("lastVizitEnd").value.property.value();
+			//String gpsbegin = ""+(int)(Numeric.string2double(row.child("gpsbegin").value.property.value()));
+			//String gpsfinish = ""+(int)(Numeric.string2double(row.child("gpsfinish").value.property.value()));
 			String shirota = row.child("shirota").value.property.value();
+			double gpsbegin = Numeric.string2double(row.child("gpsbegin").value.property.value());
+			double gpsfinish = Numeric.string2double(row.child("gpsfinish").value.property.value());
+
 			String vizitInfo = "";
 			int bg1 = clientBG;
 			int bg2 = clientBG;
@@ -2006,6 +2269,7 @@ I/System.out: </>
 			int bg5 = clientBG;
 			int bg6 = clientBG;
 			String description = "";
+			String gpsstate = "";
 			if(name.startsWith("(не в маршруте)")){
 				clientBG = 0x11000000;
 				kodBG = clientBG;
@@ -2020,13 +2284,13 @@ I/System.out: </>
 				if(KolichestvoOtkrytykhDogovorov > 0){
 					if(KolichestvoOtkrytykhDogovorov < KolichestvoDogovorov){
 						clientBG = 0xffccccff;
-						dogovor = "Открытых договоров: " + Math.round(KolichestvoOtkrytykhDogovorov) + " из " + Math.round(KolichestvoDogovorov);
+						dogovor = "Откр. дог.: " + Math.round(KolichestvoOtkrytykhDogovorov) + " из " + Math.round(KolichestvoDogovorov);
 					}else{
-						dogovor = "Всего договоров: " + Math.round(KolichestvoOtkrytykhDogovorov);
+						dogovor = "Всего дог.: " + Math.round(KolichestvoOtkrytykhDogovorov);
 					}
 				}else{
 					clientBG = 0xffffcccc;
-					dogovor = "Закрытых договоров: " + Math.round(KolichestvoDogovorov);
+					dogovor = "Закр. дог.: " + Math.round(KolichestvoDogovorov);
 				}
 				String msSqlTimeFormatString = "yyyy-MM-dd'T'HH:mm:ss";
 
@@ -2051,28 +2315,8 @@ I/System.out: </>
 				String todayDate = Auxiliary.tryReFormatDate(Auxiliary.sqliteDate.format(new Date()), "yyyy-MM-dd", "dd.MM.yy");
 				//if (lastVizitDate.length() < 3) {
 				//if (lastVizitDate.length() < 3) {
-				if(lastVizitTime.length() < 5){
-					vizitInfo = "нет визитов";
-				}else{
-					//if (!startDate.equals(endDate)) {
-					if(lastVizitEnd.length() < 5){
-						String startTime = Auxiliary.tryReFormatDateGMT(lastVizitTime, msSqlTimeFormatString, "dd.MM.yy HH:mm:ss", 3);
-						vizitInfo = startTime + " - не завершён";
-						dayColor = 0xffffff00;
-						kodBG = dayColor;
-					}else{
-						//vizitInfo = endTime + ", " + vizitActivity;
-						//if (!startDate.equals(endDate)) {
-						String startTime = Auxiliary.tryReFormatDateGMT(lastVizitTime, msSqlTimeFormatString, "dd.MM.yy HH:mm:ss", 3);
-						vizitInfo = startTime + " - " + endTime + ", " + vizitActivity;
-						//}
-						if(endDate.equals(todayDate)){
-							dayColor = 0xff00ff00;
-							kodBG = 0xff00ff00;
-						}
-					}
-				}
-				description = dogovor + ", " + vizitInfo;
+				int brownColor = 0xff996600;
+
 				int dayWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
 				if(dayWeek == 2){
 					if(row.child("Den1").value.property.value().trim().equals("1")){
@@ -2108,15 +2352,64 @@ I/System.out: </>
 					if(row.child("Den6").value.property.value().trim().equals("1")){
 						bg6 = dayColor;
 						kodBG = dayColor;
+
 					}
 				}
 				if(shirota.length() < 3){
 					kodBG = 0xccff33cc;
 					description = "Координаты не зафиксированны! " + description;
 				}
+
+				if(lastVizitTime.length() < 5){
+					vizitInfo = "нет визитов";
+				}else{
+					//if (!startDate.equals(endDate)) {
+					if(lastVizitEnd.length() < 5){
+						String startTime = Auxiliary.tryReFormatDateGMT(lastVizitTime, msSqlTimeFormatString, "dd.MM.yy HH:mm:ss", 3);
+						vizitInfo = startTime + "/" + ((int)gpsbegin) + "м, не завершён";
+						dayColor = 0xffffff00;
+						kodBG = dayColor;
+						if(gpsbegin < 0 || gpsbegin > Settings.MAX_DISTANCE_TO_CLIENT){
+							gpsstate = ": не засчитан визит";
+							dayColor = brownColor;
+							kodBG = dayColor;
+						}
+					}else{
+						//vizitInfo = endTime + ", " + vizitActivity;
+						//if (!startDate.equals(endDate)) {
+						String startTime = Auxiliary.tryReFormatDateGMT(lastVizitTime, msSqlTimeFormatString, "dd.MM.yy HH:mm:ss", 3);
+						vizitInfo = startTime + "/" + ((int)gpsbegin) + "м - " + endTime + "/" + ((int)gpsfinish) + "м, " + vizitActivity;
+						//}
+						//gpsstate = endDate+"/"+todayDate;
+
+
+						if(endDate.equals(todayDate)){
+							dayColor = 0xff00ff00;
+							kodBG = 0xff00ff00;
+							if(gpsbegin < 0 || gpsbegin > Settings.MAX_DISTANCE_TO_CLIENT || gpsfinish < 0 || gpsfinish > Settings.MAX_DISTANCE_TO_CLIENT){
+								gpsstate = ": не засчитан визит";
+								dayColor = brownColor;
+								kodBG = dayColor;
+							}
+						}
+					}
+				}
+				description = dogovor + ", " + vizitInfo;
+				/*
+				if(gpsbegin < 0 || gpsbegin > Settings.MAX_DISTANCE_TO_CLIENT || gpsfinish < 0 || gpsfinish > Settings.MAX_DISTANCE_TO_CLIENT){
+					dayColor = 0xff996600;
+					kodBG = dayColor;
+				}*/
+
 			}
+/*
+			String gpsstate = "";
+			if(gpsbegin < 0 || gpsbegin > Settings.MAX_DISTANCE_TO_CLIENT || gpsfinish < 0 || gpsfinish > Settings.MAX_DISTANCE_TO_CLIENT){
+				gpsstate = ": не засчитан визит";
+			}
+*/
 			columnKod.cell(row.child("Kod").value.property.value(), kodBG, tapTask);
-			columnClient.cell(name, clientBG, tapTask, description);
+			columnClient.cell(name + gpsstate, clientBG, tapTask, description);
 
 			columnPn.cell(formatDayToggle(row.child("Den1").value.property.value()), bg1, tapTask);
 			columnVt.cell(formatDayToggle(row.child("Den2").value.property.value()), bg2, tapTask);
@@ -2194,6 +2487,8 @@ I/System.out: </>
 				+ "\n  	,(select EndTime from Vizits where Vizits.Client=a.Kod and BeginTime=(select max(BeginTime) from Vizits where Vizits.Client=a.Kod)) as lastVizitEnd"//
 				//+ "\n  	,(select max(BeginTime) from Vizits where Vizits.Client=a.Kod) as lastVizitTime"//
 				+ "\n  	,(select BeginTime from Vizits where Vizits.Client=a.Kod and BeginTime=(select max(BeginTime) from Vizits where Vizits.Client=a.Kod)) as lastVizitTime"//
+				+ "\n  	,(select gpsbegin from Vizits where Vizits.Client=a.Kod and BeginTime=(select max(BeginTime) from Vizits where Vizits.Client=a.Kod)) as gpsbegin"//
+				+ "\n  	,(select gpsfinish from Vizits where Vizits.Client=a.Kod and BeginTime=(select max(BeginTime) from Vizits where Vizits.Client=a.Kod)) as gpsfinish"//
 				+ "\n  from ("//
 				+ "\n  	select"//
 				+ "\n  			m._id as _id"//

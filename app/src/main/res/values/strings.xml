@@ -447,7 +447,7 @@
 	<string name="naimenovanie">Наименование</string>
 	<string name="closed">Закрыт</string>
 	<!--<string name="fixed_prices_request">Заявка на фиксированные цены от</string>-->
-	<string name="action_date_since">Время действия с:</string>
+	<!--<string name="action_date_since">Время действия с:</string>-->
 	<string name="number_symbol">№</string>
 	<string name="bill">Накладная</string>
 	<string name="bill_number">Номер накладной</string>

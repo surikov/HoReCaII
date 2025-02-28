@@ -308,7 +308,7 @@ public class Activity_NomenclatureNew extends Activity{
 		gridCategories = new DataGrid(this).noHead.is(true);
 		gridItems = new DataGrid2(this);
 		tipTochki = new RedactSingleChoice(this);
-		summaZakaza.value("Сумма заказа: " + Auxiliary.activityExatras(this).child(IExtras.ORDER_AMOUNT).value.property.value());
+		summaZakaza.value("" + Auxiliary.activityExatras(this).child(IExtras.ORDER_AMOUNT).value.property.value() + "р.");
 		String sql = "select _idrref as _idrref,naimenovanie as naimenovanie from TipyTorgovihTochek where deletionmark=x'00' order by naimenovanie";
 		tipTochkiData = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 		tipTochki.item("Любой тип");
@@ -346,49 +346,71 @@ public class Activity_NomenclatureNew extends Activity{
 						returnSelectedRow();
 					}
 				})
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 1))
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.3 * 1))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
-				.width().is(Auxiliary.tapSize * 2.5).height()
+				.width().is(Auxiliary.tapSize * 2.3).height()
 				.is(1 * Auxiliary.tapSize));
 		layoutless.child(new Knob(this).labelText.is("Фото").afterTap.is(new Task(){
 					public void doTask(){
 						openFoto();
 					}
 				})
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 2))
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.3 * 2))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
-				.width().is(Auxiliary.tapSize * 2.5)
+				.width().is(Auxiliary.tapSize * 2.3)
 				.height().is(1 * Auxiliary.tapSize));
-		/*
+
 		layoutless.child(new Knob(this).labelText.is("Запрос цен").afterTap.is(new Task(){
 					public void doTask(){
 						requestPriceNew();
 					}
 				})
-				.locked().is(true)
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
-		*/
-		layoutless.child(new Knob(this).labelText.is("Остатки").afterTap.is(new Task(){
-			public void doTask(){
-				requestOstatki();
-			}
-		})
-						.hidden().is(true)
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 5)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+				//.locked().is(true)
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.3 * 3))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2.3)
+				.height().is(1 * Auxiliary.tapSize));
+		layoutless.child(new Knob(this).labelText.is("Обратн.связь").afterTap.is(new Task(){
+					public void doTask(){
+						promptObratnaya();
+					}
+				})
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.3 * 4))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2.3)
+				.height().is(1 * Auxiliary.tapSize));
+
 
 		layoutless.child(new Knob(this).labelText.is("Обратн.связь").afterTap.is(new Task(){
 					public void doTask(){
 						promptObratnaya();
 					}
 				})
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 3)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.3 * 5))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2.3)
+				.height().is(1 * Auxiliary.tapSize));
 
 
 		layoutless.child(new Knob(this).labelText.is("Сертификат").afterTap.is(new Task(){
-			public void doTask(){
-				openCertificate();
-			}
-		}).left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.5 * 4)).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 2.5).height().is(1 * Auxiliary.tapSize));
+					public void doTask(){
+						openCertificate();
+					}
+				})
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.3 * 6))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2.3)
+				.height().is(1 * Auxiliary.tapSize));
+		layoutless.child(new Knob(this).labelText.is("Остатки").afterTap.is(new Task(){
+					public void doTask(){
+						requestOstatki();
+					}
+				})
+				.hidden().is(!Settings.pokazatOstatki)
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * 2.3 * 7))
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 2.3)
+				.height().is(1 * Auxiliary.tapSize));
 		/*
 		layoutless.child(new Knob(this)
 				.labelText.is(new Note().value("★").when(filterByStar).otherwise("☆"))
@@ -425,13 +447,17 @@ public class Activity_NomenclatureNew extends Activity{
 				.item("Корзина")
 				.item("Распродажа")
 				.selection.is(filterStmStarRecomendaciaKorzina)
-				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.5 * 5 + 5)))
+				.left().is(layoutless.width().property.minus(Auxiliary.tapSize * (2.3 * 7 + 3)))
 				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
-				.width().is(5 * Auxiliary.tapSize)
+				.width().is(3 * Auxiliary.tapSize)
 				.height().is(Auxiliary.tapSize)
 		);
 
-		layoutless.child(new Decor(this).labelText.is(summaZakaza).labelAlignLeftCenter().left().is(Auxiliary.tapSize * 0.5).top().is(layoutless.height().property.minus(Auxiliary.tapSize)).width().is(Auxiliary.tapSize * 5).height().is(1 * Auxiliary.tapSize));
+		layoutless.child(new Decor(this).labelText.is(summaZakaza).labelAlignLeftCenter()
+				.left().is(Auxiliary.tapSize * 0.1)
+				.top().is(layoutless.height().property.minus(Auxiliary.tapSize))
+				.width().is(Auxiliary.tapSize * 4)
+				.height().is(1 * Auxiliary.tapSize));
 		choiceKuhnya = new RedactSingleChoice(this);
 		layoutless.child(choiceKuhnya
 				.item("Любая кухня")
@@ -500,8 +526,8 @@ public class Activity_NomenclatureNew extends Activity{
 						, columnNomenklatura.title.is("Номенклатура").width.is(8 * Auxiliary.tapSize)
 						, columnProizvoditel.title.is("Пр-ль").width.is(2 * Auxiliary.tapSize)
 						, columnMinKolichestvo.title.is("Min/Квант").width.is(2 * Auxiliary.tapSize)
-						, columnCena.title.is("Цена").width.is(3.5 * Auxiliary.tapSize)
-						, columnSkidka.title.is("Скидка").width.is(2.5 * Auxiliary.tapSize)
+						, columnCena.title.is("Цена").width.is(3 * Auxiliary.tapSize)
+						, columnSkidka.title.is("Скидка").width.is(2.0 * Auxiliary.tapSize)
 						, columnPosledniaya.title.is("Последняя цена").width.is(2 * Auxiliary.tapSize)
 				})
 				.left().is(new Numeric().value(5 * Auxiliary.tapSize).when(mode.equals(ShowViewNomenklatura)).otherwise(0))
@@ -559,7 +585,7 @@ public class Activity_NomenclatureNew extends Activity{
 					, searchHistoryByName.value()//
 					, ISearchBy.SEARCH_NAME
 					, false//
-					, true//
+					, true//history
 					, ApplicationHoreca.getInstance().getCurrentAgent().getSkladPodrazdeleniya()//
 					, itemsMaxCount//gridPageSize * 3//
 					//, gridHistory.dataOffset.property.value().intValue()//
@@ -677,7 +703,7 @@ public class Activity_NomenclatureNew extends Activity{
 				}
 			}
 		}
-		System.out.println("requeryGridData done " + itemsData.dumpXML());
+		//System.out.println("requeryGridData done " + itemsData.dumpXML());
 	}
 
 	Intent SetActivityResult(){
@@ -712,7 +738,19 @@ public class Activity_NomenclatureNew extends Activity{
 				resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.VID_SKIDKI, "x'00'");
 				resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.CENA_SO_SKIDKOY, Numeric.string2double(selectedRow.child("Cena").value.property.value()));
 			}
-			resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.MIN_CENA, Numeric.string2double(selectedRow.child("MinCena").value.property.value()));
+			System.out.println(selectedRow.dumpXML());
+			double rowMinCena = Numeric.string2double(selectedRow.child("MinCena").value.property.value());
+			double smartProCena = Numeric.string2double(selectedRow.child("smartprice").value.property.value());
+			System.out.println("rowMinCena "+rowMinCena);
+			System.out.println("smartProCena "+smartProCena);
+			if(smartProCena > 0 && smartProCena >= rowMinCena){
+				System.out.println("set "+smartProCena);
+				resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.MIN_CENA,smartProCena);
+			}else{
+				System.out.println("set "+rowMinCena);
+				resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.MIN_CENA, rowMinCena);
+			}
+			//resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.MIN_CENA, Numeric.string2double(selectedRow.child("MinCena").value.property.value()));
 			resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.MAX_CENA, Numeric.string2double(selectedRow.child("MaxCena").value.property.value()));
 		}
 		resultIntent.putExtra(sweetlife.android10.consts.ITableColumnsNames.SKIDKA, Numeric.string2double(selectedRow.child("Skidka").value.property.value()));
@@ -761,13 +799,13 @@ public class Activity_NomenclatureNew extends Activity{
 		}
 	}
 
-	/*
+
 	void requestPriceNew(){
 		if(selectedRow != null){
 			Vector<String> artikuls = new Vector<String>();
 			artikuls.add(selectedRow.child("Artikul").value.property.value());
 			final Note resultMessage = new Note().value("Проверка цен номенклатуры");
-			Cfg.sendRequestPriceNew(this, artikuls, 9999, resultMessage, new Task(){
+			Cfg.sendRequestPriceNew(this, artikuls, resultMessage, new Task(){
 				public void doTask(){
 					Auxiliary.warn(resultMessage.value(), Activity_NomenclatureNew.this);
 					refreshCategotyGrid();
@@ -777,7 +815,7 @@ public class Activity_NomenclatureNew extends Activity{
 			Auxiliary.warn("Не выбрана номенклатура.", Activity_NomenclatureNew.this);
 		}
 	}
-*/
+
 	/*
 		void toggleStarFilter() {
 			filterByStar.value(!filterByStar.value());
@@ -885,6 +923,7 @@ public class Activity_NomenclatureNew extends Activity{
 				int artikulBackground = 0;
 				int naimenovanieBackGround = 0;
 				int cenaBackground = 0;
+				//int poslednyaBackground = 0;
 				String LastSell = itemsData.children.get(ii).child("LastSell").value.property.value();
 				if(LastSell != null){
 					if(LastSell.length() > 0){
@@ -901,6 +940,7 @@ public class Activity_NomenclatureNew extends Activity{
 						}
 					}
 				}
+
 				double CENA = Numeric.string2double(itemsData.children.get(ii).child("Cena").value.property.value());
 				double MIN_CENA = Numeric.string2double(itemsData.children.get(ii).child("MinCena").value.property.value());
 				double MAX_CENA = Numeric.string2double(itemsData.children.get(ii).child("MaxCena").value.property.value());
@@ -924,6 +964,25 @@ public class Activity_NomenclatureNew extends Activity{
 					maxCenaText = maxCenaText + "/" + ((int)(100.0 * (MAX_CENA - BASE_PRICE) / BASE_PRICE)) + "%";
 				}
 				final String art = itemsData.children.get(ii).child("Artikul").value.property.value();
+//System.out.println(itemsData.dumpXML());
+				String assortime = itemsData.children.get(ii).child("curAssortiment_nomenklatura_idrref").value.property.value();
+				if(assortime.trim().length() < 1){
+					artikulBackground = 0xff666666;
+					tap = new Task(){
+						public void doTask(){
+/*
+							Bough selectedAnalogRow=new Bough();
+							Cfg.promptAnalog(new Task(){
+								public void doTask(){
+									//System.out.println("selectedAnalogRow "+selectedAnalogRow.dumpXML());
+									selectedRow=selectedAnalogRow;
+									returnSelectedRow();
+								}
+							}, selectedAnalogRow,Activity_NomenclatureNew.this, art, ApplicationHoreca.getInstance().getClientInfo().getKod());
+*/
+						}
+					};
+				}
 				final int nn = ii;
 				Task arttap = new Task(){
 					public void doTask(){
@@ -975,6 +1034,7 @@ public class Activity_NomenclatureNew extends Activity{
 				String lastDate = Auxiliary.tryReFormatDate(itemsData.children.get(ii).child("LastSell").value.property.value(), "yyyy-MM-dd", "dd.MM.yy");
 				if(lastDate.length() > 0){
 					columnPosledniaya.cell(lastDate
+
 							, tap
 							, Auxiliary.formatNonEmptyNumber(itemsData.children.get(ii).child("LastPrice").value.property.value(), "р")
 									+ "/" + itemsData.children.get(ii).child("lastSellCount").value.property.value()
@@ -982,6 +1042,7 @@ public class Activity_NomenclatureNew extends Activity{
 				}else{
 					columnPosledniaya.cell(" ", tap, "");
 				}
+				//System.out.println("assortime "+assortime+"/"+art+"/"+itemsData.children.get(ii).child("Naimenovanie").value.property.value());
 			}
 			if(itemsData.children.size() < 10){
 				for(int ii = 0; ii < 10 - itemsData.children.size(); ii++){

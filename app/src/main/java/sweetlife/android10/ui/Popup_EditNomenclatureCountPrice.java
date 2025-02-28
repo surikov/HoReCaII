@@ -301,7 +301,7 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 		btnFixPrice.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v){
-				if(Cfg.noSmartPro(mFoodstaff.getArtikul(),anchor.getContext())){
+				if(Cfg.noSmartPro(mFoodstaff.getArtikul(), anchor.getContext())){
 					saveRow();
 					promptFixPrice(mFoodstaff.getBasePrice());
 					dismiss(0);
@@ -329,25 +329,24 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 		final Numeric cena = new Numeric();
 
 		Calendar today = java.util.Calendar.getInstance();
-		today.set(Calendar.HOUR_OF_DAY,1);
-		today.set(Calendar.MINUTE,1);
-		today.set(Calendar.SECOND,1);
-		today.set(Calendar.MILLISECOND,1);
-		today.add(Calendar.DAY_OF_MONTH,1);
+		today.set(Calendar.HOUR_OF_DAY, 1);
+		today.set(Calendar.MINUTE, 1);
+		today.set(Calendar.SECOND, 1);
+		today.set(Calendar.MILLISECOND, 1);
+		today.add(Calendar.DAY_OF_MONTH, 1);
 		final Numeric fromMs = new Numeric().value((float)today.getTimeInMillis());
 
 		Calendar next = java.util.Calendar.getInstance();
 		next.setTimeInMillis((long)this.fixEndMs);
-		next.set(Calendar.HOUR_OF_DAY,2);
-		next.set(Calendar.MINUTE,2);
-		next.set(Calendar.SECOND,2);
-		next.set(Calendar.MILLISECOND,2);
+		next.set(Calendar.HOUR_OF_DAY, 2);
+		next.set(Calendar.MINUTE, 2);
+		next.set(Calendar.SECOND, 2);
+		next.set(Calendar.MILLISECOND, 2);
 		if(next.before(today)){
 			next.setTimeInMillis(today.getTimeInMillis());
 		}
-		next.add(Calendar.DAY_OF_MONTH,1);
+		next.add(Calendar.DAY_OF_MONTH, 1);
 		final Numeric toMs = new Numeric().value((float)next.getTimeInMillis());
-
 
 
 		//c.add(java.util.Calendar.DAY_OF_MONTH, 1);
@@ -358,12 +357,12 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 		//	to.value(from.value());
 		//}
 		System.out.println("promptFixPrice " + today.getTimeInMillis()
-				+" / "+this.fixEndMs + " / " + fromMs.value().longValue() + " / " + toMs.value().longValue());
+				+ " / " + this.fixEndMs + " / " + fromMs.value().longValue() + " / " + toMs.value().longValue());
 		//final Numeric to = new Numeric().value((float)c.getTimeInMillis());
-		Note cenaLabel=new Note().value("Цена");
+		Note cenaLabel = new Note().value("Цена");
 		cena.afterChange(new Task(){
 			public void doTask(){
-				if(BASE_PRICE>0){
+				if(BASE_PRICE > 0){
 					double nacenka = (100.0 * (cena.value() - BASE_PRICE) / BASE_PRICE);
 					cenaLabel.value("Цена (наценка " + String.format("%.2f", nacenka) + "%)");
 				}else{
@@ -384,23 +383,39 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 				, "Добавить", new Task(){
 					@Override
 					public void doTask(){
-						System.out.println("save");
-						SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
-						String clientID = ApplicationHoreca.getInstance().getClientInfo().getID();
-						ZayavkaNaSkidki mZayavka = new ZayavkaNaSkidki(clientID, mDB);
-						FixedPricesNomenclatureData mFixedPricesNomenclatureData = new FixedPricesNomenclatureData(mDB, mZayavka);
-						mFixedPricesNomenclatureData.newFixedPriceNomenclature(mFoodstaff.getNomenklaturaID(), mFoodstaff.getArtikul(), mFoodstaff.getNomenklaturaNaimenovanie());
-						mFixedPricesNomenclatureData.getNomenclature(0).setCena(cena.value());
-						mFixedPricesNomenclatureData.WriteToDataBase(mDB);
-						java.util.Calendar c1 = java.util.Calendar.getInstance();
-						c1.setTimeInMillis(fromMs.value().longValue());
-						mZayavka.setVremyaNachalaSkidkiPhiksCen(c1.getTime());
-						java.util.Calendar c2 = java.util.Calendar.getInstance();
-						c2.setTimeInMillis(toMs.value().longValue());
-						mZayavka.setVremyaOkonchaniyaSkidkiPhiksCen(c2.getTime());
-						mZayavka.writeToDataBase(mDB);
+						checkSingleFixPrice(cena, fromMs, toMs);
 					}
 				}, null, null, null, null);
+	}
+
+	void checkSingleFixPrice(Numeric cena, Numeric fromMs, Numeric toMs){
+		Cfg.checkFixValid(this.anchor.getContext(), new Task(){
+					public void doTask(){
+						saveSingleFixPrice(cena, fromMs, toMs);
+					}
+				}, mFoodstaff.getArtikul()
+				, ApplicationHoreca.getInstance().getClientInfo().getKod()
+				, Auxiliary.short1cDate.format(new Date(fromMs.value().longValue()))
+				, Auxiliary.short1cDate.format(new Date(toMs.value().longValue()))
+		);
+	}
+
+	void saveSingleFixPrice(Numeric cena, Numeric fromMs, Numeric toMs){
+		System.out.println("save");
+		SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
+		String clientID = ApplicationHoreca.getInstance().getClientInfo().getID();
+		ZayavkaNaSkidki mZayavka = new ZayavkaNaSkidki(clientID, mDB);
+		FixedPricesNomenclatureData mFixedPricesNomenclatureData = new FixedPricesNomenclatureData(mDB, mZayavka);
+		mFixedPricesNomenclatureData.newFixedPriceNomenclature(mFoodstaff.getNomenklaturaID(), mFoodstaff.getArtikul(), mFoodstaff.getNomenklaturaNaimenovanie());
+		mFixedPricesNomenclatureData.getNomenclature(0).setCena(cena.value());
+		mFixedPricesNomenclatureData.WriteToDataBase(mDB);
+		java.util.Calendar c1 = java.util.Calendar.getInstance();
+		c1.setTimeInMillis(fromMs.value().longValue());
+		mZayavka.setVremyaNachalaSkidkiPhiksCen(c1.getTime());
+		java.util.Calendar c2 = java.util.Calendar.getInstance();
+		c2.setTimeInMillis(toMs.value().longValue());
+		mZayavka.setVremyaOkonchaniyaSkidkiPhiksCen(c2.getTime());
+		mZayavka.writeToDataBase(mDB);
 	}
 
 	void promptFixPrice22(){
@@ -433,16 +448,26 @@ public class Popup_EditNomenclatureCountPrice extends BetterPopupWindow{
 
 	private void CheckInputCount(){
 		double count = 0.00D;
-		if(mEditCount.getText().toString().length() != 0){
-			count = Double.parseDouble(mEditCount.getText().toString().replace(',', '.'));
+		try{
+			if(mEditCount.getText().toString().length() != 0){
+				count = Double.parseDouble(mEditCount.getText().toString().replace(',', '.'));
+			}
+		}catch(Throwable t){
+			t.printStackTrace();
+			count = 1.00D;
 		}
 		mEditCount.setText(DecimalFormatHelper.format(mCountHelper.ReCalculateCount(count)));
 	}
 
 	private void rollCount(boolean increase){
 		double count = 0.00D;
-		if(mEditCount.getText().toString().length() != 0){
-			count = Double.parseDouble(mEditCount.getText().toString().replace(',', '.'));
+		try{
+			if(mEditCount.getText().toString().length() != 0){
+				count = Double.parseDouble(mEditCount.getText().toString().replace(',', '.'));
+			}
+		}catch(Throwable t){
+			t.printStackTrace();
+			count = 1;
 		}
 		System.out.println("rollCount " + increase + ": " + count);
 		if(increase){

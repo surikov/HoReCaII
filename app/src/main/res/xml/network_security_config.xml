@@ -3,4 +3,10 @@ https://stackoverflow.com/questions/69335670/cant-send-http-with-axios-even-set-
 -->
 <network-security-config>
 	<base-config cleartextTrafficPermitted="true"></base-config>
+	<domain-config>
+		<domain includeSubdomains="true">serviceb.swlife.ru</domain>
+		<trust-anchors>
+			<certificates src="@raw/swlife_ru_2025_04_05"/>
+		</trust-anchors>
+	</domain-config>
 </network-security-config>

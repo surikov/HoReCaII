@@ -13,7 +13,7 @@ import tee.binding.*;
 import java.net.*;
 import java.util.Vector;
 
-public class Settings {
+public class Settings{
 	//private String LOGS_EMAIL                   = "horeca.logs@gmail.com";
 	//private String LOGS_PASSWORD                = "qwerty12345678";
 	private final static String _SERVICE_APPROVE_ORDER = "ChangeOfOrders.1cws";
@@ -30,6 +30,8 @@ public class Settings {
 	public static int colorSTM = 0xffff66ff;
 	public static int colorTransparent = 0x00000000;
 	public static int colorSmartPro = 0xff00ccff;
+
+	public static boolean pokazatOstatki = false;
 	//private static String _primaryURL = "89.109.7.162";
 	//private  static String _secondaryURL = "95.79.111.216";
 
@@ -40,7 +42,10 @@ public class Settings {
 	//private static String _secondaryFileStoreURL="http://89.109.7.162/";//androbmen/android/Update2.xml";
 	public static String photoURL = "https://files.swlife.ru/photo/";
 
-	private static String _primaryURL = "https://service.swlife.ru";
+	public static boolean useAlternativeService=false;
+	private static String __primaryURL = "https://service.swlife.ru";
+	//private static String __primaryURL = "https://serviceb.swlife.ru";
+	private static String __anotherURL = "https://serviceb.swlife.ru";
 	//private static String _primaryURL = "https://testservice.swlife.ru";
 
 	//private static String _secondaryURL = "https://95.79.111.216";//"http://89.109.7.162";
@@ -64,7 +69,7 @@ public class Settings {
 
 
 	private static String _wsdlDiff = "";
-	private static String _baseURL = _primaryURL;
+	//private static String _baseURL = _primaryURL;
 	private static String _baseFileStoreURL = _primaryFileStoreURL;
 	private static Settings instance = null;
 	private static String _SERVICE_DOLGI_PO_NKLADNIM = "GatDolgi.1cws";
@@ -102,39 +107,56 @@ public class Settings {
 	private String _SERVICE_CONTRACTS_CODES = "wsclientstatus/wsclientstatus12.1cws";
 	private long MINIMAL_FREE_SPACE = 536870912;
 	private int SPY_GPS_PERIOD = 15000;
-	private long MAX_DISTANCE_TO_CLIENT = 100;//123123;
+	public static int MAX_DISTANCE_TO_CLIENT = 100;//123123;
 	private int PERIOD_CLEAR_GPS_DB_DATA = 604800000;
 	private int PERIOD_CLEAR_DB = 604800000;
 
 
-	private Settings() {
+	private Settings(){
 		MakeDefaulPaths();
 		//ReadXMLFile(TABLET_WORKING_DIR + SETTINGS_XML_NAME);
 		loadConfig();
 	}
+
 	/*
 public static sweetlife.android10.R Rres(){
 	sweetlife.android10.R rr= sweetlife.android10.R;
 	return rr;
 }
 */
-	public static Bough check_1C_access() {
+	/*public static  String getServicesURL(){
+		//private static String __primaryURL = "https://service.swlife.ru";
+		//private static String __anotherURL = "https://serviceb.swlife.ru";
+		if(1==1){
+			return __primaryURL;
+		}else{
+			return __anotherURL;
+		}
+	}*/
+	public static Bough check_1C_access(){
 		Bough result = new Bough();
-		try {
+		try{
 			//String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/surikovimei/" + Cfg.device_id();
 			String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/ПроверкаНеобходимостиСменыПароля";
 			System.out.println("check_1C_access " + url);
-			result  = Auxiliary.checkPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+			result = Auxiliary.checkPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 			//result  = Auxiliary.checkPrivateURL(url.trim(), "bot28", "Molgav1024");
 			System.out.println("ПроверкаНеобходимостиСменыПароля " + result.dumpXML());
-		} catch (Throwable t) {
+			url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/ObnovlenieInfo/ПросмотрОстатковДоступен";
+			Bough data = Auxiliary.checkPrivateURL(url.trim(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
+			Bough rr = Bough.parseJSON(data.child("data").value.property.value());
+			System.out.println("rr " + rr.dumpXML());
+			if(rr.child("Результат").value.property.value().equals("true")){
+				pokazatOstatki = true;
+			}
+		}catch(Throwable t){
 			t.printStackTrace();
 			//result=t.getMessage();
 			result.child("exception2").value.is(t.getMessage());
 		}
 		return result;
 	}
-
+/*
 	public static long checkPrimaryAccess(Activity a) {
 		long time = -1;
 		try {
@@ -149,17 +171,17 @@ public static sweetlife.android10.R Rres(){
 			t.printStackTrace();
 		}
 		return time;
-	}
+	}*/
 
-	public static String selectedBase1C() {
+	public static String selectedBase1C(){
 		return Settings.getInstance()._base1c;
 	}
 
-	public static String selectedWSDL() {
+	public static String selectedWSDL(){
 		return Settings.getInstance()._wsdlDiff;
 	}
 
-	public static int ndsById(String id) {
+	public static int ndsById(String id){
 		/*
 		18%: 9701531aae7e29e1418d1fb94bb4dd8d
 		18% / 118%: 896ebdc306e4395048a15e1001835fd3
@@ -170,68 +192,69 @@ public static sweetlife.android10.R Rres(){
 		20%: 96a72e469df2a8df4f5bf008c2577b7d
 		20% / 120%: b751b731d8b9680e4f36dcf6accbc9bd
 		 */
-		if (id.equals("9701531aae7e29e1418d1fb94bb4dd8d")) {
+		if(id.equals("9701531aae7e29e1418d1fb94bb4dd8d")){
 			return 18;
 		}
-		if (id.equals("896ebdc306e4395048a15e1001835fd3")) {
+		if(id.equals("896ebdc306e4395048a15e1001835fd3")){
 			return 18;
 		}
-		if (id.equals("8c35d1aa082d09c449482233639cb5dc")) {
+		if(id.equals("8c35d1aa082d09c449482233639cb5dc")){
 			return 10;
 		}
-		if (id.equals("8267317daeb1c9804a93e2accba8ba62")) {
+		if(id.equals("8267317daeb1c9804a93e2accba8ba62")){
 			return 10;
 		}
-		if (id.equals("805878f21622004e4e02ce8f6dfd246a")) {
+		if(id.equals("805878f21622004e4e02ce8f6dfd246a")){
 			return 0;
 		}
-		if (id.equals("8540419f4ca125b141cfbf05c518610d")) {
+		if(id.equals("8540419f4ca125b141cfbf05c518610d")){
 			return 0;
 		}
-		if (id.equals("96a72e469df2a8df4f5bf008c2577b7d")) {
+		if(id.equals("96a72e469df2a8df4f5bf008c2577b7d")){
 			return 20;
 		}
-		if (id.equals("b751b731d8b9680e4f36dcf6accbc9bd")) {
+		if(id.equals("b751b731d8b9680e4f36dcf6accbc9bd")){
 			return 20;
 		}
 		return 0;
 	}
 
-	public static Bough cfg() {
+	public static Bough cfg(){
 		return getInstance().configuration;
 	}
 
-	static void loadConfig() {
+	static void loadConfig(){
 		//System.out.println("Settings.configuration: loadConfig");
 		configuration = null;//new Bough();
-		try {
+		try{
 			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/Horeca2.xml";
 			System.out.println("loadConfig from " + path);
 			File file = new File(path);
 			Vector<String> strings = Auxiliary.readTextFromFile(file);
 			String xml = Auxiliary.strings2text(strings);
 			System.out.println("configuration is " + xml);
-			try {
+			try{
 				configuration = Bough.parseXML(xml);
-			} catch (Throwable t) {
+			}catch(Throwable t){
 				t.printStackTrace();
 			}
-		} catch (Throwable t) {
+		}catch(Throwable t){
 			t.printStackTrace();
 		}
-		if (configuration == null) {
+		if(configuration == null){
 			configuration = new Bough();
 		}
 		//System.out.println("Settings.configuration: " + configuration.dumpXML());
+		/*
 		try {
 			String xml = Auxiliary.strings2text(Auxiliary.readTextFromFile(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/horeca/Horeca2ip.xml")));
 			Bough baseIP = Bough.parseXML(xml);
 			if (baseIP.child("primary").value.property.value().trim().length() > 1) {
 				_primaryURL = baseIP.child("primary").value.property.value().trim();
 			}
-			/*if (baseIP.child("secondary").value.property.value().trim().length() > 1) {
+			/if (baseIP.child("secondary").value.property.value().trim().length() > 1) {
 				_secondaryURL = baseIP.child("secondary").value.property.value().trim();
-			}*/
+			}/
 			if (baseIP.child("base1C").value.property.value().trim().length() > 1) {
 				_base1c = baseIP.child("base1C").value.property.value().trim();
 			}
@@ -241,48 +264,82 @@ public static sweetlife.android10.R Rres(){
 			_baseURL = _primaryURL;
 		} catch (Throwable t) {
 			t.printStackTrace();
-		}
+		}*/
 	}
 
-	public static Settings getInstance() {
-		if (instance == null) {
+	public static Settings getInstance(){
+		if(instance == null){
 			instance = new Settings();
 		}
 		return instance;
 	}
-/*
-	public void setPrimaryURL() {
-		_baseURL = _primaryURL;
-		_baseFileStoreURL = _primaryFileStoreURL;
-		//System.out.println("Settings.baseURL " + Settings._baseURL);
-		isPrimaryGate = true;
-	}
 
-	public void setSecondaryURL() {
-		_baseURL = _secondaryURL;
-		_baseFileStoreURL = _secondaryFileStoreURL;
-		//System.out.println("Settings.baseURL " + Settings._baseURL);
-		isPrimaryGate = false;
-	}
-*/
-	public String getBaseURL() {
+	/*
+		public void setPrimaryURL() {
+			_baseURL = _primaryURL;
+			_baseFileStoreURL = _primaryFileStoreURL;
+			//System.out.println("Settings.baseURL " + Settings._baseURL);
+			isPrimaryGate = true;
+		}
+
+		public void setSecondaryURL() {
+			_baseURL = _secondaryURL;
+			_baseFileStoreURL = _secondaryFileStoreURL;
+			//System.out.println("Settings.baseURL " + Settings._baseURL);
+			isPrimaryGate = false;
+		}
+	*/
+	public String getBaseURL(){
 		/*if(Cfg.hrcPersonalLogin==null) {
 			return "http://" + _baseURL + "/";
 		}else{
 			return "http://" + _secondaryURL + "/";
 		}*/
 		//return "http://" + _baseURL + "/";
-		return "" + _baseURL + "/";
+		//return "" + _baseURL + "/";
+		System.out.println("getBaseURL for '" + Cfg.whoCheckListOwner() + "'");
+		if(
+				useAlternativeService
+				//1 == 1
+						//|| Cfg.whoCheckListOwner().equals("supernn2_hrc")
+						//|| Cfg.whoCheckListOwner().equals("bot28")
+				/*
+				Cfg.whoCheckListOwner().equals("bot28")
+						|| Cfg.whoCheckListOwner().equals("hrc29")
+						|| Cfg.whoCheckListOwner().equals("hrc28")
+						|| Cfg.whoCheckListOwner().equals("hrc210")
+						|| Cfg.whoCheckListOwner().equals("hrc23")
+						|| Cfg.whoCheckListOwner().equals("hrc213")
+						|| Cfg.whoCheckListOwner().equals("hrc27")
+						|| Cfg.whoCheckListOwner().equals("hrc511")
+						|| Cfg.whoCheckListOwner().equals("hrc634")
+						|| Cfg.whoCheckListOwner().equals("hrc212")
+						|| Cfg.whoCheckListOwner().equals("hrc22")
+						|| Cfg.whoCheckListOwner().equals("hrc25")
+						|| Cfg.whoCheckListOwner().equals("hrc229")
+						|| Cfg.whoCheckListOwner().equals("hrc211")
+						|| Cfg.whoCheckListOwner().equals("hrc26")
+						|| Cfg.whoCheckListOwner().equals("hrc268")
+						|| Cfg.whoCheckListOwner().equals("supernn2_hrc")
+						|| Cfg.whoCheckListOwner().equals("supernn_hrc")
+				*/
+
+		){
+			return __anotherURL + "/";
+		}else{
+			return __primaryURL + "/";
+		}
 	}
 
-	public String getBaseFileStoreURL() {
+	public String getBaseFileStoreURL(){
 		return _baseFileStoreURL;
 	}
 
-	public String getBaseIP() {
-		return "service.swlife.ru";
-	}
-
+	/*
+		public String getBaseIP() {
+			return "service.swlife.ru";
+		}
+	*/
 	/*public boolean update() {
 		boolean result = false;
 		BackupFile();
@@ -298,7 +355,7 @@ public static sweetlife.android10.R Rres(){
 		RemoveFile(TABLET_RESERVE_DIR + SETTINGS_XML_NAME);
 		return result;
 	}*/
-	private void MakeDefaulPaths() {
+	private void MakeDefaulPaths(){
 		new File(TABLET_WORKING_DIR).mkdirs();
 		new File(TABLET_RESERVE_DIR).mkdirs();
 		new File(TABLET_DELTA_DIR).mkdirs();
@@ -379,86 +436,86 @@ public static sweetlife.android10.R Rres(){
 		}
 		return false;
 	}*/
-	public int getFTP_PORT() {
+	public int getFTP_PORT(){
 		return FTP_PORT;
 	}
 
-	public void setFTP_PORT(int value) {
+	public void setFTP_PORT(int value){
 		FTP_PORT = value;
 	}
 
-	public String getFTP_SERVER() {
+	public String getFTP_SERVER(){
 		return FTP_SERVER;
 	}
 
-	public void setFTP_SERVER(String value) {
+	public void setFTP_SERVER(String value){
 		FTP_SERVER = value;
 	}
 
-	public String getFTP_USER() {
+	public String getFTP_USER(){
 		return FTP_USER;
 	}
 
-	public void setFTP_USER(String value) {
+	public void setFTP_USER(String value){
 		FTP_USER = value;
 	}
 
-	public String getFTP_PASSWORD() {
+	public String getFTP_PASSWORD(){
 		return FTP_PASSWORD;
 	}
 
-	public void setFTP_PASSWORD(String value) {
+	public void setFTP_PASSWORD(String value){
 		FTP_PASSWORD = value;
 	}
 
-	public String getFTP_PATH() {
+	public String getFTP_PATH(){
 		return FTP_PATH;
 	}
 
-	public void setFTP_PATH(String value) {
+	public void setFTP_PATH(String value){
 		FTP_PATH = value;
 	}
 
-	public String getFTP_DELTA_NAME() {
+	public String getFTP_DELTA_NAME(){
 		return FTP_DELTA_NAME;
 	}
 
-	public void setFTP_DELTA_NAME(String value) {
+	public void setFTP_DELTA_NAME(String value){
 		FTP_DELTA_NAME = value;
 	}
 
-	public String getUPDATE_XML_NAME() {
+	public String getUPDATE_XML_NAME(){
 		return UPDATE_XML_NAME;
 	}
 
 	/*public String getSETTINGS_XML_NAME() {
 		return SETTINGS_XML_NAME;
 	}*/
-	public String getSERVICE_DOLGI_PO_NKLADNIM() {
+	public String getSERVICE_DOLGI_PO_NKLADNIM(){
 		return _SERVICE_DOLGI_PO_NKLADNIM;
 	}
 
-	public String getAPPLICATION_NAME() {
+	public String getAPPLICATION_NAME(){
 		return APPLICATION_NAME;
 	}
 
-	public String getTABLET_WORKING_DIR() {
+	public String getTABLET_WORKING_DIR(){
 		return TABLET_WORKING_DIR;
 	}
 
-	public String getTABLET_RESERVE_DIR() {
+	public String getTABLET_RESERVE_DIR(){
 		return TABLET_RESERVE_DIR;
 	}
 
-	public String getTABLET_DELTA_DIR() {
+	public String getTABLET_DELTA_DIR(){
 		return TABLET_DELTA_DIR;
 	}
 
-	public String getTABLET_DATABASE_FILE() {
+	public String getTABLET_DATABASE_FILE(){
 		return TABLET_DATABASE_FILE;
 	}
 
-	public String getTABLET_LOGGING_FILE() {
+	public String getTABLET_LOGGING_FILE(){
 		return TABLET_LOGGING_FILE;
 	}
 
@@ -483,21 +540,21 @@ public static sweetlife.android10.R Rres(){
 			LOGS_PASSWORD = value;
 		}
 	*/
-	public String getSERVICE_ORDERS() {
+	public String getSERVICE_ORDERS(){
 		return getBaseURL() + _SERVICE_ORDERS;
 	}
 
 	/*public void setSERVICE_ORDERS(String value) {
 		SERVICE_ORDERS = value;
 	}*/
-	public String getSERVICE_CLIENTS_STATUS() {
+	public String getSERVICE_CLIENTS_STATUS(){
 		return getBaseURL() + _SERVICE_CLIENTS_STATUS;
 	}
 
 	/*public void setSERVICE_CLIENTS_STATUS(String value) {
 		SERVICE_CLIENTS_STATUS = value;
 	}*/
-	public String getSERVICE_AVAILABLE_AMOUNT() {
+	public String getSERVICE_AVAILABLE_AMOUNT(){
 		return getBaseURL() + _SERVICE_AVAILABLE_AMOUNT;
 	}
 
@@ -510,92 +567,92 @@ public static sweetlife.android10.R Rres(){
 	/*public void setSERVICE_GPS_POINTS(String value) {
 		SERVICE_GPS_POINTS = value;
 	}*/
-	public String getSERVICE_VIZITS() {
+	public String getSERVICE_VIZITS(){
 		return getBaseURL() + _SERVICE_VIZITS;
 	}
 
 	/*public void setSERVICE_VIZITS(String value) {
 		SERVICE_VIZITS = value;
 	}*/
-	public String getSERVICE_RETURNS() {
+	public String getSERVICE_RETURNS(){
 		return getBaseURL() + _SERVICE_RETURNS;
 	}
 
 	/*public void setSERVICE_RETURNS(String value) {
 		SERVICE_RETURNS = value;
 	}*/
-	public String getSERVICE_APPROVE_ORDER() {
+	public String getSERVICE_APPROVE_ORDER(){
 		return getBaseURL() + _SERVICE_APPROVE_ORDER;
 	}
 
 	/*public  String getSERVICE_DOLGI_PO_NKLADNIM() {
 		return SERVICE_DOLGI_PO_NKLADNIM;
 	}*/
-	public String getSERVICE_FIXED_PRICES() {
+	public String getSERVICE_FIXED_PRICES(){
 		return getBaseURL() + _SERVICE_FIXED_PRICES;
 	}
 
 	/*public void setSERVICE_FIXED_PRICES(String value) {
 		SERVICE_FIXED_PRICES = value;
 	}*/
-	public String getSERVICE_DISPOSALS() {
+	public String getSERVICE_DISPOSALS(){
 		return getBaseURL() + _SERVICE_DISPOSALS;
 	}
 
 	/*public void setSERVICE_DISPOSALS(String value) {
 		SERVICE_DISPOSALS = value;
 	}*/
-	public String getSERVICE_REPORTS() {
+	public String getSERVICE_REPORTS(){
 		return getBaseURL() + _SERVICE_REPORTS;
 	}
 
 	/*public void setSERVICE_REPORTS(String value) {
 		SERVICE_REPORTS = value;
 	}*/
-	public String getSERVICE_CONTRACTS_CODES() {
+	public String getSERVICE_CONTRACTS_CODES(){
 		return getBaseURL() + _SERVICE_CONTRACTS_CODES;
 	}
 
 	/*public void setSERVICE_CONTRACTS_CODES(String value) {
 		SERVICE_CONTRACTS_CODES = value;
 	}*/
-	public long getMINIMAL_FREE_SPACE() {
+	public long getMINIMAL_FREE_SPACE(){
 		return MINIMAL_FREE_SPACE;
 	}
 
-	public void setMINIMAL_FREE_SPACE(long value) {
+	public void setMINIMAL_FREE_SPACE(long value){
 		MINIMAL_FREE_SPACE = value;
 	}
 
-	public int getSPY_GPS_PERIOD() {
+	public int getSPY_GPS_PERIOD(){
 		return SPY_GPS_PERIOD;
 	}
 
-	public void setSPY_GPS_PERIOD(int value) {
+	public void setSPY_GPS_PERIOD(int value){
 		SPY_GPS_PERIOD = value;
 	}
-
+/*
 	public long getMAX_DISTANCE_TO_CLIENT() {
 		return MAX_DISTANCE_TO_CLIENT;
 	}
 
 	public void setMAX_DISTANCE_TO_CLIENT(long value) {
 		MAX_DISTANCE_TO_CLIENT = value;
-	}
+	}*/
 
-	public int getPERIOD_CLEAR_GPS_DB_DATA() {
+	public int getPERIOD_CLEAR_GPS_DB_DATA(){
 		return PERIOD_CLEAR_GPS_DB_DATA;
 	}
 
-	public void setPERIOD_CLEAR_GPS_DB_DATA(int value) {
+	public void setPERIOD_CLEAR_GPS_DB_DATA(int value){
 		PERIOD_CLEAR_GPS_DB_DATA = value;
 	}
 
-	public int getPERIOD_CLEAR_DB() {
+	public int getPERIOD_CLEAR_DB(){
 		return PERIOD_CLEAR_DB;
 	}
 
-	public void setPERIOD_CLEAR_DB(int value) {
+	public void setPERIOD_CLEAR_DB(int value){
 		PERIOD_CLEAR_DB = value;
 	}
 	/*

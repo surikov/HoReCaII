@@ -756,6 +756,7 @@ public class ActivityMatricaEdit extends Activity{
 		Vector<Bough> rows;
 		String sql;
 		if(ZapolnitResponse){
+			//System.out.println("insert from " + data.dumpXML());
 			//rows = data.child("soap:Body").child("m:ZapolnitResponse").child("m:return").child("m:Plan");
 			rows = data.children("Plan");
 			Calendar probe = new GregorianCalendar(2013 + periodYear.value().intValue(), periodMonth.value().intValue(), 1);

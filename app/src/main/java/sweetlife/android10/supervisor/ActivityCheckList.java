@@ -210,7 +210,8 @@ public class ActivityCheckList extends Activity {
 			Auxiliary.warn("GPS данные недоступны.", ActivityCheckList.this);
 			return false;
 		}
-		if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
+		//if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()) {
+			if(distanceToClient > Settings.MAX_DISTANCE_TO_CLIENT) {
 			//if (distanceToClient > 203000) {
 			Auxiliary.warn("Удаление от контрагента " + distanceToClient + " метров.", ActivityCheckList.this);
 			return false;

@@ -103,6 +103,7 @@ public class ActivityOdnaAnketa extends Activity{
 
 	Toggle DogovorEDO = new Toggle();
 	Note OGRN = new Note();
+	Note GUIDMercury= new Note();
 	Numeric OsnovaniePodpisi = new Numeric();
 	RedactSingleChoice choiceOsnovaniePodpisi;
 
@@ -556,7 +557,7 @@ public class ActivityOdnaAnketa extends Activity{
 				+ ", DogovorEDO as DogovorEDO"
 				+ ", OGRN as OGRN"
 				+ ", OsnovaniePodpisi as OsnovaniePodpisi"
-
++", mercury as mercury"
 				+ " from AnketaKlienta where _id=" + _id//
 				;
 		Bough data = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
@@ -579,7 +580,7 @@ public class ActivityOdnaAnketa extends Activity{
 		DogovorEDO.value(data.child("row").child("DogovorEDO").value.property.value().equals("1") ? true : false);
 		OsnovaniePodpisi.value(Numeric.string2double(data.child("row").child("OsnovaniePodpisi").value.property.value()));
 		OGRN.value(data.child("row").child("OGRN").value.property.value());
-
+		GUIDMercury.value(data.child("row").child("mercury").value.property.value());
 
 		UrFizLico.value(Numeric.string2double(data.child("row").child("UrFizLico").value.property.value()));
 		FizOther.value(data.child("row").child("FizOther").value.property.value());
@@ -876,6 +877,7 @@ public class ActivityOdnaAnketa extends Activity{
 				+ ", DogovorEDO= " + (DogovorEDO.value() ? "1" : "0") //
 				+ ", OsnovaniePodpisi= " + OsnovaniePodpisi.value().intValue() //
 				+ ", OGRN= '" + OGRN.value() + "'"//
+				+ ", mercury= '" + GUIDMercury.value() + "'"
 
 				+ "\n where _id=" + _id + ";";
 		System.out.println(sql);
@@ -1000,6 +1002,8 @@ public class ActivityOdnaAnketa extends Activity{
 				+ ", DogovorEDO"
 				+ ", OsnovaniePodpisi"
 				+ ", OGRN"
+				+ ", mercury"
+
 				+ "\n) values ("
 				+ "\n'" + num1c.value() + "'"//
 				+ ", '" + Cfg.kodPodrazdeleni(Podrazdelenie.value().intValue()) + "'"
@@ -1045,6 +1049,8 @@ public class ActivityOdnaAnketa extends Activity{
 				+ ", " + (DogovorEDO.value() ? "1" : "0") //
 				+ ", " + OsnovaniePodpisi.value().intValue() //
 				+ ", '" + OGRN.value() + "'"//
+				+ ", '" + GUIDMercury.value() + "'"
+
 				//+ ", '" + (NuzhenPropusk.value() ? "1" : "0") + "~" + (BezPechati.value() ? "1" : "0")+"'"
 				+ "\n );";
 		System.out.println(sql);
@@ -1145,6 +1151,8 @@ public class ActivityOdnaAnketa extends Activity{
 				+ "\n					,\"Kommentarii\":\"" + quoteSafe(Komentariy.value()) + "\""
 				+"\n					,\"DogovorEDO\":\"" + (DogovorEDO.value() ? "true" : "false") + "\""
 				+"\n					,\"OGRN\":\"" + quoteSafe(OGRN.value()) + "\""
+				+"\n					,\"mercury\":\"" + quoteSafe(GUIDMercury.value()) + "\""
+
 				+"\n					,\"OsnovaniePodpisi\":\"" + txtOsnovaniePodpisi + "\""
 				;
 		if(contacts.children.size() > 0){
@@ -1713,6 +1721,7 @@ public class ActivityOdnaAnketa extends Activity{
 				.item("Приказ")
 		;
 		layoutless.field(this, 35, "Основание подписи", choiceOsnovaniePodpisi, 10 * Auxiliary.tapSize);
+		layoutless.field(this, 36, "GUID Меркурия", new RedactText(this).text.is(GUIDMercury), 10 * Auxiliary.tapSize);
 
 		layoutless.innerHeight.is(0.8 * 45 * Auxiliary.tapSize);
 
@@ -1729,7 +1738,7 @@ public class ActivityOdnaAnketa extends Activity{
 				.center.is(true)//
 				.width().is(layoutless.width().property)//
 				.height().is(4 * Auxiliary.tapSize)//
-				.top().is(layoutless.shiftY.property.plus(0.8 * 36 * Auxiliary.tapSize)));
+				.top().is(layoutless.shiftY.property.plus(0.8 * 37 * Auxiliary.tapSize)));
 		//setData();
 		Bundle bundle = getIntent().getExtras();
 

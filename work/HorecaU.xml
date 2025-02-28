@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
 <user><hrc>kazan</hrc><label>Казань</label></user><!--  /  /  / Казань -->
-<user><hrc>moscow4</hrc><label>Москва VIP.</label></user><!--  /  / Москва / Москва  Север -->
-<user><hrc>moscow3</hrc><label>Москва  Юг</label></user><!--  /  / Москва / Москва  Юг -->
+<user><hrc>moscow4</hrc><label>Москва VIP.</label></user>
+<user><hrc>moscow5</hrc><label>Москва  Юг</label></user><!--  /  / Москва / Москва  Юг -->
 <user><hrc>moscow2</hrc><label>Москва Север.</label></user>
 <user><hrc>oblast</hrc><label>Н.Новгород</label></user><!--  /  /  / Область -->
 <user><hrc>region1</hrc><label>Чувашия</label></user><!--  /  /  / Регионы 1 -->
 <user><hrc>region2</hrc><label>Саранск</label></user><!--  /  /  / Регионы 2 -->
 <user><hrc>region3</hrc><label>Владимир</label></user><!--  /  /  / Регионы 3 -->
 <user><hrc>south</hrc><label>Юг</label></user><!--  /  /  / Юг -->
+<!--
 <user><hrc>supermvz_hrc</hrc><label>Москва VIP Центр</label></user><!--  / Москва / Москва VIP Центр / Москва VIP Центр   -->
-<!--<user><hrc>supervip_hrc</hrc><label>VIP и госзаказчики</label></user>-->
+<user><hrc>supervip_hrc</hrc><label>VIP и госзаказчики</label></user>-->
 <user><hrc>spb</hrc><label>Санкт-Петербург</label></user>
 <user><hrc>tula</hrc><label>Тула</label></user>
 <user><hrc>region_c</hrc><label>VIP+Госзаказчики</label></user>

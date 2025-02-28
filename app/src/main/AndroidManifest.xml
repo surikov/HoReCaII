@@ -18,6 +18,7 @@
 
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.CAMERA" />
+
 	<uses-feature android:name="android.hardware.camera.autofocus" />
 
 	<uses-feature
@@ -26,8 +27,6 @@
 	<uses-feature
 		android:name="android.hardware.location.network"
 		android:required="false" />
-
-
 
 
 	<application
@@ -42,6 +41,9 @@
 
 		android:theme="@style/AppTheme"
 		android:usesCleartextTraffic="true">
+		<meta-data
+			android:name="com.google.firebase.messaging.default_notification_channel_id"
+			android:value="swlifechannelid" />
 		<!--
 	<application
 		android:name="sweetlife.android10.ApplicationHoreca"
@@ -71,10 +73,12 @@
 			android:exported="false"></service>
 		<receiver
 			android:name="sweetlife.android10.SweetStart"
+			android:permission="com.google.android.c2dm.permission.SEND"
 			android:enabled="true"
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="com.google.android.c2dm.intent.RECEIVE" />
 			</intent-filter>
 		</receiver>
 		<!--
@@ -99,6 +103,7 @@
 
 		<service
 			android:name="sweetlife.android10.HRCFirebaseMessagingService"
+
 			android:exported="false">
 			<intent-filter>
 				<action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -143,9 +148,11 @@
 			android:name="sweetlife.android10.ui.Activity_Bid"
 			android:screenOrientation="userLandscape"
 			android:windowSoftInputMode="stateHidden" />
+		<!--
 		<activity
 			android:name="sweetlife.android10.ui.Activity_BidsContractsEtc"
 			android:screenOrientation="userLandscape" />
+			-->
 		<activity
 			android:name="sweetlife.android10.ui.Activity_BidsContractsEtc_2"
 			android:screenOrientation="userLandscape" />
@@ -460,6 +467,9 @@
 		<activity
 			android:name="sweetlife.android10.ui.UploadOrderResult"
 			android:label="..."
+			android:screenOrientation="userLandscape" />
+		<activity
+			android:name="sweetlife.android10.ui.Activity_PoiskNomenklatury"
 			android:screenOrientation="userLandscape" />
 	</application>
 </manifest>

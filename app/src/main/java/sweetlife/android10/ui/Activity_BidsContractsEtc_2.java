@@ -3,6 +3,7 @@ package sweetlife.android10.ui;
 import android.app.*;
 //import android.app.Activity;
 import android.content.*;
+import android.net.*;
 import android.os.*;
 import android.view.*;
 
@@ -24,6 +25,7 @@ import reactive.ui.*;
 
 import android.database.sqlite.*;
 
+import java.io.*;
 import java.text.*;
 import java.util.*;
 import java.util.TimeZone;
@@ -53,7 +55,7 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 	MenuItem menuKlientPeople;
 	//MenuItem menuObratnayaSvyazKlient;
 
-	MenuItem menuSklad;
+	//MenuItem menuSklad;
 
 	MenuItem menuSendLimit;
 	MenuItem menuClearFixPrice;
@@ -99,6 +101,7 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 		menuKlientPeople = menu.add("Контактные лица клиента");
 		menuObnoIstoria = menu.add("Обновить историю");
 		//menuObratnayaSvyazKlient = menu.add("Обратная связь от клиента");
+
 		menuOtchety = menu.add("Отчёты");
 		menuPechati = menu.add("Печати контрагента");
 		menuShoMap = menu.add("Показать на карте");
@@ -176,10 +179,10 @@ public class Activity_BidsContractsEtc_2 extends Activity{
             promptRequestMailList(this, new Vector<String>());
             return true;
         }*/
-		if(item == menuSklad){
+		/*if(item == menuSklad){
 			doRequestSklad();
 			return true;
-		}
+		}*/
 
 		if(item == menuSendLimit){
 			promptLimit();
@@ -191,6 +194,8 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 			return true;
 		}
 */
+
+
 		if(item == menuClearFixPrice){
 			promptDeleteFixPrices();
 			return true;
@@ -239,30 +244,48 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 		return false;
 	}
 
-	void showQRwarning(String action,String title){
+	void showQRwarning(String action, String dateTime, String title){
 		System.out.println("doQRTest");
-		String link="https://portal.swlife-horeca.ru/account/checklists/checklist/"
-				+"?type=audit_territorii"
-				+"&action="+action
-				+"&client_id="+ApplicationHoreca.getInstance().getClientInfo().getKod()
-				+"&trader_id="+Cfg.whoCheckListOwner();
-		System.out.println("showQRwarning "+link);
 		SubLayoutless subLayoutless = new SubLayoutless(this);
-		subLayoutless
-				.child(new Decor(this)
-						//.labelText.is(title)
-						.sketch(new SketchQRcode()
-								.size.is(6 * Auxiliary.tapSize)
-								.text.is(link)
-						)
-						.left().is(1 * Auxiliary.tapSize)
-						.top().is(0.5 * Auxiliary.tapSize)
-						.width().is(6 * Auxiliary.tapSize)
-						.height().is(6 * Auxiliary.tapSize)
-				)
-				.width().is(Auxiliary.tapSize * 8)
-				.height().is(Auxiliary.tapSize * 9)
-		;
+		try{
+			//https://portal.swlife-horeca.ru/account/checklists/checklist/?type=audit_territorii&action=[open|close]&client_id=[код_клиента]&client_name=[наименование_клиента]&trader_id=[код_тп]&trader_name=[фио_тп]&division_id=[код_территории]&division_name=[наименование_территории]
+			SQLiteDatabase mDB = ApplicationHoreca.getInstance().getDataBase();
+			String sql = "select naimenovanie as name from Polzovateli where kod='" + Cfg.whoCheckListOwner() + "';";
+			String fio = Auxiliary.fromCursor(mDB.rawQuery(sql, null)).child("row").child("name").value.property.value();
+			sql = "select pp.kod as podkod,pp.naimenovanie as podname from Kontragenty kk join Podrazdeleniya pp on kk.podrazdelenie=pp._idrref where kk.kod='" + ApplicationHoreca.getInstance().getClientInfo().getKod() + "';";
+			sql = "select pod.kod as podkod,pod.naimenovanie as podname from Polzovateli pz join Podrazdeleniya pod on pz.podrazdelenie=pod._idrref where pz.kod='" + Cfg.whoCheckListOwner() + "';";
+			String podkod = Auxiliary.fromCursor(mDB.rawQuery(sql, null)).child("row").child("podkod").value.property.value();
+			String podname = Auxiliary.fromCursor(mDB.rawQuery(sql, null)).child("row").child("podname").value.property.value();
+			String link = "https://portal.swlife-horeca.ru/account/checklists/checklist/"
+					+ "?type=audit_territorii"
+					+ "&action=" + action
+					+ "&datetime=" + java.net.URLEncoder.encode(dateTime, java.nio.charset.StandardCharsets.UTF_8.toString())
+					+ "&client_id=" + ApplicationHoreca.getInstance().getClientInfo().getKod()
+					+ "&client_name=" + java.net.URLEncoder.encode(ApplicationHoreca.getInstance().getClientInfo().getName(), java.nio.charset.StandardCharsets.UTF_8.toString())
+					+ "&trader_id=" + Cfg.whoCheckListOwner()
+					+ "&trader_name=" + java.net.URLEncoder.encode(fio, java.nio.charset.StandardCharsets.UTF_8.toString())
+					+ "&division_id=" + podkod
+					+ "&division_name=" + java.net.URLEncoder.encode(podname, java.nio.charset.StandardCharsets.UTF_8.toString());
+			;
+			System.out.println("showQRwarning " + link);
+			subLayoutless
+					.child(new Decor(this)
+							//.labelText.is(title)
+							.sketch(new SketchQRcode()
+									.size.is(6 * Auxiliary.tapSize)
+									.text.is(link)
+							)
+							.left().is(1 * Auxiliary.tapSize)
+							.top().is(0.5 * Auxiliary.tapSize)
+							.width().is(6 * Auxiliary.tapSize)
+							.height().is(6 * Auxiliary.tapSize)
+					)
+					.width().is(Auxiliary.tapSize * 8)
+					.height().is(Auxiliary.tapSize * 9)
+			;
+		}catch(Throwable t){
+			t.printStackTrace();
+		}
 		Auxiliary.pick(this, title, subLayoutless, null, null, null, null, null, null);
 	}
 
@@ -397,16 +420,27 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 		Auxiliary.pickSingleChoice(this, listItems, defaultSelection, title, afterSelect, positiveButtonTitle, callbackPositiveBtn, null, null);
 	}
 
-	/*
-		@SuppressWarnings("deprecation")
-		@Override
-		public void onActivityResult(int requestCode, int resultCode, Intent data){
-			System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + data);
-			super.onActivityResult(requestCode, resultCode, data);
-			String filePath = null;
-			Uri uri = null;
-			if(resultCode == RESULT_OK){
-				switch(requestCode){
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent){
+		System.out.println("onActivityResult " + requestCode + "/" + resultCode + "/" + intent);
+		super.onActivityResult(requestCode, resultCode, intent);
+		//String filePath = null;
+		//Uri uri = null;
+		if(resultCode == RESULT_OK){
+			//switch(requestCode){
+				/*case FILE_SELECT_RESULT123:
+					Uri uri = intent.getData();
+					String path = Auxiliary.pathForMediaURI(this, uri);
+					if(path != null && path.length() > 5){
+						dogovorFiles.add(path);
+					}else{
+						Auxiliary.warn("Выберите файл из памяти устройства. Невозможно присоединить " + uri, this);
+					}
+					promptOtpravitDogovor();
+					break;*/
+					/*
 					case System.out.println(data.dumpXML());:
 						uri = data.getData();
 						filePath = Auxiliary.pathForMediaURI(this, uri);
@@ -425,10 +459,11 @@ public class Activity_BidsContractsEtc_2 extends Activity{
 						}
 						tovarObratnayaSvyazKlient.value(filePath);
 						break;
-				}
-			}
+						*/
+			//}
 		}
-	*/
+	}
+
 	void promptRassylkaSchetovNaOplatu(){
 		final Vector<Bough> items = new Vector<Bough>();
 		new Expect().task.is(new Task(){
@@ -837,7 +872,11 @@ I/System.out: </>
 	}
 
 	public void resetTitle(){
-		setTitle(ApplicationHoreca.getInstance().getClientInfo().getName() + " (долги по накладным: " + ApplicationHoreca.getInstance().getClientInfo().dolgMessage + ")");
+		setTitle(ApplicationHoreca.getInstance().getClientInfo().getKod()
+				+ ": "
+				+ ApplicationHoreca.getInstance().getClientInfo().getName()
+				+ " (долги по накладным: " + ApplicationHoreca.getInstance().getClientInfo().dolgMessage
+				+ ")");
 	}
 
 	void doRequestSklad(){
@@ -1303,7 +1342,7 @@ I/System.out: </>
 		layoutless.child(new Knob(this).afterTap.is(new Task(){
 							@Override
 							public void doTask(){
-								if(gpsTimeExists60())
+								//if(gpsTimeExists60())
 									beginVizitButtonClick();
 							}
 						})//
@@ -1315,12 +1354,24 @@ I/System.out: </>
 		layoutless.child(new Knob(this).afterTap.is(new Task(){
 							@Override
 							public void doTask(){
-								if(mojnoZakrytVizit()){
+								/*if(mojnoZakrytVizit()){
 									endVizitCasePrompt();
-								}
+								}*/
+								mojnoZakrytVizit();
 							}
 						})//
 						.labelText.is("Конец визита").left().is(3 * Auxiliary.tapSize)//
+						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
+						.width().is(3 * Auxiliary.tapSize)//
+						.height().is(1 * Auxiliary.tapSize)//
+		);
+		layoutless.child(new Knob(this).afterTap.is(new Task(){
+							@Override
+							public void doTask(){
+								qrVizitButtonClick();
+							}
+						})//
+						.labelText.is("QR визита").left().is(6 * Auxiliary.tapSize)//
 						.top().is(layoutless.height().property.minus(1 * Auxiliary.tapSize))//
 						.width().is(3 * Auxiliary.tapSize)//
 						.height().is(1 * Auxiliary.tapSize)//
@@ -1776,6 +1827,7 @@ I/System.out: </>
 		startActivity(intent);
 	}
 
+
 	void promptDeleteFixPrices(){
 		Auxiliary.pickConfirm(this, "Удаление заявок на фикс.цены", "Удалить", new Task(){
 			@Override
@@ -1872,21 +1924,21 @@ I/System.out: </>
 		startActivity(intent);
 	}
 
-	void beginVizit(){
+	void beginVizit(long distance){
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		GPSInfo mGPSInfo = GPS.getGPSInfo();
-		String timeString = Auxiliary.tryReFormatDate3(mGPSInfo.getVizitTimeString(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss");
+		String timeString = Auxiliary.tryReFormatDate3(mGPSInfo.currentUTCdateTime(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss");
 		//String timeString = mGPSInfo.getVizitTimeString();
-		mGPSInfo.BeginVizit(mAppInstance.getClientInfo().getKod());
+		mGPSInfo.BeginVizit(mAppInstance.getClientInfo().getKod(), distance);
 		Auxiliary.warn("Начало визита" + ": " + timeString, Activity_BidsContractsEtc_2.this);
-		//this.showQRwarning("open","Начало визита" + ": " + timeString);
+		//this.showQRwarning("open", "Начало визита" + ": " + timeString);
 	}
 
-	void promptRepeatVizit(String lastVizitTime){
+	void promptRepeatVizit(String lastVizitTime, long distanceToClient){
 		Auxiliary.pickConfirm(this, "Уже имеется открытый визит с временем начала " + lastVizitTime + ". Изменить открытый визит?", "Начать", new Task(){
 			@Override
 			public void doTask(){
-				beginVizit();
+				beginVizit(distanceToClient);
 			}
 		});
 	}
@@ -1900,10 +1952,26 @@ I/System.out: </>
 				mAppInstance.getClientInfo().getLat()
 				, mAppInstance.getClientInfo().getLon()
 		);
-		if(distanceToClient == GPSInfo.GPS_NOT_AVAILABLE){
-			Auxiliary.warn("GPS данные недоступны. Невозможно начать визит.", this);
+		//if((new Date().getTime()) - GPSInfo.lastDateTime() > 60 * 1000){
+			//Auxiliary.warn("Нет координат за последние 60с. Проверьте GPS и настройки даты/времени.", Activity_BidsContractsEtc_2.this);
+		if(distanceToClient == GPSInfo.GPS_NOT_AVAILABLE || (new Date().getTime()) - GPSInfo.lastDateTime() > 60 * 1000){
+			//Auxiliary.warn("GPS данные недоступны. Невозможно начать визит.", this);
+			Auxiliary.pickConfirm(this, "GPS данные недоступны. Визит засчитан не будет."
+					, "Всё равно открыть", new Task(){
+						@Override
+						public void doTask(){
+							String beginTime = mGPSInfo.findPreVizitTimeDaily(mAppInstance.getClientInfo().getKod());
+							if(beginTime != null){
+								promptRepeatVizit(beginTime, distanceToClient);
+							}else{
+								beginVizit(distanceToClient);
+							}
+						}
+					}
+			);
 		}else{
-			if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+			//if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+			if(distanceToClient > Settings.MAX_DISTANCE_TO_CLIENT){
 				/*
 				String warning = "Удаление от контрагента " + distanceToClient + " метров. Визит засчитан не будет. Начать визит?";
 				if(mAppInstance.getClientInfo().getLat() == 0){
@@ -1922,16 +1990,30 @@ I/System.out: </>
 					}
 				});
 				*/
-				Auxiliary.warn("Удаление от контрагента " + distanceToClient
-								+ " метров. Запрещено открывать визиты дальше " + Settings.getInstance().getMAX_DISTANCE_TO_CLIENT() + "м"
+				/*Auxiliary.warn("Удаление от контрагента " + distanceToClient
+								+ " метров. Запрещено открывать визиты дальше " + Settings.MAX_DISTANCE_TO_CLIENT + "м"
 						, this);
+				*/
+				Auxiliary.pickConfirm(this, "Удаление от контрагента " + distanceToClient + " метров. Визит засчитан не будет."
+						, "Всё равно открыть", new Task(){
+							@Override
+							public void doTask(){
+								String beginTime = mGPSInfo.findPreVizitTimeDaily(mAppInstance.getClientInfo().getKod());
+								if(beginTime != null){
+									promptRepeatVizit(beginTime, distanceToClient);
+								}else{
+									beginVizit(distanceToClient);
+								}
+							}
+						}
+				);
 			}else{
 				//if (!mGPSInfo.IsFirstVizitDaily(mAppInstance.getClientInfo().getKod())) {
 				String beginTime = mGPSInfo.findPreVizitTimeDaily(mAppInstance.getClientInfo().getKod());
 				if(beginTime != null){
-					promptRepeatVizit(beginTime);
+					promptRepeatVizit(beginTime, distanceToClient);
 				}else{
-					beginVizit();
+					beginVizit(distanceToClient);
 				}
 			}
 		}
@@ -1940,19 +2022,28 @@ I/System.out: </>
 		//}
 	}
 
-	boolean gpsTimeExists60(){
+	boolean _gpsTimeExists60(){
 		//if(1==1)return true;
 
 		//if ((new Date().getTime()) - Session.getGPSTime() > 30 * 1000) {
 		if((new Date().getTime()) - GPSInfo.lastDateTime() > 60 * 1000){
-			Auxiliary.warn("Нет координат за последние 60с. Проверьте GPS и настройки даты/времени.", Activity_BidsContractsEtc_2.this);
+			//Auxiliary.warn("Нет координат за последние 60с. Проверьте GPS и настройки даты/времени.", Activity_BidsContractsEtc_2.this);
 			return false;
 		}else{
 			return true;
 		}
 	}
 
-	boolean mojnoZakrytVizit(){
+	void pickForseCloseVizit(String warning){
+		Auxiliary.pickConfirm(this, warning, "Всё равно закрыть", new Task() {
+			@Override
+			public void doTask () {
+				pickEndVizitCasePrompt();
+			}
+		});
+	}
+
+	void mojnoZakrytVizit(){
 
 
 		//System.out.println("////////");
@@ -1966,9 +2057,13 @@ I/System.out: </>
 			return false;
 		}*/
 
-
-		if(!gpsTimeExists60())
+		if((new Date().getTime()) - GPSInfo.lastDateTime() > 60 * 1000){
+			pickForseCloseVizit("Нет координат за последние 60с. Проверьте GPS и настройки даты/времени. Визит засчитан не будет.");
+			return;
+		}
+		/*if(!gpsTimeExists60()){
 			return false;
+		}*/
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
 		long duration = 0;
@@ -2002,7 +2097,7 @@ I/System.out: </>
 			}
 		}else{
 			Auxiliary.warn("Не найдено незакрытых визитов для контрагента " + mAppInstance.getClientInfo().getKod().trim(), Activity_BidsContractsEtc_2.this);
-			return false;
+			return;
 		}
 		//cursor.close();
 		//if (duration < 1000 * 60 * 15) {
@@ -2014,23 +2109,25 @@ I/System.out: </>
 					+ "\nдо "
 					+ userTime.format(now)
 					+ "\nпрошло меньше " + coarse + " мин.", Activity_BidsContractsEtc_2.this);
-			return false;
+			return;
 		}
 		long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
 		if(distanceToClient == GPSInfo.GPS_NOT_AVAILABLE){
-			Auxiliary.warn("GPS данные недоступны.", Activity_BidsContractsEtc_2.this);
-			return false;
+			//Auxiliary.warn("GPS данные недоступны.", Activity_BidsContractsEtc_2.this);
+			pickForseCloseVizit("GPS данные недоступны. Визит засчитан не будет.");
+			return ;
 		}
 
-		if(distanceToClient > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
-			Auxiliary.warn("Удаление от контрагента " + distanceToClient + " метров."
-					, Activity_BidsContractsEtc_2.this);
-			return false;
+		if(distanceToClient > Settings.MAX_DISTANCE_TO_CLIENT){
+			//Auxiliary.warn("Удаление от контрагента " + distanceToClient + " метров."					, Activity_BidsContractsEtc_2.this);
+			pickForseCloseVizit("Удаление от контрагента " + distanceToClient + " метров. Визит засчитан не будет.");
+			return;
 		}
-		return true;
+		//return true;
+		pickEndVizitCasePrompt();
 	}
 
-	void endVizitCasePrompt(){
+	void pickEndVizitCasePrompt(){
 		String sql = "select [Naimenovanie] as Naimenovanie from RezultatVizita order by [Kod]";
 		ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
 		SQLiteDatabase mDB = mAppInstance.getDataBase();
@@ -2046,13 +2143,33 @@ I/System.out: </>
 				//System.out.println(selection.value());
 				GPSInfo mGPSInfo = GPS.getGPSInfo();
 				ApplicationHoreca mAppInstance = ApplicationHoreca.getInstance();
+				long distanceToClient = GPSInfo.isTPNearClient(mAppInstance.getClientInfo().getLat(), mAppInstance.getClientInfo().getLon());
 				mGPSInfo.EndVisit(mAppInstance.getClientInfo().getKod()
 						, b.children.get(selection.value().intValue()).child("Naimenovanie").value.property.value()
+						, distanceToClient
 				);
-				//String timeString = Auxiliary.tryReFormatDate3(mGPSInfo.getVizitTimeString(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss");
-				//showQRwarning("close","Окончание визита" );
+				String timeString = Auxiliary.tryReFormatDate3(mGPSInfo.currentUTCdateTime(), "yyyy-MM-dd'T'HH:mm:ss", "dd.MM.yyyy HH:mm:ss");
+				System.out.println("endVizitCasePrompt " + timeString);
+				//showQRwarning("close", "Окончание визита");
 			}
 		}, null, null, null, null);
+	}
+
+	void qrVizitButtonClick(){
+		GPSInfo mGPSInfo = GPS.getGPSInfo();
+		String beginTime = GPS.getGPSInfo().findPreVizitTimeDaily(ApplicationHoreca.getInstance().getClientInfo().getKod());
+		if(beginTime != null){
+			String lastBegin = mGPSInfo.findLastVizitBegin(ApplicationHoreca.getInstance().getClientInfo().getKod());
+			String lastEnd = mGPSInfo.findLastVizitEnd(ApplicationHoreca.getInstance().getClientInfo().getKod());
+			System.out.println("qrVizitButtonClick " + lastBegin + " / " + lastEnd);
+			if(lastEnd.length() > 1){
+				showQRwarning("close", lastEnd, "Визит завершён " + lastEnd);
+			}else{
+				showQRwarning("open", lastBegin, "Начало визита " + lastBegin);
+			}
+		}else{
+			Auxiliary.warn("Сегодня не было визитов к " + ApplicationHoreca.getInstance().getClientInfo().getName(), Activity_BidsContractsEtc_2.this);
+		}
 	}
 
 	void switchPage(int nn){

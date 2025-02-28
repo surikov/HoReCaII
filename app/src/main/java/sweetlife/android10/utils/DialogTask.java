@@ -6,7 +6,7 @@ import android.os.Bundle;
 public class DialogTask extends ManagedAsyncTask<Integer>{
 
 	public static int ERROR_NONE;
-	sweetlife.android10.ui.Activity_BidsContractsEtc back;
+	sweetlife.android10.ui.Activity_BidsContractsEtc_2 back;
 	private IDialogTaskAction mAction;
 
 	public DialogTask(
@@ -23,7 +23,7 @@ public class DialogTask extends ManagedAsyncTask<Integer>{
 			String progressMessage,
 			Context appContext, 
 			IDialogTaskAction action 
-			,sweetlife.android10.ui.Activity_BidsContractsEtc f
+			,sweetlife.android10.ui.Activity_BidsContractsEtc_2 f
 			) {
 	
 		super(progressMessage, appContext);

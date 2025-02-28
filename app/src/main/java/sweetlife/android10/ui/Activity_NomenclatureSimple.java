@@ -60,6 +60,7 @@ public class Activity_NomenclatureSimple extends Activity_Base implements ITable
 		((Button) findViewById(R.id.btn_save)).setOnClickListener(mSaveClick);
 
 		mCurrentListAdapter = mNomenclatureListAdapter;
+		this.setTitle("Выбор номенклатуры");
 	}
 
 	private void InitializeTabHost() {

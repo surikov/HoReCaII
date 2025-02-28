@@ -630,7 +630,9 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		if(uchetnayaCena(kontragentID) || podrazdeleniya_NeIspolzovatCR(polzovatelID)){
 			sql = sql + "\n 	,0 as MinCena ";
 		}else{
-			sql = sql + "\n 	,case when ifnull(smartSkidki.price,0)>0 then 0";
+			//sql = sql + "\n 	,case when ifnull(smartSkidki.price,0)>0 then 0";
+			//sql = sql + "\n 	,case when ifnull(smartSkidki.price,0)>0 then smartSkidki.price";
+			sql = sql + "\n 	,case";
 			sql = sql + "\n 		when ifnull(hero1.Cena,0)>0 then hero1.Cena when ifnull(n1.zapret,x'00')=x'01' then 0 when ifnull(n1.MinCena,0)>0 then n1.MinCena when ifnull(n1.nacenka,0)>0 then round(1000*(1.000+n1.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
 			sql = sql + "\n 		when ifnull(hero2.Cena,0)>0 then hero2.Cena when ifnull(n2.zapret,x'00')=x'01' then 0 when ifnull(n2.MinCena,0)>0 then n2.MinCena when ifnull(n2.nacenka,0)>0 then round(1000*(1.000+n2.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
 			sql = sql + "\n 		when ifnull(hero3.Cena,0)>0 then hero3.Cena when ifnull(n3.zapret,x'00')=x'01' then 0 when ifnull(n3.MinCena,0)>0 then n3.MinCena when ifnull(n3.nacenka,0)>0 then round(1000*(1.000+n3.nacenka*0.010)*TekuschieCenyOstatkovPartiy.Cena/1000,2)";
@@ -761,10 +763,12 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		sql = sql + "\n  	,stars.artikul as stars_artikul ";
 		sql = sql + "\n  	,newSkidki.datastart as datastart, newSkidki.dataend as dataend";
 		sql = sql + "\n  	,smartSkidki.price as smartprice ";
+		sql = sql + "\n  	,curAssortiment.nomenklatura_idrref as curAssortiment_nomenklatura_idrref ";
+
 		sql = sql + "\n	from Nomenklatura_sorted n ";
 		sql = sql + "\n 	cross join Consts const ";
-		if(!no_assortiment){
-			sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
+		if(!(no_assortiment || history)){
+			sql = sql + "\n 	cross join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef] and curAssortiment.zapret != x'01'";
 		}
 		sql = sql + "\n 	cross join (select "//
 				+ "\n 			'" + dataOtgruzki + "' as dataOtgruzki "//
@@ -784,33 +788,14 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 			sql = sql + "\n 	cross join FlagmanTovar on  FlagmanTovar.Articul=n.Artikul and FlagmanTovar.SegmentKod='" + flagmanTovarSegmentKod + "'  ";
 		}
 		if(history){
-			/*
-			sql = sql//
-					+ "\n 	cross join Prodazhi_last Prodazhi"
-					+ "\n 				on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
-					+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
-			*/
 			sql = sql + "\n 	cross join Prodazhi_last Prodazhi on Prodazhi.nomenklatura=n.[_IDRRef] ";
 		}else{
-			/*
-			if (flagmanTovarSegmentKod != null) {
-				//Calendar c = Calendar.getInstance();
-				//c.set(Calendar.DAY_OF_MONTH, 1);
-				//String thismonth = Auxiliary.sqliteDate.format(c.getTime());
-				sql = sql//
-						+ "\n 	left join Prodazhi_last Prodazhi on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
-						//+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] and Prodazhi.period>=date('" + thismonth + "') ";
-						+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
-			} else {
-				sql = sql//
-						+ "\n 	left join Prodazhi_last Prodazhi on Prodazhi.DogovorKontragenta in (select DogovoryKontragentov_strip._IDRref from DogovoryKontragentov_strip where DogovoryKontragentov_strip.vladelec=parameters.kontragent ) "//
-						+ "\n 				and Prodazhi.nomenklatura=n.[_IDRRef] ";
-			}
-			*/
 			sql = sql + "\n 	left join Prodazhi_last Prodazhi on Prodazhi.nomenklatura=n.[_IDRRef] ";
+
 		}
-		if(no_assortiment){
-			sql = sql + "\n 	left join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef]";
+		if(no_assortiment || history){
+			sql = sql + "\n 	left join AssortimentCurrent curAssortiment on curAssortiment.nomenklatura_idrref=n.[_IDRRef] and curAssortiment.zapret != x'01'";
+			//sql = sql + "\n 	and length(n.artikul)>5 ";
 		}
 		sql = sql + "\n 	left join Prodazhi_CR on Prodazhi_CR.nomenklatura=n.[_IDRRef] ";
 		cacheTop20(polzovatelID, dataOtgruzki);
@@ -1008,7 +993,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 						+ ") ";
 			}
 		}
-		if(no_assortiment){
+		if(no_assortiment || history){
 			sql = sql + "\n where 1=1 ";
 		}else{
 			if(etoTrafik){
@@ -1060,7 +1045,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 		}*/
 		sql = sql + "\n limit " + limit + " offset " + offset;
 		//System.out.println("stmOnly "+stmOnly);
-		//System.out.println( "composeSQLall_Old: " + sql);
+		System.out.println( "composeSQLall_Old: " +history+": "+ sql);
 		return sql;
 	}
 
@@ -1068,7 +1053,7 @@ public abstract class Request_NomenclatureBase implements ITableColumnsNames{
 	static String kontragentIDcurrent = "";
 	static String polzovatelIDcurrent = "";
 
-	static void refreshPointData(String dataOtgruzki, String kontragentID, String polzovatelID){
+	public static void refreshPointData(String dataOtgruzki, String kontragentID, String polzovatelID){
 		//static void refreshTovariGeroiDay(String dataOtgruzki) {
 
 		if(dataOtgruzki.equals(dataOtgruzkiTovariGeroiDay)
@@ -1186,8 +1171,11 @@ order by cc.sklad
 					+ " 	,cc.nomenklatura as Nomenklatura,cc.cena as Cena,cc.podrazdelenie as Podrazdelenie,cc.sklad as Sklad,cc.zapret as Zapret,cc.registrator as Registrator"
 					+ " from CenyNomenklaturyPoPodrazdeleniu cc"
 					+ " where cc.period<='" + dataOtgruzki + "'"
+					//+ "		and cc.zapret<>x'01'"
 					+ " group by cc.nomenklatura,cc.podrazdelenie,cc.sklad"
 					+ " order by cc.sklad";
+			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+			sql="delete from CenyNomenklatury_SLICE where zapret=x'01'";
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 
 			ApplicationHoreca.getInstance().getDataBase().execSQL("CREATE TABLE if not exists CenyNomenklaturySklada_last (	"

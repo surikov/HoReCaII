@@ -15,6 +15,7 @@ public class BidData implements ISQLConsts {
 	private String mClientID;
 	private int mLiniyaDostavki = 0;
 	private Calendar mChoosedDay;
+	//public String nomerZakazaKlienta="";
 
 	public void UpdateOrderExtraChargeInfo(String dataOtgruzki) {
 		try {

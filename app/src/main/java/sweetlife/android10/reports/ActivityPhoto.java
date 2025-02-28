@@ -24,7 +24,7 @@ public class ActivityPhoto extends Activity{
 	WebRender brwsr;
 	public static String artikulField = "artikulField";
 	public static String nameField = "nameField";
-	Bitmap bm = null;
+	//Bitmap bm = null;
 	//String comment = "";
 	String kommentariy = "";
 	String Nabor = "";
@@ -32,6 +32,121 @@ public class ActivityPhoto extends Activity{
 	String EdinicyIzmereniyaNaimenovanie = "";
 	String proizvoditel = "";
 	Bough managers = null;
+
+	String template1 = "<html>"
+			+ "\n<head>"
+			+ "\n	<meta charset='UTF-8'>"
+			+ "\n	<style>"
+			+ "\n		p {"
+			+ "\n			padding-left: 16px;"
+			+ "\n			padding-right: 16px;"
+			+ "\n		}"
+			+ "\n		.fotos {"
+			+ "\n			width: inherit;"
+			+ "\n			height: 320px;"
+			+ "\n			justify-content: space-between;"
+			+ "\n			display: flex;"
+			+ "\n			align-items: center;"
+			+ "\n			padding-top: 0px;"
+			+ "\n			padding-bottom: 0px;"
+			+ "\n			margin: 0px;"
+			+ "\n		}"
+			+ "\n		#foto {"
+			+ "\n			max-width: 75%;"
+			+ "\n			object-fit: contain;"
+			+ "\n		}"
+			+ "\n		.arrow {"
+			+ "\n			font-size: 64px;"
+			+ "\n			text-decoration: none"
+			+ "\n		}"
+			+ "\n	</style>"
+			+ "\n</head>"
+			+ "\n<body>";
+	String template2 = ""
+			+ "\n	<p><i>Производитель:</i> <b>PURATOS N.V.</b></p>"
+			+ "\n	<p><i>Срок годности:</i> 365</p>"
+			+ "\n	<p><i>Квант:</i> 8.5кг по 1.0кг</p>"
+			+ "\n	<p><i>Состав:</i> Пудра сахарная, сахар, жир растительный пальмовый, вода питьевая, сироп глюкозный, сгущенное с сахаром цельное молоко (молоко нормализованное, сахар), влагоудерживающий агент - загуститель (Е406), ароматизатор, краситель (Е171), регулятор кислотности – сорбитовый сироп, эмульгаторы (Е472e, E475, Е471), соль, кислота лимонная, консервант - сорбат калия.</p>";
+	String template3 = ""
+			+ "\n	<div class='fotos'>"
+			+ "\n		<a href=\"javascript:moveLeft();\" class='arrow'>&lt;</a>"
+			+ "\n		<img id='foto' height=300px src=\"\" />"
+			+ "\n		<a href=\"javascript:moveRight();\" class='arrow'>&gt;</a>"
+			+ "\n	</div>";
+	String template3ii = ""
+			+ "\n	<div class='fotos'>"
+			+ "\n		<span class='arrow'> </span>"
+			+ "\n		<img id='foto' height=300px src=\"\" />"
+			+ "\n		<span class='arrow'> </span>"
+			+ "\n	</div>";
+	String template4 = ""
+			+ "\n	<p><i>Описание:</i> Глазурь кондитерская на жировой основе для глазирования поверхности хлебобулочных и кондитерских изделий, идеально подходит для глазирования берлинеров, донатсов, куличей и других хлебобулочных изделий Глазурь обеспечивает ровное покрытие продукта, имеет прекрасный блеск Эластична после застывания, не затвердевает Помаду можно смешивать с фруктовыми сиропами «Классик» для придания вкуса, цвета и аромата Возможно аэрирование помады для получения массы для декорирования кондитерских изделий Айсинг, Фудж Преимущества для клиента Глазурь готова к применению Помаду можно смешивать с фруктовыми сиропами «Классик» для придания вкуса, цвета и аромата Преимущества для потребителя Обеспечивает отличное покрытие продукта Эластична после застывания, не затвердевает Привлекательный внешний вид изделий</p>";
+	String template5 = ""
+			+ "\n	<p>Ответственные:</p>"
+			+ "\n	<ul>";
+	String template6 = ""
+			+ "\n		<li>Ахметова Надежда Дмитриевна, Ассистент группы по поставщику: <i>Доб: 10-62, Mail: <a href='mailto:akhmetova@swlife.ru'>akhmetova@swlife.ru</a></i></li>"
+			+ "\n		<li>Коржавина Дарья Игоревна, Менеджер группы: <i>Mail: <a href='mailto:korjavina@swlife.ru'>korjavina@swlife.ru</a>, Тел: 79040535346, Доб: 09-83</i></li>";
+	String template7 = ""
+			+ "\n	</ul>"
+			+ "\n	<p><i>Глобальный каталог:</i>"
+			+ "\n		<ul>";
+	String template8 = ""
+			+ "\n			<li>t° max хранения: 20</li>"
+			+ "\n			<li>t° min хранения: 0</li>"
+			+ "\n			<li>Без глютена: Нет</li>"
+			+ "\n			<li>Бездрожжевые: Нет</li>"
+			+ "\n			<li>Белки: 1</li>"
+			+ "\n			<li>Веган: Нет</li>"
+			+ "\n			<li>Вес БРУТТО: 12.85</li>"
+			+ "\n			<li>ГОСТ или ТУ: ТУ 9125-127-40222408-2015 \"Глазури. Технические условия\"</li>"
+			+ "\n			<li>Жиры: 13</li>"
+			+ "\n			<li>Кошерный продукт: Нет</li>"
+			+ "\n			<li>Производитель для ценника: АО Пуратос Россия 142121 Московская обл. Подольск ул. Станционная вблизи дер. Северово дом 18</li>"
+			+ "\n			<li>Производитель (импортер или дистрибьютор): АО Пуратос Россия 142121 Московская обл. Подольск ул. Станционная вблизи дер. Северово дом 18</li>"
+			+ "\n			<li>Углеводы: 75</li>"
+			+ "\n			<li>Условия хранения: Хранить в чистых, сухих, хорошо вентилируемых помещениях при температуре от 0°С до +20°С и относительной влажности воздуха не более 75%. Плотно закрывать ведро после каждого использования.</li>"
+			+ "\n			<li>Халяль: Нет</li>"
+			+ "\n			<li>Калории: 417</li>"
+			+ "\n			<li>Постный продукт: Нет</li>";
+	String template9 = ""
+			+ "\n		</ul>"
+			+ "\n	</p>"
+			+ "\n	<p>&nbsp;</p>"
+			+ "\n</body>"
+			+ "\n<script>"
+			+ "\n	let idx = 0;"
+			+ "\n	let fotos = [";
+	String template10 = ""
+			+ "\n		'https://files.swlife.ru/photo/104833.jpg'"
+			+ "\n		, 'https://files.swlife.ru/photo/104833_1.jpg'"
+			+ "\n		, 'https://files.swlife.ru/photo/104833_2.jpg'"
+			+ "\n		, 'https://files.swlife.ru/photo/104833_3.jpg'"
+			+ "\n		, 'https://files.swlife.ru/photo/104833_4.jpg'"
+			+ "\n		, 'https://files.swlife.ru/photo/104833_5.jpg'"
+			+ "\n		, 'https://files.swlife.ru/photo/104833_6.jpg'"
+			+ "\n		, 'https://files.swlife.ru/photo/104833_7.jpg'";
+	String template11 = ""
+			+ "\n	];"
+			+ "\n	function moveLeft() {"
+			+ "\n		idx--;"
+			+ "\n		changeFoto();"
+			+ "\n	}"
+			+ "\n	function moveRight() {"
+			+ "\n		idx++;"
+			+ "\n		changeFoto();"
+			+ "\n	}"
+			+ "\n	function changeFoto() {"
+			+ "\n		if (idx < 0) idx = 0;"
+			+ "\n		if (idx >= fotos.length) idx = fotos.length - 1;"
+			+ "\n		if (idx < fotos.length && idx >= 0) {"
+			+ "\n			document.getElementById('foto').src = fotos[idx];"
+			+ "\n		}"
+			+ "\n	}"
+			+ "\n	changeFoto();"
+			+ "\n	console.log('init', fotos);"
+			+ "\n</script>"
+			+ "\n</html>";
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -71,27 +186,44 @@ public class ActivityPhoto extends Activity{
 	void loadInfoAndShowPhoto(String artikul){
 		final Note url = new Note().value(
 				Settings.getInstance().getBaseURL() + Settings.selectedBase1C()
-				//"https://testservice.swlife.ru/shatov"
+						//"https://testservice.swlife.ru/shatov"
 						+ "/hs/Planshet/DataGK/" + artikul
 		);
 		final Note result = new Note();
+		final Note fotosHTML = new Note();
+		final Numeric cnt=new Numeric();
 		new Expect().task.is(new Task(){
 			@Override
 			public void doTask(){
 				try{
 					byte[] b = Auxiliary.loadFileFromPrivateURL(url.value(), Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 					String txt = new String(b, "UTF-8");
-					java.util.Vector<Bough> data = Bough.parseJSON(txt).children("Data");
-					//System.out.println("result "+data.dumpXML());
-					result.value("<ul>");
+
+					Bough parsed = Bough.parseJSON(txt);
+					//System.out.println(parsed.dumpXML());
+					java.util.Vector<Bough> data = parsed.children("Data");
+					//System.out.println("Data "+data.dumpXML());
+					//fotosHTML.value("\n<div class='fotos'><nobr>");
+					java.util.Vector<Bough> foto = parsed.children("Foto");
+					//System.out.println("Foto "+foto.dumpXML());
+					String del = "";
+					for(int ii = 0; ii < foto.size(); ii++){
+						//System.out.println("Foto "+ii+": "+foto.get(ii).value.property.value());
+						//fotosHTML.value(fotosHTML.value() + "\n<img height=300px src=\"" + foto.get(ii).value.property.value() + "\"/>");
+						fotosHTML.value(fotosHTML.value() + del + "'" + foto.get(ii).value.property.value() + "'");
+						del = ",";
+					}
+					//fotosHTML.value(fotosHTML.value() + "\n</nobr></div>");
+					cnt.value(foto.size());
+					//result.value("\n<ul>");
 					for(int ii = 0; ii < data.size(); ii++){
-						result.value(result.value() + "<li>"
+						result.value(result.value() + "\n<li>"
 								+ data.get(ii).child("Пункт").value.property.value()
 								+ ": " + data.get(ii).child("ЗначениеРесурса").value.property.value()
-								.replace("&", "&amp;").replace("<", "&lt;")
+								.replace("&", "&amp;").replace("<", "&lt;").replace("\n", "<br/>")
 								+ "</li>");
 					}
-					result.value(result.value() + "<ul>");
+					//result.value(result.value() + "<ul>");
 				}catch(Throwable t){
 					t.printStackTrace();
 					result.value(t.getMessage() + "\n" + url.value());
@@ -102,14 +234,14 @@ public class ActivityPhoto extends Activity{
 			@Override
 			public void doTask(){
 				//System.out.println("result " + result.dumpXML());
-				showCatInfoPhoto(result.value());
+				showCatInfoPhoto(result.value(), fotosHTML.value(),cnt.value().intValue());
 			}
 		}).status.is("Подождите").start(this)
 		;
 	}
 
-	void showCatInfoPhoto(String globalCat){
-		if(bm != null){
+	void showCatInfoPhoto(String globalCat, String fotos,int cnt){
+		/*if(bm != null){
 			layoutless.child(new Decor(ActivityPhoto.this).bitmap.is(bm)//
 					.width().is(bm.getWidth()).height().is(bm.getHeight())
 					.left().is(Auxiliary.tapSize / 2).top().is(Auxiliary.tapSize / 2)//
@@ -120,13 +252,14 @@ public class ActivityPhoto extends Activity{
 			layoutless.child(new Decor(ActivityPhoto.this).labelText.is("Нет фотографии")//
 					.width().is(200).height().is(200).left().is(l).top().is(t)//
 			);
-		}
+		}*/
+		/*
 		layoutless.child(new Decor(ActivityPhoto.this).background.is(0xffeeeeee)//
 				.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize / 2))//
 				.height().is(layoutless.height().property.minus(Auxiliary.tapSize))//
 				.left().is(layoutless.width().property.divide(2))//
 				.top().is(Auxiliary.tapSize * 0.5)//
-		);
+		);*/
 		brwsr = new WebRender(this).afterLink.is(new Task(){
 			@Override
 			public void doTask(){
@@ -141,35 +274,75 @@ public class ActivityPhoto extends Activity{
 			}
 		});
 		layoutless.child(brwsr//
-				.width().is(layoutless.width().property.divide(2).minus(Auxiliary.tapSize * 0.7))//
-				.height().is(layoutless.height().property.minus(Auxiliary.tapSize * 1.2))//
-				.left().is(layoutless.width().property.divide(2).plus(Auxiliary.tapSize * 0.1))//
-				.top().is(Auxiliary.tapSize * 0.6)//
+				.width().is(layoutless.width().property)//
+				.height().is(layoutless.height().property)//
+				.left().is(0)//
+				.top().is(0)//
 		);
-
-		String description = "<html><body>";
+/*
+		String description = "<html>"
+				+ "	<head>"
+				+ "		<meta charset='UTF-8'>"
+				+ "		<style>"
+				+ "			body {"
+				+ "				padding: 0px;"
+				+ "				margin: 0px;"
+				+ "			}"
+				+ "			p {"
+				+ "				padding-left: 16px;"
+				+ "				padding-right: 16px;"
+				+ "			}"
+				+ "			.fotos {"
+				+ "				overflow-x: auto;"
+				+ "				overflow-y: hidden;"
+				+ "				width: inherit;"
+				+ "				height: 320px;"
+				+ "				border-style: none;"
+				+ "				padding-left: 16px;"
+				+ "				padding-right: 16px;"
+				+ "				padding-top: 0px;"
+				+ "				padding-bottom: 0px;"
+				+ "				margin: 0px;"
+				+ "				text-align: center;"
+				+ "			}"
+				+ "			img {"
+				+ "				padding: 0px;"
+				+ "				margin: 0px;"
+				+ "			}"
+				+ "		</style>"
+				+ "	</head>"
+				+ "	<body>"
+				+ "		<p>&nbsp;</p>";
+		*/
+		String description = template1;
 		if(proizvoditel.trim().length() > 0){
-			description = description + "<p><i>Производитель:</i> <b>" + proizvoditel + "</b></p>";
+			description = description + "\n<p><i>Производитель:</i> <b>" + proizvoditel + "</b></p>";
 		}
 		if(SrokGodnosti.trim().length() > 0){
-			description = description + "<p><i>Срок годности:</i> " + SrokGodnosti + "</p>";
+			description = description + "\n<p><i>Срок годности:</i> " + SrokGodnosti + "</p>";
 		}
 		if(EdinicyIzmereniyaNaimenovanie.trim().length() > 0){
-			description = description + "<p><i>Квант:</i> " + EdinicyIzmereniyaNaimenovanie + "</p>";
+			description = description + "\n<p><i>Квант:</i> " + EdinicyIzmereniyaNaimenovanie + "</p>";
 		}
 		if(Nabor.trim().length() > 0){
-			description = description + "<p><i>Состав:</i> " + Nabor + "</p>";
+			description = description + "\n<p><i>Состав:</i> " + Nabor + "</p>";
+		}
+		//description = description + fotos;
+		if(cnt>1){
+			description = description + template3;
+		}else{
+			description = description + template3ii;
 		}
 		if(kommentariy.trim().length() > 0){
-			description = description + "<p><i>Описание:</i> " + kommentariy.replace("\n", "<br/>") + "</p>";
+			description = description + "\n<p><i>Описание:</i> " + kommentariy.replace("\n", "<br/>") + "</p>";
 		}
-
+		description = description + template5;
 		java.util.Vector<Bough> all = managers.children("Ответственные");
 		if(all.size() > 0){
-			description = description + "<p>Ответственные:</p>";
-			description = description + "<ul>";
+			//description = description + "\n<p>Ответственные:</p>";
+			//description = description + "<ul>";
 			for(int ii = 0; ii < all.size(); ii++){
-				description = description + "<li>" + all.get(ii).child("ФИО").value.property.value()
+				description = description + "\n<li>" + all.get(ii).child("ФИО").value.property.value()
 						+ ", " + all.get(ii).child("Должность").value.property.value();
 				java.util.Vector<Bough> kontakts = all.get(ii).children("Контакты");
 				String delimtr = ": <i>";
@@ -188,12 +361,18 @@ public class ActivityPhoto extends Activity{
 				}
 				description = description + "</i></li>";
 			}
-			description = description + "</ul>";
+			//description = description + "</ul>";
 		}
+		description = description + template7;
+
 		if(globalCat.trim().length() > 0){
-			description = description + "<p><i>Глобальный каталог:</i> " + globalCat.replace("\n", "<br/>") + "</p>";
+			//description = description + "<p><i>Глобальный каталог:</i> " + globalCat + "</p>";
+			description = description + globalCat;
 		}
-		description = description + "</body></html>";
+		description = description + template9;
+		description = description + fotos;
+		description = description + template11;
+		//description = description + "<p>&nbsp;</p></body></html>";
 		/*
 		layoutless.child(new HTMLBox(ActivityPhoto.this)//.background.is(0xffccff99)//
 				.htmlText.is(description + description + description)//
@@ -223,7 +402,7 @@ public class ActivityPhoto extends Activity{
 				artikul = artikul.replace('\\', '-');
 				System.out.println(Settings.getInstance().photoURL + artikul + ".bmp");
 				//bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".bmp");
-				bm = Auxiliary.loadBitmapFromPublicURL(Settings.getInstance().photoURL + artikul + ".bmp");
+				/*bm = Auxiliary.loadBitmapFromPublicURL(Settings.getInstance().photoURL + artikul + ".bmp");
 				if(bm == null){
 					//bm = sweetlife.android10.utils.UIHelper.loadImageFromURL(Settings.getInstance().photoURL + artikul + ".jpg");
 					bm = Auxiliary.loadBitmapFromPublicURL(Settings.getInstance().photoURL + artikul + ".jpg");
@@ -250,7 +429,7 @@ public class ActivityPhoto extends Activity{
 						newH = bm.getHeight() * rw;
 					}
 					bm = Bitmap.createScaledBitmap(bm, (int)newW, (int)newH, true);
-				}
+				}*/
 
 				try{
 					String infoUrl = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Otvetstvenie/GetFIO/" + artikul;

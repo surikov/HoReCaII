@@ -93,7 +93,8 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 
 				float distance = opLocation.distanceTo(clientLocation);
 				//System.out.println("distance "+distance);
-				if(distance > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+				//if(distance > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+				if(distance > Settings.MAX_DISTANCE_TO_CLIENT){
 					names = names + " /" + opened.children.get(i).child("Naimenovanie").value.property.value();
 				}
 			}
@@ -134,7 +135,8 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 
 					float distance = opLocation.distanceTo(clientLocation);
 					//System.out.println("distance "+distance);
-					if(distance > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+					//if(distance > Settings.getInstance().getMAX_DISTANCE_TO_CLIENT()){
+					if(distance > Settings.MAX_DISTANCE_TO_CLIENT){
 						if(cursor != null && !cursor.isClosed()){
 							cursor.close();
 						}
@@ -169,6 +171,20 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 			}
 		}
 		return false;
+	}
+
+	public String findLastVizitBegin(String clientCode){
+		String sql = "select beginTime as beginTime from Vizits where Client = " + clientCode + " order by beginTime desc limit 1";
+		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		String utc=b.child("row").child("beginTime").value.property.value();
+		return Auxiliary.tryReFormatDate3(utc,"yyyy-MM-dd'T'HH:mm:ss","dd.MM.yyyy HH:mm:ss");
+	}
+
+	public String findLastVizitEnd(String clientCode){
+		String sql = "select endTime as endTime from Vizits where Client = " + clientCode + " order by beginTime desc limit 1";
+		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		String utc =b.child("row").child("endTime").value.property.value();
+		return Auxiliary.tryReFormatDate3(utc,"yyyy-MM-dd'T'HH:mm:ss","dd.MM.yyyy HH:mm:ss");
 	}
 
 	public String findPreVizitTimeDaily(String clientCode){
@@ -263,26 +279,33 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 		}
 	}
 
-	public synchronized boolean BeginVizit(String clientCode){
+	public synchronized boolean BeginVizit(String clientCode,long distance){
 		if(clientCode == null || clientCode.length() == 0){
 			return false;
 		}
 		//System.out.println("BeginVizit " + clientCode);
 		ContentValues initialValues = new ContentValues();
-		String timeString = getVizitTimeString();
+		String timeString = currentUTCdateTime();//getVizitTimeString();
 		//java.util.Date date=new java.util.Date();
 		initialValues.put(BEGIN_DATE, new java.sql.Date(System.currentTimeMillis()).toString());
 		initialValues.put(BEGIN_TIME, timeString);
 		initialValues.put(CLIENT, clientCode);
 		initialValues.put(TP, mPhizlicoCode);
 		initialValues.put(UPLOAD, FALSE);
+		initialValues.put("gpsbegin", distance);
 		if(IsDatabaseOpened()){
 			DatabaseHelper.insertInTranzaction(mDB, VizitsTableName, initialValues);
 		}
 		return false;
 	}
 
-	public String getVizitTimeString(){
+	public String currentUTCdateTime(){
+		Calendar satellitesTime = Calendar.getInstance();
+		long tim = satellitesTime.getTimeInMillis();
+		return mDateTimeFormat.format(new java.util.Date(tim));
+	}
+
+	public String _____getVizitTimeString(){
 		Calendar satellitesTime = Calendar.getInstance();
 		//satellitesTime.setTimeInMillis(Session.getGPSTime());
 		/*
@@ -304,7 +327,7 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 		return s;
 	}
 
-	public boolean EndVisit(String clientCode, String action){
+	public boolean EndVisit(String clientCode, String action,double distance){
 		if(!IsVizitBegin(clientCode)){
 			return false;
 		}
@@ -312,9 +335,10 @@ public class GPSInfo implements ISQLConsts, ITableColumnsNames, ITableNames{
 		if(action != null && action.length() != 0){
 			initialValues.put(ACTIVITY, action);
 		}
-		String timeString = getVizitTimeString();
+		String timeString = currentUTCdateTime();//getVizitTimeString();
 		//System.out.println(END_TIME + ": " + timeString);
 		initialValues.put(ENDTIMEfieldName, timeString);
+		initialValues.put("gpsfinish", distance);
 		if(IsDatabaseOpened()){
 			DatabaseHelper.updateInTranzaction(mDB, VizitsTableName, initialValues, "Client = " + clientCode + " and EndTime is null", null);
 			//DatabaseHelper.updateInTranzaction(mDB, VISITS, initialValues, "Client = " + clientCode + " and EndTime is null", null);

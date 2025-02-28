@@ -25,7 +25,7 @@ import tee.binding.*;
 import tee.binding.it.*;
 import tee.binding.task.*;
 
-public class Activity_BidDegustacia extends Activity {
+public class Activity_BidDegustacia extends Activity{
 	Layoutless layoutless;
 	Numeric otgruzka = new Numeric().value(ActivityWebServicesReports.dateOnly(Calendar.getInstance(), 1));
 	ColumnText columnName;
@@ -41,45 +41,45 @@ public class Activity_BidDegustacia extends Activity {
 	MenuItem menuDelete;
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
+		if(extras != null){
 			id.value(extras.getString("_id"));
 		}
 		layoutless = new Layoutless(this);
 		init();
 		setContentView(layoutless);
-		if (id.value().equals("")) {
+		if(id.value().equals("")){
 			this.setTitle("Добавление дегустации (" + ApplicationHoreca.getInstance().getClientInfo().getName() + ")");
-		} else {
-			if (status.value() > 0) {
+		}else{
+			if(status.value() > 0){
 				this.setTitle("Просмотр дегустации (" + ApplicationHoreca.getInstance().getClientInfo().getName() + ")");
-			} else {
+			}else{
 				this.setTitle("Редактирование дегустации (" + ApplicationHoreca.getInstance().getClientInfo().getName() + ")");
 			}
 		}
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu){
 		menuDelete = menu.add("Удалить заявку на дегустацию");
 		return true;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item == menuDelete) {
+	public boolean onOptionsItemSelected(MenuItem item){
+		if(item == menuDelete){
 			promptDelete();
 			return true;
 		}
 		return false;
 	}
 
-	void promptDelete() {
-		Auxiliary.pickConfirm(this, "Удаление заявки на дегустацию", "Удалить", new Task() {
+	void promptDelete(){
+		Auxiliary.pickConfirm(this, "Удаление заявки на дегустацию", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				ApplicationHoreca.getInstance().getDataBase().execSQL("delete from ZayavkaNaDegustaciu where _id=" + id.value() + ";");
 				ApplicationHoreca.getInstance().getDataBase().execSQL("delete from ZayavkaNaDegustaciuNomenklatura where _id=" + id.value() + ";");
 				Activity_BidDegustacia.this.finish();
@@ -87,12 +87,12 @@ public class Activity_BidDegustacia extends Activity {
 		});
 	}
 
-	void init() {
-		if (!id.value().equals("")) {
+	void init(){
+		if(!id.value().equals("")){
 			String sql = "select comment,otgruzka,status from ZayavkaNaDegustaciu where _id=" + id.value();
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			comment.value(b.child("row").child("comment").value.property.value());
-			otgruzka.value((double) DateTimeHelper.SQLDateToDate(b.child("row").child("otgruzka").value.property.value()).getTime());
+			otgruzka.value((double)DateTimeHelper.SQLDateToDate(b.child("row").child("otgruzka").value.property.value()).getTime());
 			//toDate.value((double) DateTimeHelper.SQLDateToDate(b.child("row").child("toDate").value.property.value()).getTime());
 			status.value(Numeric.string2double(b.child("row").child("status").value.property.value()));
 		}
@@ -143,9 +143,9 @@ public class Activity_BidDegustacia extends Activity {
 		//
 		layoutless.child(new Knob(this)//
 				.labelText.is("Номенклатура")//
-				.afterTap.is(new Task() {
+				.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						doShowNomenklatureShooser();
 					}
 				})//
@@ -156,9 +156,9 @@ public class Activity_BidDegustacia extends Activity {
 		);
 		layoutless.child(new Knob(this)//
 				.labelText.is("Выгрузить")//
-				.afterTap.is(new Task() {
+				.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						doUpload();
 					}
 				})//
@@ -170,9 +170,9 @@ public class Activity_BidDegustacia extends Activity {
 		);
 		layoutless.child(new Knob(this)//
 				.labelText.is("Удалить")//
-				.afterTap.is(new Task() {
+				.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						doDeleteSpecificacia();
 					}
 				})//
@@ -184,9 +184,9 @@ public class Activity_BidDegustacia extends Activity {
 		);
 		layoutless.child(new Knob(this)//
 				.labelText.is("Сохранить")//
-				.afterTap.is(new Task() {
+				.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						doSave(true);
 					}
 				}).top().is(layoutless.height().property.minus(Auxiliary.tapSize * 0.8))//
@@ -202,14 +202,14 @@ public class Activity_BidDegustacia extends Activity {
 		refreshItems();
 	}
 
-	void refreshItems() {
+	void refreshItems(){
 		columnArtikul.clear();
 		columnName.clear();
 		columnCena.clear();
 		columnKolichestvo.clear();
 		columnEdizm.clear();
 		columnSumma.clear();
-		if (!id.value().equals("")) {
+		if(!id.value().equals("")){
 			sweetlife.android10.database.nomenclature.Request_NomenclatureBase.adjustTekuschieCenyOstatkovPartiy_strip(ApplicationHoreca.getInstance().getClientInfo().getID());
 			String sql = "select"//
 					+ " ZayavkaNaDegustaciuNomenklatura._id as aid"//
@@ -234,7 +234,7 @@ public class Activity_BidDegustacia extends Activity {
 			Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
 			System.out.println(sql);
 			//System.out.println(b.dumpXML());
-			for (int i = 0; i < b.children.size(); i++) {
+			for(int i = 0; i < b.children.size(); i++){
 				Bough row = b.children.get(i);
 				//columnArtikul, columnName, columnOldCena, columnNewCena
 				final String artikul = row.child("artikul").value.property.value();
@@ -245,13 +245,13 @@ public class Activity_BidDegustacia extends Activity {
 				final String edizm = row.child("edizm").value.property.value();
 				final String summa = row.child("summa").value.property.value();
 				final String minNorma = row.child("minNorma").value.property.value();
-				Task tap = new Task() {
+				Task tap = new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						doShowEditArtikul(aid, kolichestvo, naimenovanie, minNorma);//Artikul, Naimenovanie, Numeric.string2double(old), Numeric.string2double(Oborot));
 					}
 				};
-				if (status.value() > 0) {
+				if(status.value() > 0){
 					tap = null;
 				}
 				columnArtikul.cell(artikul, tap);
@@ -265,7 +265,7 @@ public class Activity_BidDegustacia extends Activity {
 		}
 	}
 
-	void doShowEditArtikul(final String aid, String kolichestvo, String naimenovanie, String minNorma) {
+	void doShowEditArtikul(final String aid, String kolichestvo, String naimenovanie, String minNorma){
 		double kol = Numeric.string2double(kolichestvo);
 		final Numeric n = new Numeric().value(kol);
 		final double step = Numeric.string2double(minNorma);
@@ -280,10 +280,11 @@ public class Activity_BidDegustacia extends Activity {
 		);
 		rake.child(new Knob(this)//
 				.labelText.is("+")//
-				.afterTap.is(new Task() {
+				.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 						n.value(n.value() + step);
+						n.value(step*Math.round(n.value()/step));
 					}
 				})//
 				.left().is(Auxiliary.tapSize * 7.5)//
@@ -292,31 +293,33 @@ public class Activity_BidDegustacia extends Activity {
 		);
 		rake.child(new Knob(this)//
 				.labelText.is("-")//
-				.afterTap.is(new Task() {
+				.afterTap.is(new Task(){
 					@Override
-					public void doTask() {
+					public void doTask(){
 
 						n.value(n.value() - step);
-						if (n.value() < 0) {
+						if(n.value() < 0){
 							n.value(0);
 						}
+						n.value(step*Math.round(n.value()/step));
 					}
 				})//
 				.left().is(Auxiliary.tapSize * 8.5)//
 				.width().is(Auxiliary.tapSize)//
 				.height().is(Auxiliary.tapSize)//
 		);
-		Auxiliary.pick(this, naimenovanie, rake, "Изменить", new Task() {
+		Auxiliary.pick(this, naimenovanie, rake, "Изменить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
+				n.value(step*Math.round(n.value()/step));
 				String sql = "update ZayavkaNaDegustaciuNomenklatura set kolichestvo=" + n.value() + " where _id=" + aid;
 				//System.out.println(sql);
 				ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 				refreshItems();
 			}
-		}, "Удалить", new Task() {
+		}, "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				doAskDeleteArtikul(aid);
 			}
 		}, null, null);
@@ -338,9 +341,9 @@ public class Activity_BidDegustacia extends Activity {
 		*/
 	}
 
-	void doSave(boolean close) {
+	void doSave(boolean close){
 		long nn = -1;
-		if (id.value().equals("")) {
+		if(id.value().equals("")){
 			java.util.Date datyeFrom = new java.util.Date();
 			datyeFrom.setTime(otgruzka.value().longValue());
 			String sql = "insert into ZayavkaNaDegustaciu  (otgruzka,status,comment,kontragent) values ("//
@@ -354,7 +357,7 @@ public class Activity_BidDegustacia extends Activity {
 			nn = statement.executeInsert();
 			id.value("" + nn);
 			statement.close();
-		} else {
+		}else{
 			java.util.Date datyeFrom = new java.util.Date();
 			datyeFrom.setTime(otgruzka.value().longValue());
 			String sql = "update ZayavkaNaDegustaciu set "//
@@ -366,12 +369,12 @@ public class Activity_BidDegustacia extends Activity {
 			//System.out.println(sql);
 			ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		}
-		if (close) {
+		if(close){
 			this.finish();
 		}
 	}
 
-	void doDropSpecFromDB() {
+	void doDropSpecFromDB(){
 		String sql = "delete from ZayavkaNaDegustaciuNomenklatura where parent=" + id.value();
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		sql = "delete from ZayavkaNaDegustaciu where _id=" + id.value();
@@ -379,17 +382,129 @@ public class Activity_BidDegustacia extends Activity {
 		finish();
 	}
 
-	void doDeleteSpecificacia() {
-		Auxiliary.pick3Choice(this, "Удаление дегустации", "Вы уверены?", "Удалить", new Task() {
+	void doDeleteSpecificacia(){
+		Auxiliary.pick3Choice(this, "Удаление дегустации", "Вы уверены?", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				doDropSpecFromDB();
 			}
 		}, null, null, null, null);
 		//System.out.println("doDeleteSpecificacia ");
 	}
 
-	void doUpload() {
+	void doUpload(){
+		//System.out.println("doUpload ");
+		doSave(false);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(otgruzka.value().longValue());
+		int toY = calendar.get(Calendar.YEAR);
+		int toM = calendar.get(Calendar.MONTH) + 1;
+		int toD = calendar.get(Calendar.DAY_OF_MONTH);
+		sweetlife.android10.database.nomenclature.Request_NomenclatureBase.adjustTekuschieCenyOstatkovPartiy_strip(ApplicationHoreca.getInstance().getClientInfo().getID());
+		String sql = "select"//
+				+ " ZayavkaNaDegustaciuNomenklatura._id as aid"//
+				+ ",ZayavkaNaDegustaciuNomenklatura.nomenklatura as nomenklatura"//
+				+ ",ZayavkaNaDegustaciuNomenklatura.kolichestvo as kolichestvo"//
+				+ ",nomenklatura.naimenovanie as naimenovanie"//
+				+ ",nomenklatura.artikul as artikul"//
+				//+ ",EdinicyIzmereniya_strip.naimenovanie as edizm"//
+				+ ",nomenklatura.skladEdIzm as edizm"//
+				+ ",TekuschieCenyOstatkovPartiy.Cena as sebestoimost" //
+				+ ",TekuschieCenyOstatkovPartiy.Cena * ZayavkaNaDegustaciuNomenklatura.kolichestvo as summa" //
+				+ " from ZayavkaNaDegustaciuNomenklatura "//
+				+ " join nomenklatura on nomenklatura._IDRRef=ZayavkaNaDegustaciuNomenklatura.nomenklatura"//
+				+ " left join TekuschieCenyOstatkovPartiy_strip TekuschieCenyOstatkovPartiy on nomenklatura._idrref=TekuschieCenyOstatkovPartiy.nomenklatura"//
+				//+ " join EdinicyIzmereniya_strip on nomenklatura.EdinicaKhraneniyaOstatkov=EdinicyIzmereniya_strip._idrref"//
+				+ " where ZayavkaNaDegustaciuNomenklatura.parent=" + id.value()//
+				+ " order by nomenklatura.artikul"//
+				;
+		Bough b = Auxiliary.fromCursor(ApplicationHoreca.getInstance().getDataBase().rawQuery(sql, null));
+		System.out.println(sql);
+		//System.out.println(b.dumpXML());
+		//for (int i = 0; i < b.children.size(); i++) {}
+		//http://89.109.7.162/Degustaciya.1cws?wsdl
+		String artikul = "";
+		boolean flag = false;
+		String post = "{"
+				+ "\n    \"Klient\": " + ApplicationHoreca.getInstance().getClientInfo().getKod()
+				+ "\n    ,\"Data\": \"" + toY + ActivityWebServicesReports.pad2(toM) + ActivityWebServicesReports.pad2(toD) + "\""
+				+ "\n    ,\"Commentarii\": \"" + comment.value().replace('\n', ' ').replace('\r', ' ').replace('"', '\'') + "\""
+				+ "\n    ,\"Tablica\": [";
+		String dlmtr = "";
+		for(int i = 0; i < b.children.size(); i++){
+			Bough row = b.children.get(i);
+			post = post + dlmtr + "{\"Art\": \"" + row.child("artikul").value.property.value()
+					+ "\", \"Kol\": " + row.child("kolichestvo").value.property.value() + "}";
+			dlmtr = "\n	        ,";
+			if(Numeric.string2double(row.child("kolichestvo").value.property.value()) <= 0){
+				flag = true;
+				artikul = row.child("artikul").value.property.value();
+				break;
+			}
+		}
+		if(flag){
+			Auxiliary.warn("Для артикула " + artikul + " не указано количество.", this);
+			return;
+		}
+		post = post + "\n	        ]";
+		post = post + "\n}";
+		//System.out.println(post);
+		final Bough result = new Bough();
+		final String postData = post;
+		//final RawSOAP r = new RawSOAP();
+		new Expect().status.is("Выполнение...").task.is(new Task(){
+			@Override
+			public void doTask(){
+				try{
+					String url = Settings.getInstance().getBaseURL() + Settings.selectedBase1C() + "/hs/Planshet/SozdDegust/" + Cfg.whoCheckListOwner();
+					result.children = Auxiliary.loadTextFromPrivatePOST(url, postData.getBytes("UTF-8"), 1000 * 60 * 3, Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword(),true).children;
+					System.out.println(url );
+					System.out.println(postData);
+					System.out.println(result.dumpXML());
+/*
+<result>
+	<code>200</code>
+	<message>OK / {
+		&quot;Success&quot;: false,
+		&quot;Message&quot;: &quot;{HTTPСервис.ОбменСПланшетом.Модуль(1842)}: Ошибка при вызове метода контекста (ПрочитатьJSON): Непредвиденный символ при чтении JSON&quot;
+		}</message>
+	<raw>{
+		&quot;Success&quot;: false,
+		&quot;Message&quot;: &quot;{HTTPСервис.ОбменСПланшетом.Модуль(1842)}: Ошибка при вызове метода контекста (ПрочитатьJSON): Непредвиденный символ при чтении JSON&quot;
+		}</raw>
+</result>
+*/
+				}catch(Throwable t){
+					t.printStackTrace();
+				}
+			}
+		}).afterDone.is(new Task(){
+			@Override
+			public void doTask(){
+				String json = result.child("raw").value.property.value();
+				Bough data = Bough.parseJSON(json);
+				System.out.println("data: " + data.dumpXML());
+				if(data.child("Success").value.property.value().equals("true")){
+					String sql = "update ZayavkaNaDegustaciu set "//
+							+ " status=1"//
+							+ " where _id=" + id.value();
+					//System.out.println(sql);
+					ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
+					Auxiliary.bye("Спецификация отправлена: " + data.child("Message").value.property.value(), Activity_BidDegustacia.this);
+				}else{
+					Auxiliary.warn("Ошибка: " + data.child("Message").value.property.value(), Activity_BidDegustacia.this);
+				}
+
+			}
+		}).afterCancel.is(new Task(){
+			@Override
+			public void doTask(){
+				//refreshTask.start();
+			}
+		}).start(this);
+	}
+
+	void ___doUpload(){
 		//System.out.println("doUpload ");
 		doSave(false);
 		Calendar calendar = Calendar.getInstance();
@@ -431,20 +546,20 @@ public class Activity_BidDegustacia extends Activity {
 				+ "\n	        <ns1:Data>" + toY + ActivityWebServicesReports.pad2(toM) + ActivityWebServicesReports.pad2(toD) + "</ns1:Data>"//
 				+ "\n	        <ns1:Tablica>"//
 				;
-		for (int i = 0; i < b.children.size(); i++) {
+		for(int i = 0; i < b.children.size(); i++){
 			Bough row = b.children.get(i);
 			xml = xml + "\n	          <ns1:Str>"//
 					+ "\n	            <ns1:Artikul>" + row.child("artikul").value.property.value() + "</ns1:Artikul>"//
 					+ "\n	            <ns1:Kolvo>" + row.child("kolichestvo").value.property.value() + "</ns1:Kolvo>"//
 					+ "\n	          </ns1:Str>"//
 			;
-			if (Numeric.string2double(row.child("kolichestvo").value.property.value()) <= 0) {
+			if(Numeric.string2double(row.child("kolichestvo").value.property.value()) <= 0){
 				flag = true;
 				artikul = row.child("artikul").value.property.value();
 				break;
 			}
 		}
-		if (flag) {
+		if(flag){
 			Auxiliary.warn("Для артикула " + artikul + " не указано количество.", this);
 			return;
 		}
@@ -459,9 +574,9 @@ public class Activity_BidDegustacia extends Activity {
 		System.out.println(xml);
 		final String soapXML = xml;
 		final RawSOAP r = new RawSOAP();
-		new Expect().status.is("Выполнение...").task.is(new Task() {
+		new Expect().status.is("Выполнение...").task.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				r.url.is(Settings.getInstance().getBaseURL() + "DegustaciyaNov.1cws")//
 						//r.url.is(Settings.getInstance().getBaseURL() + "Degustaciyatest.1cws")//
 						.xml.is(soapXML);
@@ -469,21 +584,21 @@ public class Activity_BidDegustacia extends Activity {
 
 				r.startNow(Cfg.whoCheckListOwner(), Cfg.hrcPersonalPassword());
 			}
-		}).afterDone.is(new Task() {
+		}).afterDone.is(new Task(){
 			@Override
-			public void doTask() {
-				if (r.exception.property.value() != null) {
+			public void doTask(){
+				if(r.exception.property.value() != null){
 					Auxiliary.warn("Ошибка: " + r.exception.property.value().getMessage(), Activity_BidDegustacia.this);
 					r.exception.property.value().printStackTrace();
-				} else {
-					if (r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300) {
+				}else{
+					if(r.statusCode.property.value() >= 100 && r.statusCode.property.value() <= 300){
 						System.out.println(r.data.dumpXML());
 						String rez = r.data.child("soap:Body")//
 								.child("m:GetResponse")//
 								.child("m:return")//
 								.value.property.value();
 
-						if (rez.trim().toUpperCase().equals("OK")) {
+						if(rez.trim().toUpperCase().equals("OK")){
 							/*java.util.Date datyeFrom = new java.util.Date();
 							datyeFrom.setTime(fromDate.value().longValue());
 							java.util.Date dateTo = new java.util.Date();
@@ -496,46 +611,46 @@ public class Activity_BidDegustacia extends Activity {
 							//finish();
 							Auxiliary.bye("Результат: " //
 									+ rez, Activity_BidDegustacia.this);
-						} else {
+						}else{
 							Auxiliary.warn("Ошибка: " //
 									+ rez, Activity_BidDegustacia.this);
 						}
-					} else {
+					}else{
 						Auxiliary.inform("Ошибка: " + r.statusCode.property.value() + ": " + r.statusDescription.property.value(), Activity_BidDegustacia.this);
 					}
 				}
 				//refreshTask.start();
 			}
-		}).afterCancel.is(new Task() {
+		}).afterCancel.is(new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				//refreshTask.start();
 			}
 		}).start(this);
 	}
 
-	void doAskDeleteArtikul(final String aid) {
+	void doAskDeleteArtikul(final String aid){
 		//System.out.println("delete " + Artikul);
-		Auxiliary.pick3Choice(this, "Удаление номенклатуры", "Вы уверены?", "Удалить", new Task() {
+		Auxiliary.pick3Choice(this, "Удаление номенклатуры", "Вы уверены?", "Удалить", new Task(){
 			@Override
-			public void doTask() {
+			public void doTask(){
 				doDropArtikulFromGrid(aid);
 			}
 		}, null, null, null, null);
 	}
 
-	void doDropArtikulFromGrid(String aid) {
+	void doDropArtikulFromGrid(String aid){
 		String sql = "delete from ZayavkaNaDegustaciuNomenklatura where _id=" + aid;
 		//System.out.println(sql);
 		ApplicationHoreca.getInstance().getDataBase().execSQL(sql);
 		refreshItems();
 	}
 
-	void doReplaceArtikulInGrid(final String Artikul, final String Naimenovanie, final double newCena, final double whatOborot) {
+	void doReplaceArtikulInGrid(final String Artikul, final String Naimenovanie, final double newCena, final double whatOborot){
 		grid.refresh();
 	}
 
-	void doShowNomenklatureShooser() {
+	void doShowNomenklatureShooser(){
 		//System.out.println("doSearch");
 		Intent intent = new Intent();
 		intent.setClass(this, Activity_Nomenclature.class);
@@ -545,7 +660,7 @@ public class Activity_BidDegustacia extends Activity {
 		startActivityForResult(intent, IExtras.ADD_NOMENCATURE);
 	}
 
-	void doInsertNewArtikul(String nomenklaturaID) {
+	void doInsertNewArtikul(String nomenklaturaID){
 		//System.out.println("doInsertNewArtikul " + nomenklaturaID);
 		doSave(false);
 		String sql = "insert into ZayavkaNaDegustaciuNomenklatura (parent,nomenklatura,kolichestvo) values ("//
@@ -560,16 +675,16 @@ public class Activity_BidDegustacia extends Activity {
 	}
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data){
 		super.onActivityResult(requestCode, resultCode, data);
 		//System.out.println("doInsertNewArtikul "+RESULT_OK);
-		if (resultCode == RESULT_OK) {
+		if(resultCode == RESULT_OK){
 			doInsertNewArtikul(data.getStringExtra(ITableColumnsNames.NOMENCLATURE_ID));
 		}
 	}
 
 	@Override
-	protected void onResume() {
+	protected void onResume(){
 		super.onResume();
 		//Auxiliary.hideSoftKeyboard(this);
 	}

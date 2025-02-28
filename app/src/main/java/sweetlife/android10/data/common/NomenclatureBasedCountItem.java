@@ -1,6 +1,6 @@
 package sweetlife.android10.data.common;
 
-public abstract class NomenclatureBasedCountItem extends NomenclatureBasedItem {
+public abstract class NomenclatureBasedCountItem extends NomenclatureBasedItem{
 
 	protected double mMinNorma;
 	protected double mKoefMest;
@@ -23,7 +23,7 @@ public abstract class NomenclatureBasedCountItem extends NomenclatureBasedItem {
 									  boolean New
 									  //, String skidkaProcent//
 									  //, String skidkaNaimenovanie//
-	) {
+	){
 
 		super(_id,
 				nomerStroki,
@@ -44,57 +44,59 @@ public abstract class NomenclatureBasedCountItem extends NomenclatureBasedItem {
 		//System.out.println("NomenclatureBasedCountItem");
 	}
 
-	public double getKolichestvo() {
+	public double getKolichestvo(){
 
 		return mKolichestvo;
 	}
 
-	public void setKolichestvo(Double kolichestvo) {
+	public void setKolichestvo(Double kolichestvo){
 
 		mKolichestvo = kolichestvo;
 	}
 
-	public String getEdinicaIzmereniyaID() {
+	public String getEdinicaIzmereniyaID(){
 
 		return mEdinicaIzmereniyaID;
 	}
 
-	public void setEdinicaIzmereniyaID(String edinicaIzmereniyaID) {
+	public void setEdinicaIzmereniyaID(String edinicaIzmereniyaID){
 
 		mEdinicaIzmereniyaID = edinicaIzmereniyaID;
 	}
 
-	public String getEdinicaIzmereniyaName() {
+	public String getEdinicaIzmereniyaName(){
 
 		return mEdinicaIzmereniyaName;
 	}
 
-	public void _setEdinicaIzmereniyaName(String edinicaIzmereniyaName) {
+	public void _setEdinicaIzmereniyaName(String edinicaIzmereniyaName){
 
 		mEdinicaIzmereniyaName = edinicaIzmereniyaName;
 	}
 
-	public double getMinNorma() {
-
-		return mMinNorma;
+	public double getMinNorma(){
+		//if(mMinNorma > 0)
+			return mMinNorma;
+		//else
+		//	return 1;
 	}
 
-	public void setMinNorma(double minNorma) {
+	public void setMinNorma(double minNorma){
 
 		mMinNorma = minNorma;
 	}
 
-	public double getKoefMest() {
+	public double getKoefMest(){
 		//return getMinNorma();
 		return mKoefMest;
 	}
 
-	public void setKoefMest(double koefMest) {
+	public void setKoefMest(double koefMest){
 
 		mKoefMest = koefMest;
 	}
 
-	void adjustVes() {
+	void adjustVes(){
 
 	}
 }

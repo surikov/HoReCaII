@@ -10,60 +10,69 @@ import java.util.Calendar;
 import android.content.Intent;
 //import android.support.annotation.NonNull;
 
+import reactive.ui.*;
 import sweetlife.android10.ui.Activity_Update;
 
-public class SweetStart extends BroadcastReceiver {
+public class SweetStart extends BroadcastReceiver{
 
 
-    public SweetStart() {
+	public SweetStart(){
 
-    }
+	}
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        //System.out.println("SweetStart.onReceive");
-        //Activity_UploadBids.logToFile("onReceive.txt","SweetStart.onReceive "+intent.getAction());
-        //String act=intent.getAction();
-        if (intent.getAction()!=null && intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            // Set the alarm here.
-            initSchedule(context);
-        }else{
-            //Activity_UploadBids.logToFile("startUpdate.txt","Activity_Update");
-            try {
-                Intent updateintent = new Intent();
-                updateintent.setClass(context, Activity_Update.class);
-                updateintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                context.startActivity(updateintent);
-            }catch(Throwable t){
-                //Activity_UploadBids.logToFile("startUpdateCatch.txt",t.getMessage());
-            }
-        }
-    }
+	@Override
+	public void onReceive(Context context, Intent intent){
+		System.out.println("SweetStart.onReceive " + Auxiliary.bundle2bough(intent.getExtras()).dumpXML());
+		System.out.println("SweetStart intent action " + intent.getAction());
+		//Activity_UploadBids.logToFile("onReceive.txt","SweetStart.onReceive "+intent.getAction());
+		//String act=intent.getAction();
+		if(intent.getAction() != null && intent.getAction().equals("action com.google.android.c2dm.intent.RECEIVE")){
+			String title = Auxiliary.bundle2bough(intent.getExtras()).child("gcm.notification.title").value.property.value();
+			String body = Auxiliary.bundle2bough(intent.getExtras()).child("gcm.notification.body").value.property.value();
+			HRCFirebaseMessagingService.saveFCMData(title, body);
+		}else{
+			if(intent.getAction() != null && intent.getAction().equals("android.intent.action.BOOT_COMPLETED")){
+				// Set the alarm here.
+				initSchedule(context);
+			}else{
+				//Activity_UploadBids.logToFile("startUpdate.txt","Activity_Update");
+				try{
+					Intent updateintent = new Intent();
+					updateintent.setClass(context, Activity_Update.class);
+					updateintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					context.startActivity(updateintent);
+				}catch(Throwable t){
+					//Activity_UploadBids.logToFile("startUpdateCatch.txt",t.getMessage());
+				}
+			}
+		}
+	}
 
-    public void initSchedule(Context context) {
-        //Activity_UploadBids.logToFile("initSchedule.txt","SweetStart.initSchedule");
-        AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-        Intent intent = new Intent(context, SweetStart.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent
+	public void initSchedule(Context context){
+		//Activity_UploadBids.logToFile("initSchedule.txt","SweetStart.initSchedule");
+		AlarmManager alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+
+		Intent intent = new Intent(context, SweetStart.class);
+		PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent
 				, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        alarmMgr.cancel(alarmIntent);
-        alarmIntent.cancel();
+		alarmMgr.cancel(alarmIntent);
+		alarmIntent.cancel();
 /*
         intent = new Intent(context, SweetStart.class);
         alarmIntent = PendingIntent.getBroadcast(context, 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         alarmMgr.cancel(alarmIntent);
         alarmIntent.cancel();
 */
-        intent = new Intent(context, SweetStart.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 6);
-        calendar.add(Calendar.DAY_OF_MONTH,1);
-        System.out.println(calendar);
+		intent = new Intent(context, SweetStart.class);
+		alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		calendar.set(Calendar.HOUR_OF_DAY, 6);
+		calendar.add(Calendar.DAY_OF_MONTH, 1);
+		System.out.println(calendar);
 
-         alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+		alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
 
-    }
+	}
 }
